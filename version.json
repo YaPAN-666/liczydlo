@@ -1,7 +1,8 @@
 {
- "wersja": "1.0.1",
+ "wersja": "1.1.0",
  "data": "2026-11-10",
  "zmiany": [
-  "Nowy podpis na stronie tytułowej: Studio Pracy Umysłowej, Paweł Czarnocki."
+  "Wybór źródła wydatku dyszy: katalog Birchmeier, katalog TeeJet albo własny pomiar.",
+  "Przy katalogu aplikacja przypomina, że oba katalogi różnią się dwukrotnie."
  ]
 }

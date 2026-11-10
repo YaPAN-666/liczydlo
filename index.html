@@ -764,10 +764,10 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
-const S = {mode:'init', store:null, dl:null, reps:{}, answered:false, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false};
+const S = {mode:'init', store:null, dl:null, reps:{}, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false};
 
 // Wydatek rośnie z pierwiastkiem z ciśnienia: Q2 = Q1 * sqrt(p2/p1). Między punktami katalogu liczymy od najbliższego niższego.
 function flowTab(tab, p){
@@ -933,7 +933,7 @@ function calc(){
     tiles.push({k:'Woda', v:fmt(V,2) + ' l', s:`${fmtT(ml)} ml na 1000 dawek`, main:true});
     tiles.push({k:'Czas oprysku', v:isFinite(t) ? `${Math.floor(t)} min ${pad(Math.round((t % 1) * 60) % 60)} s` : '–', s:'czysty czas natrysku'});
     tiles.push({k:'Przepływ dyszy', v:isNum(Q) ? fmt(Q,3) + ' l/min' : '–', s:qsrc});
-    Object.assign(R, {ml1000:ml, water_l:V, pressure:p, flow:Q, flowSrc:qsrc, mode:$('s-mode').selectedOptions[0].textContent, minutes:t});
+    Object.assign(R, {ml1000:ml, water_l:V, pressure:p, flow:Q, flowSrc:qsrc, flowKey:src, mode:$('s-mode').selectedOptions[0].textContent, minutes:t});
     if(src === 'reczne' && !measured) msgs.push(['warn','Wpisz zmierzony przepływ dyszy, inaczej nie policzę czasu oprysku.']);
     else if(src !== 'reczne') msgs.push(['info','Katalogi podają dla TXVK-6 różne wydatki: Birchmeier dwa razy więcej niż TeeJet. Zmierz wydatek cylindrem i wybierz „Pomiar własny”.']);
     if(mode !== 'lanca' && p > 3) msgs.push(['bad','Z dmuchawą pracuj przy 2,0–2,5 bar, maksymalnie 3 bar.']);
@@ -1056,19 +1056,142 @@ function renderReports(){
     return `<div class="item${open ? ' sel' : ''}" data-id="${esc(r.id)}" role="button" tabindex="0">
       <span class="t">${fmtDate(r.date)} · ${esc(r.farm || 'bez nazwy fermy')}</span>
       <span class="s">${esc(r.birdLabel || '')} · ${esc(String(r.age))} dni · ${fmt0(r.birds)} szt. · ${esc(r.vacName)} (${esc((ROUTES[r.route] || '').toLowerCase())}) · ${esc(r.packs)} · ${main}</span>
+      ${open && S.sum === r.id ? sumPanel(r) : ''}
       ${open ? `<div class="formula" style="white-space:pre-wrap;margin-top:6px">${esc(r.text || '')}</div>
-      <div class="tools"><button class="btn small ghost" type="button" data-act="copy">Kopiuj</button>${canShare() ? '<button class="btn small ghost" type="button" data-act="share">Udostępnij</button>' : ''}${(S.dl || !IN_ARTIFACT) ? '<button class="btn small ghost" type="button" data-act="dl">Pobierz (.txt)</button>' : ''}<button class="btn small danger" type="button" data-act="del">Usuń</button></div>` : ''}</div>`;
+      <div class="tools">${r.route === 'spray' ? `<button class="btn small" type="button" data-act="sum">${S.sum === r.id ? 'Zamknij podsumowanie' : 'Podsumowanie'}</button>` : ''}<button class="btn small ghost" type="button" data-act="copy">Kopiuj</button>${canShare() ? '<button class="btn small ghost" type="button" data-act="share">Udostępnij</button>' : ''}${(S.dl || !IN_ARTIFACT) ? '<button class="btn small ghost" type="button" data-act="dl">Pobierz (.txt)</button>' : ''}<button class="btn small danger" type="button" data-act="del">Usuń</button></div>` : ''}</div>`;
   }).join('') || '<div class="empty">Brak raportów pasujących do wyszukiwania.</div>';
 }
 async function reportAction(ev){
   const item = ev.target.closest('.item'); if(!item) return; const id = item.dataset.id; const r = S.reps[id];
   const btn = ev.target.closest('[data-act]');
+  if(!btn && ev.target.closest('[data-sum]')) return;   // kliknięcia w panelu podsumowania nie zwijają raportu
   if(!btn){ S.open = S.open === id ? null : id; renderReports(); return; }
   if(!r) return;
+  if(btn.dataset.act === 'sum'){ S.sum = S.sum === id ? null : id; renderReports(); return; }
+  if(btn.dataset.act === 'sum-calc'){ ev.stopPropagation(); return sumCalc(r); }
+  if(btn.dataset.act === 'sum-save'){ ev.stopPropagation(); return sumSave(id, r); }
   if(btn.dataset.act === 'copy') return copyText(r.text || '');
   if(btn.dataset.act === 'dl') return downloadFile(`raport_szczepienia_${r.date}_${(r.farm || 'ferma').replace(/[^\p{L}\p{N}]+/gu,'_')}.txt`, r.text || '', 'text/plain');
   if(btn.dataset.act === 'share'){ try { await navigator.share({title:'Raport szczepienia – Liczydło', text:r.text || ''}); } catch(e){} return; }
   if(btn.dataset.act === 'del'){ if(!armConfirm(btn)) return; try { await S.store.remove(id); S.open = null; toast('Usunięto raport.'); } catch(e){ toast(errText(e)); } }
+}
+
+/* ---------- Podsumowanie zabiegu ----------
+   Porównuje przebieg zabiegu z planem: rzeczywisty wydatek dyszy, zużytą objętość
+   i czas. Wskazuje, co było ustawione inaczej, niż zakładał raport, i co z tym zrobić. */
+function pf(x){ const v = parseFloat(String(x == null ? '' : x).replace(',','.')); return isFinite(v) ? v : NaN; }
+function fmtMin(t){ return isNum(t) ? `${Math.floor(t)} min ${pad(Math.round((t % 1) * 60) % 60)} s` : '–'; }
+function flowKeyOf(r){
+  if(r.flowKey && FLOW_SRC[r.flowKey]) return r.flowKey;
+  if(/TeeJet/i.test(r.flowSrc || '')) return 'teejet';
+  if(/Birchmeier/i.test(r.flowSrc || '')) return 'birch';
+  return 'reczne';
+}
+function sumPanel(r){
+  const s = r.sum || {};
+  const v = isNum(s.min) ? s.min : '';
+  return `<div class="card flat" style="margin-top:8px" data-sum="1">
+    <h3>Podsumowanie zabiegu</h3>
+    <span class="note">Plan: ${fmt(r.water_l,2)} l · ${fmt(r.flow,3)} l/min (${esc(r.flowSrc || '')}) · ${fmtMin(r.minutes)} · ${fmtT(r.ml1000)} ml na 1000 dawek · ${esc(r.mode || '')}</span>
+    <div class="row tight">
+      <label>Rzeczywisty czas – minuty
+        <input id="sum-min" type="text" inputmode="numeric" autocomplete="off" value="${esc(String(v))}" placeholder="np. 24"></label>
+      <label>i sekundy
+        <input id="sum-sec" type="text" inputmode="numeric" autocomplete="off" value="${esc(String(isNum(s.sec) ? s.sec : ''))}" placeholder="0"></label>
+      <label>Zużyta objętość (l)
+        <input id="sum-v" type="text" inputmode="decimal" autocomplete="off" value="${esc(String(isNum(s.used) ? fmt(s.used,2) : fmt(r.water_l,2)))}"></label>
+      <label>Ciśnienie na manometrze (bar)
+        <input id="sum-p" type="text" inputmode="decimal" autocomplete="off" value="${esc(String(isNum(s.bar) ? fmtT(s.bar) : fmtT(r.pressure)))}"></label>
+    </div>
+    <div class="tools">
+      <button class="btn small" type="button" data-act="sum-calc">Przelicz</button>
+      <button class="btn small ghost" type="button" data-act="sum-save">Zapisz w raporcie</button>
+      <span class="note">Potwierdź parametry albo popraw te, które w kurniku wyszły inaczej.</span>
+    </div>
+    <div id="sum-out">${s.html || ''}</div>
+  </div>`;
+}
+function sumRead(){
+  const mn = pf(($('sum-min') || {}).value), sc = pf(($('sum-sec') || {}).value);
+  return {min:isNum(mn) ? mn : NaN, sec:isNum(sc) ? sc : 0, used:pf(($('sum-v') || {}).value), bar:pf(($('sum-p') || {}).value)};
+}
+function sumDiag(r, inp){
+  const tiles = [], msgs = [];
+  const t = (isNum(inp.min) ? inp.min : 0) + (isNum(inp.sec) ? inp.sec : 0) / 60;
+  if(!(t > 0)) return {tiles, msgs:[['warn','Podaj rzeczywisty czas oprysku – bez niego nie da się policzyć wydatku.']]};
+  const V = isNum(inp.used) && inp.used > 0 ? inp.used : r.water_l;
+  const p = isNum(inp.bar) && inp.bar > 0 ? inp.bar : r.pressure;
+  const Q = V / t, key = flowKeyOf(r), fs = FLOW_SRC[key];
+  const Qexp = fs && fs.tab ? flowTab(fs.tab, p) : r.flow;
+  const rr = Qexp > 0 ? Q / Qexp : NaN;
+  tiles.push({k:'Rzeczywisty wydatek', v:fmt(Q,3) + ' l/min', s:`${fmt(V,2)} l w ${fmtMin(t)}`, main:true});
+  tiles.push({k:'Wydatek oczekiwany', v:fmt(Qexp,3) + ' l/min', s:key === 'reczne' ? 'z pomiaru zapisanego w raporcie' : `${fs.n}, ${fmtT(p)} bar`});
+  if(isNum(rr)){ const dp = (rr - 1) * 100; tiles.push({k:'Odchyłka wydatku', v:(Math.abs(dp) < 0.5 ? '0' : (dp > 0 ? '+' : '') + fmt0(dp)) + '%', s:'wobec oczekiwanego'}); }
+
+  if(isNum(p) && isNum(r.pressure) && Math.abs(p - r.pressure) > 0.05){
+    const e = Math.sqrt(p / r.pressure);
+    msgs.push(['info', `Ciśnienie ${fmtT(p)} bar zamiast ${fmtT(r.pressure)} bar z planu. Sama ta różnica zmienia wydatek o ${(e >= 1 ? '+' : '') + fmt0((e - 1) * 100)}% i kroplę na ok. ${fmt0(vmdAt(p) || 0)} µm.`]);
+  }
+  const dV = r.water_l > 0 ? V / r.water_l : 1;
+  if(Math.abs(dV - 1) > 0.05){
+    if(dV < 1) msgs.push(['bad', `Zużyto ${fmt(V,2)} l zamiast ${fmt(r.water_l,2)} l – zostało ${fmt0((1 - dV) * 100)}% roztworu. Ptaki dostały ok. ${fmt0(r.ml1000 * dV)} ml na 1000 dawek zamiast ${fmtT(r.ml1000)}. Najczęściej: zabieg przerwany, pominięty fragment kurnika albo resztka w zbiorniku. Rozlicz objętość na sektory i dokończ dawkę.`]);
+    else msgs.push(['warn', `Zużyto ${fmt(V,2)} l zamiast ${fmt(r.water_l,2)} l – o ${fmt0((dV - 1) * 100)}% więcej, stąd dłuższy czas. Samo w sobie nie szkodzi, jeśli cała objętość trafiła na ptaki.`]);
+  }
+  if(isNum(rr)){
+    if(Math.abs(rr - 1) <= 0.1) msgs.push(['ok','Wydatek dyszy zgodny z oczekiwanym (odchyłka do 10%). Dysza i ciśnienie pracowały tak, jak zakładał raport.']);
+    else if(key === 'teejet' && rr >= 1.7 && rr <= 2.3) msgs.push(['info','Dysza dała dokładnie dwa razy więcej niż katalog TeeJet – czyli tyle, ile podaje katalog Birchmeiera. To rozstrzyga rozbieżność katalogową: przełącz w obliczeniach źródło na „Katalog Birchmeier” albo wpisz zmierzony wydatek. Uwaga: przy takim wydatku kropla jest grubsza, niż liczy aplikacja.']);
+    else if(key === 'birch' && rr >= 0.42 && rr <= 0.58) msgs.push(['info','Dysza dała dokładnie połowę tego, co katalog Birchmeiera – czyli tyle, ile podaje TeeJet. To rozstrzyga rozbieżność katalogową: przełącz źródło na „Katalog TeeJet” albo wpisz zmierzony wydatek.']);
+    else if(rr > 1.1) msgs.push(['warn', `Wydatek wyższy o ${fmt0((rr - 1) * 100)}%. Typowa przyczyna: zużyta kryza – otwór rozrabia się od przepływu, więc rośnie wydatek i grubnie kropla. Sprawdź końcówkę pod lupą i wymień ją; sprawdź też, czy manometr nie zaniża ciśnienia.`]);
+    else if(rr < 0.9) msgs.push(['bad', `Wydatek niższy o ${fmt0((1 - rr) * 100)}%. Sprawdź po kolei: sitko 50 mesh w dyszy, samą kryzę, filtr w zbiorniku, zagięty lub przyduszony wąż, naładowanie akumulatora i rzeczywiste ciśnienie na manometrze. Zbyt niski wydatek oznacza, że część ptaków dostała mniej dawki.`]);
+  }
+  const vmd = vmdAt(p);
+  if(vmd && isNum(rr) && rr > 0){
+    // Kroplę da się oszacować, gdy wydatek się zgadza albo gdy kryza jest większa, niż zakładano
+    // (wielkość kropli rośnie z wydatkiem mniej więcej jak Q^0,39). Przydławiony przepływ – sitko,
+    // zagięty wąż – nie zmienia kryzy, więc wtedy nic nie szacujemy.
+    const dusz = rr < 0.9 && !(key === 'birch' && rr >= 0.42 && rr <= 0.58);
+    if(dusz) msgs.push(['warn','Przy przydławionym przepływie wielkości kropli nie da się oszacować – widmo jest wtedy nierówne. Udrożnij dyszę, powtórz pomiar wydatku i dopiero wtedy oceniaj kroplę.']);
+    else {
+      const vr = Math.abs(rr - 1) <= 0.1 ? vmd : vmd * Math.pow(rr, 0.39);
+      tiles.push({k:'Kropla – szacunek', v:fmt0(vr) + ' µm', s:Math.abs(rr - 1) <= 0.1 ? `z ciśnienia ${fmtT(p)} bar` : 'z ciśnienia i odchyłki wydatku'});
+      const vac = VACCINES.find(x => x.id === r.vacId), d = vac && vac.r && vac.r.spray && vac.r.spray.d;
+      if(d){
+        const [lo, hi] = d;
+        if(isNum(lo) && vr < lo) msgs.push(['warn', `Szacowana kropla ${fmt0(vr)} µm jest drobniejsza niż okno z ChPLW (${fmtRange(d)} µm). Obniż ciśnienie przy kolejnym zabiegu.`]);
+        else if(isNum(hi) && vr > hi) msgs.push(['warn', `Szacowana kropla ${fmt0(vr)} µm jest grubsza niż okno z ChPLW (${fmtRange(d)} µm). Podnieś ciśnienie albo sprawdź, czy końcówka nie jest zużyta.`]);
+        else msgs.push(['ok', `Szacowana kropla ${fmt0(vr)} µm mieści się w oknie z ChPLW (${fmtRange(d)} µm).`]);
+      }
+    }
+  }
+  if(t > 30) msgs.push(['bad', `Zabieg trwał ${fmtMin(t)} – powyżej 30 minut, czyli górnej granicy wyłączonej wentylacji. Podziel kurnik na sektory i szczep kolejno albo zwiększ wydatek, ale tylko w granicach okna kropli z ChPLW.`]);
+  else if(t > 20) msgs.push(['warn', `Zabieg trwał ${fmtMin(t)} – blisko granicy wyłączonej wentylacji (15–30 min).`]);
+  return {tiles, msgs, calc:{t, V, p, Q, Qexp, rr}};
+}
+function sumHTML(d){
+  const tiles = d.tiles.map(t => `<div class="tile${t.main ? ' main' : ''}"><span>${esc(t.k)}</span><b>${esc(t.v)}</b>${t.s ? `<small>${esc(t.s)}</small>` : ''}</div>`).join('');
+  const msgs = d.msgs.map(([k, t]) => `<div class="msg ${k}">${esc(t)}</div>`).join('');
+  return `<div class="tiles" style="margin-top:8px">${tiles}</div><div class="msgs" style="margin-top:8px">${msgs}</div>`;
+}
+function sumCalc(r){
+  const d = sumDiag(r, sumRead());
+  const box = $('sum-out'); if(box) box.innerHTML = sumHTML(d);
+  return d;
+}
+async function sumSave(id, r){
+  const inp = sumRead(), d = sumDiag(r, inp);
+  const box = $('sum-out'); if(box) box.innerHTML = sumHTML(d);
+  if(!d.calc){ toast('Uzupełnij czas oprysku.'); return; }
+  const c = d.calc;
+  const lines = ['', 'PODSUMOWANIE ZABIEGU',
+    `Czas rzeczywisty: ${fmtMin(c.t)}`,
+    `Zużyta objętość: ${fmt(c.V,2)} l (plan ${fmt(r.water_l,2)} l)`,
+    `Ciśnienie na manometrze: ${fmtT(c.p)} bar (plan ${fmtT(r.pressure)} bar)`,
+    `Wydatek rzeczywisty: ${fmt(c.Q,3)} l/min, oczekiwany ${fmt(c.Qexp,3)} l/min (${isNum(c.rr) ? (c.rr >= 1 ? '+' : '') + fmt0((c.rr - 1) * 100) + '%' : '–'})`]
+    .concat(d.msgs.map(([, t]) => '- ' + t)).join('\n');
+  const base = String(r.text || '').split('\nPODSUMOWANIE ZABIEGU')[0].replace(/\s+$/,'');
+  const sum = {min:inp.min, sec:inp.sec, used:c.V, bar:c.p, flow:c.Q, dev:c.rr, at:new Date().toISOString(), html:sumHTML(d)};
+  try { await S.store.set(id, Object.assign({}, r, {sum, text:base + lines})); toast('Podsumowanie zapisane w raporcie.'); }
+  catch(e){ toast(errText(e)); }
 }
 
 /* ---------- Szczepionki (wiedza) ---------- */

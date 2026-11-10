@@ -1,8 +1,8 @@
 {
- "wersja": "1.1.0",
+ "wersja": "1.2.0",
  "data": "2026-11-10",
  "zmiany": [
-  "Wybór źródła wydatku dyszy: katalog Birchmeier, katalog TeeJet albo własny pomiar.",
-  "Przy katalogu aplikacja przypomina, że oba katalogi różnią się dwukrotnie."
+  "Podsumowanie zabiegu: w zapisanym raporcie wpisujesz rzeczywisty czas, objętość i ciśnienie,\n     a aplikacja liczy rzeczywisty wydatek dyszy, wskazuje, co było ustawione inaczej, i co z tym zrobić.",
+  "Wybór źródła wydatku dyszy: katalog Birchmeier, katalog TeeJet albo własny pomiar."
  ]
 }

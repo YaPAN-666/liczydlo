@@ -162,7 +162,9 @@ dl.kv dd{margin:0;min-width:0}
 .splash .abacus{width:min(32vw,140px);height:auto;color:#f1f6f2;margin-bottom:22px}
 .splash .name{font-family:var(--f-head);font-weight:700;font-size:clamp(56px,17vw,108px);line-height:1;letter-spacing:.005em;color:#f1f6f2}
 .splash .app{font-family:var(--f-head);font-weight:600;font-size:clamp(18px,5.4vw,30px);letter-spacing:.65em;padding-left:.65em;color:#e8a964}
-.splash .brand{justify-self:center;font-family:var(--f-body);font-size:12px;letter-spacing:.3em;padding-left:.3em;color:#f1f6f2;opacity:.8;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+.splash .brand{justify-self:center;display:grid;justify-items:center;gap:6px;text-align:center;font-family:var(--f-body);color:#f1f6f2;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+.splash .brand .studio{font-size:12px;font-weight:500;letter-spacing:.2em;padding-left:.2em;opacity:.88}
+.splash .brand .author{font-size:11px;letter-spacing:.14em;padding-left:.14em;opacity:.66}
 
 /* Pasek „Dostępna nowa wersja” */
 .updbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--brand);color:var(--brand-ink);display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.92rem}
@@ -172,7 +174,8 @@ dl.kv dd{margin:0;min-width:0}
 .brandrow h1 .mark svg{width:22px;height:22px;display:block}
 .brandrow h1 .sub{font-family:var(--f-body);font-weight:400;font-size:.78rem;color:var(--muted);letter-spacing:0;align-self:flex-end;margin-bottom:3px}
 .headtools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.credit{text-align:center;font-size:.72rem;letter-spacing:.3em;color:var(--muted)}
+.credit{text-align:center;font-size:.72rem;letter-spacing:.18em;line-height:1.8;color:var(--muted)}
+.credit span{letter-spacing:.12em;opacity:.85}
 </style>
 </head>
 <body>
@@ -188,7 +191,7 @@ dl.kv dd{margin:0;min-width:0}
     <div class="name">Liczydło</div>
     <div class="app">APP</div>
   </div>
-  <div class="brand">Tarpan</div>
+  <div class="brand"><span class="studio">Studio Pracy Umysłowej</span><span class="author">Paweł Czarnocki</span></div>
 </div>
 
 <header class="appbar">
@@ -388,7 +391,7 @@ dl.kv dd{margin:0;min-width:0}
       <p class="note">Usunięcie aplikacji albo wyczyszczenie danych Chrome kasuje raporty z telefonu – zrób wcześniej kopię w zakładce Raporty.</p>
     </div>
   </div>
-  <p class="credit">Tarpan</p>
+  <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
 </section>
 </main>
 <div class="updbar" id="updbar" role="status" hidden><span id="upd-text">Dostępna nowa wersja aplikacji.</span><button class="btn small" type="button" id="upd-btn">Aktualizuj</button></div>
@@ -752,7 +755,7 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.0.1';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, answered:false, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false};

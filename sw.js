@@ -1,7 +1,7 @@
 /* Liczydło APP – service worker (praca bez internetu i aktualizacje)
    Przy każdej nowej wersji zmienia się VERSION – telefon pobiera wtedy nowe pliki
    i pokazuje pasek „Dostępna nowa wersja”. */
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 const CACHE = 'liczydlo-app-' + VERSION;
 const FONTS = 'liczydlo-fonts';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];

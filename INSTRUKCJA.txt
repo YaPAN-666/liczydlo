@@ -1,0 +1,46 @@
+LICZYDŁO APP – wersja 1.0.0
+=====================================
+
+Zawartość folderu „liczydlo”:
+  index.html            – aplikacja
+  manifest.webmanifest  – nazwa, ikona i kolory aplikacji na telefonie
+  sw.js                 – praca bez internetu i aktualizacje
+  version.json          – numer wersji i lista zmian
+  icons/                – ikony aplikacji
+
+1. UMIESZCZENIE W INTERNECIE (raz) – GitHub Pages, bezpłatnie
+   a) Zaloguj się na github.com (lub załóż konto).
+   b) „New repository” → nazwa: liczydlo → Public → Create repository.
+   c) „uploading an existing file” → przeciągnij WSZYSTKIE pliki z folderu „liczydlo”
+      razem z folderem „icons” → „Commit changes”.
+   d) Settings → Pages → Source: „Deploy from a branch” → Branch: main, folder: / (root) → Save.
+   e) Po 1–2 minutach aplikacja jest pod adresem:  https://TWOJ-LOGIN.github.io/liczydlo/
+   Aplikacja nie zawiera danych ferm ani raportów – raporty zostają w telefonach.
+
+2. INSTALACJA NA TELEFONIE Z ANDROIDEM
+   a) Otwórz adres aplikacji w Chrome.
+   b) Menu ⋮ → „Zainstaluj aplikację” (albo „Dodaj do ekranu głównego”)
+      lub w aplikacji: „O aplikacji” → „Zainstaluj na telefonie”.
+   c) Na ekranie pojawi się ikona „Liczydło”. Po pierwszym uruchomieniu działa bez internetu.
+
+3. AKTUALIZACJA
+   a) Nową wersję (nowy plik ZIP) wgraj do tego samego repozytorium:
+      „Add file” → „Upload files” → przeciągnij wszystkie pliki → „Commit changes”
+      (pliki o tych samych nazwach zostaną zastąpione).
+   b) Na telefonie: uruchom aplikację z dostępem do internetu. Na dole pojawi się pasek
+      „Dostępna nowa wersja” → stuknij „Aktualizuj”. Zapisane raporty zostają.
+   c) Ręcznie: „O aplikacji” → „Sprawdź aktualizacje”.
+
+4. RAPORTY I KOPIA ZAPASOWA
+   Raporty są zapisane w pamięci telefonu. Odinstalowanie aplikacji lub wyczyszczenie
+   danych Chrome je usuwa. Zakładka Raporty → „Zapisz kopię raportów” (plik .json);
+   na nowym telefonie → „Wczytaj kopię”.
+
+5. PLIK APK (opcjonalnie)
+   Gdy aplikacja działa pod adresem z punktu 1: wejdź na www.pwabuilder.com, wpisz adres,
+   wybierz „Package for stores” → Android → pobierz paczkę i zainstaluj plik APK
+   (Android zapyta o zgodę na instalację z nieznanego źródła). Treść aplikacji nadal
+   aktualizuje się z adresu internetowego.
+
+Dane szczepionek: ChPLW i ulotki z Rejestru Produktów Leczniczych – stan na 10.11.2026.
+Przed zabiegiem obowiązuje aktualna ChPLW serii i decyzja lekarza weterynarii.

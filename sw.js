@@ -1,7 +1,7 @@
 /* Liczydło APP – service worker (praca bez internetu i aktualizacje)
    Przy każdej nowej wersji zmienia się VERSION – telefon pobiera wtedy nowe pliki
    i pokazuje pasek „Dostępna nowa wersja”. */
-const VERSION = '1.3.0';
+const VERSION = '1.4.0';
 const CACHE = 'liczydlo-app-' + VERSION;
 const FONTS = 'liczydlo-fonts';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];
@@ -33,6 +33,13 @@ self.addEventListener('fetch', event => {
       event.respondWith(fetch(req, {cache:'no-store'}).catch(() => new Response('{}', {headers:{'Content-Type':'application/json'}})));
       return;
     }
+    // Stan licencji zawsze z serwera; bez internetu – błąd, a aplikacja zostaje przy ostatnim znanym stanie.
+    if(url.pathname.endsWith('/kontrola.json')){
+      event.respondWith(fetch(req, {cache:'no-store'}).catch(() => new Response('', {status:503, statusText:'offline'})));
+      return;
+    }
+    // Strona operatora nie jest częścią aplikacji – zawsze z sieci.
+    if(url.pathname.endsWith('/operator.html')) return;
     if(req.mode === 'navigate'){
       event.respondWith(caches.match('./index.html').then(r => r || fetch(req)));
       return;

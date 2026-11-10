@@ -1,10 +1,11 @@
 {
- "wersja": "1.3.0",
+ "wersja": "1.4.0",
  "data": "2026-11-10",
  "zmiany": [
-  "Podsumowanie: gdy zabieg nie poszedł zgodnie z planem – lista kontrolna i konkretne zmiany ustawień na następny raz.",
-  "Pamięć zaleceń: przy kolejnym szczepieniu na tej fermie ostrzeżenie i przycisk „Zastosuj zalecenia”; w podsumowaniu sprawdzenie, czy zadziałały, i pytanie o wprowadzenie na stałe.",
-  "Zakładka „Zmiany”: spis modyfikacji i ustawienia stałe ferm.",
-  "Liczba sektorów oraz ciśnienie, przy którym zmierzono wydatek dyszy."
+  "Liczba osób i podział pracy: każda osoba w swoich sektorach albo wszyscy razem; roztwór i czas dla każdej osoby.",
+  "Kontrola czasu zużycia szczepionki po rozpuszczeniu (ChPLW) i pojemności zbiornika REC 15.",
+  "Licencja: zdalna blokada wszystkich kopii i hasło (kill-switch); klauzule w „O aplikacji”.",
+  "Strona tytułowa znika po dotknięciu ekranu; liczbę ptaków wpisujesz sam.",
+  "Szybsze działanie: czcionki w tle, podsumowanie przelicza się w trakcie wpisywania."
  ]
 }

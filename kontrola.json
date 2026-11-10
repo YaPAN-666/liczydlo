@@ -1,0 +1,7 @@
+{
+ "_opis": "Sterowanie wszystkimi kopiami Liczydła. Plik przygotujesz na stronie operator.html. blokada: true – zablokuj wszystkie kopie. haslo: skrót hasła (pusty – bez hasła). komunikat: tekst na ekranie blokady. maksDniBezInternetu: 0 – bez limitu. Usunięcie pliku = brak ograniczeń.",
+ "blokada": false,
+ "haslo": "",
+ "komunikat": "",
+ "maksDniBezInternetu": 0
+}

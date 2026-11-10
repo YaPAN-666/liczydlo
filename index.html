@@ -13,7 +13,8 @@
 <meta name="apple-mobile-web-app-title" content="Liczydło">
 <title>Liczydło</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" data-fonts media="print" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}
 
 /* Układ: warsztat zabiegowy – pasek aplikacji z zakładkami, pod nim robocze panele (dane wejściowe | wynik). Na telefonie jedna kolumna. */
@@ -165,6 +166,29 @@ dl.kv dd{margin:0;min-width:0}
 .splash .brand{justify-self:center;display:grid;justify-items:center;gap:6px;text-align:center;font-family:var(--f-body);color:#f1f6f2;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
 .splash .brand .studio{font-size:12px;font-weight:500;letter-spacing:.2em;padding-left:.2em;opacity:.88}
 .splash .brand .author{font-size:11px;letter-spacing:.14em;padding-left:.14em;opacity:.66}
+.splash .brand .ks{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;opacity:.5;margin-top:6px}
+.splash .tap{margin-top:30px;font-size:13px;letter-spacing:.12em;color:#f1f6f2;opacity:0;animation:tapIn .6s ease 1s forwards,tapPulse 2.4s ease-in-out 1.6s infinite}
+@keyframes tapIn{to{opacity:.8}}
+@keyframes tapPulse{0%,100%{opacity:.8}50%{opacity:.4}}
+@media (prefers-reduced-motion:reduce){.splash .tap{animation:none;opacity:.8}}
+.credit .ks{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;opacity:.7}
+
+/* Ekran blokady i hasła (kill-switch) */
+.gate{position:fixed;inset:0;z-index:55;background:var(--bg);color:var(--ink);overflow:auto;display:grid;place-items:center;padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.gate-in{width:100%;max-width:420px;display:grid;gap:12px;justify-items:center;text-align:center}
+.gate-in h2{margin:0}
+.gate-in p{margin:0}
+.gate-ico{width:44px;height:44px;color:var(--brand)}
+#gate-form{display:grid;gap:10px;width:100%;max-width:300px;text-align:left}
+#gate-form .btn{justify-content:center}
+#gate-err:empty{display:none}
+.gate .tools{justify-content:center}
+.toast{z-index:59}
+.updbar{z-index:58}
+#crew:empty{display:none}
+#crew{margin-top:10px}
+#s-org-wrap{grid-column:1/-1}
+#lic p{margin:0}
 
 /* Pasek „Dostępna nowa wersja” */
 .updbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--brand);color:var(--brand-ink);display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.92rem}
@@ -200,8 +224,29 @@ dl.kv dd{margin:0;min-width:0}
     </svg>
     <div class="name">Liczydło</div>
     <div class="app">APP</div>
+    <div class="tap" aria-hidden="true">dotknij ekranu, aby rozpocząć</div>
   </div>
-  <div class="brand"><span class="studio">Studio Pracy Umysłowej</span><span class="author">Paweł Czarnocki</span></div>
+  <div class="brand"><span class="studio">Studio Pracy Umysłowej</span><span class="author">Paweł Czarnocki</span><span class="ks">kill-switch enabled app</span></div>
+</div>
+
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-h" hidden>
+  <div class="gate-in">
+    <svg class="gate-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    <h2 id="gate-h">Aplikacja zablokowana</h2>
+    <p id="gate-msg"></p>
+    <form id="gate-form" hidden>
+      <label>Hasło
+        <input id="gate-pass" type="password" autocomplete="current-password" enterkeyhint="go"></label>
+      <button class="btn" type="submit" id="gate-ok">Odblokuj</button>
+    </form>
+    <span class="note" id="gate-err" role="alert"></span>
+    <div class="tools">
+      <button class="btn ghost" type="button" id="gate-retry">Sprawdź ponownie</button>
+      <button class="btn ghost" type="button" id="gate-export">Zapisz kopię raportów</button>
+    </div>
+    <p class="note">Aplikacja jest udostępniana na zasadzie odwołalnej licencji niewyłącznej. Operator zastrzega sobie prawo do zawieszenia lub zakończenia świadczenia usługi w dowolnym momencie bez podania przyczyny.</p>
+    <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span><br><span class="ks">kill-switch enabled app</span></p>
+  </div>
 </div>
 
 <header class="appbar">
@@ -247,7 +292,7 @@ dl.kv dd{margin:0;min-width:0}
             <input id="age" type="number" min="0" step="1" value="8" inputmode="numeric">
             <span class="hint" id="age-hint"></span></label>
           <label>Liczba ptaków
-            <input id="birds" type="number" min="1" step="1" value="40000" inputmode="numeric"></label>
+            <input id="birds" type="number" min="1" step="1" placeholder="np. 40000" inputmode="numeric"></label>
         </div>
       </div>
 
@@ -297,6 +342,15 @@ dl.kv dd{margin:0;min-width:0}
           <label>Liczba sektorów
             <input id="s-sec" type="number" min="1" max="6" step="1" value="1" inputmode="numeric">
             <span class="hint">każdy sektor osobno, z wyłączoną wentylacją</span></label>
+          <label>Liczba osób
+            <input id="s-os" type="number" min="1" max="6" step="1" value="1" inputmode="numeric">
+            <span class="hint">każda osoba z własnym opryskiwaczem</span></label>
+          <label id="s-org-wrap" hidden>Podział pracy
+            <select id="s-org">
+              <option value="osobno">Każda osoba w swoich sektorach</option>
+              <option value="razem">Wszyscy razem, sektor po sektorze</option>
+            </select>
+            <span class="hint" id="s-org-hint"></span></label>
         </div>
       </div>
 
@@ -338,6 +392,7 @@ dl.kv dd{margin:0;min-width:0}
         <div class="card-h"><h2>Wynik</h2><span class="note" id="res-sub"></span></div>
         <div id="farm-alert"></div>
         <div class="tiles" id="tiles"></div>
+        <div id="crew"></div>
         <div class="msgs" id="msgs"></div>
         <div id="know"></div>
       </div>
@@ -426,8 +481,18 @@ dl.kv dd{margin:0;min-width:0}
       </ol>
       <p class="note">Usunięcie aplikacji albo wyczyszczenie danych Chrome kasuje raporty z telefonu – zrób wcześniej kopię w zakładce Raporty.</p>
     </div>
+    <div class="card" id="lic">
+      <h2>Licencja</h2>
+      <p>Aplikacja jest udostępniana na zasadzie odwołalnej licencji niewyłącznej.</p>
+      <p>Operator zastrzega sobie prawo do zawieszenia lub zakończenia świadczenia usługi w dowolnym momencie bez podania przyczyny.</p>
+      <dl class="kv">
+        <dt>Operator</dt><dd>Studio Pracy Umysłowej – Paweł Czarnocki</dd>
+        <dt>Status licencji</dt><dd id="i-lic">–</dd>
+      </dl>
+      <p class="note">Przy uruchomieniu, gdy jest internet, aplikacja sprawdza u operatora, czy może działać. Operator może zablokować wszystkie kopie albo wprowadzić hasło. Raporty zapisane w telefonie można zawsze zapisać jako kopię – także na ekranie blokady.</p>
+    </div>
   </div>
-  <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
+  <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span><br><span class="ks">kill-switch enabled app</span></p>
 </section>
 </main>
 <div class="updbar" id="updbar" role="status" hidden><span id="upd-text">Dostępna nowa wersja aplikacji.</span><button class="btn small" type="button" id="upd-btn">Aktualizuj</button></div>
@@ -793,10 +858,13 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.4.0';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
-const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false};
+const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};
+let calcQueued = false, sumTimer = null;
+// Kilka zdarzeń „input” w jednej klatce ekranu = jedno przeliczenie.
+function scheduleCalc(){ if(calcQueued) return; calcQueued = true; requestAnimationFrame(() => { calcQueued = false; calc(); }); }
 
 // Wydatek rośnie z pierwiastkiem z ciśnienia: Q2 = Q1 * sqrt(p2/p1). Między punktami katalogu liczymy od najbliższego niższego.
 function flowTab(tab, p){
@@ -935,6 +1003,18 @@ function calc(){
   const age = Math.max(0, Math.round(num('age',0))); const dol = age + 1;
   const birds = Math.max(0, Math.round(num('birds',0)));
   $('age-hint').textContent = `${dol}. dzień życia · ${Math.ceil(dol/7)}. tydzień`;
+  const kk = (v ? v.id : '') + '|' + route; if(S.knowKey !== kk){ S.knowKey = kk; renderKnow(v); }   // opis z ChPLW tylko po zmianie
+  $('s-org-wrap').hidden = !(Math.round(num('s-os',1)) > 1 && Math.round(num('s-sec',1)) > 1);
+  if(!(birds > 0)){
+    const R0 = {route, age, birds:0};
+    $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R0) : '';
+    $('tiles').innerHTML = ''; $('crew').innerHTML = '';
+    $('msgs').innerHTML = '<div class="msg info">Wpisz liczbę ptaków – wtedy policzę fiolki, wodę i czas.</div>';
+    $('res-sub').textContent = ROUTES[route];
+    S.last = {v, bird, R:R0, msgs:[], empty:true};
+    return;
+  }
+  let crewH = '';
   const loss = route === 'inj' ? Math.max(0, num('i-loss',0)) : 0;
   const need = Math.ceil(birds * (1 + loss/100));
   const bp = bestPacks(need, parsePacks($('packs').value));
@@ -956,23 +1036,42 @@ function calc(){
     const sp = (v && v.r && v.r.spray) || {};
     const ml = Math.max(0, num('s-ml',0)), p = num('s-p',0), mode = $('s-mode').value;
     const nsec = Math.max(1, Math.min(6, Math.round(num('s-sec',1))));
+    const k = Math.max(1, Math.min(6, Math.round(num('s-os',1)))), C = crewPlan(k, nsec, $('s-org').value);
     const src = $('s-src').value, fs = FLOW_SRC[src] || FLOW_SRC.birch;
     const qm = pf($('s-q').value), measured = isNum(qm) && qm > 0, qp0 = pf($('s-qp').value), qp = isNum(qp0) && qp0 > 0 ? qp0 : p;
     const Q = src === 'reczne' ? (measured && p > 0 ? qm * Math.sqrt(p / qp) : NaN) : flowTab(fs.tab, p);
     const qsrc = src === 'reczne' ? (measured ? `pomiar własny ${fmt(qm,3)} l/min przy ${fmtT(qp)} bar` : 'pomiar własny') : `${fs.n}, ${fmtT(p)} bar`;
-    const V = birds / 1000 * ml / 1000; const t = Q > 0 ? V / Q : NaN, ts = t / nsec;
+    // t1 – jeden opryskiwacz na całą objętość; tw – cały zabieg (od startu do końca); ts – najdłuższy sektor
+    const V = birds / 1000 * ml / 1000, t1 = Q > 0 ? V / Q : NaN, tw = t1 * C.wall, ts = t1 * C.sec;
     tiles.push({k:'Woda', v:fmt(V,2) + ' l', s:`${fmtT(ml)} ml na 1000 dawek`, main:true});
-    tiles.push({k:'Czas oprysku', v:fmtMin(t), s:nsec > 1 ? `${nsec} ${plSektor(nsec)} po ${fmtMin(ts)}` : 'czysty czas natrysku'});
-    tiles.push({k:'Przepływ dyszy', v:isNum(Q) ? fmt(Q,3) + ' l/min' : '–', s:qsrc});
+    if(k > 1) tiles.push({k:'Czas zabiegu', v:fmtMin(tw), s:`${k} ${plOsoba(k)} jednocześnie · ${C.n > 1 ? fmtMin(ts) + ' na sektor' : 'razem w jednym sektorze'}`});
+    else tiles.push({k:'Czas oprysku', v:fmtMin(tw), s:nsec > 1 ? `${nsec} ${plSektor(nsec)} po ${fmtMin(ts)}` : 'czysty czas natrysku'});
+    tiles.push({k:'Przepływ dyszy', v:isNum(Q) ? fmt(Q,3) + ' l/min' : '–', s:qsrc + (k > 1 ? ' · każdy opryskiwacz' : '')});
+    if(k > 1){
+      const L = C.persons.map(o => V * o.share), same = L.every(x => Math.abs(x - L[0]) < 0.005);
+      tiles.push({k:'Roztwór na osobę', v:same ? fmt(L[0],2) + ' l' : L.map(x => fmt(x,2)).join(' / ') + ' l', s:'całość rozpuść razem, potem rozlej'});
+      if(isNum(t1)) crewH = crewHTML(C, V, t1);
+    }
+    $('s-org-hint').textContent = C.razem ? 'krótszy czas w każdym sektorze' : 'sektory opryskiwane równolegle';
     Object.assign(R, {ml1000:ml, water_l:V, pressure:p, flow:Q, flowSrc:qsrc, flowKey:src, flowQ:src === 'reczne' && measured ? qm : null, flowQbar:src === 'reczne' && measured ? qp : null,
-      mode:$('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, minutes:t});
+      mode:$('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, minutes:tw, sprayMin:t1, sectorMin:ts,
+      crew:k > 1 && isNum(t1) ? C.persons.map(o => ({no:o.no, sec:o.sec, l:V * o.share, min:t1 * o.work})) : null});
     if(src === 'reczne' && !measured) msgs.push(['warn','Wpisz zmierzony przepływ dyszy, inaczej nie policzę czasu oprysku.']);
     else if(src !== 'reczne'){
       const vb = src === 'birch' && isNum(Q) ? vmdEst(p, Q) : null, vt = vmdAt(p);
       msgs.push(['info', 'Katalogi podają dla TXVK-6 różne wydatki: Birchmeier dwa razy więcej niż TeeJet.' + (vb && vt && Math.abs(vb - vt) > 3 ? ` Gdyby dysza naprawdę dawała ${fmt(Q,2)} l/min, kropla miałaby ok. ${fmt0(vb)} µm, a nie ${fmt0(vt)} µm.` : '') + ' Zmierz wydatek cylindrem i wybierz „Pomiar własny”.']);
     }
-    if(isNum(ts) && ts > T_MAX) msgs.push(['bad', `Planowany czas ${fmtMin(ts)}${nsec > 1 ? ' na sektor' : ''} przekracza ${T_MAX} min – granicę wyłączonej wentylacji. Podziel kurnik na sektory albo zmień ustawienia w granicach ChPLW.`]);
+    if(isNum(ts) && ts > T_MAX) msgs.push(['bad', `Planowany czas ${fmtMin(ts)}${nsec > 1 ? ' na sektor' : ''} przekracza ${T_MAX} min – granicę wyłączonej wentylacji. Podziel kurnik na sektory, dodaj osobę z opryskiwaczem albo zmień ustawienia w granicach ChPLW.`]);
     else if(isNum(ts) && ts > T_GOAL) msgs.push(['warn', `Planowany czas ${fmtMin(ts)}${nsec > 1 ? ' na sektor' : ''} – blisko granicy wyłączonej wentylacji (limit ${T_MAX} min).`]);
+    const um = useMinutes(v);
+    if(um && isNum(tw)){
+      if(tw > um) msgs.push(['bad', `Zabieg potrwa ${fmtMin(tw)} – dłużej niż czas zużycia szczepionki po rozpuszczeniu (ChPLW: ${v.use}). Dodaj osobę z drugim opryskiwaczem albo przygotuj roztwór w dwóch partiach – fiolki rozpuszczone osobno dla każdej części kurnika.`]);
+      else if(tw > useTarget(um)) msgs.push(['warn', `Zabieg potrwa ${fmtMin(tw)}, a szczepionkę trzeba zużyć w ${v.use} od rozpuszczenia – zostaw zapas czasu na przygotowanie roztworu.`]);
+    }
+    const maxL = V * Math.max(...C.persons.map(o => o.share));
+    if(maxL > TANK_L) msgs.push(['warn', `Na ${k > 1 ? 'osobę' : 'opryskiwacz'} przypada ${fmt(maxL,2)} l – więcej niż mieści zbiornik REC 15 (${TANK_L} l). Potrzebne ${Math.ceil(maxL / TANK_L)} ${pl(Math.ceil(maxL / TANK_L), 'napełnienie', 'napełnienia', 'napełnień')} – przygotuj roztwór w czystym pojemniku i dolewaj${k === 1 ? ' albo dodaj osobę z drugim opryskiwaczem' : ''}.`]);
+    if(k > 1 && C.uneven) msgs.push(['warn', `Nierówny podział: ${C.persons.map(o => `osoba ${o.no} – ${secText(o.sec)}`).join(', ')}. Osoby skończą w różnym czasie – lepiej liczba sektorów podzielna przez liczbę osób albo praca razem, sektor po sektorze.`]);
+    if(k > 1) msgs.push(['info', `${k} ${plOsoba(k)}: rozpuść wszystkie fiolki w całej objętości wody, wymieszaj i dopiero wtedy rozlej do opryskiwaczy wg tabeli. Opryskiwacze ustaw tak samo – ta sama dysza i ciśnienie.`]);
     if(mode !== 'lanca' && p > 3) msgs.push(['bad','Z dmuchawą pracuj przy 2,0–2,5 bar, maksymalnie 3 bar.']);
     else if(p < 2 || p > (mode === 'lanca' && dropWin(v) ? 6 : 3)) msgs.push(['warn', mode === 'lanca' && dropWin(v) ? 'Zalecane ciśnienie dla TXVK-6: 2,0–3,0 bar; z lancą do 6 bar, jeśli kropla mieści się w oknie z ChPLW.' : 'Zalecane ciśnienie dla TXVK-6: 2,0–2,5 bar (maks. 3).']);
     if(mode !== 'lanca' && dol <= 7) msgs.push(['warn','Pisklęta w 1. tygodniu szczep bez dmuchawy (lanca 30–50 cm nad ptakami).']);
@@ -1031,9 +1130,9 @@ function calc(){
   $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R) : '';
   const ord = {bad:0, warn:1, ok:2, info:3}; msgs.sort((a,b) => ord[a[0]] - ord[b[0]]);
   $('tiles').innerHTML = tiles.map(t => `<div class="tile${t.main ? ' main' : ''}"><span>${esc(t.k)}</span><b>${esc(t.v)}</b><small>${esc(t.s || '')}</small></div>`).join('');
+  $('crew').innerHTML = crewH;
   $('msgs').innerHTML = msgs.map(([c,t]) => `<div class="msg ${c}">${esc(t)}</div>`).join('');
   $('res-sub').textContent = `${ROUTES[route]} · ${fmt0(birds)} ptaków`;
-  renderKnow(v);
   S.last = {v, bird, R, msgs};
 }
 function renderKnow(v){
@@ -1055,7 +1154,12 @@ function reportText(){
   lines.push(`Drób: ${L.bird.l} · wiek ${R.age} dni · ${fmt0(R.birds)} szt.`);
   lines.push(`Szczepienie: ${DISEASES[$('dz').value] || $('dz').value} – ${v ? v.n : 'szczepionka spoza bazy'} (${ROUTES[R.route].toLowerCase()})`);
   lines.push(`Szczepionka: ${R.packs} dawek (razem ${fmt0(R.doses)})`);
-  if(R.route === 'spray'){ lines.push(`Woda: ${fmt(R.water_l,2)} l (${fmtT(R.ml1000)} ml na 1000 dawek)`); lines.push(`Opryskiwacz: TXVK-6, ${fmtT(R.pressure)} bar, ${fmt(R.flow,3)} l/min (${R.flowSrc}), ${R.mode.toLowerCase()}`); lines.push(`Czas oprysku: ${fmtMin(R.minutes)}${(R.sectors || 1) > 1 ? ` – ${R.sectors} ${plSektor(R.sectors)} po ${fmtMin(R.minutes / R.sectors)}` : ''}`);
+  if(R.route === 'spray'){ lines.push(`Woda: ${fmt(R.water_l,2)} l (${fmtT(R.ml1000)} ml na 1000 dawek)`); lines.push(`Opryskiwacz: TXVK-6, ${fmtT(R.pressure)} bar, ${fmt(R.flow,3)} l/min (${R.flowSrc}), ${R.mode.toLowerCase()}`);
+    const k = R.persons || 1, n = R.sectors || 1;
+    if(k > 1){
+      lines.push(`Czas zabiegu: ${fmtMin(R.minutes)} – ${k} ${plOsoba(k)} jednocześnie, ${n} ${plSektor(n)}, ${orgText(R.org, n)}${n > 1 ? `; ${fmtMin(R.sectorMin)} na sektor` : ''}`);
+      (R.crew || []).forEach(o => lines.push(`  Osoba ${o.no}: ${R.org === 'razem' ? 'razem' : secText(o.sec)} · ${fmt(o.l,2)} l roztworu · ${fmtMin(o.min)}`));
+    } else lines.push(`Czas oprysku: ${fmtMin(R.minutes)}${n > 1 ? ` – ${n} ${plSektor(n)} po ${fmtMin(R.sectorMin)}` : ''}`);
     if(R.modId && S.mods[R.modId]) lines.push(`Ustawienia wg zaleceń z ${fmtDate(S.mods[R.modId].date)}: ${changesText(S.mods[R.modId].changes) || (S.mods[R.modId].actions || []).join(' ') || 'lista kontrolna'}`); }
   if(R.route === 'woda'){ lines.push(`Woda: ${fmt0(R.water_l)} l (${fmt(R.l1000,1)} l na 1000; ${R.waterBasis})`); if(R.milk_kg > 0) lines.push(`Mleko w proszku: ${fmt(R.milk_kg,2)} kg`); }
   if(R.route === 'oko') lines.push(`Rozpuszczalnik: ${fmt0(R.diluent_ml)} ml (${fmtT(R.ml1000,1)} ml na 1000 dawek)`);
@@ -1073,6 +1177,7 @@ async function copyText(text){
 async function saveReport(btn){
   if(!S.store){ toast('Pamięć aplikacji jeszcze się łączy – spróbuj za chwilę.'); return; }
   const L = S.last; if(!L) return;
+  if(L.empty){ toast('Wpisz liczbę ptaków.'); $('birds').focus(); return; }
   const doc = Object.assign({}, L.R, {date:$('date').value || todayISO(), farm:$('farm').value.trim(), bird:$('bird').value, birdLabel:L.bird.l, dz:$('dz').value, vacId:L.v ? L.v.id : '', vacName:L.v ? L.v.n : 'spoza bazy', notes:$('notes').value.trim(), text:reportText(), createdAt:new Date().toISOString()});
   btn.disabled = true;
   if(S.mode === 'local' && !IN_ARTIFACT && !S.persisted && navigator.storage && navigator.storage.persist){ S.persisted = true; navigator.storage.persist().catch(() => {}); }
@@ -1094,7 +1199,7 @@ function renderReports(){
   const box = $('r-list');
   if(!all.length){ box.innerHTML = `<div class="empty"><b>Brak zapisanych raportów.</b><span>W zakładce „Obliczenia” uzupełnij dane i kliknij „Zapisz raport”.</span>${S.mode === 'init' ? '<span>Łączenie z pamięcią aplikacji…</span>' : ''}</div>`; return; }
   box.innerHTML = rows.map(r => {
-    const main = r.route === 'spray' ? `${fmt(r.water_l,1)} l wody · ${fmt(r.minutes,0)} min` : r.route === 'woda' ? `${fmt0(r.water_l)} l wody` : r.route === 'oko' ? `${fmt0(r.diluent_ml)} ml rozpuszczalnika` : `${fmt0(r.vaccine_ml)} ml szczepionki`;
+    const main = r.route === 'spray' ? `${fmt(r.water_l,1)} l wody · ${fmt(r.minutes,0)} min${(r.persons || 1) > 1 ? ` · ${r.persons} ${plOsoba(r.persons)}` : ''}` : r.route === 'woda' ? `${fmt0(r.water_l)} l wody` : r.route === 'oko' ? `${fmt0(r.diluent_ml)} ml rozpuszczalnika` : `${fmt0(r.vaccine_ml)} ml szczepionki`;
     const open = S.open === r.id;
     return `<div class="item${open ? ' sel' : ''}" data-id="${esc(r.id)}" role="button" tabindex="0">
       <span class="t">${fmtDate(r.date)} · ${esc(r.farm || 'bez nazwy fermy')}${r.sum ? (typeof r.sum.ok === 'boolean' ? ` <span class="pill ${r.sum.ok ? 'done' : 'late'}">${r.sum.ok ? 'zgodnie z planem' : 'problemy'}</span>` : ' <span class="pill">podsumowany</span>') : ''}${r.modId ? ' <span class="pill plan">wg zaleceń</span>' : ''}</span>
@@ -1146,6 +1251,47 @@ const MOD_ST = {
 function pf(x){ const v = parseFloat(String(x == null ? '' : x).replace(',','.')); return isFinite(v) ? v : NaN; }
 function fmtMin(t){ if(!isNum(t)) return '–'; const s = Math.round(t * 60); return `${Math.floor(s / 60)} min ${pad(s % 60)} s`; }
 function plSektor(n){ const a = n % 10, b = n % 100; return n === 1 ? 'sektor' : (a >= 2 && a <= 4 && !(b >= 12 && b <= 14)) ? 'sektory' : 'sektorów'; }
+function pl(n, one, few, many){ const a = n % 10, b = n % 100; return n === 1 ? one : (a >= 2 && a <= 4 && !(b >= 12 && b <= 14)) ? few : many; }
+function plOsoba(n){ return pl(n, 'osoba', 'osoby', 'osób'); }
+
+/* ---------- Osoby i podział pracy ----------
+   k osób, każda z własnym opryskiwaczem o tym samym wydatku Q; n równych sektorów.
+   osobno – każda osoba ma swoje sektory, sektory opryskiwane równolegle (przy n < k
+            kilka osób w jednym sektorze); razem – wszyscy w jednym sektorze, sektor po sektorze.
+   Czasy liczone jako ułamek czasu jednego opryskiwacza na całą objętość (V/Q):
+   wall – cały zabieg od startu do końca, sec – najdłuższy sektor (czas wyłączonej wentylacji). */
+const ORG_L = {osobno:'każda osoba w swoich sektorach', razem:'wszyscy razem, sektor po sektorze'};
+const TANK_L = 15;   // zbiornik Birchmeier REC 15
+function crewPlan(k, n, org){
+  k = Math.max(1, Math.round(k) || 1); n = Math.max(1, Math.round(n) || 1);
+  const razem = k > 1 && (org === 'razem' || n === 1);
+  const persons = Array.from({length:k}, (_, i) => ({no:i + 1, sec:[], share:0, work:0})), sectors = [];
+  if(razem){
+    for(let s = 1; s <= n; s++) sectors.push({no:s, p:k, f:1 / (n * k)});
+    persons.forEach(o => { o.sec = sectors.map(x => x.no); o.share = 1 / k; o.work = 1 / k; });
+  } else if(n >= k){
+    let s = 1;
+    persons.forEach((o, i) => { const c = Math.floor(n / k) + (i < n % k ? 1 : 0); for(let j = 0; j < c; j++){ sectors.push({no:s, p:1, f:1 / n}); o.sec.push(s++); } o.share = c / n; o.work = c / n; });
+  } else {
+    let i = 0;
+    for(let s = 1; s <= n; s++){ const c = Math.floor(k / n) + (s - 1 < k % n ? 1 : 0); sectors.push({no:s, p:c, f:1 / (n * c)}); for(let j = 0; j < c; j++){ const o = persons[i++]; o.sec = [s]; o.share = 1 / (n * c); o.work = 1 / (n * c); } }
+  }
+  const wall = Math.max(...persons.map(o => o.work)), sec = Math.max(...sectors.map(x => x.f));
+  return {k, n, org:razem ? 'razem' : 'osobno', razem, persons, sectors, wall, sec, uneven:persons.some(o => Math.abs(o.work - wall) > 1e-9)};
+}
+const CREW_F = new Map();
+function crewF(k, n, org){ const key = k + '|' + n + '|' + org; let c = CREW_F.get(key); if(!c){ const p = crewPlan(k, n, org); c = {wall:p.wall, sec:p.sec, org:p.org}; CREW_F.set(key, c); } return c; }
+function orgText(org, n){ return n > 1 ? ORG_L[org] || '' : 'razem w jednym sektorze'; }
+function secShort(a){ const s = [...(a || [])].sort((x, y) => x - y); if(!s.length) return '–'; return s.length > 1 && s.every((x, i) => !i || x === s[i - 1] + 1) ? `${s[0]}–${s[s.length - 1]}` : s.join(', '); }
+function secText(a){ return ((a || []).length > 1 ? 'sektory ' : 'sektor ') + secShort(a); }
+function crewHTML(C, V, t1){
+  const rows = C.persons.map(o => `<tr><td>${o.no}</td><td>${C.razem ? (C.n > 1 ? 'wszystkie, razem' : 'razem') : esc(secShort(o.sec))}</td><td>${fmt(V * o.share, 2)} l</td><td>${fmtMin(t1 * o.work)}</td></tr>`).join('');
+  return `<div class="tablewrap"><table><thead><tr><th>Osoba</th><th>Sektory</th><th>Roztwór</th><th>Czas pracy</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+// Czas zużycia szczepionki po rozpuszczeniu z ChPLW (pole „Zużyć w”), w minutach; przy zakresie – dolna granica.
+function useMinutes(v){ const m = String(v && v.use || '').match(/(\d+(?:[.,]\d+)?)\s*(?:[–-]\s*\d+(?:[.,]\d+)?\s*)?h\b/); return m ? parseFloat(m[1].replace(',', '.')) * 60 : null; }
+// Cel z zapasem na przygotowanie roztworu: ¾ czasu, ale nie mniej niż czas minus 30 min.
+function useTarget(um){ return Math.max(um * 0.75, um - 30); }
 function flowKeyOf(r){
   if(r.flowKey && FLOW_SRC[r.flowKey]) return r.flowKey;
   if(/TeeJet/i.test(r.flowSrc || '')) return 'teejet';
@@ -1187,31 +1333,53 @@ function nozzleState(key, rr){
 // Model dyszy na następny zabieg liczy dokładnie tak jak obliczenia: z katalogu albo z pomiaru
 // przeliczonego pierwiastkiem z ciśnienia; kropla z danych TeeJet, przy pomiarze poprawiona o wydatek.
 function flowAt(m, p){ return m.src === 'reczne' ? m.Q * Math.sqrt(p / m.p) : flowTab(FLOW_SRC[m.src].tab, p); }
-function predict(m, p, ml, n, birds){
-  const Q = flowAt(m, p), V = birds / 1000 * ml / 1000, t = V / Q;
-  return {Q, V, t, n, ts:t / n, vmd:m.src === 'reczne' ? vmdEst(p, Q) : vmdAt(p)};
+function predict(m, p, ml, n, birds, k = 1, org = 'osobno'){
+  const Q = flowAt(m, p), V = birds / 1000 * ml / 1000, t1 = V / Q, C = crewF(k, n, org);
+  return {Q, V, t:t1 * C.wall, ts:t1 * C.sec, n, k, org:C.org, vmd:m.src === 'reczne' ? vmdEst(p, Q) : vmdAt(p)};
 }
-// Najmniejsza zmiana ustawień, przy której zabieg mieści się w limicie czasu na sektor, a kropla
-// w oknie z ChPLW. Koszt zmiany: 0,1 bar = 1, 10 ml wody mniej (w granicach ChPLW) = 1,
-// dodatkowy sektor = 20, zmiana trybu pracy = 30. Powyżej 3 bar tylko lanca i tylko przy oknie kropli.
-function bestSettings(cur, m, v, birds, limit, allowMl = true){
-  const win = dropWin(v), mlr = mlRange(v);
+// Najmniejsza zmiana ustawień, przy której najdłuższy sektor mieści się w limicie czasu, kropla
+// w oknie z ChPLW, a cały zabieg – w czasie zużycia szczepionki (opt.useMax). Koszt zmiany:
+// 0,1 bar = 1, 10 ml wody mniej (w granicach ChPLW) = 1, dodatkowy sektor = 20, dodatkowa osoba
+// z opryskiwaczem = 25, zmiana trybu pracy = 30, zmiana podziału pracy = 5.
+// Powyżej 3 bar tylko lanca i tylko przy oknie kropli. opt.kFix – wariant z określoną liczbą osób.
+function bestSettings(cur, m, v, birds, limit, opt = {}){
+  const win = dropWin(v), mlr = mlRange(v), allowMl = opt.allowMl !== false, useMax = opt.useMax || Infinity;
+  const ck = cur.k || 1, corg = cur.org || 'osobno';
   const modes = cur.mode !== 'lanca' && win ? [cur.mode, 'lanca'] : [cur.mode];
   const mls = [cur.ml]; if(mlr && allowMl) for(let x = Math.ceil(cur.ml / 10) * 10 - 10; x >= mlr[0]; x -= 10) mls.push(x);
+  const kMin = opt.kFix || ck, kMax = opt.kFix || Math.max(3, ck), nMax = Math.max(4, cur.n);
+  const combos = [];   // podział pracy liczony raz: [n, k, org, wall, sec, koszt]
+  for(let n = cur.n; n <= nMax; n++) for(let k = kMin; k <= kMax; k++){
+    for(const org of k > 1 && n > 1 ? ['osobno', 'razem'] : ['osobno']){
+      const c = crewF(k, n, org);
+      combos.push([n, k, c.org, c.wall, c.sec, (n - cur.n) * 20 + (k - ck) * 25 + (ck > 1 && n > 1 && c.org !== corg ? 5 : 0)]);
+    }
+  }
   let best = null;
   for(const mode of modes){
-    const pmax = mode === 'lanca' && win ? 6 : 3;
+    const pmax = mode === 'lanca' && win ? 6 : 3, mcost = mode !== cur.mode ? 30 : 0;
     for(let pi = 20; pi <= pmax * 10; pi++){
-      const p = pi / 10;
-      for(const ml of mls) for(let n = cur.n; n <= 4; n++){
-        const pr = predict(m, p, ml, n, birds);
-        if(!(pr.ts <= limit) || !inWin(win, pr.vmd)) continue;
-        const cost = Math.abs(p - cur.p) * 10 + Math.max(0, cur.ml - ml) / 10 + (n - cur.n) * 20 + (mode !== cur.mode ? 30 : 0);
-        if(!best || cost < best.cost - 1e-9) best = {p, ml, n, mode, cost, pr};
+      const p = pi / 10, Q = flowAt(m, p), vmd = m.src === 'reczne' ? vmdEst(p, Q) : vmdAt(p);
+      if(!(Q > 0) || !inWin(win, vmd)) continue;
+      const pcost = Math.abs(p - cur.p) * 10 + mcost;
+      for(const ml of mls){
+        const V = birds / 1000 * ml / 1000, t1 = V / Q, mlcost = pcost + Math.max(0, cur.ml - ml) / 10;
+        for(const [n, k, org, wall, sec, ccost] of combos){
+          if(!(t1 * sec <= limit) || !(t1 * wall <= useMax)) continue;
+          const cost = mlcost + ccost;
+          if(!best || cost < best.cost - 1e-9) best = {p, ml, n, k, org, mode, cost, pr:{Q, V, t:t1 * wall, ts:t1 * sec, n, k, org, vmd}};
+        }
       }
     }
   }
   return best;
+}
+// Tekst prognozy: cały zabieg i najdłuższy sektor (starsze zapisy nie mają t ani k)
+function predText(pr){
+  if(!pr) return '';
+  const n = pr.n || 1, k = pr.k || 1, t = isNum(pr.t) ? pr.t : pr.ts * n;
+  if(n === 1 && k === 1) return fmtMin(t);
+  return `cały zabieg ${fmtMin(t)}, ${fmtMin(pr.ts)} na sektor (${k > 1 ? `${k} ${plOsoba(k)}, ` : ''}${n} ${plSektor(n)})`;
 }
 function flowLabel(x){
   if(!x) return '–';
@@ -1223,32 +1391,37 @@ const PARAM = {
   pressure: {l:'Ciśnienie',          f:x => fmtT(x) + ' bar'},
   ml1000:   {l:'Woda na 1000 dawek', f:x => fmtT(x) + ' ml'},
   sectors:  {l:'Liczba sektorów',    f:x => String(x)},
+  persons:  {l:'Liczba osób',        f:x => String(x)},
+  org:      {l:'Podział pracy',      f:x => x ? ORG_L[x] || String(x) : '–'},
   mode:     {l:'Tryb pracy',         f:x => MODE_L[x] || String(x)}
 };
 function changesText(chs){ return (chs || []).filter(c => PARAM[c.k]).map(c => `${PARAM[c.k].l.toLowerCase()}: ${PARAM[c.k].f(c.from)} → ${PARAM[c.k].f(c.to)}`).join('; '); }
 // Pełne ustawienia oprysku z raportu – to one zostały sprawdzone w zabiegu, więc to je zapisuje się na stałe
 function repConfig(rep){
   const fk = flowKeyOf(rep);
-  return {flow:fk === 'reczne' ? {key:'reczne', q:isNum(rep.flowQ) ? rep.flowQ : rep.flow, bar:isNum(rep.flowQbar) ? rep.flowQbar : rep.pressure} : {key:fk}, pressure:rep.pressure, ml1000:rep.ml1000, sectors:rep.sectors || 1, mode:modeKeyOf(rep)};
+  return {flow:fk === 'reczne' ? {key:'reczne', q:isNum(rep.flowQ) ? rep.flowQ : rep.flow, bar:isNum(rep.flowQbar) ? rep.flowQbar : rep.pressure} : {key:fk}, pressure:rep.pressure, ml1000:rep.ml1000, sectors:rep.sectors || 1, persons:rep.persons || 1, org:rep.org || 'osobno', mode:modeKeyOf(rep)};
 }
 function changeList(cur, b){
-  const out = [];
+  const out = [], ck = cur.k || 1, bk = b.k || 1;
   if(Math.abs(b.p - cur.p) > 0.05) out.push({k:'pressure', from:cur.p, to:b.p});
   if(Math.abs(b.ml - cur.ml) > 0.5) out.push({k:'ml1000', from:cur.ml, to:b.ml});
   if(b.n !== cur.n) out.push({k:'sectors', from:cur.n, to:b.n});
+  if(bk !== ck) out.push({k:'persons', from:ck, to:bk});
+  if(bk > 1 && b.n > 1 && (ck === 1 || cur.n === 1 || b.org !== cur.org)) out.push({k:'org', from:ck > 1 && cur.n > 1 ? cur.org : null, to:b.org});
   if(b.mode !== cur.mode) out.push({k:'mode', from:cur.mode, to:b.mode});
   return out;
 }
-function paramsText(P){ return Object.keys(PARAM).filter(k => P && P[k] != null).map(k => `${PARAM[k].l.toLowerCase()}: ${PARAM[k].f(P[k])}`).join('; '); }
+// Podział pracy ma znaczenie tylko przy kilku osobach i kilku sektorach
+function paramsText(P){ return Object.keys(PARAM).filter(k => P && P[k] != null && !(k === 'org' && !((P.persons || 1) > 1 && (P.sectors || 1) > 1))).map(k => `${PARAM[k].l.toLowerCase()}: ${PARAM[k].f(P[k])}`).join('; '); }
 
 function sumPanel(r){
-  const s = r.sum || {}, n = r.sectors || 1, m = r.modId && S.mods[r.modId];
+  const s = r.sum || {}, n = r.sectors || 1, k = r.persons || 1, m = r.modId && S.mods[r.modId];
   return `<div class="card flat" style="margin-top:8px" data-sum="1">
     <h3>Podsumowanie zabiegu</h3>
-    <span class="note">Plan: ${fmt(r.water_l,2)} l · ${fmt(r.flow,3)} l/min (${esc(r.flowSrc || '')}) · ${fmtMin(r.minutes)}${n > 1 ? ` w ${n} ${plSektor(n)}` : ''} · ${fmtT(r.ml1000)} ml na 1000 dawek · ${esc(r.mode || '')}</span>
+    <span class="note">Plan: ${fmt(r.water_l,2)} l · ${fmt(r.flow,3)} l/min (${esc(r.flowSrc || '')}) · ${fmtMin(r.minutes)}${n > 1 ? ` w ${n} ${plSektor(n)}` : ''}${k > 1 ? ` · ${k} ${plOsoba(k)}, ${esc(orgText(r.org, n))}` : ''} · ${fmtT(r.ml1000)} ml na 1000 dawek · ${esc(r.mode || '')}</span>
     ${m ? `<span class="note">Ten zabieg sprawdza zalecenia z ${fmtDate(m.date)}: ${esc(changesText(m.changes) || (m.actions || []).join(' ') || 'lista kontrolna')}.</span>` : ''}
     <div class="row tight">
-      <label>Rzeczywisty czas oprysku – łącznie, minuty
+      <label>${k > 1 ? 'Rzeczywisty czas zabiegu – od startu do końca, minuty' : 'Rzeczywisty czas oprysku – łącznie, minuty'}
         <input id="sum-min" type="text" inputmode="numeric" autocomplete="off" value="${esc(String(isNum(s.min) ? s.min : ''))}" placeholder="np. 24"></label>
       <label>i sekundy
         <input id="sum-sec" type="text" inputmode="numeric" autocomplete="off" value="${esc(String(isNum(s.sec) ? s.sec : ''))}" placeholder="0"></label>
@@ -1274,20 +1447,23 @@ function sumDiag(r, inp){
   const tiles = D.tiles, msgs = D.msgs, probs = D.problems, chk = D.checklist, act = D.actions;
   const t = (isNum(inp.min) ? inp.min : 0) + (isNum(inp.sec) ? inp.sec : 0) / 60;
   if(!(t > 0)){ msgs.push(['warn','Podaj rzeczywisty czas oprysku – bez niego nie da się policzyć wydatku.']); return D; }
-  const n = Math.max(1, r.sectors || 1);
+  // t – cały zabieg od startu do końca. Przy kilku osobach wydatek jednego opryskiwacza
+  // wynika z podziału pracy: t = wall · V / Q, więc Q = wall · V / t.
+  const n = Math.max(1, r.sectors || 1), k = Math.max(1, r.persons || 1), C = crewPlan(k, n, r.org);
   const V = isNum(inp.used) && inp.used > 0 ? inp.used : r.water_l;
   const p = isNum(inp.bar) && inp.bar > 0 ? inp.bar : r.pressure;
-  const Q = V / t, key = flowKeyOf(r), fs = FLOW_SRC[key];
+  const Q = C.wall * V / t, key = flowKeyOf(r), fs = FLOW_SRC[key];
   const Qexp = fs && fs.tab ? flowTab(fs.tab, p) : r.flow * Math.sqrt(p / r.pressure);
-  const rr = Qexp > 0 ? Q / Qexp : NaN, ns = nozzleState(key, rr), ts = t / n;
-  const vac = VACCINES.find(x => x.id === r.vacId) || null, win = dropWin(vac);
+  const rr = Qexp > 0 ? Q / Qexp : NaN, ns = nozzleState(key, rr), ts = t * C.sec / C.wall;
+  const vac = VACCINES.find(x => x.id === r.vacId) || null, win = dropWin(vac), um = useMinutes(vac);
   const pct = x => (x >= 0 ? '+' : '−') + fmt0(Math.abs(x) * 100) + '%';
   const vr = ns !== 'przydlawiona' && vmdAt(p) ? vmdEst(p, Q) : null;
 
-  tiles.push({k:'Rzeczywisty wydatek', v:fmt(Q,3) + ' l/min', s:`${fmt(V,2)} l w ${fmtMin(t)}`, main:true});
+  tiles.push({k:k > 1 ? 'Rzeczywisty wydatek – na opryskiwacz' : 'Rzeczywisty wydatek', v:fmt(Q,3) + ' l/min', s:k > 1 ? `${fmt(V,2)} l · ${k} ${plOsoba(k)} · ${fmtMin(t)}` : `${fmt(V,2)} l w ${fmtMin(t)}`, main:true});
   tiles.push({k:'Wydatek oczekiwany', v:fmt(Qexp,3) + ' l/min', s:key === 'reczne' ? `z pomiaru zapisanego w raporcie, ${fmtT(p)} bar` : `${fs.n}, ${fmtT(p)} bar`});
   if(isNum(rr)) tiles.push({k:'Odchyłka wydatku', v:Math.abs(rr - 1) < 0.005 ? '0%' : pct(rr - 1), s:'wobec oczekiwanego'});
-  if(n > 1) tiles.push({k:'Czas na sektor', v:fmtMin(ts), s:`${n} ${plSektor(n)}`});
+  if(Math.abs(ts - t) > 1e-6) tiles.push({k:'Czas na sektor', v:fmtMin(ts), s:`${n} ${plSektor(n)}${k > 1 ? ', ' + orgText(C.org, n) : ''}`});
+  if(k > 1 && ns !== 'ok' && ns !== 'brak') chk.push('Wydatek każdego opryskiwacza zmierzony osobno cylindrem (60 s) – czy pracowały jednakowo');
 
   if(isNum(p) && isNum(r.pressure) && Math.abs(p - r.pressure) > 0.05){
     const e = Math.sqrt(p / r.pressure);
@@ -1344,13 +1520,19 @@ function sumDiag(r, inp){
       }
     }
   }
-  const tp = r.minutes;
+  const tp = r.minutes, perSec = Math.abs(ts - t) > 1e-6;
   let tline = isNum(tp) && tp > 0 && Math.abs(t - tp) / tp > 0.1 ? `czas ${fmtMin(t)} zamiast planowanych ${fmtMin(tp)}` : null;
   if(ts > T_MAX){
-    msgs.push(['bad', `Zabieg trwał ${fmtMin(t)}${n > 1 ? `, czyli ${fmtMin(ts)} na sektor` : ''} – powyżej ${T_MAX} minut, czyli granicy wyłączonej wentylacji.`]);
-    tline = (tline || `czas ${fmtMin(t)}`) + (n > 1 ? ` (${fmtMin(ts)} na sektor)` : '') + `, powyżej limitu ${T_MAX} min`;
+    msgs.push(['bad', `Zabieg trwał ${fmtMin(t)}${perSec ? `, czyli ${fmtMin(ts)} na sektor` : ''} – powyżej ${T_MAX} minut, czyli granicy wyłączonej wentylacji.`]);
+    tline = (tline || `czas ${fmtMin(t)}`) + (perSec ? ` (${fmtMin(ts)} na sektor)` : '') + `, powyżej limitu ${T_MAX} min`;
     chk.push('Wentylacja wyłączona tylko na czas zabiegu i 15–30 min po nim', 'Ptaki obserwowane po zabiegu – duszność, przegrzanie');
-  } else if(ts > T_GOAL) msgs.push(['warn', `Zabieg trwał ${fmtMin(ts)}${n > 1 ? ' na sektor' : ''} – blisko granicy wyłączonej wentylacji (limit ${T_MAX} min).`]);
+  } else if(ts > T_GOAL) msgs.push(['warn', `Zabieg trwał ${fmtMin(ts)}${perSec ? ' na sektor' : ''} – blisko granicy wyłączonej wentylacji (limit ${T_MAX} min).`]);
+  if(um && t > um){
+    msgs.push(['bad', `Zabieg trwał ${fmtMin(t)} – dłużej niż czas zużycia szczepionki po rozpuszczeniu (ChPLW: ${vac.use}). Roztwór pod koniec mógł mieć niższe miano.`]);
+    probs.push(`zabieg dłuższy niż czas zużycia szczepionki po rozpuszczeniu (${vac.use})`);
+    chk.push('Fiolki rozpuszczone tuż przed zabiegiem, roztwór w chłodzie i cieniu', 'Czas od rozpuszczenia do końca zabiegu zanotowany');
+  }
+  if(k > 1 && C.uneven && tline) chk.push('Podział pracy: osoby skończyły mniej więcej w tym samym czasie');
   if(tline) probs.unshift(tline);
 
   // Ustawienia na następny zabieg: model wydatku z tego, jak dysza naprawdę pracowała.
@@ -1363,23 +1545,29 @@ function sumDiag(r, inp){
   } else if(ns !== 'brak'){   // zgodnie z planem albo po wymianie / udrożnieniu dyszy
     m = key === 'reczne' ? {src:'reczne', Q:isNum(r.flowQ) ? r.flowQ : r.flow, p:isNum(r.flowQbar) ? r.flowQbar : r.pressure} : {src:key};
   }
-  const cur = {p:r.pressure, ml:r.ml1000, n, mode:modeKeyOf(r)};
+  const cur = {p:r.pressure, ml:r.ml1000, n, k, org:C.org, mode:modeKeyOf(r)};
   if(m && r.birds > 0 && r.ml1000 > 0 && isNum(cur.p)){
-    const now = predict(m, cur.p, cur.ml, cur.n, r.birds);
-    const timeBad = now.ts > T_MAX, dropBad = !!win && now.vmd != null && !inWin(win, now.vmd);
-    if(timeBad || dropBad || probs.length) D.pred = now;
-    if(timeBad || dropBad){
-      const lim = timeBad ? T_GOAL : T_MAX, b = bestSettings(cur, m, vac, r.birds, lim);
+    const now = predict(m, cur.p, cur.ml, cur.n, r.birds, cur.k, cur.org);
+    const useMax = um ? useTarget(um) : Infinity;
+    const timeBad = now.ts > T_MAX, dropBad = !!win && now.vmd != null && !inWin(win, now.vmd), useBad = now.t > (um || Infinity);
+    if(timeBad || dropBad || useBad || probs.length) D.pred = now;
+    if(timeBad || dropBad || useBad){
+      const lim = timeBad ? T_GOAL : T_MAX, b = bestSettings(cur, m, vac, r.birds, lim, {useMax});
       if(b){
         D.changes.push(...changeList(cur, b));
         D.pred = b.pr;
         if(Math.abs(b.ml - cur.ml) > 0.5){   // wariant bez zmniejszania wody – zachowuje pokrycie ptaków
-          const a = bestSettings(cur, m, vac, r.birds, lim, false), ach = a ? changeList(cur, a) : [];
+          const a = bestSettings(cur, m, vac, r.birds, lim, {useMax, allowMl:false}), ach = a ? changeList(cur, a) : [];
           if(ach.length) D.alt = {changes:ach, pred:a.pr};
+        }
+        // wariant z dodatkową osobą – skraca cały zabieg, nie tylko czas w sektorze
+        if((timeBad || useBad) && b.k === cur.k && (!D.alt || D.alt.pred.k === cur.k) && cur.k < 6){
+          const a2 = bestSettings(cur, m, vac, r.birds, lim, {useMax, allowMl:false, kFix:cur.k + 1}), ach2 = a2 ? changeList(cur, a2) : [];
+          if(ach2.length) D.alt2 = {changes:ach2, pred:a2.pr};
         }
         if(win && b.pr.vmd != null && ((isNum(win[0]) && b.pr.vmd - win[0] < 0.02 * win[0]) || (isNum(win[1]) && win[1] - b.pr.vmd < 0.02 * win[1])) && D.changes.some(c => c.k === 'pressure' || c.k === 'flow'))
           act.push('Prognozowana kropla leży na granicy okna z ChPLW – przed szczepieniem sprawdź ją papierkami wodoczułymi.');
-      } else msgs.push(['bad', `Tą dyszą nie da się zmieścić w ${T_GOAL} min na sektor przy zachowaniu okna kropli z ChPLW, nawet w 4 sektorach. Potrzebna dysza o większym wydatku albo drugi opryskiwacz – decyzja lekarza weterynarii.`]);
+      } else msgs.push(['bad', `Tą dyszą nie da się zmieścić w ${T_GOAL} min na sektor${um ? ` i w czasie zużycia szczepionki (${vac.use})` : ''} przy zachowaniu okna kropli z ChPLW, nawet w ${Math.max(4, n)} sektorach i z ${Math.max(3, k)} osobami. Potrzebna dysza o większym wydatku – decyzja lekarza weterynarii.`]);
     }
   }
   if(flowTo) D.changes.unshift({k:'flow', from:{key, q:r.flowQ, bar:r.flowQbar}, to:flowTo});
@@ -1387,7 +1575,7 @@ function sumDiag(r, inp){
   D.ok = probs.length === 0;
   if(r.modId && S.mods[r.modId]) D.verify = {id:r.modId, mod:S.mods[r.modId]};
   D.checklist = [...new Set(chk)]; D.actions = [...new Set(act)];
-  D.calc = {t, ts, V, p, Q, Qexp, rr, n, ns};
+  D.calc = {t, ts, V, p, Q, Qexp, rr, n, k, ns};
   return D;
 }
 function sumHTML(d, r){
@@ -1410,9 +1598,10 @@ function sumHTML(d, r){
   h += `<div class="card flat sumbox"><h3>Co poszło niezgodnie z planem</h3><ul class="list">${d.problems.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
   if(d.checklist.length) h += `<h3>Do sprawdzenia</h3><div class="chklist">${d.checklist.map(x => `<label class="check"><input type="checkbox" data-chk="${esc(x)}"${S.sumChk[x] ? ' checked' : ''}> <span>${esc(x)}</span></label>`).join('')}</div>`;
   if(d.changes.length) h += `<h3>Zmiany na następny zabieg</h3><div class="tablewrap"><table><thead><tr><th>Parametr</th><th>Było</th><th>Zalecane</th></tr></thead><tbody>${d.changes.map(c => `<tr><td>${esc(PARAM[c.k].l)}</td><td>${esc(PARAM[c.k].f(c.from))}</td><td><b>${esc(PARAM[c.k].f(c.to))}</b></td></tr>`).join('')}</tbody></table></div>`;
-  if(d.alt) h += `<p class="note" style="margin:0">Inna możliwość – bez zmniejszania wody: ${esc(changesText(d.alt.changes))}; ${fmtMin(d.alt.pred.ts)}${d.alt.pred.n > 1 ? ' na sektor' : ''}.</p>`;
+  if(d.alt) h += `<p class="note" style="margin:0">Inna możliwość – bez zmniejszania wody: ${esc(changesText(d.alt.changes))}; ${esc(predText(d.alt.pred))}.</p>`;
+  if(d.alt2) h += `<p class="note" style="margin:0">Z dodatkową osobą: ${esc(changesText(d.alt2.changes))}; ${esc(predText(d.alt2.pred))}.</p>`;
   if(d.actions.length) h += `<ul class="list">${d.actions.map(a => `<li>${esc(a)}</li>`).join('')}</ul>`;
-  if(d.pred) h += `<p class="note" style="margin:0">Przewidywany czas przy następnym zabiegu${d.changes.length ? ' z tymi zmianami' : ''}: <b>${fmtMin(d.pred.ts)}</b>${d.pred.n > 1 ? ` na sektor (${d.pred.n} ${plSektor(d.pred.n)})` : ''}, limit ${T_MAX} min${d.pred.vmd ? ` · kropla ok. ${fmt0(d.pred.vmd)} µm${win ? ` (ChPLW ${fmtRange(win)} µm)` : ''}` : ''}.</p>`;
+  if(d.pred) h += `<p class="note" style="margin:0">Przewidywany czas przy następnym zabiegu${d.changes.length ? ' z tymi zmianami' : ''}: <b>${esc(predText(d.pred))}</b>, limit ${T_MAX} min na sektor${d.pred.vmd ? ` · kropla ok. ${fmt0(d.pred.vmd)} µm${win ? ` (ChPLW ${fmtRange(win)} µm)` : ''}` : ''}.</p>`;
   h += `<p class="note" style="margin:0">${farmKey(r.farm) ? `Po zapisaniu aplikacja zapamięta to zalecenie i przypomni o nim przy kolejnym szczepieniu na fermie „${esc(r.farm)}”.` : 'Raport nie ma nazwy fermy – zalecenie zostanie zapisane, ale aplikacja nie będzie wiedziała, przy której fermie o nim przypomnieć.'}</p></div>`;
   return h;
 }
@@ -1436,14 +1625,15 @@ async function sumSave(id, r, perm){
   if(!d.calc){ toast('Uzupełnij czas oprysku.'); return; }
   const c = d.calc, now = new Date().toISOString(), key = farmKey(r.farm);
   const L = ['', 'PODSUMOWANIE ZABIEGU',
-    `Czas rzeczywisty: ${fmtMin(c.t)}${c.n > 1 ? ` (${fmtMin(c.ts)} na sektor)` : ''}`,
+    `Czas rzeczywisty: ${fmtMin(c.t)}${Math.abs(c.ts - c.t) > 1e-6 ? ` (${fmtMin(c.ts)} na sektor)` : ''}${c.k > 1 ? ` · ${c.k} ${plOsoba(c.k)}` : ''}`,
     `Zużyta objętość: ${fmt(c.V,2)} l (plan ${fmt(r.water_l,2)} l)`,
     `Ciśnienie na manometrze: ${fmtT(c.p)} bar (plan ${fmtT(r.pressure)} bar)`,
-    `Wydatek rzeczywisty: ${fmt(c.Q,3)} l/min, oczekiwany ${fmt(c.Qexp,3)} l/min (${isNum(c.rr) ? (c.rr >= 1 ? '+' : '−') + fmt0(Math.abs(c.rr - 1) * 100) + '%' : '–'})`];
+    `Wydatek rzeczywisty${c.k > 1 ? ' (na opryskiwacz)' : ''}: ${fmt(c.Q,3)} l/min, oczekiwany ${fmt(c.Qexp,3)} l/min (${isNum(c.rr) ? (c.rr >= 1 ? '+' : '−') + fmt0(Math.abs(c.rr - 1) * 100) + '%' : '–'})`];
   d.msgs.forEach(([, t]) => L.push('- ' + t));
   if(d.verify) L.push(`Zalecenia z ${fmtDate(d.verify.mod.date)}: ${d.ok ? 'zadziałały' + (perm ? ' – wprowadzone na stałe' : '') : 'nie wystarczyły'}`);
   if(d.changes.length) L.push('Zmiany na następny zabieg: ' + changesText(d.changes));
-  if(d.alt) L.push('Inna możliwość (bez zmniejszania wody): ' + changesText(d.alt.changes));
+  if(d.alt) L.push('Inna możliwość (bez zmniejszania wody): ' + changesText(d.alt.changes) + '; ' + predText(d.alt.pred));
+  if(d.alt2) L.push('Z dodatkową osobą: ' + changesText(d.alt2.changes) + '; ' + predText(d.alt2.pred));
   d.actions.forEach(a => L.push('Zalecenie: ' + a));
   if(d.checklist.length) L.push('Do sprawdzenia: ' + d.checklist.map(x => (S.sumChk[x] ? '[x] ' : '[ ] ') + x).join('; '));
   if(!d.problems.length) L.push('Zabieg zgodny z planem.');
@@ -1468,8 +1658,9 @@ async function sumSave(id, r, perm){
       await S.store.set(mid, {kind:'mod', farm:r.farm || '', farmKey:key, vacId:r.vacId || '', vacName:r.vacName || '', date:r.date || todayISO(),
         createdAt:own ? own[1].createdAt : now, updatedAt:now, srcReport:id, prev:r.modId || null,
         problems:d.problems, changes:d.changes, actions:d.actions, checklist:d.checklist.map(x => ({t:x, ok:!!S.sumChk[x]})),
-        pred:d.pred ? {ts:d.pred.ts, n:d.pred.n, vmd:d.pred.vmd} : null,
-        alt:d.alt ? {changes:d.alt.changes, ts:d.alt.pred.ts, n:d.alt.pred.n} : null,
+        pred:d.pred ? {t:d.pred.t, ts:d.pred.ts, n:d.pred.n, k:d.pred.k || 1, vmd:d.pred.vmd} : null,
+        alt:d.alt ? {changes:d.alt.changes, t:d.alt.pred.t, ts:d.alt.pred.ts, n:d.alt.pred.n, k:d.alt.pred.k || 1} : null,
+        alt2:d.alt2 ? {changes:d.alt2.changes, t:d.alt2.pred.t, ts:d.alt2.pred.ts, n:d.alt2.pred.n, k:d.alt2.pred.k || 1} : null,
         status:own && own[1].status !== 'zalecona' ? own[1].status : 'zalecona'});
       msg = key ? `Zapisano. Przy kolejnym szczepieniu na fermie „${r.farm}” aplikacja przypomni o zaleceniach.` : 'Zapisano. Wpisuj nazwę fermy w raporcie – wtedy aplikacja przypomni o zaleceniach przy kolejnym szczepieniu.';
     } else if(own && own[1].status === 'zalecona') await S.store.remove(own[0]);
@@ -1484,6 +1675,8 @@ function formMatches(chs){
     if(c.k === 'pressure') return Math.abs(num('s-p',0) - c.to) < 0.051;
     if(c.k === 'ml1000') return Math.abs(num('s-ml',0) - c.to) < 0.5;
     if(c.k === 'sectors') return Math.round(num('s-sec',1)) === c.to;
+    if(c.k === 'persons') return Math.round(num('s-os',1)) === c.to;
+    if(c.k === 'org') return $('s-org').value === c.to || Math.round(num('s-sec',1)) === 1;
     if(c.k === 'mode') return $('s-mode').value === c.to;
     if(c.k === 'flow'){
       if(!c.to || $('s-src').value !== c.to.key) return false;
@@ -1505,6 +1698,8 @@ function applyChanges(chs){
     if(c.k === 'pressure') $('s-p').value = c.to;
     if(c.k === 'ml1000'){ $('s-ml').value = c.to; S.mlTouched = true; }
     if(c.k === 'sectors') $('s-sec').value = c.to;
+    if(c.k === 'persons') $('s-os').value = c.to;
+    if(c.k === 'org' && ORG_L[c.to]) $('s-org').value = c.to;
     if(c.k === 'mode' && MODE_L[c.to]) $('s-mode').value = c.to;
     if(c.k === 'flow') setFlow(c.to);
   }
@@ -1520,6 +1715,8 @@ function applyFarmSettings(quiet){
   if(P.flow) setFlow(P.flow);
   if(P.mode && MODE_L[P.mode]) $('s-mode').value = P.mode;
   if(isNum(P.sectors)) $('s-sec').value = P.sectors;
+  if(isNum(P.persons)) $('s-os').value = P.persons;
+  if(P.org && ORG_L[P.org]) $('s-org').value = P.org;
   if(isNum(P.pressure)){
     const vm = P.flow && P.flow.key === 'reczne' ? vmdEst(P.pressure, P.flow.q * Math.sqrt(P.pressure / P.flow.bar)) : vmdAt(P.pressure);
     if(!v || v.id === P.vacId || !win || inWin(win, vm)) $('s-p').value = P.pressure;
@@ -1603,8 +1800,9 @@ function modCard(m){
     ${(m.problems || []).length ? `<div><span class="note">Niezgodne z planem</span><ul class="list">${m.problems.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
     ${rows ? `<div class="tablewrap"><table><thead><tr><th>Parametr</th><th>Było</th><th>Zalecono</th></tr></thead><tbody>${rows}</tbody></table></div>` : ''}
     ${(m.actions || []).length ? `<ul class="list">${m.actions.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
-    ${m.pred ? `<span class="note">Przewidywany czas po zmianach: ${fmtMin(m.pred.ts)}${m.pred.n > 1 ? ` na sektor (${m.pred.n} ${plSektor(m.pred.n)})` : ''}${m.pred.vmd ? ` · kropla ok. ${fmt0(m.pred.vmd)} µm` : ''}</span>` : ''}
-    ${m.alt ? `<span class="note">Inna możliwość – bez zmniejszania wody: ${esc(changesText(m.alt.changes))}; ${fmtMin(m.alt.ts)}${m.alt.n > 1 ? ' na sektor' : ''}.</span>` : ''}
+    ${m.pred ? `<span class="note">Przewidywany czas po zmianach: ${esc(predText(m.pred))}${m.pred.vmd ? ` · kropla ok. ${fmt0(m.pred.vmd)} µm` : ''}</span>` : ''}
+    ${m.alt ? `<span class="note">Inna możliwość – bez zmniejszania wody: ${esc(changesText(m.alt.changes))}; ${esc(predText(m.alt))}.</span>` : ''}
+    ${m.alt2 ? `<span class="note">Z dodatkową osobą: ${esc(changesText(m.alt2.changes))}; ${esc(predText(m.alt2))}.</span>` : ''}
     ${chk.length ? `<details${m.status === 'zalecona' ? ' open' : ''}><summary>Lista kontrolna – ${chk.filter(x => x.ok).length} z ${chk.length} sprawdzone</summary><div class="chklist" style="margin-top:6px">${chk.map((x, i) => `<label class="check"><input type="checkbox" data-mc="${i}" data-id="${esc(m.id)}"${x.ok ? ' checked' : ''}> <span>${esc(x.t)}</span></label>`).join('')}</div></details>` : ''}
     <span class="note">${esc(hist)}</span>
     <div class="tools">${tools}</div></div>`;
@@ -1680,7 +1878,10 @@ function renderRules(){
   <div><h3>Oprysk</h3><ul class="list">
     <li>Woda na 1000 dawek wg ChPLW: zwykle 150–500 ml; Poulvac IB Primer dla opryskiwacza plecakowego: 250 ml (klatki), 500 ml (ściółka).</li>
     <li>Birchmeier zaleca do szczepienia drobiu tylko dyszę TXVK-6. Ciśnienie 2,0–2,5 bar (z dmuchawą maks. 3). Przepływ: katalog Birchmeier lub test cylindrem.</li>
-    <li>Pisklęta – bez dmuchawy, 30–50 cm nad ptakami. Szczepienia przypominające – dmuchawa AS 1200 poziom 1 (wyjątkowo 2). Wentylacja wyłączona w trakcie i 15–30 min po.</li></ul></div>
+    <li>Pisklęta – bez dmuchawy, 30–50 cm nad ptakami. Szczepienia przypominające – dmuchawa AS 1200 poziom 1 (wyjątkowo 2). Wentylacja wyłączona w trakcie i 15–30 min po.</li>
+    <li>Cały zabieg – od rozpuszczenia fiolek do końca oprysku – musi zmieścić się w czasie zużycia z ChPLW (pole „Zużyć w”, zwykle 1–3 h). Aplikacja porównuje go z planem.</li>
+    <li>Kilka osób: każda z własnym opryskiwaczem ustawionym tak samo. Wszystkie fiolki rozpuść w całej wodzie, wymieszaj i dopiero wtedy rozlej do opryskiwaczy wg tabeli w wyniku. Osoby w osobnych sektorach skracają cały zabieg; praca razem, sektor po sektorze, skraca też czas w każdym sektorze.</li>
+    <li>Zbiornik REC 15 mieści 15 l. Większą objętość na osobę przygotuj w czystym pojemniku i dolewaj w trakcie.</li></ul></div>
   <div><h3>Kropla do oka / nosa i iniekcja</h3><ul class="list">
     <li>Rozpuszczalnik na 1000 dawek wg ChPLW: 30–31,5 ml (Cevac, Nobilis), 50 ml (Primun, Avinew), 100 ml (Avishield).</li>
     <li>Szczepionki inaktywowane: zwykle 0,5 ml i.m. lub s.c. (Gallimune 407: 0,3 ml); doprowadzić do 15–25°C i wstrząsnąć.</li></ul></div>
@@ -1688,8 +1889,109 @@ function renderRules(){
   <div><h3>Źródła</h3><ul class="list">
     <li><a href="https://rejestry.ezdrowie.gov.pl/rpl/search/public" target="_blank" rel="noopener">Rejestr Produktów Leczniczych</a> – ulotki i ChPLW (linki przy każdej szczepionce)</li>
     <li><a href="https://eli.gov.pl/api/acts/DU/2026/335/text/I/D20260335.pdf" target="_blank" rel="noopener">Dz.U. 2026 poz. 335</a> · <a href="https://fs.siteor.com/wagrowiec-piw/files/!09202025/Przewodnik_ND_GIW_2025_v_5.pdf" target="_blank" rel="noopener">GIW – przewodnik ND v5</a></li>
-    <li><a href="https://eseu.aviagen.com/assets/Tech_Center/Broiler_Breeder_Tech_Articles/English/AviagenBrief_DrinkingWaterVaccination_Sept08.pdf" target="_blank" rel="noopener">Aviagen – szczepienie przez wodę</a> · katalog i instrukcja Birchmeier AS 1200 (zdjęcia z 9.11.2026)</li></ul>
+    <li><a href="https://eseu.aviagen.com/assets/Tech_Center/Broiler_Breeder_Tech_Articles/English/AviagenBrief_DrinkingWaterVaccination_Sept08.pdf" target="_blank" rel="noopener">Aviagen – szczepienie przez wodę</a> · katalog i instrukcja Birchmeier AS 1200 (zdjęcia z 9.11.2026) · <a href="https://www.birchmeier.us/en/content/products/rec-15-ac1/index.php" target="_blank" rel="noopener">Birchmeier REC 15 AC1</a> – zbiornik 15 l</li></ul>
     <p class="note">Przed zabiegiem obowiązuje aktualna ChPLW serii i decyzja lekarza weterynarii.</p></div>`;
+}
+
+/* ---------- Licencja: zdalna blokada i hasło (kill-switch) ----------
+   Operator steruje wszystkimi kopiami plikiem kontrola.json obok aplikacji (GitHub Pages):
+   blokada – true blokuje wszystkie kopie; haslo – skrót PBKDF2 hasła (pusty = bez hasła);
+   komunikat – tekst na ekranie blokady; maksDniBezInternetu – po tylu dniach bez połączenia
+   aplikacja prosi o internet (0 = bez limitu). Plik przygotowuje strona operator.html.
+   Aplikacja sprawdza plik przy starcie, po powrocie do aplikacji, po odzyskaniu internetu
+   i co 30 min; bez internetu działa według ostatniego znanego stanu. Hasło podane raz
+   zostaje w telefonie do czasu, aż operator je zmieni. */
+const GATE_URL = './kontrola.json', GATE_KEY = 'liczydlo.licencja.v1', PASS_KEY = 'liczydlo.dostep.v1';
+const G = {ctl:null, at:null, state:'open', busy:null, net:null};
+function lsGet(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
+function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+function gateNorm(j){
+  const o = j && typeof j === 'object' ? j : {};
+  return {blokada:o.blokada === true, haslo:typeof o.haslo === 'string' ? o.haslo.trim() : '', komunikat:typeof o.komunikat === 'string' ? o.komunikat.trim().slice(0, 500) : '',
+    dni:Math.max(0, Math.min(365, parseInt(o.maksDniBezInternetu != null ? o.maksDniBezInternetu : o.dni, 10) || 0))};   // dni – zapis w telefonie
+}
+function gateState(){
+  const c = G.ctl; if(!c) return 'open';
+  if(c.blokada) return 'lock';
+  if(c.dni > 0 && G.at && Date.now() - Date.parse(G.at) > c.dni * 864e5) return 'stale';
+  if(c.haslo){ const a = lsGet(PASS_KEY); if(!a || a.h !== c.haslo) return 'pass'; }
+  return 'open';
+}
+function gateRender(){
+  const st = G.state = gateState(), box = $('gate'); if(!box) return;
+  const was = !box.hidden; box.hidden = st === 'open';
+  ['main', 'header.appbar'].forEach(s => { const el = document.querySelector(s); if(el) el.inert = st !== 'open'; });
+  if(st === 'open'){ if(was) $('gate-err').textContent = ''; return; }
+  const c = G.ctl || {};
+  $('gate-h').textContent = st === 'lock' ? 'Aplikacja zablokowana' : st === 'pass' ? 'Podaj hasło' : 'Potwierdź licencję';
+  $('gate-msg').textContent = st === 'lock' ? (c.komunikat || 'Operator zawiesił udostępnianie aplikacji.')
+    : st === 'pass' ? (c.komunikat || 'Dostęp do aplikacji wymaga hasła od operatora.')
+    : `Aplikacja nie łączyła się z internetem od ponad ${c.dni} ${pl(c.dni, 'dnia', 'dni', 'dni')}. Połącz telefon z internetem i stuknij „Sprawdź ponownie”.`;
+  $('gate-form').hidden = st !== 'pass';
+}
+// Wynik: true – odczytano stan od operatora; false – brak internetu lub błąd (zostaje ostatni znany stan)
+function gateCheck(){
+  if(IN_ARTIFACT) return Promise.resolve(false);
+  if(G.busy) return G.busy;
+  G.busy = (async () => {
+    let ok = false;
+    try {
+      const r = await fetch(GATE_URL + '?t=' + Date.now(), {cache:'no-store'});
+      if(r.ok || r.status === 404){ G.ctl = gateNorm(r.ok ? await r.json() : {}); G.at = new Date().toISOString(); lsSet(GATE_KEY, {ctl:G.ctl, at:G.at}); ok = true; }
+    } catch(e){}
+    G.net = ok; G.busy = null; gateRender(); licInfo();
+    return ok;
+  })();
+  return G.busy;
+}
+function b64e(u8){ let s = ''; for(const b of u8) s += String.fromCharCode(b); return btoa(s); }
+function b64d(s){ const b = atob(s), u = new Uint8Array(b.length); for(let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+// Zapis hasła: pbkdf2-sha256$iteracje$sól$skrót (base64) – ten sam format tworzy strona operator.html
+async function passOk(pass, rec){
+  const p = String(rec || '').split('$');
+  if(p.length !== 4 || p[0] !== 'pbkdf2-sha256') return false;
+  const it = parseInt(p[1], 10); if(!(it >= 1000 && it <= 5e6)) return false;
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass.normalize('NFC')), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({name:'PBKDF2', hash:'SHA-256', salt:b64d(p[2]), iterations:it}, key, 256);
+  return b64e(new Uint8Array(bits)) === p[3];
+}
+async function gateUnlock(ev){
+  ev.preventDefault();
+  const inp = $('gate-pass'), err = $('gate-err'), btn = $('gate-ok'), c = G.ctl;
+  if(!c || !c.haslo){ gateRender(); return; }
+  if(!inp.value){ err.textContent = 'Wpisz hasło.'; return; }
+  if(!(window.crypto && crypto.subtle)){ err.textContent = 'Hasło działa w aplikacji otwartej z jej adresu (https).'; return; }
+  btn.disabled = true; err.textContent = 'Sprawdzam hasło…';
+  let ok = false; try { ok = await passOk(inp.value, c.haslo); } catch(e){}
+  if(!ok) await new Promise(r => setTimeout(r, 700));   // spowalnia zgadywanie
+  btn.disabled = false;
+  if(ok){ lsSet(PASS_KEY, {h:c.haslo, at:new Date().toISOString()}); inp.value = ''; err.textContent = ''; gateRender(); toast('Odblokowano.'); }
+  else { err.textContent = 'Nieprawidłowe hasło.'; inp.select(); }
+}
+async function gateRetry(){
+  const err = $('gate-err'); err.textContent = 'Sprawdzam…';
+  const ok = await gateCheck();
+  if(G.state === 'open') return;
+  err.textContent = !ok ? 'Brak połączenia z serwerem aplikacji – sprawdź internet.' : G.state === 'lock' ? 'Blokada nadal obowiązuje.' : G.state === 'pass' ? '' : 'Nie udało się potwierdzić licencji.';
+}
+function licInfo(){
+  const el = $('i-lic'); if(!el) return;
+  if(IN_ARTIFACT){ el.textContent = 'podgląd w Claude – bez sprawdzania'; return; }
+  const c = G.ctl, when = G.at ? new Date(G.at).toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) : null;
+  const st = G.state === 'lock' ? 'zablokowana' : G.state === 'pass' ? 'wymaga hasła' : G.state === 'stale' ? 'wymaga potwierdzenia przez internet' : c && c.haslo ? 'aktywna, z hasłem' : 'aktywna';
+  el.textContent = when ? `${st} · sprawdzono ${when}` : 'jeszcze nie sprawdzono – połącz z internetem';
+}
+function gateInit(){
+  const s = lsGet(GATE_KEY); if(s && s.ctl){ G.ctl = gateNorm(s.ctl); G.at = s.at || null; }
+  gateRender();
+  $('gate-form').addEventListener('submit', gateUnlock);
+  $('gate-retry').addEventListener('click', gateRetry);
+  $('gate-export').addEventListener('click', exportBackup);
+  if(IN_ARTIFACT) return;
+  gateCheck();
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') gateCheck(); });
+  window.addEventListener('online', () => gateCheck());
+  setInterval(() => gateCheck(), 30 * 60 * 1000);
 }
 
 /* ---------- Nawigacja i start ---------- */
@@ -1720,13 +2022,15 @@ function bind(){
   $('s-ml').addEventListener('input', () => { S.mlTouched = true; });
   $('s-src').addEventListener('change', flowSrcUI);
   $('age').addEventListener('input', () => { if(!S.mlTouched) applyDefaultsSpray(); });
-  $('v-obliczenia').addEventListener('input', ev => { if(['bird','dz','vac'].includes(ev.target.id)) return; calc(); });
+  $('v-obliczenia').addEventListener('input', ev => { if(['bird','dz','vac'].includes(ev.target.id)) return; scheduleCalc(); });
   $('w-dose').addEventListener('change', calc);
   $('save').addEventListener('click', ev => saveReport(ev.currentTarget));
-  $('copy').addEventListener('click', () => copyText(reportText()));
+  $('copy').addEventListener('click', () => { if(S.last && S.last.empty){ toast('Wpisz liczbę ptaków.'); return; } copyText(reportText()); });
   $('r-q').addEventListener('input', renderReports);
   $('r-list').addEventListener('click', reportAction);
   $('r-list').addEventListener('change', ev => { const x = ev.target.closest('[data-chk]'); if(x) S.sumChk[x.dataset.chk] = x.checked; });
+  // Podsumowanie przelicza się samo w trakcie wpisywania
+  $('r-list').addEventListener('input', ev => { if(!/^sum-/.test(ev.target.id || '')) return; clearTimeout(sumTimer); sumTimer = setTimeout(() => { const r = S.sum && S.reps[S.sum]; if(r) sumCalc(r); }, 250); });
   $('farm').addEventListener('change', onFarmChange);
   $('farm-alert').addEventListener('click', farmAlertAction);
   $('m-q').addEventListener('input', renderMods);
@@ -1753,6 +2057,8 @@ function flowSrcUI(){
 function applyDefaultsSpray(){ const sd = sprayDefault(curVac(), Math.max(0, Math.round(num('age',0)))); $('s-ml').value = sd.ml; $('s-ml-hint').textContent = sd.hint; }
 async function init(){
   initSplash();
+  gateInit();
+  loadFonts();
   $('date').value = todayISO();
   bind(); flowSrcUI(); fillDz(); $('dz').value = 'ND'; fillVac(); onVacChange();
   showTab(location.hash.slice(1) || 'obliczenia');
@@ -1790,15 +2096,15 @@ async function importBackup(file){
   toast(n ? `Wczytano pozycji z kopii: ${n}.` : 'Wszystko z kopii już jest w aplikacji.');
 }
 
-/* ---------- Strona tytułowa ---------- */
+/* ---------- Strona tytułowa – znika po dotknięciu ekranu ---------- */
 function initSplash(){
   const sp = $('splash'); if(!sp) return;
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let done = false;
-  const hide = () => { if(done) return; done = true; sp.classList.add('out'); setTimeout(() => { sp.hidden = true; }, reduce ? 0 : 550); };
+  const hide = () => { if(done) return; done = true; document.removeEventListener('keydown', onKey); sp.classList.add('out'); setTimeout(() => { sp.hidden = true; }, reduce ? 0 : 550); };
+  const onKey = ev => { if(ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Escape'){ ev.preventDefault(); hide(); } };
   sp.addEventListener('click', hide);
-  document.addEventListener('keydown', hide, {once:true});
-  setTimeout(hide, 1900);
+  document.addEventListener('keydown', onKey);
 }
 
 /* ---------- Aplikacja na telefon: instalacja i aktualizacje ---------- */
@@ -1850,7 +2156,14 @@ async function installApp(){
   S.installEvt.prompt(); try { await S.installEvt.userChoice; } catch(e){}
   S.installEvt = null; $('i-install').hidden = true;
 }
+// Czcionki ładują się w tle (media="print" → "all"), więc nie wstrzymują pierwszego wyświetlenia.
+function loadFonts(){
+  const l = document.querySelector('link[data-fonts]'); if(!l) return;
+  const on = () => { l.media = 'all'; };
+  if(l.sheet) on(); else l.addEventListener('load', on, {once:true});
+}
 function renderInfo(){
+  licInfo();
   $('i-ver').textContent = APP_VERSION;
   $('i-data').textContent = `ChPLW i ulotki – stan na ${DATA_DATE}; ${VACCINES.length} szczepionek`;
   $('i-mode').textContent = S.mode === 'db' ? 'w pamięci aplikacji (Claude)' : IN_ARTIFACT ? 'tylko w tej przeglądarce' : 'w tym telefonie (kopia w zakładce Raporty)';

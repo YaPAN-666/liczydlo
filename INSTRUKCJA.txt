@@ -1,4 +1,4 @@
-LICZYDŁO APP – wersja 1.3.0
+LICZYDŁO APP – wersja 1.4.0
 =====================================
 
 Zawartość folderu „liczydlo”:
@@ -6,6 +6,7 @@ Zawartość folderu „liczydlo”:
   manifest.webmanifest  – nazwa, ikona i kolory aplikacji na telefonie
   sw.js                 – praca bez internetu i aktualizacje
   version.json          – numer wersji i lista zmian
+  operator.html         – strona operatora: blokada wszystkich kopii i hasło
   icons/                – ikony aplikacji
 
 1. UMIESZCZENIE W INTERNECIE (raz) – GitHub Pages, bezpłatnie
@@ -36,7 +37,18 @@ Zawartość folderu „liczydlo”:
    danych Chrome je usuwa. Zakładka Raporty → „Zapisz kopię raportów” (plik .json);
    na nowym telefonie → „Wczytaj kopię”.
 
-5. PLIK APK (opcjonalnie)
+5. LICENCJA: BLOKADA WSZYSTKICH KOPII I HASŁO (kill-switch)
+   Wszystkimi kopiami steruje plik kontrola.json w repozytorium (obok index.html).
+   a) Otwórz https://TWOJ-LOGIN.github.io/liczydlo/operator.html, wybierz ustawienia
+      (blokada, hasło, komunikat, limit dni bez internetu) → „Przygotuj plik” → „Kopiuj”.
+   b) „Otwórz plik na GitHubie” → zaznacz całą treść, wklej → „Commit changes”.
+   c) Po 1–2 minutach kopie z internetem sprawdzą nowy stan przy uruchomieniu, po powrocie
+      do aplikacji i co 30 minut. Telefon bez internetu – przy najbliższym połączeniu.
+   Hasło podane raz zostaje w telefonie, dopóki go nie zmienisz. Na ekranie blokady można
+   zawsze zapisać kopię raportów. Usunięcie pliku kontrola.json = brak ograniczeń.
+   Plik kontrola.json NIE jest częścią paczki ZIP – aktualizacja aplikacji go nie zmienia.
+
+6. PLIK APK (opcjonalnie)
    Gdy aplikacja działa pod adresem z punktu 1: wejdź na www.pwabuilder.com, wpisz adres,
    wybierz „Package for stores” → Android → pobierz paczkę i zainstaluj plik APK
    (Android zapyta o zgodę na instalację z nieznanego źródła). Treść aplikacji nadal

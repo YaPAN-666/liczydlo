@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Liczydło – operator</title>
+<style>
+:root{color-scheme:light;--bg:#f3f5f2;--surface:#fff;--ink:#17231c;--muted:#5b6b61;--line:#d5ddd6;--brand:#23553e;--brand-ink:#f1f6f2;--bad:#a3342b;--bad-soft:#f7e3e0;--ok:#23553e;--ok-soft:#e1efe6;--r:10px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#111814;--surface:#18221c;--ink:#e3ebe5;--muted:#9aaba0;--line:#2d3a32;--brand:#7cc29b;--brand-ink:#0f1a14;--bad:#f08a7e;--bad-soft:#3a1f1c;--ok:#7cc29b;--ok-soft:#1d3327}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111814;--surface:#18221c;--ink:#e3ebe5;--muted:#9aaba0;--line:#2d3a32;--brand:#7cc29b;--brand-ink:#0f1a14;--bad:#f08a7e;--bad-soft:#3a1f1c;--ok:#7cc29b;--ok-soft:#1d3327}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.np{display:grid;gap:8px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 48px;display:grid;gap:14px}
+h1{font-size:1.35rem;margin:0}
+h2{font-size:1.02rem;margin:0 0 8px}
+p{margin:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.note{color:var(--muted);font-size:.86rem}
+label{display:grid;gap:4px;font-size:.88rem;color:var(--muted)}
+.opt{display:flex;gap:8px;align-items:flex-start;color:var(--ink);font-size:.94rem}
+.opt input{margin-top:4px}
+input[type=password],input[type=number],textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+textarea{min-height:70px;resize:vertical}
+#out{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;min-height:190px}
+.btn{font:inherit;font-weight:600;border:1px solid var(--brand);background:var(--brand);color:var(--brand-ink);border-radius:8px;padding:9px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.btn.ghost{background:transparent;color:var(--brand)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:.92rem}
+dt{color:var(--muted)}
+dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.msg{border-left:3px solid var(--line);padding:6px 10px;border-radius:0 6px 6px 0;font-size:.9rem}
+.msg.bad{border-color:var(--bad);background:var(--bad-soft)}
+.msg.ok{border-color:var(--ok);background:var(--ok-soft)}
+.msg:empty{display:none}
+ol{margin:0;padding-left:20px;display:grid;gap:4px}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:6px}
+legend{font-weight:600;margin-bottom:4px;padding:0}
+</style>
+</head>
+<body>
+<main>
+  <h1>Liczydło – blokada i hasło</h1>
+  <p class="note">Strona operatora. Przygotowuje plik <b>kontrola.json</b>, który steruje wszystkimi kopiami aplikacji. Sama strona niczego nie zmienia – zmiana zaczyna działać po zapisaniu pliku w repozytorium na GitHubie.</p>
+
+  <section class="card">
+    <h2>Stan teraz</h2>
+    <dl id="now"><dt>Odczyt</dt><dd>sprawdzam…</dd></dl>
+  </section>
+
+  <section class="card">
+    <h2>Nowe ustawienia</h2>
+    <fieldset>
+      <legend>Aplikacja</legend>
+      <label class="opt"><input type="radio" name="lock" value="0" checked> działa normalnie</label>
+      <label class="opt"><input type="radio" name="lock" value="1"> zablokuj wszystkie kopie</label>
+    </fieldset>
+    <fieldset>
+      <legend>Hasło</legend>
+      <label class="opt"><input type="radio" name="pass" value="none" checked> bez hasła</label>
+      <label class="opt" id="keep-wrap" hidden><input type="radio" name="pass" value="keep"> zostaw obecne hasło</label>
+      <label class="opt"><input type="radio" name="pass" value="new"> ustaw nowe hasło (każda kopia poprosi o hasło jeden raz)</label>
+      <div id="new-pass" class="np" hidden>
+        <label>Nowe hasło (co najmniej 8 znaków)<input type="password" id="p1" autocomplete="new-password"></label>
+        <label>Powtórz hasło<input type="password" id="p2" autocomplete="new-password"></label>
+      </div>
+    </fieldset>
+    <label>Komunikat na ekranie blokady lub hasła (opcjonalnie)
+      <textarea id="msg" maxlength="500" placeholder="np. Aplikacja wstrzymana. Kontakt: …"></textarea></label>
+    <label>Po ilu dniach bez internetu aplikacja ma prosić o połączenie (0 = bez limitu)
+      <input type="number" id="days" min="0" max="365" step="1" value="0" inputmode="numeric"></label>
+    <div class="tools"><button class="btn" type="button" id="make">Przygotuj plik</button></div>
+    <div class="msg" id="err" role="alert"></div>
+  </section>
+
+  <section class="card" id="res" hidden>
+    <h2>Plik kontrola.json</h2>
+    <textarea id="out" readonly spellcheck="false"></textarea>
+    <div class="tools">
+      <button class="btn" type="button" id="copy">Kopiuj</button>
+      <a class="btn ghost" id="edit" target="_blank" rel="noopener">Otwórz plik na GitHubie</a>
+    </div>
+    <ol class="note">
+      <li>Stuknij „Kopiuj”.</li>
+      <li>„Otwórz plik na GitHubie” (zaloguj się), zaznacz całą treść pliku i wklej skopiowaną.</li>
+      <li>„Commit changes” → „Commit changes”. GitHub publikuje zmianę w 1–2 minuty.</li>
+      <li>Kopie z internetem sprawdzają stan przy uruchomieniu, po powrocie do aplikacji i co 30 minut. Telefon bez internetu dowie się przy najbliższym połączeniu.</li>
+    </ol>
+    <div class="msg ok" id="done"></div>
+  </section>
+  <p class="note">Hasło nie trafia do pliku – zapisywany jest tylko jego skrót (PBKDF2-SHA-256). Zapamiętaj hasło i przekaż je osobom uprawnionym. Plik jest publiczny, dlatego hasło powinno mieć co najmniej 8 znaków i nie być słowem ze słownika.</p>
+</main>
+<script>
+const ITER = 310000;
+const $ = id => document.getElementById(id);
+const ownerRepo = (() => { const h = location.hostname, seg = location.pathname.split('/').filter(Boolean); return h.endsWith('.github.io') ? [h.split('.')[0], seg[0] || 'liczydlo'] : ['YaPAN-666', 'liczydlo']; })();
+let current = null;
+function b64e(u8){ let s = ''; for(const b of u8) s += String.fromCharCode(b); return btoa(s); }
+async function hashPass(pass){
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass.normalize('NFC')), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({name:'PBKDF2', hash:'SHA-256', salt, iterations:ITER}, key, 256);
+  return `pbkdf2-sha256$${ITER}$${b64e(salt)}$${b64e(new Uint8Array(bits))}`;
+}
+function row(k, v){ return `<dt>${k}</dt><dd>${v}</dd>`; }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+async function readNow(){
+  const box = $('now');
+  try {
+    const r = await fetch('./kontrola.json?t=' + Date.now(), {cache:'no-store'});
+    if(r.status === 404){ current = {}; box.innerHTML = row('Plik', 'brak – aplikacja działa bez ograniczeń'); return; }
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const txt = await r.text(); let j;
+    try { j = JSON.parse(txt); } catch(e){ box.innerHTML = row('Plik', '<b>błąd składni</b> – kopie trzymają się ostatniego poprawnego stanu. Przygotuj plik od nowa.'); current = {}; return; }
+    current = j || {};
+    box.innerHTML = row('Aplikacja', j.blokada === true ? '<b>zablokowana</b>' : 'działa') + row('Hasło', j.haslo ? 'włączone' : 'wyłączone')
+      + row('Komunikat', j.komunikat ? esc(j.komunikat) : '–') + row('Limit bez internetu', (parseInt(j.maksDniBezInternetu, 10) || 0) ? `${parseInt(j.maksDniBezInternetu, 10)} dni` : 'bez limitu');
+    if(j.haslo){ $('keep-wrap').hidden = false; document.querySelector('input[name=pass][value=keep]').checked = true; }
+    if(j.blokada === true) document.querySelector('input[name=lock][value="1"]').checked = true;
+    if(j.komunikat) $('msg').value = j.komunikat;
+    $('days').value = parseInt(j.maksDniBezInternetu, 10) || 0;
+  } catch(e){ box.innerHTML = row('Odczyt', 'nie udało się odczytać pliku – sprawdź internet.'); }
+}
+function passMode(){ return document.querySelector('input[name=pass]:checked').value; }
+document.addEventListener('change', ev => { if(ev.target.name === 'pass') $('new-pass').hidden = passMode() !== 'new'; });
+$('make').addEventListener('click', async () => {
+  const err = $('err'); err.className = 'msg bad'; err.textContent = '';
+  const mode = passMode(); let haslo = '';
+  if(mode === 'keep') haslo = (current && current.haslo) || '';
+  if(mode === 'new'){
+    const a = $('p1').value, b = $('p2').value;
+    if(a.length < 8){ err.textContent = 'Hasło musi mieć co najmniej 8 znaków.'; return; }
+    if(a !== b){ err.textContent = 'Hasła się różnią.'; return; }
+    if(!(window.crypto && crypto.subtle)){ err.textContent = 'Ta przeglądarka nie potrafi utworzyć skrótu hasła – otwórz stronę przez https.'; return; }
+    $('make').disabled = true; $('make').textContent = 'Liczę skrót hasła…';
+    try { haslo = await hashPass(a); } finally { $('make').disabled = false; $('make').textContent = 'Przygotuj plik'; }
+  }
+  const days = Math.max(0, Math.min(365, parseInt($('days').value, 10) || 0));
+  const obj = {
+    _opis: 'Sterowanie wszystkimi kopiami Liczydła. Plik przygotujesz na stronie operator.html. blokada: true – zablokuj wszystkie kopie. haslo: skrót hasła (pusty – bez hasła). komunikat: tekst na ekranie blokady. maksDniBezInternetu: 0 – bez limitu. Usunięcie pliku = brak ograniczeń.',
+    blokada: document.querySelector('input[name=lock]:checked').value === '1',
+    haslo,
+    komunikat: $('msg').value.trim().slice(0, 500),
+    maksDniBezInternetu: days
+  };
+  $('out').value = JSON.stringify(obj, null, 1) + '\n';
+  $('edit').href = `https://github.com/${ownerRepo[0]}/${ownerRepo[1]}/edit/main/kontrola.json`;
+  $('res').hidden = false; $('done').textContent = '';
+  $('p1').value = $('p2').value = '';
+  $('res').scrollIntoView({behavior:'smooth', block:'start'});
+});
+$('copy').addEventListener('click', async () => {
+  const t = $('out').value;
+  try { await navigator.clipboard.writeText(t); }
+  catch(e){ $('out').select(); document.execCommand('copy'); }
+  $('done').textContent = 'Skopiowano. Teraz otwórz plik na GitHubie i wklej.';
+});
+readNow();
+</script>
+</body>
+</html>

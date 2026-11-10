@@ -1,8 +1,10 @@
 {
- "wersja": "1.2.0",
+ "wersja": "1.3.0",
  "data": "2026-11-10",
  "zmiany": [
-  "Podsumowanie zabiegu: w zapisanym raporcie wpisujesz rzeczywisty czas, objętość i ciśnienie,\n     a aplikacja liczy rzeczywisty wydatek dyszy, wskazuje, co było ustawione inaczej, i co z tym zrobić.",
-  "Wybór źródła wydatku dyszy: katalog Birchmeier, katalog TeeJet albo własny pomiar."
+  "Podsumowanie: gdy zabieg nie poszedł zgodnie z planem – lista kontrolna i konkretne zmiany ustawień na następny raz.",
+  "Pamięć zaleceń: przy kolejnym szczepieniu na tej fermie ostrzeżenie i przycisk „Zastosuj zalecenia”; w podsumowaniu sprawdzenie, czy zadziałały, i pytanie o wprowadzenie na stałe.",
+  "Zakładka „Zmiany”: spis modyfikacji i ustawienia stałe ferm.",
+  "Liczba sektorów oraz ciśnienie, przy którym zmierzono wydatek dyszy."
  ]
 }

@@ -188,6 +188,7 @@ dl.kv dd{margin:0;min-width:0}
 #crew:empty{display:none}
 #crew{margin-top:10px}
 #s-org-wrap{grid-column:1/-1}
+.row > label.wide{grid-column:1/-1}
 #lic p{margin:0}
 
 /* Pasek „Dostępna nowa wersja” */
@@ -313,8 +314,22 @@ dl.kv dd{margin:0;min-width:0}
       </div>
 
       <div class="card" id="in-spray">
-        <h2>3. Oprysk – dysza TXVK-6</h2>
+        <h2>3. Oprysk</h2>
         <div class="row">
+          <label class="wide">Opryskiwacz Birchmeier
+            <select id="s-spr">
+              <option value="rec15">REC 15 AC1 / AC2 / AC5</option>
+              <option value="rec15pc">REC 15 PC1</option>
+              <option value="rex15">REX 15 AC1</option>
+              <option value="reb15">REB 15 AC1</option>
+            </select>
+            <span class="hint" id="s-spr-hint"></span></label>
+          <label>Dysza
+            <select id="s-noz">
+              <option value="vk6">TX-VK6</option>
+              <option value="vk18">TX-VK18</option>
+            </select>
+            <span class="hint" id="s-noz-hint"></span></label>
           <label>Woda na 1000 dawek (ml)
             <input id="s-ml" type="number" min="10" step="10" value="250" inputmode="decimal">
             <span class="hint" id="s-ml-hint"></span></label>
@@ -325,7 +340,8 @@ dl.kv dd{margin:0;min-width:0}
               <option value="lanca">Bez dmuchawy (lanca)</option>
               <option value="dm1">Dmuchawa – poziom 1</option>
               <option value="dm2">Dmuchawa – poziom 2</option>
-            </select></label>
+            </select>
+            <span class="hint" id="s-mode-hint"></span></label>
           <label>Wydatek dyszy wg
             <select id="s-src">
               <option value="birch">Katalog Birchmeier</option>
@@ -815,6 +831,11 @@ const TXVK6 = [[1,0.48],[2,0.66],[3,0.79],[4,0.90],[5,1.00],[6,1.08]];
 const TXVK6_TEEJET = [[2,0.327],[3,0.393],[4,0.448],[5,0.496],[6,0.539]];
 // Orientacyjny VMD kropli TX-VK6 wg danych TeeJet [bar, µm] – Birchmeier podaje tylko klasę VF
 const VMD_TEEJET = [[2,153],[4,132],[6,122]];
+// TeeJet TX-VK18 (0,300 gpm przy 40 psi) [bar, l/min] – trzy razy więcej niż TX-VK6; zgodne z tabelą
+// Birchmeier dla dyszy tej samej klasy wydatku (AITXA 8003: 0,96 / 1,18 / 1,36 / 1,53 / 1,67 l/min przy 2–6 bar)
+const TXVK18_TEEJET = [[2,0.968],[3,1.18],[4,1.37],[5,1.53],[6,1.67]];
+// VMD kropli TX-VK18 wg danych TeeJet [bar, µm] (Dv0,1 / Dv0,9 przy 2 bar: 115 / 331 µm)
+const VMD_VK18 = [[2,235],[4,203],[6,188]];
 const DISEASES = {'ND':'Rzekomy pomór drobiu (ND)','IB':'Zakaźne zapalenie oskrzeli (IB)','IBD':'Choroba Gumboro (IBD)','aMPV':'Metapneumowirus – TRT/SHS','Marek':'Choroba Mareka','ILT':'Zakaźne zapalenie krtani i tchawicy (ILT)','AE':'Zakaźne zapalenie mózgu i rdzenia (AE)','CAV':'Zakaźna anemia kurcząt (CAV)','EDS':'Zespół spadku nieśności (EDS)','Reo':'Reowirusy','Salmonella':'Salmonelloza','E. coli':'Kolibakterioza (E. coli)','Pasteurella':'Cholera drobiu (pasterelloza)','ORT':'ORT (Ornithobacterium)','MG':'Mykoplazmoza (MG)','HE':'Krwotoczne zapalenie jelit indyków (HE)','Kokcydioza':'Kokcydioza','inne':'Inne'};
 const ROUTES = {spray:'Oprysk',woda:'Woda do picia',oko:'Oko / nos',inj:'Iniekcja',inovo:'In ovo'};
 
@@ -858,7 +879,7 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.5.0';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};
@@ -873,14 +894,68 @@ function flowTab(tab, p){
   let b = tab[0]; tab.forEach(r => { if(r[0] <= p) b = r; });
   return b[1] * Math.sqrt(p / b[0]);
 }
-const FLOW_SRC = {
-  birch:  {tab:TXVK6,        n:'katalog Birchmeier', h:'Katalog Birchmeiera: 0,66 l/min przy 2 bar.'},
-  teejet: {tab:TXVK6_TEEJET, n:'katalog TeeJet',     h:'Katalog TeeJet: 0,33 l/min przy 2 bar – połowa tego, co podaje Birchmeier.'},
-  reczne: {tab:null,         n:'pomiar własny',      h:'Najpewniejsze: zbierz ciecz z dyszy przez 60 s do cylindra.'}
+// Dysze: wydatek z katalogów [bar, l/min] i kropla VMD wg TeeJet [bar, µm].
+// Birchmeier zaleca do szczepienia drobiu dyszę TXVK-6 (instrukcja AS 1200, tabela „Użycie dysz”);
+// katalog Birchmeiera nie podaje TX-VK18.
+const NOZ = {
+  vk6:  {n:'TX-VK6',  birch:TXVK6, teejet:TXVK6_TEEJET,  vmd:VMD_TEEJET, h:'zalecana przez Birchmeiera do szczepienia drobiu'},
+  vk18: {n:'TX-VK18', birch:null,  teejet:TXVK18_TEEJET, vmd:VMD_VK18,   h:'ok. 3 razy większy wydatek i grubsza kropla niż TX-VK6'}
 };
-function vmdAt(p){
+const FLOW_SRC = {
+  birch:  {n:'katalog Birchmeier', h:{vk6:'Katalog Birchmeiera: 0,66 l/min przy 2 bar.'}},
+  teejet: {n:'katalog TeeJet',     h:{vk6:'Katalog TeeJet: 0,33 l/min przy 2 bar – połowa tego, co podaje Birchmeier.', vk18:'Katalog TeeJet: 0,97 l/min przy 2 bar. Birchmeier nie podaje tej dyszy.'}},
+  reczne: {n:'pomiar własny',      h:{vk6:'Najpewniejsze: zbierz ciecz z dyszy przez 60 s do cylindra.', vk18:'Najpewniejsze: zbierz ciecz z dyszy przez 60 s do cylindra.'}}
+};
+// Opryskiwacze plecakowe Birchmeier „Accu-Power” – ulotka linii (12076802), karta REC 15 AC1 (12076702)
+// i instrukcja REC 15 AC1/AC2/AC5 (12081203): zakres ciśnienia, wydajność pompy przy 0 bar (q0)
+// i przy ciśnieniu maksymalnym (qMax), maks. wydatek oprysku (out), zbiornik. Dmuchawa AS 1200
+// współpracuje tylko z REC 15 i REX 15 (ulotka linii, przypis 4).
+const SPRAYERS = {
+  rec15:   {n:'Birchmeier REC 15 AC1', pMin:0.5, pMax:6,  q0:2.0, qMax:1.0, out:1.4, tank:15, as:true,
+            h:'0,5–6 bar · zbiornik 15 l · pompa maks. ok. 1,4 l/min · akumulator 4 Ah ≈ 11 h pracy przy 2 bar · praca w 5–30 °C'},
+  rec15pc: {n:'Birchmeier REC 15 PC1', pMin:0.5, pMax:6,  q0:2.0, qMax:1.0, out:1.4, tank:15, as:true,
+            h:'0,5–6 bar · zbiornik 15 l · ta sama pompa co REC 15 AC1 (maks. ok. 1,4 l/min)'},
+  rex15:   {n:'Birchmeier REX 15 AC1', pMin:1,   pMax:10, q0:6.0, qMax:3.5, out:2.8, tank:15, as:true,
+            h:'1–10 bar · zbiornik 15 l · pompa maks. ok. 2,8 l/min · 10 kg'},
+  reb15:   {n:'Birchmeier REB 15 AC1', pMin:0.5, pMax:3,  q0:3.1, qMax:2.3, out:1.9, tank:15, as:false,
+            h:'0,5–3 bar · zbiornik 15 l · pompa maks. ok. 1,9 l/min · nie współpracuje z dmuchawą AS 1200'}
+};
+// Dmuchawa AS 1200 (instrukcja): prędkość powietrza i czas pracy akumulatora na danym poziomie
+const AS1200 = {dm1:{v:21, t:'5 h 40 min'}, dm2:{v:26, t:'3 h 20 min'}};
+function sprOf(id){ return SPRAYERS[id] ? id : 'rec15'; }
+function sprayer(){ const id = sprOf($('s-spr').value); return Object.assign({id}, SPRAYERS[id]); }
+function sprayerName(s){ return s && s.n || SPRAYERS.rec15.n; }
+// Wydajność pompy przy ciśnieniu p: liniowo między wartością przy 0 bar i przy ciśnieniu maksymalnym,
+// nie więcej niż maks. wydatek oprysku z ulotki. Przybliżenie z dwóch punktów danych producenta.
+function pumpCap(s, p){ if(!s || !s.q0 || !isNum(p)) return Infinity; return Math.min(s.out, s.q0 + (s.qMax - s.q0) * Math.min(Math.max(p, 0), s.pMax) / s.pMax); }
+// Najwyższe ciśnienie (krok 0,1 bar), przy którym pompa nadąża za dyszą
+function pMaxPump(s, flowFn){ let best = null; for(let pi = Math.round(s.pMin * 10); pi <= Math.round(s.pMax * 10); pi++){ const p = pi / 10, q = flowFn(p); if(isNum(q) && q <= pumpCap(s, p) + 1e-9) best = p; } return best; }
+// Wybór opryskiwacza ustawia granice ciśnienia i blokuje dmuchawę tam, gdzie nie pasuje.
+// Zwraca true, gdy trzeba było przełączyć z dmuchawy na lancę.
+function sprayerUI(){
+  const s = sprayer(), mode = $('s-mode'); let forced = false;
+  [...mode.options].forEach(o => { if(o.value !== 'lanca') o.disabled = !s.as; });
+  if(!s.as && mode.value !== 'lanca'){ mode.value = 'lanca'; forced = true; }
+  $('s-p').max = s.pMax; $('s-p').min = s.pMin;
+  $('s-spr-hint').textContent = s.h;
+  const a = AS1200[mode.value];
+  $('s-mode-hint').textContent = a ? `AS 1200: ${a.v} m/s, akumulator dmuchawy ok. ${a.t}` : 'lanca 30–50 cm nad ptakami';
+  return forced;
+}
+// Ostatnio używany sprzęt zostaje w telefonie – technik zwykle pracuje tym samym opryskiwaczem i dyszą.
+const EQ_KEY = 'liczydlo.sprzet.v1';
+function saveEquipment(){ lsSet(EQ_KEY, {spr:$('s-spr').value, noz:$('s-noz').value}); }
+function loadEquipment(){
+  const e = lsGet(EQ_KEY); if(!e) return;
+  if(SPRAYERS[e.spr]) $('s-spr').value = e.spr;
+  if(NOZ[e.noz]){ $('s-noz').value = e.noz; $('s-noz').dataset.cur = e.noz; }
+}
+function nozOf(x){ return NOZ[x] ? x : 'vk6'; }
+function nozTab(src, noz){ const z = NOZ[nozOf(noz)]; return src === 'birch' ? z.birch : src === 'teejet' ? z.teejet : null; }
+function vmdAt(p, noz){
+  const T = NOZ[nozOf(noz)].vmd;
   if(!isNum(p) || p < 2 || p > 6) return null;
-  for(let i=0;i<VMD_TEEJET.length-1;i++){ const [p1,v1] = VMD_TEEJET[i], [p2,v2] = VMD_TEEJET[i+1]; if(p >= p1 && p <= p2) return v1 + (v2-v1)*(p-p1)/(p2-p1); }
+  for(let i=0;i<T.length-1;i++){ const [p1,v1] = T[i], [p2,v2] = T[i+1]; if(p >= p1 && p <= p2) return v1 + (v2-v1)*(p-p1)/(p2-p1); }
   return null;
 }
 function parsePacks(s){ return [...new Set(String(s||'').split(/[,;\s]+/).map(x => parseInt(x,10)).filter(x => x > 0))].sort((a,b) => a-b); }
@@ -1005,6 +1080,7 @@ function calc(){
   $('age-hint').textContent = `${dol}. dzień życia · ${Math.ceil(dol/7)}. tydzień`;
   const kk = (v ? v.id : '') + '|' + route; if(S.knowKey !== kk){ S.knowKey = kk; renderKnow(v); }   // opis z ChPLW tylko po zmianie
   $('s-org-wrap').hidden = !(Math.round(num('s-os',1)) > 1 && Math.round(num('s-sec',1)) > 1);
+  sprayerUI();   // granice ciśnienia, dmuchawa i podpowiedź opryskiwacza – także przed wpisaniem liczby ptaków
   if(!(birds > 0)){
     const R0 = {route, age, birds:0};
     $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R0) : '';
@@ -1034,19 +1110,22 @@ function calc(){
 
   if(route === 'spray'){
     const sp = (v && v.r && v.r.spray) || {};
+    const SP = sprayer();   // sprayerUI() na początku calc() już ustawił granice i ewentualnie lancę
     const ml = Math.max(0, num('s-ml',0)), p = num('s-p',0), mode = $('s-mode').value;
     const nsec = Math.max(1, Math.min(6, Math.round(num('s-sec',1))));
     const k = Math.max(1, Math.min(6, Math.round(num('s-os',1)))), C = crewPlan(k, nsec, $('s-org').value);
+    const noz = nozOf($('s-noz').value), NZ = NOZ[noz], tankL = SP.tank;
     const src = $('s-src').value, fs = FLOW_SRC[src] || FLOW_SRC.birch;
     const qm = pf($('s-q').value), measured = isNum(qm) && qm > 0, qp0 = pf($('s-qp').value), qp = isNum(qp0) && qp0 > 0 ? qp0 : p;
-    const Q = src === 'reczne' ? (measured && p > 0 ? qm * Math.sqrt(p / qp) : NaN) : flowTab(fs.tab, p);
+    const tab = nozTab(src, noz);
+    const Q = src === 'reczne' ? (measured && p > 0 ? qm * Math.sqrt(p / qp) : NaN) : tab ? flowTab(tab, p) : NaN;
     const qsrc = src === 'reczne' ? (measured ? `pomiar własny ${fmt(qm,3)} l/min przy ${fmtT(qp)} bar` : 'pomiar własny') : `${fs.n}, ${fmtT(p)} bar`;
     // t1 – jeden opryskiwacz na całą objętość; tw – cały zabieg (od startu do końca); ts – najdłuższy sektor
     const V = birds / 1000 * ml / 1000, t1 = Q > 0 ? V / Q : NaN, tw = t1 * C.wall, ts = t1 * C.sec;
     tiles.push({k:'Woda', v:fmt(V,2) + ' l', s:`${fmtT(ml)} ml na 1000 dawek`, main:true});
     if(k > 1) tiles.push({k:'Czas zabiegu', v:fmtMin(tw), s:`${k} ${plOsoba(k)} jednocześnie · ${C.n > 1 ? fmtMin(ts) + ' na sektor' : 'razem w jednym sektorze'}`});
     else tiles.push({k:'Czas oprysku', v:fmtMin(tw), s:nsec > 1 ? `${nsec} ${plSektor(nsec)} po ${fmtMin(ts)}` : 'czysty czas natrysku'});
-    tiles.push({k:'Przepływ dyszy', v:isNum(Q) ? fmt(Q,3) + ' l/min' : '–', s:qsrc + (k > 1 ? ' · każdy opryskiwacz' : '')});
+    tiles.push({k:'Przepływ dyszy ' + NZ.n, v:isNum(Q) ? fmt(Q,3) + ' l/min' : '–', s:qsrc + (k > 1 ? ' · każdy opryskiwacz' : '')});
     if(k > 1){
       const L = C.persons.map(o => V * o.share), same = L.every(x => Math.abs(x - L[0]) < 0.005);
       tiles.push({k:'Roztwór na osobę', v:same ? fmt(L[0],2) + ' l' : L.map(x => fmt(x,2)).join(' / ') + ' l', s:'całość rozpuść razem, potem rozlej'});
@@ -1054,12 +1133,20 @@ function calc(){
     }
     $('s-org-hint').textContent = C.razem ? 'krótszy czas w każdym sektorze' : 'sektory opryskiwane równolegle';
     Object.assign(R, {ml1000:ml, water_l:V, pressure:p, flow:Q, flowSrc:qsrc, flowKey:src, flowQ:src === 'reczne' && measured ? qm : null, flowQbar:src === 'reczne' && measured ? qp : null,
-      mode:$('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, minutes:tw, sprayMin:t1, sectorMin:ts,
+      nozzle:noz, sprayer:SP.id, sprayerName:sprayerName(SP), tank:tankL || null, pMax:SP.pMax || null, mode:$('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, minutes:tw, sprayMin:t1, sectorMin:ts,
       crew:k > 1 && isNum(t1) ? C.persons.map(o => ({no:o.no, sec:o.sec, l:V * o.share, min:t1 * o.work})) : null});
     if(src === 'reczne' && !measured) msgs.push(['warn','Wpisz zmierzony przepływ dyszy, inaczej nie policzę czasu oprysku.']);
-    else if(src !== 'reczne'){
-      const vb = src === 'birch' && isNum(Q) ? vmdEst(p, Q) : null, vt = vmdAt(p);
+    else if(src !== 'reczne' && noz === 'vk6'){
+      const vb = src === 'birch' && isNum(Q) ? vmdEst(p, Q, noz) : null, vt = vmdAt(p, noz);
       msgs.push(['info', 'Katalogi podają dla TXVK-6 różne wydatki: Birchmeier dwa razy więcej niż TeeJet.' + (vb && vt && Math.abs(vb - vt) > 3 ? ` Gdyby dysza naprawdę dawała ${fmt(Q,2)} l/min, kropla miałaby ok. ${fmt0(vb)} µm, a nie ${fmt0(vt)} µm.` : '') + ' Zmierz wydatek cylindrem i wybierz „Pomiar własny”.']);
+    }
+    if(noz === 'vk18'){
+      // Dysza TX-VK18: ostrzeżenia, gdy parametry nie pasują do szczepienia
+      msgs.push(['warn', 'TX-VK18: do szczepienia drobiu Birchmeier zaleca dyszę TXVK-6 (tabela dysz do AS 1200). TX-VK18 ma ok. 3 razy większy wydatek i grubszą kroplę (ok. 190–235 µm przy 2–6 bar).']);
+      if(mode !== 'lanca') msgs.push(['warn', 'TX-VK18 z dmuchawą AS 1200: tej dyszy nie ma w tabeli dysz Birchmeiera do AS 1200, a na poziomach 1–2 dmuchawa nie rozbija grubych kropli. Szczep lancą albo załóż TX-VK6.']);
+      const q6 = flowTab(TXVK6_TEEJET, p);
+      if(isNum(t1) && q6 > 0 && src !== 'reczne') msgs.push(['info', `Ta sama objętość dyszą TX-VK6 (katalog TeeJet): ok. ${fmtMin(V / q6 * C.wall)}. Przy TX-VK18 trzeba iść ok. 3 razy szybciej, równym tempem – inaczej początek kurnika dostanie za dużo roztworu, a koniec za mało.`]);
+      if(!sp.d) msgs.push(['warn', `ChPLW (w bazie) nie podaje wielkości kropli. TX-VK18 daje kroplę grubą – ok. ${fmt0(vmdAt(Math.min(6, Math.max(2, p)), noz))} µm przy ${fmtT(Math.min(6, Math.max(2, p)))} bar. Sprawdź w ChPLW, czy szczepionka dopuszcza oprysk grubokroplisty.`]);
     }
     if(isNum(ts) && ts > T_MAX) msgs.push(['bad', `Planowany czas ${fmtMin(ts)}${nsec > 1 ? ' na sektor' : ''} przekracza ${T_MAX} min – granicę wyłączonej wentylacji. Podziel kurnik na sektory, dodaj osobę z opryskiwaczem albo zmień ustawienia w granicach ChPLW.`]);
     else if(isNum(ts) && ts > T_GOAL) msgs.push(['warn', `Planowany czas ${fmtMin(ts)}${nsec > 1 ? ' na sektor' : ''} – blisko granicy wyłączonej wentylacji (limit ${T_MAX} min).`]);
@@ -1069,21 +1156,35 @@ function calc(){
       else if(tw > useTarget(um)) msgs.push(['warn', `Zabieg potrwa ${fmtMin(tw)}, a szczepionkę trzeba zużyć w ${v.use} od rozpuszczenia – zostaw zapas czasu na przygotowanie roztworu.`]);
     }
     const maxL = V * Math.max(...C.persons.map(o => o.share));
-    if(maxL > TANK_L) msgs.push(['warn', `Na ${k > 1 ? 'osobę' : 'opryskiwacz'} przypada ${fmt(maxL,2)} l – więcej niż mieści zbiornik REC 15 (${TANK_L} l). Potrzebne ${Math.ceil(maxL / TANK_L)} ${pl(Math.ceil(maxL / TANK_L), 'napełnienie', 'napełnienia', 'napełnień')} – przygotuj roztwór w czystym pojemniku i dolewaj${k === 1 ? ' albo dodaj osobę z drugim opryskiwaczem' : ''}.`]);
+    if(tankL && maxL > tankL){ const nf = Math.ceil(maxL / tankL); msgs.push(['warn', `Na ${k > 1 ? 'osobę' : 'opryskiwacz'} przypada ${fmt(maxL,2)} l – więcej niż mieści zbiornik (${sprayerName(SP)}: ${fmtT(tankL)} l). Potrzebne ${nf} ${pl(nf, 'napełnienie', 'napełnienia', 'napełnień')} – przygotuj roztwór w czystym pojemniku i dolewaj${k === 1 ? ' albo dodaj osobę z drugim opryskiwaczem' : ''}.`]); }
+    // Opryskiwacz: zakres ciśnienia, wydajność pompy, dmuchawa (dane producenta)
+    if(!SP.as) msgs.push(['info', `${SP.n} nie współpracuje z dmuchawą AS 1200 (wg Birchmeiera tylko REC 15 i REX 15) – szczep lancą.`]);
+    if(p > SP.pMax + 1e-9) msgs.push(['bad', `${SP.n} pracuje do ${fmtT(SP.pMax)} bar – ustaw niższe ciśnienie.`]);
+    else if(p > 0 && p < SP.pMin - 1e-9) msgs.push(['bad', `${SP.n} pracuje od ${fmtT(SP.pMin)} bar.`]);
+    const cap = pumpCap(SP, p);
+    if(isNum(Q) && Q > cap + 1e-9 && p <= SP.pMax + 1e-9){
+      const pOk = pMaxPump(SP, pp => src === 'reczne' ? qm * Math.sqrt(pp / qp) : flowTab(tab, pp));
+      msgs.push([Q > cap * 1.1 ? 'bad' : 'warn', `Pompa ${SP.n} przy ${fmtT(p)} bar daje ok. ${fmt(cap,2)} l/min, a dysza ${NZ.n} potrzebuje ${fmt(Q,2)} l/min – ciśnienie się nie utrzyma i wydatek będzie mniejszy niż w planie.${pOk ? ` Ustaw najwyżej ok. ${fmtT(pOk)} bar` : ' Zmniejsz ciśnienie'}${noz === 'vk18' ? ' albo załóż TX-VK6' : ''}.`]);
+    }
+    if(p > 6 + 1e-9) msgs.push(['warn', `Powyżej 6 bar nie ma danych kropli i wydatku ${NZ.n} – kropla drobnieje, a okna z ChPLW nie da się sprawdzić.`]);
     if(k > 1 && C.uneven) msgs.push(['warn', `Nierówny podział: ${C.persons.map(o => `osoba ${o.no} – ${secText(o.sec)}`).join(', ')}. Osoby skończą w różnym czasie – lepiej liczba sektorów podzielna przez liczbę osób albo praca razem, sektor po sektorze.`]);
     if(k > 1) msgs.push(['info', `${k} ${plOsoba(k)}: rozpuść wszystkie fiolki w całej objętości wody, wymieszaj i dopiero wtedy rozlej do opryskiwaczy wg tabeli. Opryskiwacze ustaw tak samo – ta sama dysza i ciśnienie.`]);
     if(mode !== 'lanca' && p > 3) msgs.push(['bad','Z dmuchawą pracuj przy 2,0–2,5 bar, maksymalnie 3 bar.']);
-    else if(p < 2 || p > (mode === 'lanca' && dropWin(v) ? 6 : 3)) msgs.push(['warn', mode === 'lanca' && dropWin(v) ? 'Zalecane ciśnienie dla TXVK-6: 2,0–3,0 bar; z lancą do 6 bar, jeśli kropla mieści się w oknie z ChPLW.' : 'Zalecane ciśnienie dla TXVK-6: 2,0–2,5 bar (maks. 3).']);
+    else if(p < 2 || p > (mode === 'lanca' && dropWin(v) ? 6 : 3)) msgs.push(['warn', mode === 'lanca' && dropWin(v) ? `Zalecane ciśnienie dla ${NZ.n}: 2,0–3,0 bar; z lancą do 6 bar, jeśli kropla mieści się w oknie z ChPLW.` : `Zalecane ciśnienie dla ${NZ.n}: 2,0–2,5 bar (maks. 3).`]);
     if(mode !== 'lanca' && dol <= 7) msgs.push(['warn','Pisklęta w 1. tygodniu szczep bez dmuchawy (lanca 30–50 cm nad ptakami).']);
     if(mode === 'dm2') msgs.push(['warn','Poziom 2 tylko, gdy zasięg poziomu 1 nie wystarcza.']);
-    if(mode !== 'lanca') msgs.push(['info','Z dmuchawą: ptaki ok. 1–3 m od wylotu, strumień skośnie w dół nad stado.']);
+    if(mode !== 'lanca') msgs.push(['info','Z dmuchawą: ptaki ok. 1–3 m od wylotu, strumień skośnie w dół nad stado. Dmuchawa AS 1200 pracuje w temperaturze 5–30°C (instrukcja AS 1200) – w cieplejszym kurniku sprawdź jej działanie.']);
     const allowed = sp.ml ? [sp.ml] : (sp.opts || sp.byAge || []).map(o => o.ml);
     if(allowed.length){ const lo = Math.min(...allowed.map(a => a[0])), hi = Math.max(...allowed.map(a => a[1])); if(ml < lo || ml > hi) msgs.push(['warn', `${fmtT(ml)} ml na 1000 dawek – poza zakresem z ChPLW (${fmtT(lo)}–${fmtT(hi)} ml).`]); }
-    const vmd = src === 'reczne' && isNum(Q) ? vmdEst(p, Q) : vmdAt(p);
+    const vmd = src === 'reczne' && isNum(Q) ? vmdEst(p, Q, noz) : vmdAt(p, noz);
     if(sp.d && vmd){
       const [lo, hi] = sp.d;
       if(isNum(lo) && vmd < lo) msgs.push(['warn', `Kropla ok. ${fmt0(vmd)} µm – drobniejsza niż w ChPLW (${fmtRange(sp.d)} µm). Obniż ciśnienie do 2 bar.`]);
-      else if(isNum(hi) && vmd > hi) msgs.push(['warn', `ChPLW wymaga kropli ${fmtRange(sp.d)} µm – TXVK-6 daje grubszą (ok. ${fmt0(vmd)} µm). Decyzja lekarza.`]);
+      else if(isNum(hi) && vmd > hi){
+        // TX-VK18 nawet przy 6 bar daje ok. 188 µm – ciśnieniem nie da się zejść do okna
+        const fix = noz === 'vk18' && vmdAt(6, 'vk18') > hi && [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6].some(pp => inWin(sp.d, vmdAt(pp, 'vk6')));
+        msgs.push([noz === 'vk18' ? 'bad' : 'warn', `ChPLW wymaga kropli ${fmtRange(sp.d)} µm – ${NZ.n} daje grubszą (ok. ${fmt0(vmd)} µm).${fix ? ' Z tą szczepionką użyj dyszy TX-VK6 – TX-VK18 nawet przy 6 bar daje ok. 188 µm.' : ' Decyzja lekarza.'}`]);
+      }
       else msgs.push(['ok', `Kropla ok. ${fmt0(vmd)} µm – zgodna z ChPLW (${fmtRange(sp.d)} µm).`]);
     }
     if(sp.water) msgs.push(['info', 'Woda wg ChPLW: ' + sp.water + '.']);
@@ -1154,7 +1255,7 @@ function reportText(){
   lines.push(`Drób: ${L.bird.l} · wiek ${R.age} dni · ${fmt0(R.birds)} szt.`);
   lines.push(`Szczepienie: ${DISEASES[$('dz').value] || $('dz').value} – ${v ? v.n : 'szczepionka spoza bazy'} (${ROUTES[R.route].toLowerCase()})`);
   lines.push(`Szczepionka: ${R.packs} dawek (razem ${fmt0(R.doses)})`);
-  if(R.route === 'spray'){ lines.push(`Woda: ${fmt(R.water_l,2)} l (${fmtT(R.ml1000)} ml na 1000 dawek)`); lines.push(`Opryskiwacz: TXVK-6, ${fmtT(R.pressure)} bar, ${fmt(R.flow,3)} l/min (${R.flowSrc}), ${R.mode.toLowerCase()}`);
+  if(R.route === 'spray'){ lines.push(`Woda: ${fmt(R.water_l,2)} l (${fmtT(R.ml1000)} ml na 1000 dawek)`); lines.push(`Opryskiwacz: ${R.sprayerName || 'Birchmeier REC 15 AC1'}, dysza ${NOZ[nozOf(R.nozzle)].n}, ${fmtT(R.pressure)} bar, ${fmt(R.flow,3)} l/min (${R.flowSrc}), ${R.mode.toLowerCase()}`);
     const k = R.persons || 1, n = R.sectors || 1;
     if(k > 1){
       lines.push(`Czas zabiegu: ${fmtMin(R.minutes)} – ${k} ${plOsoba(k)} jednocześnie, ${n} ${plSektor(n)}, ${orgText(R.org, n)}${n > 1 ? `; ${fmtMin(R.sectorMin)} na sektor` : ''}`);
@@ -1319,33 +1420,45 @@ function mlRange(v){
 }
 function dropWin(v){ const d = v && v.r && v.r.spray && v.r.spray.d; return d && (isNum(d[0]) || isNum(d[1])) ? d : null; }
 function inWin(w, x){ if(!w || x == null) return true; if(isNum(w[0]) && x < w[0]) return false; if(isNum(w[1]) && x > w[1]) return false; return true; }
-// Kropla: dane TeeJet dotyczą TX-VK6 o wydatku z katalogu TeeJet. Większy rzeczywisty wydatek
+// Kropla: dane TeeJet dotyczą dyszy o wydatku z katalogu TeeJet. Większy rzeczywisty wydatek
 // oznacza większą kryzę i grubszą kroplę – VMD rośnie mniej więcej jak Q^0,39.
-function dropK(p, Q){ const qt = flowTab(TXVK6_TEEJET, p); if(!isNum(Q) || !(qt > 0)) return 1; const k = Q / qt; return Math.abs(k - 1) <= 0.1 ? 1 : Math.pow(k, 0.39); }
-function vmdEst(p, Q){ const v = vmdAt(p); return v ? v * dropK(p, Q) : null; }
-function nozzleState(key, rr){
+function dropK(p, Q, noz){ const qt = flowTab(NOZ[nozOf(noz)].teejet, p); if(!isNum(Q) || !(qt > 0)) return 1; const k = Q / qt; return Math.abs(k - 1) <= 0.1 ? 1 : Math.pow(k, 0.39); }
+function vmdEst(p, Q, noz){ const v = vmdAt(p, noz); return v ? v * dropK(p, Q, noz) : null; }
+// Stan dyszy z porównania wydatku rzeczywistego z oczekiwanym. Najpierw: czy to w ogóle ta końcówka –
+// TX-VK18 daje 3 razy więcej niż TX-VK6, więc pomyłkę widać od razu w wydatku.
+function nozzleState(key, rr, noz, Q, p){
   if(!isNum(rr)) return 'brak';
-  if(key === 'teejet' && rr >= 1.7 && rr <= 2.3) return 'jakBirch';
-  if(key === 'birch' && rr >= 0.42 && rr <= 0.58) return 'jakTeeJet';
+  noz = nozOf(noz);
+  const near = tb => { const q = tb ? flowTab(tb, p) : NaN; return isNum(Q) && q > 0 && Math.abs(Q / q - 1) <= 0.12; };
+  if(Math.abs(rr - 1) > 0.25){
+    if(noz === 'vk6' && near(TXVK18_TEEJET)) return 'jakVK18';
+    if(noz === 'vk18' && (near(TXVK6_TEEJET) || near(TXVK6))) return 'jakVK6';
+  }
+  if(noz === 'vk6' && key === 'teejet' && rr >= 1.7 && rr <= 2.3) return 'jakBirch';
+  if(noz === 'vk6' && key === 'birch' && rr >= 0.42 && rr <= 0.58) return 'jakTeeJet';
   if(Math.abs(rr - 1) <= 0.1) return 'ok';
   return rr > 1 ? 'zuzyta' : 'przydlawiona';
 }
 // Model dyszy na następny zabieg liczy dokładnie tak jak obliczenia: z katalogu albo z pomiaru
 // przeliczonego pierwiastkiem z ciśnienia; kropla z danych TeeJet, przy pomiarze poprawiona o wydatek.
-function flowAt(m, p){ return m.src === 'reczne' ? m.Q * Math.sqrt(p / m.p) : flowTab(FLOW_SRC[m.src].tab, p); }
+function flowAt(m, p){ return m.src === 'reczne' ? m.Q * Math.sqrt(p / m.p) : flowTab(nozTab(m.src, m.noz) || NOZ[nozOf(m.noz)].teejet, p); }
 function predict(m, p, ml, n, birds, k = 1, org = 'osobno'){
   const Q = flowAt(m, p), V = birds / 1000 * ml / 1000, t1 = V / Q, C = crewF(k, n, org);
-  return {Q, V, t:t1 * C.wall, ts:t1 * C.sec, n, k, org:C.org, vmd:m.src === 'reczne' ? vmdEst(p, Q) : vmdAt(p)};
+  return {Q, V, t:t1 * C.wall, ts:t1 * C.sec, n, k, org:C.org, noz:nozOf(m.noz), vmd:m.src === 'reczne' ? vmdEst(p, Q, m.noz) : vmdAt(p, m.noz)};
 }
 // Najmniejsza zmiana ustawień, przy której najdłuższy sektor mieści się w limicie czasu, kropla
 // w oknie z ChPLW, a cały zabieg – w czasie zużycia szczepionki (opt.useMax). Koszt zmiany:
 // 0,1 bar = 1, 10 ml wody mniej (w granicach ChPLW) = 1, dodatkowy sektor = 20, dodatkowa osoba
-// z opryskiwaczem = 25, zmiana trybu pracy = 30, zmiana podziału pracy = 5.
+// z opryskiwaczem = 25, zmiana trybu pracy = 30, zmiana podziału pracy = 5, powrót z TX-VK18
+// na zalecaną TX-VK6 = 15 (tylko gdy ChPLW podaje okno kropli; wydatek nowej dyszy z katalogu TeeJet).
 // Powyżej 3 bar tylko lanca i tylko przy oknie kropli. opt.kFix – wariant z określoną liczbą osób.
+// Opryskiwacz (cur.spr) ogranicza zakres ciśnienia, wydajność pompy i dostęp do dmuchawy AS 1200.
 function bestSettings(cur, m, v, birds, limit, opt = {}){
   const win = dropWin(v), mlr = mlRange(v), allowMl = opt.allowMl !== false, useMax = opt.useMax || Infinity;
-  const ck = cur.k || 1, corg = cur.org || 'osobno';
-  const modes = cur.mode !== 'lanca' && win ? [cur.mode, 'lanca'] : [cur.mode];
+  const ck = cur.k || 1, corg = cur.org || 'osobno', cnoz = nozOf(cur.noz), SPc = SPRAYERS[sprOf(cur.spr)];
+  const nozs = [[cnoz, m, 0]];
+  if(cnoz === 'vk18' && win) nozs.push(['vk6', {src:'teejet', noz:'vk6'}, 15]);
+  const modes = !SPc.as ? ['lanca'] : cur.mode !== 'lanca' && win ? [cur.mode, 'lanca'] : [cur.mode];
   const mls = [cur.ml]; if(mlr && allowMl) for(let x = Math.ceil(cur.ml / 10) * 10 - 10; x >= mlr[0]; x -= 10) mls.push(x);
   const kMin = opt.kFix || ck, kMax = opt.kFix || Math.max(3, ck), nMax = Math.max(4, cur.n);
   const combos = [];   // podział pracy liczony raz: [n, k, org, wall, sec, koszt]
@@ -1356,18 +1469,18 @@ function bestSettings(cur, m, v, birds, limit, opt = {}){
     }
   }
   let best = null;
-  for(const mode of modes){
-    const pmax = mode === 'lanca' && win ? 6 : 3, mcost = mode !== cur.mode ? 30 : 0;
-    for(let pi = 20; pi <= pmax * 10; pi++){
-      const p = pi / 10, Q = flowAt(m, p), vmd = m.src === 'reczne' ? vmdEst(p, Q) : vmdAt(p);
-      if(!(Q > 0) || !inWin(win, vmd)) continue;
+  for(const [noz, mm, ncost] of nozs) for(const mode of modes){
+    const pmax = Math.min(mode === 'lanca' && win ? 6 : 3, SPc.pMax), mcost = (mode !== cur.mode ? 30 : 0) + ncost;
+    for(let pi = Math.max(20, Math.round(SPc.pMin * 10)); pi <= Math.round(pmax * 10); pi++){
+      const p = pi / 10, Q = flowAt(mm, p), vmd = mm.src === 'reczne' ? vmdEst(p, Q, noz) : vmdAt(p, noz);
+      if(!(Q > 0) || !inWin(win, vmd) || Q > pumpCap(SPc, p) + 1e-9) continue;   // pompa musi nadążyć za dyszą
       const pcost = Math.abs(p - cur.p) * 10 + mcost;
       for(const ml of mls){
         const V = birds / 1000 * ml / 1000, t1 = V / Q, mlcost = pcost + Math.max(0, cur.ml - ml) / 10;
         for(const [n, k, org, wall, sec, ccost] of combos){
           if(!(t1 * sec <= limit) || !(t1 * wall <= useMax)) continue;
           const cost = mlcost + ccost;
-          if(!best || cost < best.cost - 1e-9) best = {p, ml, n, k, org, mode, cost, pr:{Q, V, t:t1 * wall, ts:t1 * sec, n, k, org, vmd}};
+          if(!best || cost < best.cost - 1e-9) best = {p, ml, n, k, org, mode, noz, m:mm, cost, pr:{Q, V, t:t1 * wall, ts:t1 * sec, n, k, org, noz, vmd}};
         }
       }
     }
@@ -1387,6 +1500,7 @@ function flowLabel(x){
   return (FLOW_SRC[x.key] || {}).n || String(x.key);
 }
 const PARAM = {
+  nozzle:   {l:'Dysza',              f:x => NOZ[nozOf(x)].n},
   flow:     {l:'Wydatek dyszy wg',   f:flowLabel},
   pressure: {l:'Ciśnienie',          f:x => fmtT(x) + ' bar'},
   ml1000:   {l:'Woda na 1000 dawek', f:x => fmtT(x) + ' ml'},
@@ -1399,10 +1513,11 @@ function changesText(chs){ return (chs || []).filter(c => PARAM[c.k]).map(c => `
 // Pełne ustawienia oprysku z raportu – to one zostały sprawdzone w zabiegu, więc to je zapisuje się na stałe
 function repConfig(rep){
   const fk = flowKeyOf(rep);
-  return {flow:fk === 'reczne' ? {key:'reczne', q:isNum(rep.flowQ) ? rep.flowQ : rep.flow, bar:isNum(rep.flowQbar) ? rep.flowQbar : rep.pressure} : {key:fk}, pressure:rep.pressure, ml1000:rep.ml1000, sectors:rep.sectors || 1, persons:rep.persons || 1, org:rep.org || 'osobno', mode:modeKeyOf(rep)};
+  return {nozzle:nozOf(rep.nozzle), flow:fk === 'reczne' ? {key:'reczne', q:isNum(rep.flowQ) ? rep.flowQ : rep.flow, bar:isNum(rep.flowQbar) ? rep.flowQbar : rep.pressure} : {key:fk}, pressure:rep.pressure, ml1000:rep.ml1000, sectors:rep.sectors || 1, persons:rep.persons || 1, org:rep.org || 'osobno', mode:modeKeyOf(rep)};
 }
 function changeList(cur, b){
   const out = [], ck = cur.k || 1, bk = b.k || 1;
+  if(b.noz && b.noz !== nozOf(cur.noz)) out.push({k:'nozzle', from:nozOf(cur.noz), to:b.noz});
   if(Math.abs(b.p - cur.p) > 0.05) out.push({k:'pressure', from:cur.p, to:b.p});
   if(Math.abs(b.ml - cur.ml) > 0.5) out.push({k:'ml1000', from:cur.ml, to:b.ml});
   if(b.n !== cur.n) out.push({k:'sectors', from:cur.n, to:b.n});
@@ -1418,7 +1533,7 @@ function sumPanel(r){
   const s = r.sum || {}, n = r.sectors || 1, k = r.persons || 1, m = r.modId && S.mods[r.modId];
   return `<div class="card flat" style="margin-top:8px" data-sum="1">
     <h3>Podsumowanie zabiegu</h3>
-    <span class="note">Plan: ${fmt(r.water_l,2)} l · ${fmt(r.flow,3)} l/min (${esc(r.flowSrc || '')}) · ${fmtMin(r.minutes)}${n > 1 ? ` w ${n} ${plSektor(n)}` : ''}${k > 1 ? ` · ${k} ${plOsoba(k)}, ${esc(orgText(r.org, n))}` : ''} · ${fmtT(r.ml1000)} ml na 1000 dawek · ${esc(r.mode || '')}</span>
+    <span class="note">Plan: ${fmt(r.water_l,2)} l · ${esc(r.sprayerName || SPRAYERS.rec15.n)}, dysza ${esc(NOZ[nozOf(r.nozzle)].n)} ·${fmt(r.flow,3)} l/min (${esc(r.flowSrc || '')}) · ${fmtMin(r.minutes)}${n > 1 ? ` w ${n} ${plSektor(n)}` : ''}${k > 1 ? ` · ${k} ${plOsoba(k)}, ${esc(orgText(r.org, n))}` : ''} · ${fmtT(r.ml1000)} ml na 1000 dawek · ${esc(r.mode || '')}</span>
     ${m ? `<span class="note">Ten zabieg sprawdza zalecenia z ${fmtDate(m.date)}: ${esc(changesText(m.changes) || (m.actions || []).join(' ') || 'lista kontrolna')}.</span>` : ''}
     <div class="row tight">
       <label>${k > 1 ? 'Rzeczywisty czas zabiegu – od startu do końca, minuty' : 'Rzeczywisty czas oprysku – łącznie, minuty'}
@@ -1452,15 +1567,17 @@ function sumDiag(r, inp){
   const n = Math.max(1, r.sectors || 1), k = Math.max(1, r.persons || 1), C = crewPlan(k, n, r.org);
   const V = isNum(inp.used) && inp.used > 0 ? inp.used : r.water_l;
   const p = isNum(inp.bar) && inp.bar > 0 ? inp.bar : r.pressure;
-  const Q = C.wall * V / t, key = flowKeyOf(r), fs = FLOW_SRC[key];
-  const Qexp = fs && fs.tab ? flowTab(fs.tab, p) : r.flow * Math.sqrt(p / r.pressure);
-  const rr = Qexp > 0 ? Q / Qexp : NaN, ns = nozzleState(key, rr), ts = t * C.sec / C.wall;
+  const Q = C.wall * V / t, key = flowKeyOf(r), fs = FLOW_SRC[key], noz = nozOf(r.nozzle), NZ = NOZ[noz], tabE = nozTab(key, noz);
+  const Qexp = tabE ? flowTab(tabE, p) : r.flow * Math.sqrt(p / r.pressure);
+  const rr = Qexp > 0 ? Q / Qexp : NaN, ns = nozzleState(key, rr, noz, Q, p), ts = t * C.sec / C.wall;
   const vac = VACCINES.find(x => x.id === r.vacId) || null, win = dropWin(vac), um = useMinutes(vac);
   const pct = x => (x >= 0 ? '+' : '−') + fmt0(Math.abs(x) * 100) + '%';
-  const vr = ns !== 'przydlawiona' && vmdAt(p) ? vmdEst(p, Q) : null;
+  // przy pomyłce końcówki kropla liczona dla tej, która naprawdę pracowała
+  const nozReal = ns === 'jakVK18' ? 'vk18' : ns === 'jakVK6' ? 'vk6' : noz;
+  const vr = ns !== 'przydlawiona' && vmdAt(p, nozReal) ? vmdEst(p, Q, nozReal) : null;
 
   tiles.push({k:k > 1 ? 'Rzeczywisty wydatek – na opryskiwacz' : 'Rzeczywisty wydatek', v:fmt(Q,3) + ' l/min', s:k > 1 ? `${fmt(V,2)} l · ${k} ${plOsoba(k)} · ${fmtMin(t)}` : `${fmt(V,2)} l w ${fmtMin(t)}`, main:true});
-  tiles.push({k:'Wydatek oczekiwany', v:fmt(Qexp,3) + ' l/min', s:key === 'reczne' ? `z pomiaru zapisanego w raporcie, ${fmtT(p)} bar` : `${fs.n}, ${fmtT(p)} bar`});
+  tiles.push({k:'Wydatek oczekiwany', v:fmt(Qexp,3) + ' l/min', s:key === 'reczne' ? `z pomiaru zapisanego w raporcie, ${fmtT(p)} bar` : `${NZ.n}, ${fs.n}, ${fmtT(p)} bar`});
   if(isNum(rr)) tiles.push({k:'Odchyłka wydatku', v:Math.abs(rr - 1) < 0.005 ? '0%' : pct(rr - 1), s:'wobec oczekiwanego'});
   if(Math.abs(ts - t) > 1e-6) tiles.push({k:'Czas na sektor', v:fmtMin(ts), s:`${n} ${plSektor(n)}${k > 1 ? ', ' + orgText(C.org, n) : ''}`});
   if(k > 1 && ns !== 'ok' && ns !== 'brak') chk.push('Wydatek każdego opryskiwacza zmierzony osobno cylindrem (60 s) – czy pracowały jednakowo');
@@ -1484,6 +1601,18 @@ function sumDiag(r, inp){
     probs.push(`zużyto ${fmt(V,2)} l roztworu zamiast ${fmt(r.water_l,2)} l`);
   }
   if(ns === 'ok') msgs.push(['ok','Wydatek dyszy zgodny z oczekiwanym (odchyłka do 10%). Dysza i ciśnienie pracowały tak, jak zakładał plan.']);
+  if(ns === 'jakVK18'){
+    msgs.push(['bad', `Dysza dała ok. ${fmt(Q / flowTab(TXVK6_TEEJET, p), 1)} razy więcej niż TX-VK6 – tyle, ile TX-VK18. Najpewniej założona była końcówka TX-VK18, a nie TX-VK6: roztwór zszedł za szybko, a kropla była grubsza (ok. ${fmt0(vmdAt(p, 'vk18'))} µm).`]);
+    probs.push(`wydatek jak TX-VK18 (${fmt(Q,2)} l/min) – prawdopodobnie inna końcówka niż TX-VK6`);
+    chk.push('Oznaczenie i kolor końcówki sprawdzone – TX-VK6 czy TX-VK18', 'Wydatek zmierzony cylindrem przy 2 bar (zbieranie 60 s)');
+    act.push('Do szczepienia załóż TX-VK6 (zalecenie Birchmeiera) i zmierz wydatek cylindrem. Jeśli zostajesz przy TX-VK18 – wybierz ją w aplikacji.');
+  }
+  if(ns === 'jakVK6'){
+    msgs.push(['warn', `Dysza dała tyle, co TX-VK6 (${fmt(Q,2)} l/min), choć w planie była TX-VK18. Najpewniej założona była TX-VK6 – stąd dłuższy czas.`]);
+    probs.push(`wydatek jak TX-VK6 (${fmt(Q,2)} l/min) – w planie była TX-VK18`);
+    chk.push('Oznaczenie i kolor końcówki sprawdzone – TX-VK6 czy TX-VK18');
+    act.push('W aplikacji wybierz dyszę, która jest naprawdę założona – TX-VK6 jest zalecana do szczepienia.');
+  }
   if(ns === 'jakBirch'){
     msgs.push(['info','Dysza dała dwa razy więcej niż katalog TeeJet – tyle, ile podaje katalog Birchmeiera. To rozstrzyga rozbieżność katalogową dla tego opryskiwacza. Przy takim wydatku kropla jest grubsza niż w danych TeeJet.']);
     probs.push(`wydatek dyszy ${pct(rr - 1)} wobec katalogu TeeJet – tyle, ile podaje katalog Birchmeiera`);
@@ -1498,18 +1627,27 @@ function sumDiag(r, inp){
   if(ns === 'zuzyta'){
     msgs.push(['warn', `Wydatek wyższy o ${fmt0((rr - 1) * 100)}%. Typowa przyczyna: zużyta kryza – otwór rozrabia się od przepływu, więc rośnie wydatek i grubnie kropla.`]);
     probs.push(`wydatek dyszy ${pct(rr - 1)} – prawdopodobnie zużyta kryza`);
-    chk.push('Końcówka porównana z nową – otwór i krawędzie kryzy', 'Nowa końcówka TX-VK6 założona', 'Manometr sprawdzony – czy nie zaniża ciśnienia', 'Wydatek zmierzony cylindrem po wymianie (60 s)');
-    act.push('Wymień końcówkę TX-VK6 i zmierz wydatek cylindrem po wymianie.');
+    chk.push('Końcówka porównana z nową – otwór i krawędzie kryzy', `Nowa końcówka ${NZ.n} założona`, 'Manometr sprawdzony – czy nie zaniża ciśnienia', 'Wydatek zmierzony cylindrem po wymianie (60 s)');
+    act.push(`Wymień końcówkę ${NZ.n} i zmierz wydatek cylindrem po wymianie.`);
   }
-  if(ns === 'przydlawiona'){
+  // Plan wymagał więcej, niż pompa opryskiwacza daje przy tym ciśnieniu – wtedy niski wydatek to granica pompy, nie zatkana dysza
+  const SPr = SPRAYERS[sprOf(r.sprayer)], capR = pumpCap(SPr, p), pumpLim = ns === 'przydlawiona' && isNum(Qexp) && Qexp > capR * 1.02 && Q <= capR * 1.15;
+  if(pumpLim){
+    const pOk = pMaxPump(SPr, pp => tabE ? flowTab(tabE, pp) : r.flow * Math.sqrt(pp / r.pressure));
+    msgs.push(['bad', `Plan zakładał ${fmt(Qexp,2)} l/min, a pompa ${SPr.n} przy ${fmtT(p)} bar daje ok. ${fmt(capR,2)} l/min. Wydatek ograniczyła pompa – ciśnienie nie utrzymało się na ustawionym poziomie.`]);
+    probs.push(`wydatek ${pct(rr - 1)} – pompa nie nadążała za dyszą ${NZ.n} przy ${fmtT(p)} bar`);
+    chk.push('Ciśnienie na sterowniku w trakcie oprysku – czy trzymało ustawioną wartość', 'Akumulator naładowany przed zabiegiem', 'Wydatek zmierzony cylindrem przy niższym ciśnieniu (60 s)');
+    act.push(`Następnym razem ustaw najwyżej ok. ${fmtT(pOk || 3)} bar${noz === 'vk18' ? ' albo załóż TX-VK6' : ''} – wtedy pompa utrzyma ciśnienie.`);
+  } else if(ns === 'przydlawiona'){
     msgs.push(['bad', `Wydatek niższy o ${fmt0((1 - rr) * 100)}% – przepływ przydławiony. Zbyt niski wydatek oznacza, że część ptaków dostała mniej dawki.`]);
     msgs.push(['warn','Przy przydławionym przepływie wielkości kropli nie da się oszacować – widmo jest wtedy nierówne. Udrożnij dyszę i powtórz pomiar wydatku.']);
     probs.push(`wydatek dyszy ${pct(rr - 1)} – przydławiony przepływ`);
-    chk.push('Sitko 50 mesh w dyszy wyjęte i przepłukane', 'Kryza drożna – sprawdzona pod światło', 'Filtr w zbiorniku czysty', 'Wąż bez zagięć i przygnieceń', 'Akumulator naładowany przed zabiegiem', 'Manometr pokazuje ustawione ciśnienie', 'Wydatek zmierzony cylindrem po czyszczeniu (60 s)');
-    act.push('Przed kolejnym zabiegiem wyczyść sitko i kryzę, sprawdź filtr, wąż i akumulator, potem zmierz wydatek cylindrem.');
+    // Instrukcja REC 15 (Usuwanie usterek): przy niewystarczającym ciśnieniu lub wydajności – filtr w zaworze spustowym i wąż zasysający
+    chk.push('Sitko 50 mesh w dyszy wyjęte i przepłukane', 'Kryza drożna – sprawdzona pod światło', 'Filtr w zaworze spustowym (rękojeść lancy) wyczyszczony', 'Wąż zasysający w zbiorniku drożny', 'Wąż bez zagięć i przygnieceń', 'Akumulator naładowany przed zabiegiem', 'Ciśnienie na sterowniku zgodne z ustawionym', 'Wydatek zmierzony cylindrem po czyszczeniu (60 s)');
+    act.push('Przed kolejnym zabiegiem wyczyść sitko i kryzę dyszy, filtr w zaworze spustowym i wąż zasysający, naładuj akumulator, potem zmierz wydatek cylindrem.');
   }
   if(vr != null){
-    tiles.push({k:'Kropla – szacunek', v:fmt0(vr) + ' µm', s:dropK(p, Q) === 1 ? `z ciśnienia ${fmtT(p)} bar` : `z ciśnienia i wydatku ${fmt(Q,2)} l/min`});
+    tiles.push({k:'Kropla – szacunek', v:fmt0(vr) + ' µm', s:(dropK(p, Q, nozReal) === 1 ? `z ciśnienia ${fmtT(p)} bar` : `z ciśnienia i wydatku ${fmt(Q,2)} l/min`) + (nozReal !== 'vk6' || noz !== 'vk6' ? ` · ${NOZ[nozReal].n}` : '')});
     if(win){
       if(inWin(win, vr)) msgs.push(['ok', `Szacowana kropla ${fmt0(vr)} µm mieści się w oknie z ChPLW (${fmtRange(win)} µm).`]);
       else {
@@ -1538,14 +1676,20 @@ function sumDiag(r, inp){
   // Ustawienia na następny zabieg: model wydatku z tego, jak dysza naprawdę pracowała.
   // Gdy dysza dała wydatek inny niż katalog TeeJet (do którego odnoszą się dane kropli),
   // aplikacja przechodzi na pomiar własny – wtedy plan i prognoza liczą kroplę tak samo.
-  let m = null, flowTo = null;
-  if(ns === 'jakBirch' || ns === 'jakTeeJet' || (ns === 'ok' && key !== 'reczne' && dropK(p, Q) !== 1)){
+  let m = null, flowTo = null, nozTo = null;
+  if(ns === 'jakVK18'){   // następnym razem zalecana TX-VK6 – plan z katalogu
+    m = {src:key === 'reczne' ? 'teejet' : key, noz:'vk6'};
+    if(key === 'reczne') flowTo = {key:'teejet'};
+  } else if(ns === 'jakVK6'){   // naprawdę pracowała TX-VK6 – plan z jej zmierzonego wydatku
+    nozTo = 'vk6'; flowTo = {key:'reczne', q:Math.round(Q * 1000) / 1000, bar:p};
+    m = {src:'reczne', Q:flowTo.q, p, noz:'vk6'};
+  } else if(ns === 'jakBirch' || ns === 'jakTeeJet' || (ns === 'ok' && key !== 'reczne' && dropK(p, Q, noz) !== 1)){
     flowTo = {key:'reczne', q:Math.round(Q * 1000) / 1000, bar:p};
-    m = {src:'reczne', Q:flowTo.q, p};
+    m = {src:'reczne', Q:flowTo.q, p, noz};
   } else if(ns !== 'brak'){   // zgodnie z planem albo po wymianie / udrożnieniu dyszy
-    m = key === 'reczne' ? {src:'reczne', Q:isNum(r.flowQ) ? r.flowQ : r.flow, p:isNum(r.flowQbar) ? r.flowQbar : r.pressure} : {src:key};
+    m = key === 'reczne' ? {src:'reczne', Q:isNum(r.flowQ) ? r.flowQ : r.flow, p:isNum(r.flowQbar) ? r.flowQbar : r.pressure, noz} : {src:key, noz};
   }
-  const cur = {p:r.pressure, ml:r.ml1000, n, k, org:C.org, mode:modeKeyOf(r)};
+  const cur = {p:r.pressure, ml:r.ml1000, n, k, org:C.org, mode:modeKeyOf(r), noz:nozTo || noz, spr:sprOf(r.sprayer)};
   if(m && r.birds > 0 && r.ml1000 > 0 && isNum(cur.p)){
     const now = predict(m, cur.p, cur.ml, cur.n, r.birds, cur.k, cur.org);
     const useMax = um ? useTarget(um) : Infinity;
@@ -1556,6 +1700,10 @@ function sumDiag(r, inp){
       if(b){
         D.changes.push(...changeList(cur, b));
         D.pred = b.pr;
+        if(b.noz !== cur.noz){   // powrót na TX-VK6: wydatek z katalogu, kropla w oknie ChPLW
+          flowTo = key === 'teejet' ? null : {key:'teejet'};
+          act.push('Załóż końcówkę TX-VK6 i zmierz jej wydatek cylindrem (60 s) – potem wpisz pomiar w aplikacji.');
+        }
         if(Math.abs(b.ml - cur.ml) > 0.5){   // wariant bez zmniejszania wody – zachowuje pokrycie ptaków
           const a = bestSettings(cur, m, vac, r.birds, lim, {useMax, allowMl:false}), ach = a ? changeList(cur, a) : [];
           if(ach.length) D.alt = {changes:ach, pred:a.pr};
@@ -1571,6 +1719,7 @@ function sumDiag(r, inp){
     }
   }
   if(flowTo) D.changes.unshift({k:'flow', from:{key, q:r.flowQ, bar:r.flowQbar}, to:flowTo});
+  if(nozTo && nozTo !== noz) D.changes.unshift({k:'nozzle', from:noz, to:nozTo});
 
   D.ok = probs.length === 0;
   if(r.modId && S.mods[r.modId]) D.verify = {id:r.modId, mod:S.mods[r.modId]};
@@ -1672,6 +1821,7 @@ async function sumSave(id, r, perm){
 function modsOf(key){ return Object.entries(S.mods).filter(([, m]) => key && m.farmKey === key).sort((a, b) => String(b[1].createdAt).localeCompare(String(a[1].createdAt))); }
 function formMatches(chs){
   return (chs || []).every(c => {
+    if(c.k === 'nozzle') return $('s-noz').value === c.to;
     if(c.k === 'pressure') return Math.abs(num('s-p',0) - c.to) < 0.051;
     if(c.k === 'ml1000') return Math.abs(num('s-ml',0) - c.to) < 0.5;
     if(c.k === 'sectors') return Math.round(num('s-sec',1)) === c.to;
@@ -1689,12 +1839,15 @@ function formMatches(chs){
 }
 function setFlow(x){
   if(!x || !FLOW_SRC[x.key]) return;
+  if(x.key === 'birch' && !nozTab('birch', $('s-noz').value)) return;   // TX-VK18 nie ma katalogu Birchmeiera
   $('s-src').value = x.key;
   if(x.key === 'reczne'){ $('s-q').value = fmtT(x.q, 3); $('s-qp').value = fmtT(x.bar); }
   flowSrcUI();
 }
 function applyChanges(chs){
-  for(const c of chs || []){
+  const list = [...(chs || [])].sort((a, b) => (b.k === 'nozzle') - (a.k === 'nozzle'));   // najpierw dysza, potem wydatek
+  for(const c of list){
+    if(c.k === 'nozzle') setNozzle(c.to, true);
     if(c.k === 'pressure') $('s-p').value = c.to;
     if(c.k === 'ml1000'){ $('s-ml').value = c.to; S.mlTouched = true; }
     if(c.k === 'sectors') $('s-sec').value = c.to;
@@ -1711,15 +1864,20 @@ function applyFarmSettings(quiet){
   const key = farmKey($('farm').value), fd = key && S.farms[farmDocId(key)];
   if(!fd || S.route !== 'spray') return false;
   if(modsOf(key).some(([, m]) => m.status === 'zalecona')) return false;
-  const P = fd.params || {}, v = curVac(), win = dropWin(v), mlr = mlRange(v), skipped = [];
+  const P = fd.params || {}, v = curVac(), win = dropWin(v), mlr = mlRange(v), skipped = [], SPc = sprayer();
+  if(P.nozzle && NOZ[P.nozzle]) setNozzle(P.nozzle, true);
   if(P.flow) setFlow(P.flow);
-  if(P.mode && MODE_L[P.mode]) $('s-mode').value = P.mode;
+  if(P.mode && MODE_L[P.mode]){
+    if(P.mode === 'lanca' || SPc.as) $('s-mode').value = P.mode;
+    else skipped.push(`dmuchawa – ${SPc.n} nie współpracuje z AS 1200`);
+  }
   if(isNum(P.sectors)) $('s-sec').value = P.sectors;
   if(isNum(P.persons)) $('s-os').value = P.persons;
   if(P.org && ORG_L[P.org]) $('s-org').value = P.org;
   if(isNum(P.pressure)){
-    const vm = P.flow && P.flow.key === 'reczne' ? vmdEst(P.pressure, P.flow.q * Math.sqrt(P.pressure / P.flow.bar)) : vmdAt(P.pressure);
-    if(!v || v.id === P.vacId || !win || inWin(win, vm)) $('s-p').value = P.pressure;
+    const vm = P.flow && P.flow.key === 'reczne' ? vmdEst(P.pressure, P.flow.q * Math.sqrt(P.pressure / P.flow.bar), P.nozzle) : vmdAt(P.pressure, P.nozzle);
+    if(P.pressure > SPc.pMax + 1e-9) skipped.push(`ciśnienie ${fmtT(P.pressure)} bar – ${SPc.n} pracuje do ${fmtT(SPc.pMax)} bar`);
+    else if(!v || v.id === P.vacId || !win || inWin(win, vm)) $('s-p').value = P.pressure;
     else skipped.push(`ciśnienie ${fmtT(P.pressure)} bar – kropla poza oknem ChPLW tej szczepionki`);
   }
   if(isNum(P.ml1000)){
@@ -1878,6 +2036,9 @@ function renderRules(){
   <div><h3>Oprysk</h3><ul class="list">
     <li>Woda na 1000 dawek wg ChPLW: zwykle 150–500 ml; Poulvac IB Primer dla opryskiwacza plecakowego: 250 ml (klatki), 500 ml (ściółka).</li>
     <li>Birchmeier zaleca do szczepienia drobiu tylko dyszę TXVK-6. Ciśnienie 2,0–2,5 bar (z dmuchawą maks. 3). Przepływ: katalog Birchmeier lub test cylindrem.</li>
+    <li>TX-VK18 daje ok. 3 razy większy wydatek i kroplę ok. 190–235 µm – pasuje tylko do szczepionek, których ChPLW dopuszcza grubą kroplę. Pompa REC 15 daje najwyżej ok. 1,4 l/min (1,0 l/min przy 6 bar), więc TX-VK18 na REC 15 tylko do ok. 3,9 bar.</li>
+    <li>Opryskiwacze: REC 15 i REC 15 PC1 0,5–6 bar, REX 15 1–10 bar, REB 15 0,5–3 bar; wszystkie mają zbiornik 15 l. Dmuchawa AS 1200 współpracuje tylko z REC 15 i REX 15.</li>
+    <li>Po zabiegu opróżnij zbiornik, wlej czystą wodę i przepompuj ją przez lancę (instrukcja REC 15). Regularnie czyść filtr w zaworze spustowym, wąż zasysający i dyszę.</li>
     <li>Pisklęta – bez dmuchawy, 30–50 cm nad ptakami. Szczepienia przypominające – dmuchawa AS 1200 poziom 1 (wyjątkowo 2). Wentylacja wyłączona w trakcie i 15–30 min po.</li>
     <li>Cały zabieg – od rozpuszczenia fiolek do końca oprysku – musi zmieścić się w czasie zużycia z ChPLW (pole „Zużyć w”, zwykle 1–3 h). Aplikacja porównuje go z planem.</li>
     <li>Kilka osób: każda z własnym opryskiwaczem ustawionym tak samo. Wszystkie fiolki rozpuść w całej wodzie, wymieszaj i dopiero wtedy rozlej do opryskiwaczy wg tabeli w wyniku. Osoby w osobnych sektorach skracają cały zabieg; praca razem, sektor po sektorze, skraca też czas w każdym sektorze.</li>
@@ -1889,7 +2050,8 @@ function renderRules(){
   <div><h3>Źródła</h3><ul class="list">
     <li><a href="https://rejestry.ezdrowie.gov.pl/rpl/search/public" target="_blank" rel="noopener">Rejestr Produktów Leczniczych</a> – ulotki i ChPLW (linki przy każdej szczepionce)</li>
     <li><a href="https://eli.gov.pl/api/acts/DU/2026/335/text/I/D20260335.pdf" target="_blank" rel="noopener">Dz.U. 2026 poz. 335</a> · <a href="https://fs.siteor.com/wagrowiec-piw/files/!09202025/Przewodnik_ND_GIW_2025_v_5.pdf" target="_blank" rel="noopener">GIW – przewodnik ND v5</a></li>
-    <li><a href="https://eseu.aviagen.com/assets/Tech_Center/Broiler_Breeder_Tech_Articles/English/AviagenBrief_DrinkingWaterVaccination_Sept08.pdf" target="_blank" rel="noopener">Aviagen – szczepienie przez wodę</a> · katalog i instrukcja Birchmeier AS 1200 (zdjęcia z 9.11.2026) · <a href="https://www.birchmeier.us/en/content/products/rec-15-ac1/index.php" target="_blank" rel="noopener">Birchmeier REC 15 AC1</a> – zbiornik 15 l</li></ul>
+    <li><a href="https://eseu.aviagen.com/assets/Tech_Center/Broiler_Breeder_Tech_Articles/English/AviagenBrief_DrinkingWaterVaccination_Sept08.pdf" target="_blank" rel="noopener">Aviagen – szczepienie przez wodę</a> · katalog i instrukcja Birchmeier AS 1200 (zdjęcia z 9.11.2026)</li>
+    <li>Birchmeier: <a href="https://www.birchmeier.pl/web/global/leaflet/rec-15-ac1/Birchmeier_REC_15_AC1_Battery_backpack_sprayer_12076702.pdf" target="_blank" rel="noopener">karta REC 15 AC1</a> · <a href="https://www.birchmeier.pl/web/global/leaflet/accu-power-line/Birchmeier_Accu-Power_line_12076802.pdf" target="_blank" rel="noopener">ulotka linii Accu-Power</a> · <a href="https://www.birchmeier.pl/web/global/gebrauchsanleitungen/rec_15_ac1/Birchmeier_REC_15_AC1_AC2_AC5_Manual-Akku-Rueckenspruehgeraet_12081203_DA_FI_SV_PL.pdf" target="_blank" rel="noopener">instrukcja REC 15 (PL)</a></li></ul>
     <p class="note">Przed zabiegiem obowiązuje aktualna ChPLW serii i decyzja lekarza weterynarii.</p></div>`;
 }
 
@@ -2021,6 +2183,8 @@ function bind(){
   $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(b) setRoute(b.dataset.route); });
   $('s-ml').addEventListener('input', () => { S.mlTouched = true; });
   $('s-src').addEventListener('change', flowSrcUI);
+  $('s-noz').addEventListener('change', ev => { setNozzle(ev.target.value); saveEquipment(); calc(); });
+  $('s-spr').addEventListener('change', () => { saveEquipment(); calc(); });
   $('age').addEventListener('input', () => { if(!S.mlTouched) applyDefaultsSpray(); });
   $('v-obliczenia').addEventListener('input', ev => { if(['bird','dz','vac'].includes(ev.target.id)) return; scheduleCalc(); });
   $('w-dose').addEventListener('change', calc);
@@ -2049,10 +2213,24 @@ function bind(){
   $('i-install').addEventListener('click', installApp);
 }
 function flowSrcUI(){
-  const src = $('s-src').value, fs = FLOW_SRC[src] || FLOW_SRC.birch;
+  const noz = nozOf($('s-noz').value), opt = $('s-src').querySelector('option[value="birch"]');
+  opt.disabled = !NOZ[noz].birch;   // katalog Birchmeiera nie podaje TX-VK18
+  if(opt.disabled && $('s-src').value === 'birch') $('s-src').value = 'teejet';
+  const src = $('s-src').value, fs = FLOW_SRC[src] || FLOW_SRC.teejet;
   $('s-q-wrap').hidden = $('s-qp-wrap').hidden = src !== 'reczne';
   if(src === 'reczne' && !$('s-qp').value) $('s-qp').value = $('s-p').value;
-  $('s-src-hint').textContent = fs.h;
+  $('s-src-hint').textContent = fs.h[noz] || '';
+  $('s-noz-hint').textContent = NOZ[noz].h;
+}
+// Zmiana dyszy: pomiar wydatku dotyczy końcówki, więc po zmianie trzeba zmierzyć nową.
+function setNozzle(noz, quiet){
+  noz = nozOf(noz); const was = nozOf($('s-noz').dataset.cur || $('s-noz').value);
+  $('s-noz').value = noz; $('s-noz').dataset.cur = noz;
+  if(was !== noz && $('s-src').value === 'reczne' && $('s-q').value){
+    $('s-q').value = ''; $('s-qp').value = '';
+    if(!quiet) toast('Zmieniono dyszę – wpisz pomiar wydatku nowej końcówki.');
+  }
+  flowSrcUI();
 }
 function applyDefaultsSpray(){ const sd = sprayDefault(curVac(), Math.max(0, Math.round(num('age',0)))); $('s-ml').value = sd.ml; $('s-ml-hint').textContent = sd.hint; }
 async function init(){
@@ -2060,7 +2238,7 @@ async function init(){
   gateInit();
   loadFonts();
   $('date').value = todayISO();
-  bind(); flowSrcUI(); fillDz(); $('dz').value = 'ND'; fillVac(); onVacChange();
+  bind(); $('s-noz').dataset.cur = $('s-noz').value; loadEquipment(); flowSrcUI(); fillDz(); $('dz').value = 'ND'; fillVac(); onVacChange();
   showTab(location.hash.slice(1) || 'obliczenia');
   let db = null, dl = null;
   try { if(window.claude && typeof window.claude.use === 'function'){ [db, dl] = await Promise.all([window.claude.use('db').catch(() => null), window.claude.use('downloads').catch(() => null)]); } } catch(e){}

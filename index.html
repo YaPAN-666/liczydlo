@@ -217,6 +217,18 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 .modcard{gap:10px}
 .modcard .card-h b{font-weight:600}
 .sumbox{display:grid;gap:8px;margin-top:8px}
+
+/* Droga podania: zawsze cztery przyciski; „inna szczepionka” – przejście do szczepionki z tą drogą */
+#route{display:grid;grid-template-columns:repeat(4,1fr)}
+#route button{min-width:0}
+#route button.alt{color:var(--muted);font-weight:400;background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(0,0,0,.035) 6px 12px)}
+#route button small{display:block;margin:2px 0 0}
+@media (max-width:560px){
+  #route{grid-template-columns:1fr 1fr}
+  #route button+button{border-left:0}
+  #route button:nth-child(even){border-left:1px solid var(--line)}
+  #route button:nth-child(n+3){border-top:1px solid var(--line)}
+}
 </style>
 </head>
 <body>
@@ -432,6 +444,8 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
             <input id="i-ml" type="number" min="0.01" step="0.05" value="0.5" inputmode="decimal"></label>
           <label>Zapas na straty (%)
             <input id="i-loss" type="number" min="0" step="1" value="3" inputmode="numeric"></label>
+          <label class="wide">Miejsce wkłucia (z ChPLW)
+            <select id="i-site"></select></label>
           <label class="wide">Aparat (strzykawka automatyczna)
             <select id="i-app">
               <option value="1">Pojedynczy – jedna szczepionka</option>
@@ -501,6 +515,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
       <label>Szukaj<input id="k-q" type="search" placeholder="nazwa, choroba, szczep"></label>
       <label>Drób<select id="k-sp"><option value="">kury i indyki</option><option value="kury">kury</option><option value="indyki">indyki</option></select></label>
       <label>Choroba<select id="k-dz"></select></label>
+      <label>Droga podania<select id="k-rt"><option value="">wszystkie</option><option value="spray">oprysk</option><option value="woda">woda do picia</option><option value="oko">oko / nos</option><option value="inj">iniekcja</option></select></label>
     </div>
     <span class="note"><span class="pill v">ChPLW PL</span> odczytano z ulotki lub ChPLW w Rejestrze Produktów Leczniczych · <span class="pill p">dane częściowe</span> ChPLW zagraniczna lub niepełny odczyt · <span class="pill u">do weryfikacji</span> sprawdź w ChPLW</span>
   </div>
@@ -732,36 +747,36 @@ const VACCINES = [
  lay:'Nie w okresie nieśności ani w stadach rodzicielskich.', mix:'Nie mieszać z innymi produktami.', sch:'Brojlery z niskim MDA (≤500 ELISA), tylko w regionach z vvIBDV. Jedna dawka.',
  r:{woda:{rule:'perDay', f:2, thirst:'1–2 h', note:'ChPLW: 2 l wody na dzień życia na 1000 brojlerów (np. 14 dni → 28 l). Fiolkę rozpuścić w 10 ml wody.'}}},
 {id:'nextmune', n:'Nextmune', m:'Ceva', t:'żywa', dz:['IBD'], s:'Winterfield 2512 (pośredni plus)', sp:['kury'], st:'v', src:[RPL(44079)],
- min:{kury:1}, minT:'in ovo (18. dzień inkubacji) lub 1. dzień życia', pk:[2000,4000,8000], use:'2 h', wd:'0 dni',
+ min:{kury:1}, max:{kury:1}, minT:'in ovo (18. dzień inkubacji) lub 1. dzień życia', pk:[2000,4000,8000], use:'2 h', wd:'0 dni',
  lay:'—', mix:'Nie mieszać (poza Cevac Solvent Poultry).', sch:'Brojlery z MDA ≥3200 j. ELISA; tylko gdy vvIBDV ma znaczenie na danym terenie.',
  r:{inj:{ml:0.2, site:'s.c. – szyja, 1. dzień życia', bags:[400,800,1000,1200,1600], note:'Ampułki w ciekłym azocie (−196°C).'}, inovo:{ml:0.05, note:'18-dniowe zarodki.'}}},
 {id:'phivax-bd1', n:'Phivax BD-1', m:'Phibro', t:'żywa', dz:['IBD'], s:'M.B. (pośredni)', sp:['kury'], st:'v', src:[RPL(43263)],
- min:{kury:1}, minT:'in ovo (18. dzień) lub 1. dzień życia', pk:[500,1000,2000,2500,3000,5000,9000,10000,12000,15000], use:'4 h', wd:'0 dni',
+ min:{kury:1}, max:{kury:1}, minT:'in ovo (18. dzień) lub 1. dzień życia', pk:[500,1000,2000,2500,3000,5000,9000,10000,12000,15000], use:'4 h', wd:'0 dni',
  lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Ten sam dzień co żywe ND – bez mieszania.', sch:'MDA >2500 j. ELISA.',
  r:{inj:{ml:0.2, range:[0.1,0.2], site:'s.c. – tylna część karku, 1. dzień', note:'Rozpuszczalnik: 100–200 ml na 1000 dawek.'}, inovo:{ml:0.05, range:[0.05,0.1], note:'Rozpuszczalnik: 50–100 ml na 1000 dawek.'}}},
 {id:'cevac-transmune', n:'Cevac Transmune', m:'Ceva', t:'immunokompleks', dz:['IBD'], s:'Winterfield 2512 + immunoglobuliny', sp:['kury'], st:'p', src:[SRC_UPD('600000085447')],
- min:{kury:1}, minT:'in ovo lub 1. dzień', pk:null, use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Sprawdź w ChPLW.', sch:'Drogi: in ovo, podskórnie.',
+ min:{kury:1}, max:{kury:1}, minT:'in ovo lub 1. dzień', pk:null, use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Sprawdź w ChPLW.', sch:'Drogi: in ovo, podskórnie.',
  r:{inj:{site:'s.c.', note:'Dawka wg ChPLW.'}, inovo:{note:'Dawka wg ChPLW.'}}},
 
 /* ---------- Marek / wektorowe ---------- */
 {id:'cevac-md-rispens', n:'Cevac MD Rispens', m:'Ceva', t:'żywa (komórkowa)', dz:['Marek'], s:'CVI-988 (serotyp 1)', sp:['kury'], st:'v', src:[RPL(44084)],
- min:{kury:1}, minT:'1. dzień życia', pk:[1000,2000,4000], use:'2 h (<25°C)', wd:'0 dni',
+ min:{kury:1}, max:{kury:1}, minT:'1. dzień życia', pk:[1000,2000,4000], use:'2 h (<25°C)', wd:'0 dni',
  lay:'Nie w okresie nieśności.', mix:'Można mieszać i podawać s.c. z Vectormune ND.', sch:'Jednorazowo w 1. dniu (przyszłe nioski). Szczep wydalany ≥112 dni.',
  r:{inj:{ml:0.2, site:'s.c. – szyja', bags:[200,400,800,1000,1200,1600], note:'Ampułki w ciekłym azocie (−196°C); rozpuszczalnik <25°C.'}}},
 {id:'nobilis-rismavac', n:'Nobilis Rismavac + CA126', m:'MSD Animal Health', t:'żywa (komórkowa)', dz:['Marek'], s:'CVI-988 + HVT FC126', sp:['kury'], st:'u', src:[],
- min:{kury:1}, minT:'1. dzień', pk:[1000,2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Sprawdź w ChPLW.', sch:'Wylęgarnia, 1. dzień.',
+ min:{kury:1}, max:{kury:1}, minT:'1. dzień', pk:[1000,2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Sprawdź w ChPLW.', sch:'Wylęgarnia, 1. dzień.',
  r:{inj:{ml:0.2, site:'s.c. lub i.m., 1. dzień', note:'Do weryfikacji w ChPLW.'}}},
 {id:'vectormune-nd', n:'Vectormune ND', m:'Ceva', t:'wektorowa HVT', dz:['Marek','ND'], s:'HVT-ND', sp:['kury'], st:'u', src:[],
- min:{kury:1}, minT:'1. dzień lub in ovo', pk:[1000,2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Cevac MD Rispens: można mieszać z Rispens.', sch:'Wylęgarnia.',
+ min:{kury:1}, max:{kury:1}, minT:'1. dzień lub in ovo', pk:[1000,2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Cevac MD Rispens: można mieszać z Rispens.', sch:'Wylęgarnia.',
  r:{inj:{ml:0.2, site:'s.c., 1. dzień', note:'Do weryfikacji w ChPLW.'}, inovo:{ml:0.05, note:'Do weryfikacji.'}}},
 {id:'innovax-nd-ilt', n:'Innovax-ND-ILT', m:'MSD Animal Health', t:'wektorowa HVT', dz:['Marek','ND','ILT'], s:'HVT-ND-ILT', sp:['kury'], st:'u', src:[],
- min:{kury:1}, minT:'1. dzień lub in ovo', pk:[2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Nobilis IB Ma5: ten sam dzień co IB Ma5.', sch:'Wylęgarnia.',
+ min:{kury:1}, max:{kury:1}, minT:'1. dzień lub in ovo', pk:[2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Nobilis IB Ma5: ten sam dzień co IB Ma5.', sch:'Wylęgarnia.',
  r:{inj:{ml:0.2, site:'s.c., 1. dzień', note:'Do weryfikacji w ChPLW.'}, inovo:{ml:0.05, note:'Do weryfikacji.'}}},
 {id:'innovax-nd-ibd', n:'Innovax-ND-IBD', m:'MSD Animal Health', t:'wektorowa HVT', dz:['Marek','ND','IBD'], s:'HVT-ND-IBD', sp:['kury'], st:'u', src:[],
- min:{kury:1}, minT:'1. dzień lub in ovo', pk:[2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Nobilis IB Ma5: ten sam dzień co IB Ma5.', sch:'Wylęgarnia.',
+ min:{kury:1}, max:{kury:1}, minT:'1. dzień lub in ovo', pk:[2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Nobilis IB Ma5: ten sam dzień co IB Ma5.', sch:'Wylęgarnia.',
  r:{inj:{ml:0.2, site:'s.c., 1. dzień', note:'Do weryfikacji w ChPLW.'}, inovo:{ml:0.05, note:'Do weryfikacji.'}}},
 {id:'vaxxitek-hvt-ibd', n:'Vaxxitek HVT+IBD', m:'Boehringer Ingelheim', t:'wektorowa HVT', dz:['Marek','IBD'], s:'vHVT013-69', sp:['kury'], st:'u', src:[],
- min:{kury:1}, minT:'1. dzień lub in ovo', pk:[1000,2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Sprawdź w ChPLW.', sch:'Wylęgarnia.',
+ min:{kury:1}, max:{kury:1}, minT:'1. dzień lub in ovo', pk:[1000,2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Sprawdź w ChPLW.', sch:'Wylęgarnia.',
  r:{inj:{ml:0.2, site:'s.c., 1. dzień', note:'Do weryfikacji w ChPLW.'}, inovo:{ml:0.05, note:'Do weryfikacji.'}}},
 
 /* ---------- Inne żywe ---------- */
@@ -902,7 +917,7 @@ function clone(o){ return JSON.parse(JSON.stringify(o ?? null)); }
 function linkSrc(s){ return s.u ? `<a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)}</a>` : esc(s.t); }
 function fillSelect(sel, opts){ const prev = sel.value; sel.innerHTML = opts.map(o => `<option value="${esc(o.v)}">${esc(o.l)}</option>`).join(''); if(opts.some(o => o.v === prev)) sel.value = prev; return sel.value !== prev; }
 let toastTimer = null;
-function toast(msg){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3000); }
+function toast(msg, ms = 3000){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, ms); }
 function armConfirm(btn){
   if(btn.dataset.armed === '1'){ btn.dataset.armed = ''; btn.textContent = btn.dataset.orig; return true; }
   btn.dataset.orig = btn.textContent; btn.dataset.armed = '1'; btn.textContent = 'Kliknij ponownie';
@@ -921,7 +936,7 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.8.0';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};
@@ -1074,6 +1089,15 @@ function fillVac2(v, bird, dol){
   fillSelect(sel, list.map(({x, note}) => ({v:x.id, l:x.n + (note ? ` – ${note}` : '')})));
   if(sel.value !== sel.dataset.cur){ sel.dataset.cur = sel.value; const x = VACCINES.find(y => y.id === sel.value); if(x && isNum(x.r.inj.ml)) $('i-ml2').value = x.r.inj.ml; }
 }
+// Miejsce wkłucia – tylko te, które wymienia ChPLW; igły wg Aviagen dla szczepionek inaktywowanych (olejowych)
+const SITES = {'im-p':'i.m. – mięsień piersiowy', 'im-u':'i.m. – udo', 'sc':'s.c. – szyja'};
+const NEEDLE = {'im-p':'18 G · 6 mm', 'im-u':'18 G · 6 mm', 'sc':'18–19 G · 10–12 mm'};
+function siteOpts(t){
+  t = String(t || ''); const i = t.indexOf('i.m.'), c = t.indexOf('s.c.');
+  const im = /ud/.test(t) ? (/pier/.test(t) ? ['im-p', 'im-u'] : ['im-u']) : ['im-p'];
+  const k = i < 0 && c < 0 ? ['im-p', 'im-u', 'sc'] : i < 0 ? ['sc'] : c < 0 ? im : i < c ? im.concat('sc') : ['sc'].concat(im);
+  return k.map(x => ({v:x, l:SITES[x]}));
+}
 function packsText(bp){ return bp ? Object.keys(bp.use).map(Number).sort((a,b) => b-a).map(k => `${bp.use[k]} × ${k.toLocaleString('pl-PL')}`).join(' + ') : '–'; }
 function mid(r){ if(!r) return null; const a = r[0], b = r[1] ?? r[0]; return isNum(a) && isNum(b) ? (a+b)/2 : (isNum(a) ? a : b); }
 function parseMilk(t){ const m = String(t||'').match(/(\d+(?:[.,]\d+)?)\s*(?:[–-]\s*\d+(?:[.,]\d+)?\s*)?g\s*\/\s*l/); return m ? parseFloat(m[1].replace(',','.')) : null; }
@@ -1130,8 +1154,9 @@ const DZ_ALL = '*', RT_SHORT = {spray:'oprysk', woda:'woda', oko:'oko', inj:'ini
 function dolNow(){ return Math.max(0, Math.round(num('age',0))) + 1; }
 function vacNote(v, bk, dol){
   if(!v) return '';
-  const b = BIRDS[bk], min = v.min ? v.min[b.g] : null;
+  const b = BIRDS[bk], min = v.min ? v.min[b.g] : null, max = v.max ? v.max[b.g] : null;
   if(isNum(min) && dol < min) return `od ${min}. dnia życia`;
+  if(isNum(max) && dol > max) return max === 1 ? 'tylko 1. dzień życia (wylęgarnia)' : `do ${max}. dnia życia`;
   if(b.lay && /(^|\. )nie (w okresie nieśności|zaleca się szczepienia kur w okresie nieśności|u kur nieśnych)/i.test(v.lay || '')) return 'nie w nieśności';
   if(bk === 'kury-brojlery' && /nie u brojlerów/i.test(v.lay || '')) return 'nie u brojlerów';
   return '';
@@ -1149,7 +1174,7 @@ function fillDz(){
 // opt.keep – zostaw „inną szczepionkę”, jeśli była wybrana (np. przy zmianie wieku)
 function fillVac(opt = {}){
   const bk = $('bird').value, g = BIRDS[bk].g, dz = $('dz').value, dol = dolNow(), prev = $('vac').value;
-  const pref = v => v.r.spray ? 0 : v.r.woda ? 1 : 2;
+  const pref = v => S.rPref && v.r[S.rPref] ? 0 : 1 + (v.r.spray ? 0 : v.r.woda ? 1 : 2);   // najpierw droga wybrana przez użytkownika
   const list = VACCINES.filter(v => v.sp.includes(g) && (dz === DZ_ALL || v.dz.includes(dz)) && RT.some(r => v.r && v.r[r]))
     .map(v => ({v, note:vacNote(v, bk, dol)}))
     .sort((a,b) => (!!a.note - !!b.note) || (pref(a.v) - pref(b.v)) || (ST_ORDER[a.v.st] - ST_ORDER[b.v.st]) || a.v.n.localeCompare(b.v.n,'pl'));
@@ -1165,9 +1190,31 @@ function buildRoutes(){
   const ok = routes.filter(r => !off(r));
   if(!routes.includes(S.route) || (ok.length && off(S.route))) S.route = ok[0] || routes[0];
   if(routes.includes(prev) && prev !== S.route && off(prev)) toast(`${ROUTES[prev]}: ta szczepionka dopiero od ${routeMin(v, prev)}. dnia życia – wybrano: ${ROUTES[S.route].toLowerCase()}.`);
-  $('route').innerHTML = routes.map(r => `<button type="button" data-route="${r}" aria-pressed="${r === S.route}"${off(r) ? ' disabled' : ''}>${esc(ROUTES[r])}${off(r) ? ` <small>od ${routeMin(v, r)}. dnia</small>` : ''}</button>`).join('');
+  // Zawsze cztery drogi. Droga spoza ChPLW tej szczepionki prowadzi do innej szczepionki z tą drogą.
+  const g = BIRDS[$('bird').value].g, any = r => VACCINES.some(x => x.sp.includes(g) && x.r && x.r[r]);
+  $('route').innerHTML = RT.map(r => routes.includes(r)
+    ? `<button type="button" data-route="${r}" aria-pressed="${r === S.route}"${off(r) ? ' disabled' : ''}>${esc(ROUTES[r])}${off(r) ? ` <small>od ${routeMin(v, r)}. dnia</small>` : ''}</button>`
+    : `<button type="button" class="alt" data-route="${r}" data-alt="1" aria-pressed="false"${any(r) ? '' : ' disabled'}>${esc(ROUTES[r])} <small>${any(r) ? 'inna szczepionka' : 'brak w bazie'}</small></button>`).join('');
   RT.forEach(r => { $('in-' + r).hidden = r !== S.route; });
-  $('route-hint').textContent = v ? (routes.length === 1 ? `ChPLW tej szczepionki przewiduje tylko: ${ROUTES[routes[0]].toLowerCase()}.` : `ChPLW: ${routes.map(r => ROUTES[r].toLowerCase()).join(', ')}.`) : 'szczepionka spoza bazy – wybierz drogę z ulotki';
+  $('route-hint').textContent = v ? (routes.length === 1 ? `ChPLW tej szczepionki przewiduje tylko: ${ROUTES[routes[0]].toLowerCase()}.` : `ChPLW: ${routes.map(r => ROUTES[r].toLowerCase()).join(', ')}.`) + (routes.length < RT.length ? ' Przycisk „inna szczepionka” wybierze szczepionkę z tą drogą.' : '') : 'szczepionka spoza bazy – wybierz drogę z ulotki';
+}
+// Wybór drogi, której nie ma bieżąca szczepionka: najlepsza szczepionka z tą drogą dla tych ptaków –
+// najpierw pasująca do wieku i nieśności, potem chroniąca przed wybraną chorobą, potem dane pełne.
+function routeCands(r){
+  const bk = $('bird').value, g = BIRDS[bk].g, dol = dolNow(), dz = $('dz').value;
+  const late = v => { const m = routeMin(v, r); return isNum(m) && dol < m ? 1 : 0; }, miss = v => dz !== DZ_ALL && !v.dz.includes(dz) ? 1 : 0;
+  return VACCINES.filter(v => v.sp.includes(g) && v.r && v.r[r]).map(v => ({v, note:vacNote(v, bk, dol)}))
+    .sort((a, b) => (!!a.note - !!b.note) || (late(a.v) - late(b.v)) || (miss(a.v) - miss(b.v)) || (ST_ORDER[a.v.st] - ST_ORDER[b.v.st]) || a.v.n.localeCompare(b.v.n, 'pl'));
+}
+function pickRoute(r){
+  const c = routeCands(r)[0]; if(!c) return;
+  const best = c.v, dz = $('dz').value;
+  S.rPref = r; S.route = r;
+  if(dz !== DZ_ALL && !best.dz.includes(dz)){ S.dzAll = true; fillDz(); }
+  fillVac({keep:true});
+  $('vac').value = best.id; onVacChange();
+  S.dzAll = true; fillDz(); fillVac({keep:true});   // lista: wszystkie choroby, najpierw szczepionki z tą drogą
+  toast(`${ROUTES[r]}: wybrano ${best.n}${c.note ? ` (${c.note})` : ''}. Lista szczepionek zaczyna się teraz od tych z tą drogą.`, 6000);
 }
 // Zmiana wieku lub ptaków: opisy szczepionek i dostępne drogi podania
 function refreshGuides(){ fillVac({keep:true}); buildRoutes(); }
@@ -1190,6 +1237,7 @@ function applyDefaults(){
   $('w-milk-hint').textContent = w && w.milk ? 'ChPLW: ' + w.milk : (v ? 'ChPLW (w bazie) nie podaje ilości mleka' : 'zwykle 2–4 g/l');
   if(r.oko && isNum(r.oko.ml)) $('o-ml').value = r.oko.ml;
   if(r.inj && isNum(r.inj.ml)) $('i-ml').value = r.inj.ml;
+  const so = siteOpts(r.inj && r.inj.site); fillSelect($('i-site'), so); if(!S.siteTouched) $('i-site').value = so[0].v;
 }
 function onVacChange(){
   S.mlTouched = false; $('w-meas').value = '';
@@ -1239,6 +1287,8 @@ function calc(){
     const r = (v.r && v.r[route]) || {};
     const min = isNum(r.min) ? r.min : (v.min ? v.min[bird.g] : null);
     if(isNum(min) && dol < min) msgs.push(['bad', `Ptaki za młode. ChPLW: ${v.minT}${isNum(r.min) ? ` (ta droga od ${r.min}. dnia życia)` : ''}.`]);
+    const max = v.max ? v.max[bird.g] : null;
+    if(isNum(max) && dol > max) msgs.push(['bad', `Ptaki za stare. ChPLW: ${v.minT} – szczepionka dla ${max === 1 ? 'jednodniowych piskląt (wylęgarnia)' : `ptaków do ${max}. dnia życia`}.`]);
     if(bird.lay && v.lay) msgs.push(['warn', 'Nieśność – ChPLW: ' + v.lay]);
     if($('bird').value === 'indyki-repro' && age >= 180 && v.lay) msgs.push(['warn', 'Indyki w nieśności – ChPLW: ' + v.lay]);
     if(v.st === 'u') msgs.push(['warn', 'Dane tej szczepionki są do weryfikacji – sprawdź dawkę i sposób podania w aktualnej ChPLW.']);
@@ -1399,14 +1449,17 @@ function calc(){
       }
     }
     // Igły, miejsce, temperatura i sprawdzenie aparatu
-    const oil = v && /inaktyw|immunokompleks/i.test(v.t || ''), temp = String(r.note || '').match(/\d+\s*[–-]\s*\d+\s*°C/);
+    const oil = v && /inaktyw/i.test(v.t || ''), temp = String(r.note || '').match(/\d+\s*[–-]\s*\d+\s*°C/);
+    const site = SITES[$('i-site').value] ? $('i-site').value : 'im-p';
+    if(oil) tiles.splice(tiles.findIndex(t => t.k === 'Dawka') + 1, 0, {k:'Igła', v:NEEDLE[site], s:`${SITES[site]} · Aviagen, szczepionka olejowa`});
     if(oil){
       msgs.push(['info', 'Igły (Aviagen, szczepionki inaktywowane): s.c. 18–19 G, 10–12 mm; i.m. 18 G, 6 mm. Nową igłę zakładaj co najmniej co 500 ptaków, tępą lub zadziorowaną – od razu.']);
-      msgs.push(['info', 'Miejsce (Aviagen): i.m. – górna 1/3 mięśnia piersiowego, 2,5–3,8 cm od grzebienia mostka, igła pod kątem 45°; s.c. – dolna 1/3 szyi, z dala od głowy i nasady szyi. Udo tylko gdy konieczne – ChPLW: ' + (r.site || 'sprawdź') + '.']);
+      msgs.push(['info', 'Mokre pióra w miejscu wkłucia znaczą, że szczepionka nie trafiła – popraw technikę (Aviagen).']);
+      msgs.push(['info', 'Miejsce (Aviagen): i.m. – górna 1/3 mięśnia piersiowego, 2,5–3,8 cm od grzebienia mostka, igła pod kątem 45°; s.c. – dolna 1/3 szyi, z dala od głowy i nasady szyi. Udo tylko gdy konieczne – ChPLW: ' + (r.site || 'sprawdź').replace(/\.$/, '') + '.']);
       msgs.push(['info', `Szczepionkę olejową wyjmij z lodówki wcześniej, doprowadź do ${temp ? temp[0].replace(/\s+/g, '') + ' (ChPLW)' : 'temperatury z ChPLW'} i dobrze wstrząśnij; wstrząsaj też w trakcie. Zimna emulsja jest gęsta – aparat nie podaje wtedy pełnej dawki.`]);
     } else if(v) msgs.push(['info', `Szczepionka żywa ${r.site ? '(' + r.site + ')' : ''}: przygotowanie i rozpuszczalnik wg ChPLW; zużyj w ${v.use}. Igła wg instrukcji aparatu.`]);
     msgs.push(['info', `Przed szczepieniem sprawdź dawkę aparatu: 10 dawek do cylindra miarowego = ${fmtT(ml * 10, 1)} ml${inj2 ? ` (druga strona: ${fmtT(inj2.dose_ml * 10, 1)} ml)` : ''}.`]);
-    Object.assign(R, {vaccine_ml:Vml, dose_ml:ml, injApp:two ? 2 : 1, inj2});
+    Object.assign(R, {vaccine_ml:Vml, dose_ml:ml, injApp:two ? 2 : 1, inj2, injSite:SITES[site], needle:oil ? NEEDLE[site] : null});
   }
 
   $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R) : '';
@@ -1446,7 +1499,7 @@ function reportText(){
     if(R.modId && S.mods[R.modId]) lines.push(`Ustawienia wg zaleceń z ${fmtDate(S.mods[R.modId].date)}: ${changesText(S.mods[R.modId].changes) || (S.mods[R.modId].actions || []).join(' ') || 'lista kontrolna'}`); }
   if(R.route === 'woda'){ lines.push(`Woda: ${fmt0(R.water_l)} l (${fmt(R.l1000,1)} l na 1000; ${R.waterBasis})`); if(R.stab) lines.push(`Stabilizator: ${R.stab.txt}${R.stab.rule ? ` (${R.stab.rule})` : ''}`); else if(R.milk_kg > 0) lines.push(`Mleko w proszku: ${fmt(R.milk_kg,2)} kg`); if(R.doser) lines.push(`Dozownik: ${fmtT(R.doser.pct)}% – roztwór do wiadra ${fmt(R.doser.stock_l,1)} l (wszystkie fiolki${R.stab || R.milk_kg > 0 ? ' i stabilizator' : ''})`); }
   if(R.route === 'oko') lines.push(`Rozpuszczalnik: ${fmt0(R.diluent_ml)} ml (${fmtT(R.ml1000,1)} ml na 1000 dawek)`);
-  if(R.route === 'inj'){ lines.push(`Iniekcja: ${fmtT(R.dose_ml,2)} ml na ptaka, razem ${fmt0(R.vaccine_ml)} ml${R.injApp === 2 ? ' – aparat podwójny' : ''}`); if(R.inj2) lines.push(`Druga szczepionka (aparat podwójny): ${R.inj2.vacName} – ${fmtT(R.inj2.dose_ml,2)} ml na ptaka, razem ${fmt0(R.inj2.vaccine_ml)} ml${R.inj2.packs ? `, ${R.inj2.packs} dawek` : ''}`); }
+  if(R.route === 'inj'){ lines.push(`Iniekcja: ${fmtT(R.dose_ml,2)} ml na ptaka, razem ${fmt0(R.vaccine_ml)} ml${R.injApp === 2 ? ' – aparat podwójny' : ''}`); if(R.injSite) lines.push(`Miejsce: ${R.injSite}${R.needle ? `; igła ${R.needle}` : ''}`); if(R.inj2) lines.push(`Druga szczepionka (aparat podwójny): ${R.inj2.vacName} – ${fmtT(R.inj2.dose_ml,2)} ml na ptaka, razem ${fmt0(R.inj2.vaccine_ml)} ml${R.inj2.packs ? `, ${R.inj2.packs} dawek` : ''}`); }
   if(v) lines.push(`Karencja: ${v.wd}`);
   const w = L.msgs.filter(m => m[0] === 'bad' || m[0] === 'warn').map(m => m[1]);
   if(w.length) lines.push('Uwagi z obliczeń: ' + w.join(' '));
@@ -2189,8 +2242,8 @@ function describeRoute(k, r){
 }
 function renderKnowledge(){
   if(!$('k-dz').options.length) fillSelect($('k-dz'), [{v:'', l:'wszystkie'}, ...Object.entries(DISEASES).map(([k,l]) => ({v:k, l}))]);
-  const q = $('k-q').value.trim().toLowerCase(), sp = $('k-sp').value, dz = $('k-dz').value;
-  const rows = VACCINES.filter(v => (!q || [v.n, v.m, v.s, v.dz.join(' '), v.dz.map(d => DISEASES[d] || '').join(' ')].join(' ').toLowerCase().includes(q)) && (!sp || v.sp.includes(sp)) && (!dz || v.dz.includes(dz))).sort((a,b) => a.n.localeCompare(b.n,'pl'));
+  const q = $('k-q').value.trim().toLowerCase(), sp = $('k-sp').value, dz = $('k-dz').value, rt = $('k-rt').value;
+  const rows = VACCINES.filter(v => (!q || [v.n, v.m, v.s, v.dz.join(' '), v.dz.map(d => DISEASES[d] || '').join(' ')].join(' ').toLowerCase().includes(q)) && (!sp || v.sp.includes(sp)) && (!dz || v.dz.includes(dz)) && (!rt || (v.r && v.r[rt]))).sort((a,b) => a.n.localeCompare(b.n,'pl'));
   $('k-count').textContent = `${rows.length} z ${VACCINES.length} szczepionek`;
   $('k-list').innerHTML = rows.map(v => `<button type="button" class="item${S.selVac === v.id ? ' sel' : ''}" data-id="${esc(v.id)}"><span class="t">${esc(v.n)} <span class="pill ${v.st}">${ST_LABEL[v.st]}</span></span><span class="s">${esc(v.dz.join(' + '))} · ${esc(v.sp.join(', '))} · ${esc(Object.keys(v.r || {}).map(k => ROUTES[k].toLowerCase()).join(', ') || 'droga wg ChPLW')}</span></button>`).join('') || '<div class="empty">Brak szczepionek dla wybranych filtrów.</div>';
   const v = S.selVac ? VACCINES.find(x => x.id === S.selVac) : null; const box = $('k-detail');
@@ -2233,6 +2286,7 @@ function renderRules(){
     <li>Rozpuszczalnik na 1000 dawek wg ChPLW: 30–31,5 ml (Cevac, Nobilis), 50 ml (Primun, Avinew), 100 ml (Avishield).</li>
     <li>Szczepionki inaktywowane: zwykle 0,5 ml i.m. lub s.c. (Gallimune 407: 0,3 ml); doprowadzić do 15–25°C i wstrząsnąć.</li>
     <li>Igły do szczepionek inaktywowanych (Aviagen): s.c. 18–19 G, 10–12 mm; i.m. 18 G, 6 mm; nowa igła co najmniej co 500 ptaków. I.m. – górna 1/3 piersi, 2,5–3,8 cm od mostka, pod kątem 45°; udo tylko gdy konieczne.</li>
+    <li>Przycisk „Iniekcja” jest zawsze widoczny: przy szczepionce bez iniekcji w ChPLW wybiera szczepionkę iniekcyjną, a lista zaczyna się od szczepionek iniekcyjnych. Szczepionki podawane 1. dnia życia (wylęgarnia: Marek, HVT, immunokompleks) u starszych ptaków są na końcu listy.</li>
     <li>Aparat podwójny podaje dwie szczepionki jednym ruchem – każdą z własnej butelki i własną igłą, w dwa różne miejsca. Dwie szczepionki tego samego dnia tylko wtedy, gdy pozwala na to ChPLW obu, albo decyzją lekarza weterynarii.</li></ul></div>
   <div><h3>Obowiązek szczepień ND</h3><p class="note">Rozporządzenie MRiRW z 11.03.2026 (Dz.U. poz. 335): kury i indyki w zakładach przemieszczających drób lub jaja albo sprzedających je bezpośrednio oraz w wylęgarniach; powyżej 350 szt. – program szczepień w planie bioasekuracji. Przykładowe programy: przewodnik GIW ND v5 (2025).</p></div>
   <div><h3>Źródła</h3><ul class="list">
@@ -2377,7 +2431,8 @@ function bind(){
     calc();
   });
   $('vac').addEventListener('change', onVacChange);
-  $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(b) setRoute(b.dataset.route); });
+  $('i-site').addEventListener('change', () => { S.siteTouched = true; });
+  $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(!b || b.disabled) return; if(b.dataset.alt) pickRoute(b.dataset.route); else { S.rPref = b.dataset.route; setRoute(b.dataset.route); } });
   $('s-ml').addEventListener('input', () => { S.mlTouched = true; });
   $('s-src').addEventListener('change', flowSrcUI);
   $('s-noz').addEventListener('change', ev => { setNozzle(ev.target.value); saveEquipment(); calc(); });
@@ -2401,7 +2456,7 @@ function bind(){
   $('m-list').addEventListener('change', modCheck);
   $('m-farms').addEventListener('click', farmAction);
   $('r-list').addEventListener('keydown', ev => { if((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList.contains('item')){ ev.preventDefault(); reportAction(ev); } });
-  ['k-q','k-sp','k-dz'].forEach(id => $(id).addEventListener('input', renderKnowledge));
+  ['k-q','k-sp','k-dz','k-rt'].forEach(id => $(id).addEventListener('input', renderKnowledge));
   $('k-list').addEventListener('click', ev => { const b = ev.target.closest('.item'); if(b){ S.selVac = b.dataset.id; renderKnowledge(); $('k-detail').scrollIntoView({behavior:'smooth', block:'nearest'}); } });
   $('k-detail').addEventListener('click', ev => { if(ev.target.id === 'k-use') useVaccine(S.selVac); });
   $('b-export').addEventListener('click', exportBackup);

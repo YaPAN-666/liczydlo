@@ -1,9 +1,9 @@
 {
- "wersja": "1.7.0",
+ "wersja": "1.8.0",
  "data": "2026-11-13",
  "zmiany": [
-  "Woda do picia: wybór stabilizatora – gotowe preparaty z barwnikiem (Vac-Safe: 1 tabletka na 100 l, AviBlue: 1 płaska nakrętka na 200 l), inny wg etykiety, mleko w proszku tylko gdy wymaga go ChPLW.",
-  "Ilość stabilizatora liczona na całą wodę; przy dozowniku cała ilość idzie do wiadra (np. przy 1%: 1 tabletka Vac-Safe na 1 l roztworu).",
-  "Krok po kroku, raport i zasady zaktualizowane: stabilizator zamiast mleka, kontrola zabarwienia języków i wól; wybrany stabilizator zapamiętywany w telefonie."
+  "Droga podania zawsze widoczna: Oprysk, Woda do picia, Oko / nos, Iniekcja. Przycisk drogi, której nie ma wybrana szczepionka („inna szczepionka”), wybiera szczepionkę z tą drogą – np. „Iniekcja” pokazuje szczepionki iniekcyjne na początku listy.",
+  "Iniekcja: miejsce wkłucia z ChPLW (i.m. – pierś lub udo, s.c. – szyja) i igła w wyniku i raporcie (Aviagen: i.m. 18 G · 6 mm, s.c. 18–19 G · 10–12 mm); kontrola mokrych piór.",
+  "Szczepionki podawane tylko 1. dnia życia (wylęgarnia: Marek, HVT, immunokompleks) u starszych ptaków oznaczone i na końcu listy. Zakładka Szczepionki: filtr drogi podania."
  ]
 }

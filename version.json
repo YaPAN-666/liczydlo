@@ -1,8 +1,9 @@
 {
- "wersja": "1.8.1",
+ "wersja": "1.9.0",
  "data": "2026-11-13",
  "zmiany": [
-  "Nobilis Reo inac – dane z ulotki z 23.05.2025: ostrzeżenie dla szczepiącego (olej mineralny – przypadkowe wstrzyknięcie sobie), obrzęk po szczepieniu, przechowywanie, odporność po 4 tyg. na jeden okres nieśności, miejsce wkłucia i sterylne strzykawki.",
-  "Opis szczepionki: nowe pola „Dla szczepiącego”, „Po szczepieniu” i „Przechowywanie”; przy iniekcji ostrzeżenie z ulotki wyświetla się w wyniku."
+  "Wybór dopasowany do ptaków i wieku: listy chorób i szczepionek pokazują tylko to, co ChPLW pozwala podać tym ptakom w tym wieku (np. 6 tyg. – bez szczepionek od 16. tygodnia i z wylęgarni). Ukryte odkrywa „pokaż” pod listą szczepionek – wynik wtedy ostrzega.",
+  "Zmiana wieku lub ptaków sama poprawia wybór: szczepionka, która przestała pasować, zostaje zastąpiona (z komunikatem), a gdy wiek znów pasuje – wraca. Przyciski dróg podania i druga szczepionka aparatu podwójnego też uwzględniają wiek.",
+  "Wiek pokazany także w tygodniach; ostrzeżenia: nioski w nieśności poniżej 16. tygodnia, odchów blisko okresu „… tyg. przed nieśnością” z ChPLW."
  ]
 }

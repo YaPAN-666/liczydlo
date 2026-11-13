@@ -1,10 +1,9 @@
 {
- "wersja": "1.6.0",
- "data": "2026-11-10",
+ "wersja": "1.7.0",
+ "data": "2026-11-13",
  "zmiany": [
-  "Aplikacja prowadzi wybór: szczepionka zawęża listę chorób, choroba – listę szczepionek; drogi podania tylko z ChPLW, a niedozwolone w tym wieku są wyłączone.",
-  "Lista szczepionek pokazuje drogi podania (oprysk, woda, oko, iniekcja); szczepionki niepasujące do wieku lub nieśności – na końcu z opisem.",
-  "Woda do picia: tryb „Dozownik %” – roztwór do wiadra, mleko, sprawdzenie dozownika i lista kroków (dzień wcześniej, dzień szczepienia, po).",
-  "Iniekcja: aparat pojedynczy lub podwójny (druga szczepionka), igły, miejsce wkłucia, temperatura szczepionki olejowej i sprawdzenie dawki aparatu."
+  "Woda do picia: wybór stabilizatora – gotowe preparaty z barwnikiem (Vac-Safe: 1 tabletka na 100 l, AviBlue: 1 płaska nakrętka na 200 l), inny wg etykiety, mleko w proszku tylko gdy wymaga go ChPLW.",
+  "Ilość stabilizatora liczona na całą wodę; przy dozowniku cała ilość idzie do wiadra (np. przy 1%: 1 tabletka Vac-Safe na 1 l roztworu).",
+  "Krok po kroku, raport i zasady zaktualizowane: stabilizator zamiast mleka, kontrola zabarwienia języków i wól; wybrany stabilizator zapamiętywany w telefonie."
  ]
 }

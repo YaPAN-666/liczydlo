@@ -394,7 +394,24 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
           <label><span>Zmierzone zużycie stada w <span id="w-h">2</span> h (l) – opcjonalnie</span>
             <input id="w-meas" type="number" min="0" step="1" placeholder="pusto = wg ChPLW" inputmode="decimal">
             <span class="hint">dzień wcześniej, o tej samej porze</span></label>
-          <label>Mleko w proszku (g/l)
+          <label class="wide">Stabilizator wody
+            <select id="w-stab">
+              <option value="vacsafe">Vac-Safe (MSD) – 1 tabletka na 100 l</option>
+              <option value="aviblue">AviBlue (Elanco) – 1 nakrętka na 200 l</option>
+              <option value="inny">Inny gotowy stabilizator – dawka z etykiety</option>
+              <option value="mleko">Mleko w proszku – gdy wymaga go ChPLW</option>
+              <option value="brak">Bez stabilizatora</option>
+            </select>
+            <span class="hint" id="w-stab-hint"></span></label>
+          <label id="w-stab-amt-wrap" hidden>Dawka na 100 l wody
+            <input id="w-stab-amt" type="text" inputmode="decimal" autocomplete="off" placeholder="z etykiety"></label>
+          <label id="w-stab-unit-wrap" hidden>Jednostka
+            <select id="w-stab-unit">
+              <option value="szt.">tabletki</option>
+              <option value="g">g</option>
+              <option value="ml">ml</option>
+            </select></label>
+          <label id="w-milk-wrap" hidden>Mleko w proszku (g/l)
             <input id="w-milk" type="number" min="0" step="0.5" value="0" inputmode="decimal">
             <span class="hint" id="w-milk-hint"></span></label>
         </div>
@@ -904,7 +921,7 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.6.0';
+const APP_VERSION = '1.7.0';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};
@@ -969,13 +986,16 @@ function sprayerUI(){
 }
 // Ostatnio używany sprzęt zostaje w telefonie – technik zwykle pracuje tym samym opryskiwaczem i dyszą.
 const EQ_KEY = 'liczydlo.sprzet.v1';
-function saveEquipment(){ lsSet(EQ_KEY, {spr:$('s-spr').value, noz:$('s-noz').value, wmode:$('w-mode').value, wpct:$('w-pct').value}); }
+function saveEquipment(){ lsSet(EQ_KEY, {spr:$('s-spr').value, noz:$('s-noz').value, wmode:$('w-mode').value, wpct:$('w-pct').value, stab:$('w-stab').value, stabAmt:$('w-stab-amt').value, stabUnit:$('w-stab-unit').value}); }
 function loadEquipment(){
   const e = lsGet(EQ_KEY); if(!e) return;
   if(SPRAYERS[e.spr]) $('s-spr').value = e.spr;
   if(NOZ[e.noz]){ $('s-noz').value = e.noz; $('s-noz').dataset.cur = e.noz; }
   if(e.wmode === 'doz' || e.wmode === 'zb') $('w-mode').value = e.wmode;
   if(e.wpct && isNum(pf(e.wpct))) $('w-pct').value = e.wpct;
+  if(STAB[e.stab]) $('w-stab').value = e.stab;
+  if(e.stabAmt) $('w-stab-amt').value = e.stabAmt;
+  if(['szt.', 'g', 'ml'].includes(e.stabUnit)) $('w-stab-unit').value = e.stabUnit;
 }
 function nozOf(x){ return NOZ[x] ? x : 'vk6'; }
 function nozTab(src, noz){ const z = NOZ[nozOf(noz)]; return src === 'birch' ? z.birch : src === 'teejet' ? z.teejet : null; }
@@ -996,24 +1016,49 @@ function bestPacks(need, packs){
   for(let v=N; v<=M; v++) if(cnt[v] < 1e9){ const use = {}; let x = v; while(x > 0){ const i = from[x]; use[packs[i]] = (use[packs[i]]||0) + 1; x -= P[i]; } return {total:v*g, vials:cnt[v], use}; }
   return null;
 }
+// Stabilizator wody. Dziś zwykle gotowy preparat z niebieskim barwnikiem, który neutralizuje chlor
+// i pokazuje, czy ptaki piły: Vac-Safe (MSD) – tabletka musująca 10 g na 100 l, chlor do 5 ppm, bez składników
+// pochodzenia zwierzęcego, wg MSD może zastąpić mleko w proszku, 10 min przed szczepionką; AviBlue (Elanco) –
+// granulat musujący, 1 płaska nakrętka na 200 l (butelka 375 g na 3000 l), neutralizuje chlor, metale ciężkie,
+// zakwaszacze i środki dezynfekcyjne; przy dozowniku ilość na całą wodę (Elanco: 1000 l przy 2% = 5 nakrętek w 20 l).
+// Mleko w proszku – tylko gdy wymaga go ChPLW albo nie ma stabilizatora.
+const STAB = {
+  vacsafe:{n:'Vac-Safe', per:100, u:['tabletka','tabletki','tabletek'], ru:'tabletka', wait:'10 min', dye:1, h:'tabletka musująca: neutralizuje chlor (do 5 ppm), niebieski barwnik; wg MSD może zastąpić mleko w proszku'},
+  aviblue:{n:'AviBlue', per:200, u:['nakrętka','nakrętki','nakrętek'], ru:'płaska nakrętka', wait:'', dye:1, h:'granulat musujący: neutralizuje chlor, metale ciężkie, zakwaszacze i środki dezynfekcyjne; butelka 375 g na 3000 l'},
+  inny:{n:'stabilizator', dye:2, h:'wpisz dawkę na 100 l z etykiety preparatu'},
+  mleko:{n:'mleko w proszku', wait:'10–20 min', h:'odtłuszczone; dziś stosowane rzadko – gdy wymaga go ChPLW'},
+  brak:{n:'bez stabilizatora', h:'tylko woda bez chloru (np. destylowana); bez barwnika nie sprawdzisz, czy ptaki piły'}
+};
+function stabId(){ return STAB[$('w-stab').value] ? $('w-stab').value : 'vacsafe'; }
+function stabUI(){ const sid = stabId(); $('w-milk-wrap').hidden = sid !== 'mleko'; $('w-stab-amt-wrap').hidden = $('w-stab-unit-wrap').hidden = sid !== 'inny'; $('w-stab-hint').textContent = STAB[sid].h; }
+// Ilość stabilizatora na V litrów wody (przy dozowniku – cała ilość do wiadra)
+function stabAmount(id, V, milkGl){
+  const s = STAB[id] || STAB.vacsafe;
+  if(id === 'vacsafe' || id === 'aviblue'){ const n = Math.ceil(V / s.per - 1e-9); return {id, n:s.n, qty:n, txt:`${n} ${pl(n, ...s.u)} ${s.n}`, rule:`1 ${s.ru} na ${s.per} l`, wait:s.wait}; }
+  if(id === 'inny'){ const a = pf($('w-stab-amt').value), u = $('w-stab-unit').value; if(!(a > 0)) return {id, n:s.n, txt:'stabilizator wg etykiety', rule:'dawka z etykiety', wait:'wg etykiety'}; const q = a * V / 100; return {id, n:s.n, qty:q, txt:`${u === 'szt.' ? Math.ceil(q - 1e-9) : fmt(q, q < 10 ? 1 : 0)} ${u} stabilizatora`, rule:`${fmtT(a)} ${u} na 100 l`, wait:'wg etykiety'}; }
+  if(id === 'mleko'){ if(!(milkGl > 0)) return {id, n:s.n, txt:'mleko w proszku wg ChPLW', rule:'wpisz g/l', wait:s.wait}; const kg = V * milkGl / 1000; return {id, n:s.n, qty:kg, kg, txt:`${fmt(kg, 2)} kg mleka w proszku`, rule:`${fmtT(milkGl)} g/l`, wait:s.wait}; }
+  return {id:'brak', n:s.n, txt:'', rule:'', wait:''};
+}
 // Lista kroków szczepienia przez wodę (dozownik albo zbiornik) – wg MSD, Aviagen, Elanco, Zootecnica
 function waterSteps(o){
   const L = a => a.filter(Boolean).map(x => `<li>${esc(x)}</li>`).join('');
-  const st = isNum(o.stock) ? fmt(o.stock, 1) : '…', mk = o.milk_kg > 0 ? ` + ${fmt(o.milk_kg, 2)} kg mleka w proszku` : ' + stabilizator wg etykiety';
+  const st = isNum(o.stock) ? fmt(o.stock, 1) : '…', sb = o.stab || {id:'brak'}, mk = sb.txt ? ` + ${sb.txt}` : '', dye = (STAB[sb.id] || {}).dye,
+    wt = sb.id === 'brak' ? '' : sb.wait === '' ? '; poczekaj, aż granulat się rozpuści i woda się zabarwi' : `; odczekaj ${sb.wait === 'wg etykiety' ? 'czas z etykiety' : sb.wait}, aż ${sb.id === 'mleko' ? 'mleko się rozpuści i zwiąże' : 'stabilizator się rozpuści i zneutralizuje'} chlor`;
   const before = [
     `Zmierz zużycie wody wodomierzem w tych godzinach, w których będzie szczepienie (${fmtT(o.h)} h), i wpisz je wyżej. Aviagen: dolicz ok. 5% na większe pragnienie po wstrzymaniu wody.`,
     'Wyłącz chlorowanie, zakwaszacze i leki w wodzie – MSD: co najmniej 48 h przed; Elanco: 24 h przed i 24 h po. Sprawdź chlor paskami i pH wody (6,0–7,5).',
     o.doz ? `Umyj dozownik, wiadro i wąż ssący samą wodą. Sprawdź, czy dozownik daje ustawiony %: ${o.pct > 0 ? `przy ${fmtT(o.pct)}% ubytek 1 l z wiadra = ${fmt0(100 / o.pct)} l na wodomierzu` : 'ubytek z wiadra porównaj z wodomierzem'}.` : 'Umyj zbiornik samą wodą – bez detergentów i środków dezynfekcyjnych.',
-    o.doz ? 'Najlepiej próba bez szczepionki: woda + stabilizator z barwnikiem przez dozownik – widać, ile roztworu zejdzie i czy barwnik dochodzi do końca linii.' : null];
+    o.doz ? 'Najlepiej próba bez szczepionki: woda + stabilizator z barwnikiem przez dozownik – widać, ile roztworu zejdzie i czy barwnik dochodzi do końca linii.' : null,
+    sb.id === 'brak' ? null : isNum(sb.qty) ? `Przygotuj stabilizator: ${sb.txt} (${sb.rule}) – liczony na całą wodę${o.doz ? ', cała ilość idzie do wiadra' : ''}.` : `Przygotuj stabilizator – dawka z ${sb.id === 'mleko' ? 'ChPLW' : 'etykiety'}, liczona na całą wodę${o.doz ? '; cała ilość idzie do wiadra' : ''}.`];
   const day = [
     `Rano zakręć wodę i podnieś linie poideł – wstrzymanie ${o.thirst || '1–2 h wg ChPLW (krócej w upale)'}. Spuść z linii wodę z chlorem.`,
-    o.doz ? `Do wiadra: ${st} l wody niechlorowanej${mk}; odczekaj 10–20 min.` : `Do zbiornika: ${fmt0(o.V)} l wody niechlorowanej${mk}; odczekaj 10–20 min.`,
+    o.doz ? `Do wiadra: ${st} l wody${mk}${wt}.` : `Do zbiornika: ${fmt0(o.V)} l wody${mk}${wt}.`,
     `Fiolki${o.packs && o.packs !== '–' ? ` (${o.packs} dawek)` : ''} otwieraj pod wodą, przepłucz kilka razy, wlej ${o.doz ? 'do wiadra' : 'do zbiornika'} i wymieszaj.`,
     o.doz ? `Ustaw dozownik na ${o.pct > 0 ? fmtT(o.pct) : '…'}% i włóż wąż ssący do wiadra.` : null,
-    'Napełnij linie: otwórz końce linii i spuszczaj, aż pojawi się zabarwiony roztwór (Aviagen: ok. 1 l na każde 3 m linii smoczkowej). Zamknij końce. Najlepiej przy przyciemnionym świetle.',
+    `Napełnij linie: otwórz końce linii i spuszczaj, aż ${dye === 1 ? 'pojawi się zabarwiony roztwór' : dye === 2 ? 'pojawi się roztwór ze stabilizatorem (zabarwiony, jeśli preparat ma barwnik)' : sb.id === 'mleko' ? 'pojawi się mleczny roztwór' : 'spłynie woda stojąca w liniach'} (Aviagen: ok. 1 l na każde 3 m linii smoczkowej). Zamknij końce. Najlepiej przy przyciemnionym świetle.`,
     `Opuść linie, zapal światło i obchodź kurnik, żeby ptaki piły. Roztwór ma zejść w ${o.win}.`];
   const after = [
-    'Sprawdź języki i wola u 50–100 ptaków z kilku miejsc kurnika – co najmniej 90% zabarwionych.',
+    dye ? `Sprawdź języki i wola u 50–100 ptaków z kilku miejsc kurnika – co najmniej 90% zabarwionych${dye === 1 ? ' na niebiesko' : ' (gdy stabilizator ma barwnik)'}.` : 'Sprawdź, czy wszystkie ptaki piły – obejdź kurnik i obejrzyj wola u 50–100 ptaków.',
     o.doz ? 'Przepłucz dozownik czystą wodą. Chlorowanie wznów dopiero po 24 h.' : 'Umyj zbiornik czystą wodą. Chlorowanie wznów dopiero po 24 h.'];
   const n1 = before.filter(Boolean).length, n2 = day.filter(Boolean).length;
   return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – ${o.doz ? 'dozownik' : 'zbiornik'}</summary>
@@ -1142,7 +1187,7 @@ function applyDefaults(){
   if(w && w.rule === 'choice') fillSelect($('w-dose'), w.opts.map((o,i) => ({v:String(i), l:o.l})));
   const milk = w ? parseMilk(w.milk) : null;
   $('w-milk').value = milk != null ? milk : 0;
-  $('w-milk-hint').textContent = w && w.milk ? 'ChPLW: ' + w.milk : (v ? 'ChPLW (w bazie) nie podaje stabilizatora' : 'zwykle 2–4 g/l');
+  $('w-milk-hint').textContent = w && w.milk ? 'ChPLW: ' + w.milk : (v ? 'ChPLW (w bazie) nie podaje ilości mleka' : 'zwykle 2–4 g/l');
   if(r.oko && isNum(r.oko.ml)) $('o-ml').value = r.oko.ml;
   if(r.inj && isNum(r.inj.ml)) $('i-ml').value = r.inj.ml;
 }
@@ -1172,7 +1217,7 @@ function calc(){
   $('age-hint').textContent = `${dol}. dzień życia · ${Math.ceil(dol/7)}. tydzień`;
   const kk = (v ? v.id : '') + '|' + route; if(S.knowKey !== kk){ S.knowKey = kk; renderKnow(v); }   // opis z ChPLW tylko po zmianie
   $('s-org-wrap').hidden = !(Math.round(num('s-os',1)) > 1 && Math.round(num('s-sec',1)) > 1);
-  sprayerUI();   // granice ciśnienia, dmuchawa i podpowiedź opryskiwacza – także przed wpisaniem liczby ptaków
+  sprayerUI(); stabUI();   // granice ciśnienia, dmuchawa, podpowiedzi opryskiwacza i stabilizatora – także przed wpisaniem liczby ptaków
   if(!(birds > 0)){
     const R0 = {route, age, birds:0};
     $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R0) : '';
@@ -1295,13 +1340,14 @@ function calc(){
         if(bird.g === 'indyki') msgs.push(['warn','U indyków ilość wody zawsze ustalaj z pomiaru zużycia.']); }
       V = L * birds / 1000;
     }
-    const milk = Math.max(0, num('w-milk',0)), wmode = $('w-mode').value, pct = pf($('w-pct').value), doz = wmode === 'doz';
+    const sid = stabId(), milk = sid === 'mleko' ? Math.max(0, num('w-milk',0)) : 0, wmode = $('w-mode').value, pct = pf($('w-pct').value), doz = wmode === 'doz';
+    const stab = stabAmount(sid, V, milk);
     const win = (w && w.win) || '1,5–2 h', stock = doz && pct > 0 ? V * pct / 100 : null;
     $('w-pct-wrap').hidden = !doz;
     tiles.push({k:doz ? 'Woda przez dozownik' : 'Woda', v:fmt0(V) + ' l', s:basis, main:true});
     if(doz && isNum(stock)) tiles.push({k:'Roztwór do wiadra', v:fmt(stock, stock < 10 ? 2 : 1) + ' l', s:`dozownik ${fmtT(pct)}% – wszystkie fiolki do wiadra`});
     tiles.push({k:'Na 1000 ptaków', v:fmt(L,1) + ' l', s:range && range[0] !== range[1] ? `zakres ChPLW ${fmtRange(range)} l (przyjęto środek)` : ''});
-    if(milk > 0) tiles.push({k:'Mleko w proszku', v:fmt(V * milk / 1000, 2) + ' kg', s:doz ? `${fmtT(milk)} g/l wody – wsyp do wiadra` : `${fmtT(milk)} g/l`});
+    if(stab.txt && isNum(stab.qty)) tiles.push({k:sid === 'mleko' ? 'Mleko w proszku' : 'Stabilizator', v:sid === 'mleko' ? fmt(stab.kg, 2) + ' kg' : stab.txt.replace(' stabilizatora', ''), s:`${stab.rule}${doz ? ' – całość do wiadra' : ''}`});
     tiles.push({k:'Czas wypicia', v:win, s:w && w.win ? 'wg ChPLW' : 'zalecenie ogólne'});
     if(w && isNum(w.vacc)) tiles.push({k:'Szczepionka płynna', v:fmt(birds * w.vacc, 1) + ' ml', s:`${fmtT(w.vacc,3)} ml na ptaka`});
     if(w && w.thirst) msgs.push(['info', 'Wstrzymanie wody przed podaniem: ' + w.thirst + '.']);
@@ -1312,13 +1358,15 @@ function calc(){
       else {
         if(pct < 0.2 || pct > 2) msgs.push(['warn', `Ustawienie ${fmtT(pct)}% – sprawdź zakres swojego dozownika (np. Dosatron D25RE2: 0,2–2%).`]);
         msgs.push(['info', `Dozownik ${fmtT(pct)}%: ${fmt(stock, 1)} l roztworu zejdzie razem z ${fmt0(V)} l wody. Wszystkie fiolki i stabilizator idą do wiadra – szczepionka trafia do linii tylko przez dozownik.`]);
-        if(milk > 0) msgs.push(['info', `Mleko liczy się na całą wodę (${fmtT(milk)} g/l), więc w wiadrze jest go ${fmt0(100 / pct)} razy więcej niż w poidłach. Mieszaj roztwór w wiadrze w trakcie podawania.`]);
+        if(stab.txt && isNum(stab.qty)) msgs.push(['info', `Stabilizator liczy się na całą wodę, która przejdzie przez dozownik (${stab.rule}), więc w wiadrze jest go ${fmt0(100 / pct)} razy więcej niż w poidłach${STAB[sid].per ? ` – przy ${fmtT(pct)}% to 1 ${STAB[sid].u[0]} na ${fmtT(STAB[sid].per * pct / 100)} l roztworu${sid === 'vacsafe' ? ' (jak w broszurze MSD)' : ''}` : ''}${sid === 'mleko' ? '. Mieszaj roztwór w trakcie podawania – mleko opada' : ''}.`]);
         const um = useMinutes(v), wm = String(win).match(/(\d+(?:[.,]\d+)?)\s*h/g), winMax = wm ? Math.max(...wm.map(x => parseFloat(x.replace(',', '.')))) : 2;
         if(um && winMax * 60 + 20 > um) msgs.push(['warn', `Roztwór ze szczepionką trzeba zużyć w ${v.use} od rozpuszczenia, a picie z napełnianiem linii potrwa ok. ${fmtT(winMax)} h. Przygotuj roztwór w dwóch porcjach – fiolki rozpuszczone osobno dla każdej.`]);
       }
     }
-    crewH = waterSteps({doz, pct, stock, V, milk_kg:V * milk / 1000, packs:R.packs, win, thirst:w && w.thirst, h:w && w.h ? w.h : 2});
-    Object.assign(R, {water_l:V, l1000:L, waterBasis:basis, milk_kg:V * milk / 1000, waterMode:wmode, doser:doz && pct > 0 ? {pct, stock_l:stock} : null});
+    if(sid === 'brak') msgs.push(['warn', 'Bez stabilizatora woda musi być wolna od chloru (np. destylowana), a bez barwnika nie sprawdzisz, czy wszystkie ptaki piły.']);
+    if(w && w.milk && sid !== 'mleko' && sid !== 'brak') msgs.push(['info', `ChPLW tej szczepionki podaje jako stabilizator mleko (${w.milk}). Dziś zamiast mleka stosuje się zwykle gotowy stabilizator z barwnikiem (wg MSD Vac-Safe może zastąpić mleko w proszku) – o zamianie decyduje lekarz weterynarii.`]);
+    crewH = waterSteps({doz, pct, stock, V, stab, packs:R.packs, win, thirst:w && w.thirst, h:w && w.h ? w.h : 2});
+    Object.assign(R, {water_l:V, l1000:L, waterBasis:basis, milk_kg:sid === 'mleko' ? V * milk / 1000 : 0, stab:stab.txt ? {id:sid, txt:stab.txt, rule:stab.rule} : null, waterMode:wmode, doser:doz && pct > 0 ? {pct, stock_l:stock} : null});
   }
   if(route === 'oko'){
     const ml = Math.max(0, num('o-ml',0)); const total = (bp ? bp.total : birds) / 1000 * ml;
@@ -1396,7 +1444,7 @@ function reportText(){
       (R.crew || []).forEach(o => lines.push(`  Osoba ${o.no}: ${R.org === 'razem' ? 'razem' : secText(o.sec)} · ${fmt(o.l,2)} l roztworu · ${fmtMin(o.min)}`));
     } else lines.push(`Czas oprysku: ${fmtMin(R.minutes)}${n > 1 ? ` – ${n} ${plSektor(n)} po ${fmtMin(R.sectorMin)}` : ''}`);
     if(R.modId && S.mods[R.modId]) lines.push(`Ustawienia wg zaleceń z ${fmtDate(S.mods[R.modId].date)}: ${changesText(S.mods[R.modId].changes) || (S.mods[R.modId].actions || []).join(' ') || 'lista kontrolna'}`); }
-  if(R.route === 'woda'){ lines.push(`Woda: ${fmt0(R.water_l)} l (${fmt(R.l1000,1)} l na 1000; ${R.waterBasis})`); if(R.milk_kg > 0) lines.push(`Mleko w proszku: ${fmt(R.milk_kg,2)} kg`); if(R.doser) lines.push(`Dozownik: ${fmtT(R.doser.pct)}% – roztwór do wiadra ${fmt(R.doser.stock_l,1)} l (wszystkie fiolki${R.milk_kg > 0 ? ' i mleko' : ''})`); }
+  if(R.route === 'woda'){ lines.push(`Woda: ${fmt0(R.water_l)} l (${fmt(R.l1000,1)} l na 1000; ${R.waterBasis})`); if(R.stab) lines.push(`Stabilizator: ${R.stab.txt}${R.stab.rule ? ` (${R.stab.rule})` : ''}`); else if(R.milk_kg > 0) lines.push(`Mleko w proszku: ${fmt(R.milk_kg,2)} kg`); if(R.doser) lines.push(`Dozownik: ${fmtT(R.doser.pct)}% – roztwór do wiadra ${fmt(R.doser.stock_l,1)} l (wszystkie fiolki${R.stab || R.milk_kg > 0 ? ' i stabilizator' : ''})`); }
   if(R.route === 'oko') lines.push(`Rozpuszczalnik: ${fmt0(R.diluent_ml)} ml (${fmtT(R.ml1000,1)} ml na 1000 dawek)`);
   if(R.route === 'inj'){ lines.push(`Iniekcja: ${fmtT(R.dose_ml,2)} ml na ptaka, razem ${fmt0(R.vaccine_ml)} ml${R.injApp === 2 ? ' – aparat podwójny' : ''}`); if(R.inj2) lines.push(`Druga szczepionka (aparat podwójny): ${R.inj2.vacName} – ${fmtT(R.inj2.dose_ml,2)} ml na ptaka, razem ${fmt0(R.inj2.vaccine_ml)} ml${R.inj2.packs ? `, ${R.inj2.packs} dawek` : ''}`); }
   if(v) lines.push(`Karencja: ${v.wd}`);
@@ -2132,7 +2180,7 @@ function describeRoute(k, r){
     if(r.rule === 'choice') p.push(r.opts.map(o => o.l).join('; '));
     if(r.rule === 'measured') p.push(`ilość wypijana w ${fmtT(r.h || 2)} h`);
     if(r.repro) p.push('stada hodowlane: ' + r.repro.map(x => `${x.a}–${x.b > 900 ? '…' : x.b} d: ${fmtRange(x.l)} l`).join('; '));
-    if(isNum(r.min)) p.push(`od ${r.min}. dnia`); if(r.win) p.push(`wypić w ${r.win}`); if(r.thirst) p.push(`wstrzymanie wody ${r.thirst}`); if(r.milk) p.push(`mleko ${r.milk}`);
+    if(isNum(r.min)) p.push(`od ${r.min}. dnia`); if(r.win) p.push(`wypić w ${r.win}`); if(r.thirst) p.push(`wstrzymanie wody ${r.thirst}`); if(r.milk) p.push(`mleko wg ChPLW: ${r.milk}`);
     d = p.join(' · '); }
   if(k === 'oko') d = [isNum(r.ml) ? `${fmtT(r.ml,1)} ml na 1000 dawek` : '', r.bird, r.water].filter(Boolean).join(' · ');
   if(k === 'inj') d = [isNum(r.ml) ? `${fmtT(r.ml,2)} ml na ptaka` : 'dawka wg ChPLW', r.site, r.bottles ? r.bottles.map(b => `${b.d} dawek = ${b.ml} ml`).join(', ') : ''].filter(Boolean).join(' · ');
@@ -2167,7 +2215,8 @@ function renderRules(){
   <div><h3>Woda do picia</h3><ul class="list">
     <li>Wody tyle, ile stado wypije w czasie z ChPLW (zwykle 1,5–2 h). Najdokładniej: zużycie zmierzone dzień wcześniej o tej samej porze.</li>
     <li>Reguła z wielu ChPLW dla piskląt: 1 l × wiek (dni) na 1000 ptaków (Nobilis, Poulvac: maks. 40 l). Hipragumboro-GM97: 2 l × wiek.</li>
-    <li>Woda chłodna, bez chloru i dezynfekcji (uzdatnianie wyłączone 24–48 h przed i 24 h po); stabilizator, np. mleko odtłuszczone 2–4 g/l, jeśli ChPLW go przewiduje.</li>
+    <li>Woda chłodna, bez chloru i dezynfekcji (uzdatnianie wyłączone 24–48 h przed i 24 h po).</li>
+    <li>Stabilizator: dziś zwykle gotowy preparat z niebieskim barwnikiem, który neutralizuje chlor i pokazuje, czy ptaki piły – np. Vac-Safe (MSD, 1 tabletka na 100 l, chlor do 5 ppm; wg MSD może zastąpić mleko w proszku) albo AviBlue (Elanco, 1 płaska nakrętka na 200 l). Przy dozowniku ilość liczy się na całą wodę i wsypuje do wiadra (Elanco: 1000 l przy 2% = 5 nakrętek w 20 l roztworu). Mleko w proszku (2–4 g/l) – gdy wymaga go ChPLW albo nie ma stabilizatora.</li>
     <li>Dozownik proporcjonalny (np. Dosatron D25RE2: 0,2–2%): roztworu w wiadrze = woda wypita w czasie szczepienia × ustawiony %; przy 1% na 1000 l wody – 10 l roztworu. Wszystkie fiolki i stabilizator idą do wiadra; stabilizator liczy się na całą wodę.</li>
     <li>Linie napełnij roztworem przed opuszczeniem: spuszczaj z końców, aż pojawi się barwnik (Aviagen: ok. 1 l na 3 m linii smoczkowej). Po szczepieniu co najmniej 90% ptaków z zabarwionym językiem.</li></ul></div>
   <div><h3>Oprysk</h3><ul class="list">
@@ -2333,7 +2382,7 @@ function bind(){
   $('s-src').addEventListener('change', flowSrcUI);
   $('s-noz').addEventListener('change', ev => { setNozzle(ev.target.value); saveEquipment(); calc(); });
   $('s-spr').addEventListener('change', () => { saveEquipment(); calc(); });
-  ['w-mode', 'w-pct'].forEach(id => $(id).addEventListener('change', saveEquipment));
+  ['w-mode', 'w-pct', 'w-stab', 'w-stab-amt', 'w-stab-unit'].forEach(id => $(id).addEventListener('change', saveEquipment));
   $('crew').addEventListener('toggle', ev => { if(ev.target.matches && ev.target.matches('details.howto')) S.howtoOpen = ev.target.open; }, true);
   $('age').addEventListener('input', () => { if(!S.mlTouched) applyDefaultsSpray(); refreshGuides(); });
   $('v-obliczenia').addEventListener('input', ev => { if(['bird','dz','vac'].includes(ev.target.id)) return; scheduleCalc(); });

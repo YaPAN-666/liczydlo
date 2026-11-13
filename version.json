@@ -1,10 +1,10 @@
 {
- "wersja": "1.5.0",
+ "wersja": "1.6.0",
  "data": "2026-11-10",
  "zmiany": [
-  "Wybór opryskiwacza: Birchmeier REC 15 AC1/AC2/AC5, REC 15 PC1, REX 15 AC1, REB 15 AC1 – zakres ciśnienia, wydajność pompy, dmuchawa AS 1200 tylko z REC 15 i REX 15.",
-  "Wybór dyszy TX-VK6 albo TX-VK18 z ostrzeżeniami: kropla poza oknem ChPLW, pompa nie nadąża (TX-VK18 na REC 15 do ok. 3,9 bar), TX-VK18 z dmuchawą.",
-  "Podsumowanie rozpoznaje pomyloną końcówkę (wydatek jak TX-VK18 albo TX-VK6) i granicę wydajności pompy; lista kontrolna wg instrukcji REC 15.",
-  "Aplikacja pamięta ostatnio wybrany opryskiwacz i dyszę."
+  "Aplikacja prowadzi wybór: szczepionka zawęża listę chorób, choroba – listę szczepionek; drogi podania tylko z ChPLW, a niedozwolone w tym wieku są wyłączone.",
+  "Lista szczepionek pokazuje drogi podania (oprysk, woda, oko, iniekcja); szczepionki niepasujące do wieku lub nieśności – na końcu z opisem.",
+  "Woda do picia: tryb „Dozownik %” – roztwór do wiadra, mleko, sprawdzenie dozownika i lista kroków (dzień wcześniej, dzień szczepienia, po).",
+  "Iniekcja: aparat pojedynczy lub podwójny (druga szczepionka), igły, miejsce wkłucia, temperatura szczepionki olejowej i sprawdzenie dawki aparatu."
  ]
 }

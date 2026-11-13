@@ -1,9 +1,8 @@
 {
- "wersja": "1.8.0",
+ "wersja": "1.8.1",
  "data": "2026-11-13",
  "zmiany": [
-  "Droga podania zawsze widoczna: Oprysk, Woda do picia, Oko / nos, Iniekcja. Przycisk drogi, której nie ma wybrana szczepionka („inna szczepionka”), wybiera szczepionkę z tą drogą – np. „Iniekcja” pokazuje szczepionki iniekcyjne na początku listy.",
-  "Iniekcja: miejsce wkłucia z ChPLW (i.m. – pierś lub udo, s.c. – szyja) i igła w wyniku i raporcie (Aviagen: i.m. 18 G · 6 mm, s.c. 18–19 G · 10–12 mm); kontrola mokrych piór.",
-  "Szczepionki podawane tylko 1. dnia życia (wylęgarnia: Marek, HVT, immunokompleks) u starszych ptaków oznaczone i na końcu listy. Zakładka Szczepionki: filtr drogi podania."
+  "Nobilis Reo inac – dane z ulotki z 23.05.2025: ostrzeżenie dla szczepiącego (olej mineralny – przypadkowe wstrzyknięcie sobie), obrzęk po szczepieniu, przechowywanie, odporność po 4 tyg. na jeden okres nieśności, miejsce wkłucia i sterylne strzykawki.",
+  "Opis szczepionki: nowe pola „Dla szczepiącego”, „Po szczepieniu” i „Przechowywanie”; przy iniekcji ostrzeżenie z ulotki wyświetla się w wyniku."
  ]
 }

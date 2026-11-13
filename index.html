@@ -580,7 +580,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
      u – do weryfikacji (dane ogólne, brak odczytu ChPLW)
    Wiek minimalny (min) zapisany jako dzień życia (1 = dzień wylęgu).
    ===================================================================== */
-const RPL = id => ({t:`Ulotka PL – Rejestr Produktów Leczniczych, ID ${id}`, u:`https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/${id}/leaflet`});
+const RPL = (id, d) => ({t:`Ulotka PL${d ? ' z ' + d : ''} – Rejestr Produktów Leczniczych, ID ${id}`, u:`https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/${id}/leaflet`});
 const RPLC = id => ({t:`ChPLW PL – Rejestr Produktów Leczniczych, ID ${id}`, u:`https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/${id}/characteristic`});
 const SRC_REPORT = {t:'Raport „Dysze TX-VK6 i TX-VK18” (9.11.2026) – zestawienie ChPLW/SPC', u:'https://claude.ai/artifact/87otV9TN3s4k1UYQtEXxib'};
 const SRC_UPD = id => ({t:`Unijna baza leków weterynaryjnych (UPD), ${id}`, u:`https://medicines.health.europa.eu/veterinary/pl/${id}`});
@@ -860,10 +860,12 @@ const VACCINES = [
  min:{kury:106}, minT:'ok. 16.–20. tydz. (stada rodzicielskie)', pk:[1000], use:'3 h po otwarciu', wd:'0 dni',
  lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać. Inne inaktywowane Intervet – w osobnych wstrzyknięciach.', sch:'≥4 tyg. (ok. 6 tyg.) po szczepionce żywej.',
  r:{inj:{ml:0.5, site:'i.m. (udo/pierś) lub s.c. (kark)', bottles:[{d:1000,ml:500}], note:'Przed użyciem doprowadzić do 15–25°C.'}}},
-{id:'nobilis-reo-inac', n:'Nobilis Reo inac', m:'MSD Animal Health', t:'inaktywowana', dz:['Reo'], s:'1733, 2408', sp:['kury'], st:'v', src:[RPL(20119)],
- min:{kury:106}, minT:'ok. 16.–20. tydz.', pk:[1000], use:'3 h po otwarciu', wd:'0 dni',
- lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać. Ten sam dzień co Nobilis Reo ERS inac i RT+IBmulti+G+ND – osobno.', sch:'≥6 tyg. (min. 4) po szczepionce żywej.',
- r:{inj:{ml:0.5, site:'i.m. (udo/pierś) lub s.c. (kark)', bottles:[{d:1000,ml:500}], note:'Wstrząsnąć; doprowadzić do 15–25°C.'}}},
+{id:'nobilis-reo-inac', n:'Nobilis Reo inac', m:'MSD Animal Health (Intervet International B.V.)', t:'inaktywowana – emulsja olejowa (parafina ciekła)', dz:['Reo'], s:'1733, 2408 (≥7,4 log2 jedn. ELISA)', sp:['kury'], st:'v', src:[RPL(20119, '23.05.2025')],
+ min:{kury:106}, minT:'ok. 16.–20. tydz., nie później niż 4 tyg. przed nieśnością', pk:[1000], use:'3 h po otwarciu', wd:'0 dni',
+ lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać. Ten sam dzień co Nobilis Reo ERS inac i RT+IBmulti+G+ND – osobno.', sch:'Booster dla przyszłych stad rodzicielskich i niosek towarowych: najlepiej ≥6 tyg. (nie wcześniej niż 4 tyg.) po szczepionce żywej przeciw reowirusom. Odporność po 4 tyg., na jeden okres nieśności; przeciwciała matczyne chronią potomstwo w pierwszych tygodniach życia.',
+ safe:'Zawiera olej mineralny. Przypadkowe wstrzyknięcie sobie może spowodować silny ból i obrzęk, zwłaszcza w palec lub staw, a rzadko utratę palca. Od razu do lekarza – nawet przy bardzo małej ilości – z ulotką; jeśli ból trwa dłużej niż 12 h po pomocy, ponownie do lekarza.',
+ ae:'Bardzo często obrzęk w miejscu wstrzyknięcia; nieznaczny obrzęk może być widoczny kilka tygodni.', store:'2–8°C, nie zamrażać, chronić przed światłem.',
+ r:{inj:{ml:0.5, site:'i.m. (mięśnie ud lub piersiowe) lub s.c. (grzbietowa okolica szyi)', bottles:[{d:1000,ml:500}], note:'Doprowadzić do 15–25°C i wstrząsnąć przed użyciem; sterylne strzykawki i igły (aseptyka).'}}},
 {id:'gallimune-407', n:'Gallimune 407 ND+IB+EDS+ART', m:'Boehringer Ingelheim', t:'inaktywowana', dz:['ND','IB','EDS','aMPV'], s:'Ulster 2C, Mass 41, V127, VCO3', sp:['kury'], st:'v', src:[RPL(25468)],
  min:{kury:127}, minT:'od 18. tygodnia życia', pk:[500,1000], use:'zużyć natychmiast', wd:'0 dni',
  lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać z innymi produktami.', sch:'Stada rodzicielskie i nioski towarowe.',
@@ -936,7 +938,7 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.8.0';
+const APP_VERSION = '1.8.1';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};
@@ -1445,20 +1447,23 @@ function calc(){
         const n2 = vacNote(v2, $('bird').value, dol); if(n2) msgs.push(['bad', `${v2.n}: ${n2} (ChPLW: ${v2.minT}).`]);
         msgs.push(['info', `Aparat podwójny: każda szczepionka z własnej butelki i własną igłą, w dwa różne miejsca (np. ${r.site || 'wg ChPLW'} / ${r2.site || 'wg ChPLW'}). Szczepionek nie mieszaj w jednej butelce.`]);
         msgs.push(['warn', `Dwie szczepionki tego samego dnia – tylko gdy ChPLW obu na to pozwala lub decyzją lekarza weterynarii. ChPLW: ${v ? v.n + ' – ' + v.mix : '–'} · ${v2.n} – ${v2.mix}`]);
+        if(v2.safe && !(v && v.safe === v2.safe)) msgs.push(['warn', `${v2.n} – dla szczepiącego (ChPLW): ${v2.safe}`]);
         inj2 = {vacId:v2.id, vacName:v2.n, dose_ml:ml2, vaccine_ml:V2, packs:bp2 ? packsText(bp2) : null};
       }
     }
     // Igły, miejsce, temperatura i sprawdzenie aparatu
     const oil = v && /inaktyw/i.test(v.t || ''), temp = String(r.note || '').match(/\d+\s*[–-]\s*\d+\s*°C/);
     const site = SITES[$('i-site').value] ? $('i-site').value : 'im-p';
-    if(oil) tiles.splice(tiles.findIndex(t => t.k === 'Dawka') + 1, 0, {k:'Igła', v:NEEDLE[site], s:`${SITES[site]} · Aviagen, szczepionka olejowa`});
+    if(oil) tiles.splice(tiles.findIndex(t => t.k === 'Dawka') + 1, 0, {k:'Igła', v:NEEDLE[site], s:`${SITES[site]} · Aviagen, szczepionka inaktywowana`});
     if(oil){
       msgs.push(['info', 'Igły (Aviagen, szczepionki inaktywowane): s.c. 18–19 G, 10–12 mm; i.m. 18 G, 6 mm. Nową igłę zakładaj co najmniej co 500 ptaków, tępą lub zadziorowaną – od razu.']);
       msgs.push(['info', 'Mokre pióra w miejscu wkłucia znaczą, że szczepionka nie trafiła – popraw technikę (Aviagen).']);
       msgs.push(['info', 'Miejsce (Aviagen): i.m. – górna 1/3 mięśnia piersiowego, 2,5–3,8 cm od grzebienia mostka, igła pod kątem 45°; s.c. – dolna 1/3 szyi, z dala od głowy i nasady szyi. Udo tylko gdy konieczne – ChPLW: ' + (r.site || 'sprawdź').replace(/\.$/, '') + '.']);
-      msgs.push(['info', `Szczepionkę olejową wyjmij z lodówki wcześniej, doprowadź do ${temp ? temp[0].replace(/\s+/g, '') + ' (ChPLW)' : 'temperatury z ChPLW'} i dobrze wstrząśnij; wstrząsaj też w trakcie. Zimna emulsja jest gęsta – aparat nie podaje wtedy pełnej dawki.`]);
+      msgs.push(['info', `Szczepionkę wyjmij z lodówki wcześniej, doprowadź do ${temp ? temp[0].replace(/\s+/g, '') + ' (ChPLW)' : 'temperatury z ChPLW'} i dobrze wstrząśnij; wstrząsaj też w trakcie. Zimna szczepionka – zwłaszcza emulsja olejowa – jest gęsta i aparat może nie podać pełnej dawki.`]);
     } else if(v) msgs.push(['info', `Szczepionka żywa ${r.site ? '(' + r.site + ')' : ''}: przygotowanie i rozpuszczalnik wg ChPLW; zużyj w ${v.use}. Igła wg instrukcji aparatu.`]);
     msgs.push(['info', `Przed szczepieniem sprawdź dawkę aparatu: 10 dawek do cylindra miarowego = ${fmtT(ml * 10, 1)} ml${inj2 ? ` (druga strona: ${fmtT(inj2.dose_ml * 10, 1)} ml)` : ''}.`]);
+    if(v && v.safe) msgs.push(['warn', `Dla szczepiącego (ChPLW): ${v.safe}`]);
+    if(v && v.ae) msgs.push(['info', `Po szczepieniu (ChPLW): ${v.ae}`]);
     Object.assign(R, {vaccine_ml:Vml, dose_ml:ml, injApp:two ? 2 : 1, inj2, injSite:SITES[site], needle:oil ? NEEDLE[site] : null});
   }
 
@@ -1470,13 +1475,15 @@ function calc(){
   $('res-sub').textContent = `${ROUTES[route]} · ${fmt0(birds)} ptaków`;
   S.last = {v, bird, R, msgs};
 }
+// Dodatkowe dane z ulotki: bezpieczeństwo szczepiącego, odczyny po szczepieniu, przechowywanie
+function extraKV(v){ return [['Dla szczepiącego', v.safe], ['Po szczepieniu', v.ae], ['Przechowywanie', v.store]].filter(x => x[1]).map(([k, t]) => `<dt>${k}</dt><dd>${esc(t)}</dd>`).join(''); }
 function renderKnow(v){
   const box = $('know');
   if(!v){ box.innerHTML = '<p class="note">Szczepionka spoza bazy – obliczenia na wartościach wpisanych ręcznie.</p>'; return; }
   const r = (v.r && v.r[S.route]) || {};
   box.innerHTML = `<details><summary>Z ChPLW: ${esc(v.n)} <span class="pill ${v.st}">${ST_LABEL[v.st]}</span></summary>
     <dl class="kv" style="margin-top:8px"><dt>Wiek</dt><dd>${esc(v.minT)}</dd><dt>Schemat</dt><dd>${esc(v.sch)}</dd>${r.note ? `<dt>${esc(ROUTES[S.route])}</dt><dd>${esc(r.note)}</dd>` : ''}
-    <dt>Zużyć w</dt><dd>${esc(v.use)}</dd><dt>Karencja</dt><dd>${esc(v.wd)}</dd><dt>Nieśność</dt><dd>${esc(v.lay)}</dd><dt>Łączenie</dt><dd>${esc(v.mix)}</dd>
+    <dt>Zużyć w</dt><dd>${esc(v.use)}</dd><dt>Karencja</dt><dd>${esc(v.wd)}</dd><dt>Nieśność</dt><dd>${esc(v.lay)}</dd><dt>Łączenie</dt><dd>${esc(v.mix)}</dd>${extraKV(v)}
     <dt>Źródło</dt><dd>${v.src && v.src.length ? v.src.map(linkSrc).join('<br>') : 'brak odczytu ChPLW'}</dd></dl></details>`;
 }
 
@@ -2251,7 +2258,7 @@ function renderKnowledge(){
   box.innerHTML = `<div class="card-h"><h2>${esc(v.n)}</h2><span class="pill ${v.st}">${ST_LABEL[v.st]}</span></div>
     <dl class="kv"><dt>Producent</dt><dd>${esc(v.m)}</dd><dt>Rodzaj</dt><dd>${esc(v.t)}</dd><dt>Choroby</dt><dd>${esc(v.dz.map(d => DISEASES[d] || d).join('; '))}</dd><dt>Szczep</dt><dd>${esc(v.s)}</dd><dt>Drób</dt><dd>${esc(v.sp.join(', '))}</dd><dt>Wiek</dt><dd>${esc(v.minT)}</dd><dt>Schemat</dt><dd>${esc(v.sch)}</dd>
       ${Object.entries(v.r || {}).map(([k,r]) => describeRoute(k, r)).join('')}
-      <dt>Opakowania</dt><dd>${v.pk && v.pk.length ? esc(v.pk.join(', ')) + ' dawek' : 'sprawdź w ChPLW'}</dd><dt>Zużyć w</dt><dd>${esc(v.use)}</dd><dt>Karencja</dt><dd>${esc(v.wd)}</dd><dt>Nieśność</dt><dd>${esc(v.lay)}</dd><dt>Łączenie</dt><dd>${esc(v.mix)}</dd>
+      <dt>Opakowania</dt><dd>${v.pk && v.pk.length ? esc(v.pk.join(', ')) + ' dawek' : 'sprawdź w ChPLW'}</dd><dt>Zużyć w</dt><dd>${esc(v.use)}</dd><dt>Karencja</dt><dd>${esc(v.wd)}</dd><dt>Nieśność</dt><dd>${esc(v.lay)}</dd><dt>Łączenie</dt><dd>${esc(v.mix)}</dd>${extraKV(v)}
       <dt>Źródło</dt><dd>${v.src && v.src.length ? v.src.map(linkSrc).join('<br>') : 'brak odczytu – sprawdź w <a href="https://rejestry.ezdrowie.gov.pl/rpl/search/public" target="_blank" rel="noopener">Rejestrze Produktów Leczniczych</a>'}</dd></dl>
     ${RT.some(r => v.r && v.r[r]) ? '<div class="tools"><button class="btn small" type="button" id="k-use">Licz z tą szczepionką</button></div>' : ''}`;
 }
@@ -2287,6 +2294,7 @@ function renderRules(){
     <li>Szczepionki inaktywowane: zwykle 0,5 ml i.m. lub s.c. (Gallimune 407: 0,3 ml); doprowadzić do 15–25°C i wstrząsnąć.</li>
     <li>Igły do szczepionek inaktywowanych (Aviagen): s.c. 18–19 G, 10–12 mm; i.m. 18 G, 6 mm; nowa igła co najmniej co 500 ptaków. I.m. – górna 1/3 piersi, 2,5–3,8 cm od mostka, pod kątem 45°; udo tylko gdy konieczne.</li>
     <li>Przycisk „Iniekcja” jest zawsze widoczny: przy szczepionce bez iniekcji w ChPLW wybiera szczepionkę iniekcyjną, a lista zaczyna się od szczepionek iniekcyjnych. Szczepionki podawane 1. dnia życia (wylęgarnia: Marek, HVT, immunokompleks) u starszych ptaków są na końcu listy.</li>
+    <li>Szczepionki z olejem mineralnym (np. Nobilis Reo inac – parafina ciekła): przypadkowe wstrzyknięcie sobie, zwłaszcza w palec lub staw, wymaga natychmiastowej pomocy lekarskiej, nawet przy bardzo małej ilości – zabierz ulotkę. Strzykawki i igły sterylne.</li>
     <li>Aparat podwójny podaje dwie szczepionki jednym ruchem – każdą z własnej butelki i własną igłą, w dwa różne miejsca. Dwie szczepionki tego samego dnia tylko wtedy, gdy pozwala na to ChPLW obu, albo decyzją lekarza weterynarii.</li></ul></div>
   <div><h3>Obowiązek szczepień ND</h3><p class="note">Rozporządzenie MRiRW z 11.03.2026 (Dz.U. poz. 335): kury i indyki w zakładach przemieszczających drób lub jaja albo sprzedających je bezpośrednio oraz w wylęgarniach; powyżej 350 szt. – program szczepień w planie bioasekuracji. Przykładowe programy: przewodnik GIW ND v5 (2025).</p></div>
   <div><h3>Źródła</h3><ul class="list">

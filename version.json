@@ -1,9 +1,8 @@
 {
- "wersja": "1.9.0",
+ "wersja": "1.9.1",
  "data": "2026-11-13",
  "zmiany": [
-  "Wybór dopasowany do ptaków i wieku: listy chorób i szczepionek pokazują tylko to, co ChPLW pozwala podać tym ptakom w tym wieku (np. 6 tyg. – bez szczepionek od 16. tygodnia i z wylęgarni). Ukryte odkrywa „pokaż” pod listą szczepionek – wynik wtedy ostrzega.",
-  "Zmiana wieku lub ptaków sama poprawia wybór: szczepionka, która przestała pasować, zostaje zastąpiona (z komunikatem), a gdy wiek znów pasuje – wraca. Przyciski dróg podania i druga szczepionka aparatu podwójnego też uwzględniają wiek.",
-  "Wiek pokazany także w tygodniach; ostrzeżenia: nioski w nieśności poniżej 16. tygodnia, odchów blisko okresu „… tyg. przed nieśnością” z ChPLW."
+  "Innovax-ND-IBD – pełne dane z ChPLW (EMA, EU/2/17/213): 0,2 ml s.c. w szyję lub 0,05 ml in ovo, zużyć w 2 h, torebki rozpuszczalnika 400–1600 ml (400 ml na 2000 dawek), odporność ND po 4 tyg., IBD po 3 tyg., MD po 9 dniach; łączenie z Nobilis Rismavac, ND Clone 30/C2, IB Ma5/4-91.",
+  "Innovax-ND-IBD – dla szczepiącego: ciekły azot i ampułki (rękawice, maska lub okulary, rozmrażanie w wodzie 25–27°C); przechowywanie i kontrola rozmrożenia ampułek; szczep przechodzi na indyki."
  ]
 }

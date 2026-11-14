@@ -774,9 +774,14 @@ const VACCINES = [
 {id:'innovax-nd-ilt', n:'Innovax-ND-ILT', m:'MSD Animal Health', t:'wektorowa HVT', dz:['Marek','ND','ILT'], s:'HVT-ND-ILT', sp:['kury'], st:'u', src:[],
  min:{kury:1}, max:{kury:1}, minT:'1. dzień lub in ovo', pk:[2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Nobilis IB Ma5: ten sam dzień co IB Ma5.', sch:'Wylęgarnia.',
  r:{inj:{ml:0.2, site:'s.c., 1. dzień', note:'Do weryfikacji w ChPLW.'}, inovo:{ml:0.05, note:'Do weryfikacji.'}}},
-{id:'innovax-nd-ibd', n:'Innovax-ND-IBD', m:'MSD Animal Health', t:'wektorowa HVT', dz:['Marek','ND','IBD'], s:'HVT-ND-IBD', sp:['kury'], st:'u', src:[],
- min:{kury:1}, max:{kury:1}, minT:'1. dzień lub in ovo', pk:[2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Nobilis IB Ma5: ten sam dzień co IB Ma5.', sch:'Wylęgarnia.',
- r:{inj:{ml:0.2, site:'s.c., 1. dzień', note:'Do weryfikacji w ChPLW.'}, inovo:{ml:0.05, note:'Do weryfikacji.'}}},
+{id:'innovax-nd-ibd', n:'Innovax-ND-IBD', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa wektorowa HVT, związana z komórkami (ciekły azot)', dz:['Marek','ND','IBD'], s:'HVT HVP360 (białko F wirusa ND + VP2 wirusa IBD), 10^3,3–10^4,6 PFU', sp:['kury'], st:'v', src:[{t:'EMA – EPAR Innovax-ND-IBD: ChPLW i ulotka PL (EU/2/17/213)', u:'https://www.ema.europa.eu/en/medicines/veterinary/EPAR/innovax-nd-ibd'}],
+ min:{kury:1}, max:{kury:1}, minT:'1. dzień życia (s.c.) lub 18.–19. dzień inkubacji (in ovo)', pk:[2000,4000], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Bezpieczeństwo w okresie nieśności nie zostało określone.', mix:'Mieszać wolno tylko z Nobilis Rismavac (ten sam rozpuszczalnik, s.c.; 400 ml na każde 2000 dawek obu). Tego samego dnia, osobno: Nobilis ND Clone 30 lub ND C2 oraz Nobilis IB Ma5 lub IB 4-91.',
+ sch:'Jednorazowo w wylęgarni. Odporność: ND po 4 tyg. (z ND Clone 30 – 3 tyg., z ND C2 – 2 tyg.), IBD po 3 tyg., MD po 9 dniach (zmieszana z Rismavac – 5 dni); trwa: ND i IBD 60 tyg., MD – cały okres zagrożenia.',
+ safe:'Ciekły azot – tylko w dobrze wentylowanym pomieszczeniu. Przy wyjmowaniu ampułek: rękawice, długie rękawy, maska na twarz lub okulary; dłoń z ampułką z dala od ciała i twarzy. Ampułki mogą eksplodować przy gwałtownej zmianie temperatury – rozmrażać tylko w czystej wodzie 25–27°C, nigdy w gorącej ani lodowatej.',
+ ae:'Działania niepożądane nie są znane. Szczep szczepionkowy jest wydalany i może przechodzić na indyki – unikać bezpośredniego i pośredniego kontaktu szczepionych kur z indykami.',
+ store:'Koncentrat w ciekłym azocie (poniżej −140°C), rozpuszczalnik poniżej 30°C. Pojemnik z azotem pionowo, w czystym, suchym, wentylowanym pomieszczeniu oddzielonym od wylęgu i kurcząt. Ampułki stoją dnem do góry – zamrożona zawartość w wierzchołku ampułki znaczy, że była rozmrożona: nie używać.',
+ r:{inj:{ml:0.2, site:'s.c. – szyja', bags:[400,800,1200,1600], note:'Aseptyka. Rozpuszczalnik przejrzysty, czerwony, 15–25°C; najwyżej 5 ampułek naraz, z jednej laski; rozmrażać w wodzie 25–27°C, od razu pobrać strzykawką z igłą 18 G do torebki i wymieszać (6–8 obrotów); w trakcie szczepienia często delikatnie obracać torebkę. Ampułki: 2000 dawek – klips łososiowo-różowy, 4000 dawek – żółty.'}, inovo:{ml:0.05, note:'18.–19. dzień inkubacji; 400 ml rozpuszczalnika na 8000 dawek (4 × 2000 lub 2 × 4000).'}}},
 {id:'vaxxitek-hvt-ibd', n:'Vaxxitek HVT+IBD', m:'Boehringer Ingelheim', t:'wektorowa HVT', dz:['Marek','IBD'], s:'vHVT013-69', sp:['kury'], st:'u', src:[],
  min:{kury:1}, max:{kury:1}, minT:'1. dzień lub in ovo', pk:[1000,2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Sprawdź w ChPLW.', sch:'Wylęgarnia.',
  r:{inj:{ml:0.2, site:'s.c., 1. dzień', note:'Do weryfikacji w ChPLW.'}, inovo:{ml:0.05, note:'Do weryfikacji.'}}},
@@ -940,7 +945,7 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.9.0';
+const APP_VERSION = '1.9.1';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};

@@ -832,9 +832,14 @@ const VACCINES = [
  lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać. Unikać chemioterapeutyków przeciw Salmonella.',
  sch:'Brojlery: 1. dzień. Nioski i stada zarodowe: 1. dzień, 6.–8. tydz., 14.–18. tydz.',
  r:{woda:{rule:'ageTable', rows:[{a:0,b:3,l:[1,1]},{a:42,b:56,l:[25,35]},{a:98,b:126,l:[35,40]}], win:'do 3 h', thirst:'2–3 h', milk:'2–4 g/l (lub 20–40 ml/l)', note:'Ilość wg wodomierza z dnia poprzedniego; butelkę otwierać pod wodą, nie dzielić na kilka kurników.'}}},
-{id:'avipro-salm-vac-e', n:'AviPro Salmonella Vac E', m:'Elanco (Lohmann)', t:'żywa', dz:['Salmonella'], s:'S. Enteritidis', sp:['kury'], st:'u', src:[],
- min:{kury:1}, minT:'wg ChPLW', pk:null, use:'wg ChPLW', wd:'wg ChPLW', lay:'Sprawdź w ChPLW.', mix:'Ten sam dzień co Vac T – bez mieszania (wg ulotki Vac T).', sch:'Wg ChPLW.',
- r:{woda:{rule:'measured', h:2, note:'Do weryfikacji w ChPLW.'}}},
+{id:'avipro-salm-vac-e', n:'AviPro Salmonella Vac E', m:'Lohmann Animal Health (Elanco)', t:'żywa (bakteryjna)', dz:['Salmonella'], s:'S. Enteritidis Sm24/Rif12/Ssq, 1–6 × 10^8 CFU', sp:['kury'], st:'v', src:[RPLC(17157), RPL(17157, '12.11.2025')],
+ min:{kury:1}, minT:'od 1. dnia życia (przyszłe nioski i ptaki hodowlane)', pk:[1000,2000,5000], use:'4 h po rozpuszczeniu', wd:'21 dni (tkanki jadalne)',
+ lay:'Tylko przyszłe nioski i ptaki hodowlane – nie u brojlerów. Nie w okresie nieśności ani 3 tyg. przed.', mix:'Nie mieszać z innymi lekami. Unikać chemioterapeutyków przeciw Salmonella (jeśli konieczne – stado szczepić ponownie). Z innymi szczepionkami – decyzja indywidualna.',
+ sch:'Nioski i ptaki hodowlane: 1. dzień życia, 6.–8. tydz. i 16.–18. tydz. (nie później niż 3 tyg. przed nieśnością). Odporność po 15 dniach, trwa 52 tyg. od ostatniego szczepienia.',
+ safe:'Rozpuszczać w rękawicach ochronnych; butelkę otwierać pod wodą (bez aerozolu). Po pracy odkazić i umyć ręce; nie spożywać – po połknięciu do lekarza z ulotką. Myć i odkażać ręce po kontakcie z odchodami, zwłaszcza 7 dni po szczepieniu; zmiana ubrań, rękawiczki, dezynfekcja butów. Nie powinny podawać kobiety w ciąży; osoby z obniżoną odpornością – unikać kontaktu. Szczep wrażliwy na chinolony (ciprofloksacyna).',
+ ae:'Nieznane. Ptaki wydalają szczep szczepionkowy do 14 dni i może on przejść na ptaki w kontakcie. Szczepienie może dawać słabe wyniki serologiczne dodatnie – potwierdzić bakteriologicznie (szczep szczepionkowy: wrażliwy na erytromycynę, oporny na streptomycynę i ryfampicynę).',
+ store:'2–8°C, chronić przed światłem, nie zamrażać.',
+ r:{woda:{rule:'perDay', f:1, win:'do 4 h', milk:'2–4 g/l mleka w proszku (tłuszcz < 1%) lub 20–40 ml/l mleka chudego', note:'Woda zimna, czysta, bez chloru i metali; instalacja bez resztek środków dezynfekcyjnych. Butelkę otworzyć pod wodą, rozpuścić w 1 l, potem połączyć z wodą w wiadrze 10 l; mieszać kilka minut. Nie dzielić dużych fiolek na inne kurniki. Ilość wody wg wodomierza z dnia poprzedniego; zwykle wstrzymać wodę 2–3 h przed szczepieniem.'}}},
 {id:'nobilis-salenvac-etc', n:'Nobilis Salenvac ETC', m:'MSD Animal Health', t:'inaktywowana', dz:['Salmonella'], s:'SE, ST, Heidelberg, Infantis, Hadar, Virchow', sp:['kury'], st:'v', src:[RPL(44176)],
  min:{kury:36}, minT:'od 6. tygodnia życia', pk:[1000], use:'10 h po otwarciu', wd:'0 dni',
  lay:'Nie w okresie nieśności ani 3 tyg. przed.', mix:'Nie mieszać z innymi produktami.', sch:'1. dawka od 6. tyg.; 2. ≥4 tyg. później i ≥3 tyg. przed nieśnością.',
@@ -945,7 +950,7 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.9.1';
+const APP_VERSION = '1.9.2';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};
@@ -1342,6 +1347,8 @@ function calc(){
     if($('bird').value === 'kury-odchow' && age >= 84 && /przed/i.test(v.lay || '')) msgs.push(['warn', `Odchów, ${ageWeeks(age)} – ChPLW: ${v.lay} Sprawdź planowany początek nieśności.`]);
     if($('bird').value === 'indyki-repro' && age >= 180 && v.lay) msgs.push(['warn', 'Indyki w nieśności – ChPLW: ' + v.lay]);
     if(v.st === 'u') msgs.push(['warn', 'Dane tej szczepionki są do weryfikacji – sprawdź dawkę i sposób podania w aktualnej ChPLW.']);
+    if(v.safe) msgs.push(['warn', `Dla szczepiącego (ChPLW): ${v.safe}`]);   // każda droga podania
+    if(v.ae) msgs.push(['info', `Po szczepieniu (ChPLW): ${v.ae}`]);
   }
   if($('bird').value === 'kury-niesnosc' && age < 112) msgs.push(['warn', `Kury w okresie nieśności, a wiek ${ageWeeks(age)} – sprawdź wiek albo wybierz „Kury – nioski / reprodukcja (odchów)”.`]);
   if(bp && bp.total > need && (route === 'spray' || route === 'woda')) msgs.push(['info', `Nadwyżka ${fmt0(bp.total - need)} dawek – rozpuść wszystkie otwarte fiolki w całej wodzie; nie dziel fiolek.`]);
@@ -1511,8 +1518,7 @@ function calc(){
       msgs.push(['info', `Szczepionkę wyjmij z lodówki wcześniej, doprowadź do ${temp ? temp[0].replace(/\s+/g, '') + ' (ChPLW)' : 'temperatury z ChPLW'} i dobrze wstrząśnij; wstrząsaj też w trakcie. Zimna szczepionka – zwłaszcza emulsja olejowa – jest gęsta i aparat może nie podać pełnej dawki.`]);
     } else if(v) msgs.push(['info', `Szczepionka żywa ${r.site ? '(' + r.site + ')' : ''}: przygotowanie i rozpuszczalnik wg ChPLW; zużyj w ${v.use}. Igła wg instrukcji aparatu.`]);
     msgs.push(['info', `Przed szczepieniem sprawdź dawkę aparatu: 10 dawek do cylindra miarowego = ${fmtT(ml * 10, 1)} ml${inj2 ? ` (druga strona: ${fmtT(inj2.dose_ml * 10, 1)} ml)` : ''}.`]);
-    if(v && v.safe) msgs.push(['warn', `Dla szczepiącego (ChPLW): ${v.safe}`]);
-    if(v && v.ae) msgs.push(['info', `Po szczepieniu (ChPLW): ${v.ae}`]);
+
     Object.assign(R, {vaccine_ml:Vml, dose_ml:ml, injApp:two ? 2 : 1, inj2, injSite:SITES[site], needle:oil ? NEEDLE[site] : null});
   }
 

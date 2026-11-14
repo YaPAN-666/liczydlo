@@ -302,6 +302,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
             <input id="date" type="date"></label>
           <label>Drób
             <select id="bird">
+              <option value="">— wybierz —</option>
               <option value="kury-brojlery">Kury – brojlery</option>
               <option value="kury-odchow">Kury – nioski / reprodukcja (odchów)</option>
               <option value="kury-niesnosc">Kury w okresie nieśności</option>
@@ -309,7 +310,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
               <option value="indyki-repro">Indyki reprodukcyjne</option>
             </select></label>
           <label>Wiek (dni)
-            <input id="age" type="number" min="0" step="1" value="8" inputmode="numeric">
+            <input id="age" type="number" min="0" step="1" placeholder="np. 21" inputmode="numeric">
             <span class="hint" id="age-hint"></span></label>
           <label>Liczba ptaków
             <input id="birds" type="number" min="1" step="1" placeholder="np. 40000" inputmode="numeric"></label>
@@ -353,10 +354,10 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
             </select>
             <span class="hint" id="s-noz-hint"></span></label>
           <label>Woda na 1000 dawek (ml)
-            <input id="s-ml" type="number" min="10" step="10" value="250" inputmode="decimal">
+            <input id="s-ml" type="number" min="10" step="10" placeholder="z ChPLW" inputmode="decimal">
             <span class="hint" id="s-ml-hint"></span></label>
           <label>Ciśnienie (bar)
-            <input id="s-p" type="number" min="1" max="6" step="0.1" value="2.5" inputmode="decimal"></label>
+            <input id="s-p" type="number" min="1" max="6" step="0.1" placeholder="np. 2,5" inputmode="decimal"></label>
           <label>Tryb pracy
             <select id="s-mode">
               <option value="lanca">Bez dmuchawy (lanca)</option>
@@ -378,10 +379,10 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
             <input id="s-qp" type="text" autocomplete="off" placeholder="jak ustawione" inputmode="decimal">
             <span class="hint">przy innym ciśnieniu roboczym wydatek zostanie przeliczony</span></label>
           <label>Liczba sektorów
-            <input id="s-sec" type="number" min="1" max="6" step="1" value="1" inputmode="numeric">
+            <input id="s-sec" type="number" min="1" max="6" step="1" placeholder="1" inputmode="numeric">
             <span class="hint">każdy sektor osobno, z wyłączoną wentylacją</span></label>
           <label>Liczba osób
-            <input id="s-os" type="number" min="1" max="6" step="1" value="1" inputmode="numeric">
+            <input id="s-os" type="number" min="1" max="6" step="1" placeholder="1" inputmode="numeric">
             <span class="hint">każda osoba z własnym opryskiwaczem</span></label>
           <label id="s-org-wrap" hidden>Podział pracy
             <select id="s-org">
@@ -401,7 +402,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
               <option value="zb">Zbiornik / beczka – cała woda naraz</option>
             </select></label>
           <label id="w-pct-wrap">Ustawienie dozownika (%)
-            <input id="w-pct" type="text" inputmode="decimal" autocomplete="off" value="1">
+            <input id="w-pct" type="text" inputmode="decimal" autocomplete="off" placeholder="np. 1">
             <span class="hint">1% = 1 l roztworu na 100 l wody</span></label>
           <label id="w-dose-wrap" hidden>Która dawka
             <select id="w-dose"></select></label>
@@ -426,7 +427,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
               <option value="ml">ml</option>
             </select></label>
           <label id="w-milk-wrap" hidden>Mleko w proszku (g/l)
-            <input id="w-milk" type="number" min="0" step="0.5" value="0" inputmode="decimal">
+            <input id="w-milk" type="number" min="0" step="0.5" inputmode="decimal">
             <span class="hint" id="w-milk-hint"></span></label>
         </div>
       </div>
@@ -435,7 +436,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
         <h2>3. Kropla do oka / nosa</h2>
         <div class="row">
           <label>Rozpuszczalnik na 1000 dawek (ml)
-            <input id="o-ml" type="number" min="1" step="0.5" value="30" inputmode="decimal"></label>
+            <input id="o-ml" type="number" min="1" step="0.5" placeholder="z ChPLW" inputmode="decimal"></label>
         </div>
       </div>
 
@@ -443,9 +444,9 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
         <h2>3. Iniekcja</h2>
         <div class="row">
           <label>Dawka na ptaka (ml)
-            <input id="i-ml" type="number" min="0.01" step="0.05" value="0.5" inputmode="decimal"></label>
+            <input id="i-ml" type="number" min="0.01" step="0.05" placeholder="z ChPLW" inputmode="decimal"></label>
           <label>Zapas na straty (%)
-            <input id="i-loss" type="number" min="0" step="1" value="3" inputmode="numeric"></label>
+            <input id="i-loss" type="number" min="0" step="1" placeholder="np. 3" inputmode="numeric"></label>
           <label class="wide">Miejsce wkłucia (z ChPLW)
             <select id="i-site"></select></label>
           <label class="wide">Aparat (strzykawka automatyczna)
@@ -456,7 +457,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
           <label class="wide" id="i-vac2-wrap" hidden>Druga szczepionka (druga strona aparatu)
             <select id="i-vac2"></select></label>
           <label id="i-ml2-wrap" hidden>Dawka drugiej (ml)
-            <input id="i-ml2" type="number" min="0.01" step="0.05" value="0.5" inputmode="decimal"></label>
+            <input id="i-ml2" type="number" min="0.01" step="0.05" placeholder="z ChPLW" inputmode="decimal"></label>
         </div>
       </div>
     </div>
@@ -969,7 +970,7 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.9.3';
+const APP_VERSION = '1.10.0';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};
@@ -1116,7 +1117,7 @@ function waterSteps(o){
 }
 // Druga szczepionka do aparatu podwójnego: iniekcyjne dla tych ptaków, bez pierwszej; dawka z ChPLW przy zmianie
 function fillVac2(v, bird, dol){
-  const sel = $('i-vac2'), bk = $('bird').value;
+  const sel = $('i-vac2'), bk = birdKey();
   const list = VACCINES.filter(x => x.r && x.r.inj && x.sp.includes(bird.g) && (!v || x.id !== v.id))
     .map(x => ({x, note:vacNote(x, bk, dol)})).filter(o => S.showAll || !o.note).sort((a, b) => (!!a.note - !!b.note) || a.x.n.localeCompare(b.x.n, 'pl'));
   fillSelect(sel, list.map(({x, note}) => ({v:x.id, l:x.n + (note ? ` – ${note}` : '')})));
@@ -1190,97 +1191,108 @@ function errText(e){
    aplikacja wybiera najlepszą pasującą szczepionkę i mówi o tym; gdy wiek znów pasuje – wraca. */
 const DZ_ALL = '*', RT_SHORT = {spray:'oprysk', woda:'woda', oko:'oko', inj:'iniekcja'};
 function dolNow(){ return Math.max(0, Math.round(num('age',0))) + 1; }
+// Czysty start: nic nie jest wybrane ani wpisane, dopóki użytkownik tego nie zrobi
+function birdKey(){ return BIRDS[$('bird').value] ? $('bird').value : ''; }
+function ageKnown(){ return $('age').value.trim() !== '' && isNum(pf($('age').value)); }
+function dolSel(){ return ageKnown() ? dolNow() : null; }   // do filtrowania – bez wieku nie filtruje po wieku
+function noVac(){ return $('vac').value === '-'; }
 // Wiek w tygodniach i dniach – „6 tyg.”, „6 tyg. 3 d”, „5 dni”
 function ageWeeks(age){ const w = Math.floor(age / 7), d = age % 7; return age < 14 ? `${age} ${age === 1 ? 'dzień' : 'dni'}` : `${w} tyg.${d ? ` ${d} d` : ''}`; }
 function routeMin(v, r){ const o = v && v.r && v.r[r]; return o && isNum(o.min) ? o.min : null; }
 function vacNote(v, bk, dol){
-  if(!v) return '';
-  const b = BIRDS[bk], min = v.min ? v.min[b.g] : null, max = v.max ? v.max[b.g] : null;
-  if(isNum(min) && dol < min) return `od ${min}. dnia życia`;
-  if(isNum(max) && dol > max) return max === 1 ? 'tylko 1. dzień życia (wylęgarnia)' : `do ${max}. dnia życia`;
+  const b = BIRDS[bk]; if(!v || !b) return '';
+  const min = v.min ? v.min[b.g] : null, max = v.max ? v.max[b.g] : null;
+  if(isNum(dol) && isNum(min) && dol < min) return `od ${min}. dnia życia`;
+  if(isNum(dol) && isNum(max) && dol > max) return max === 1 ? 'tylko 1. dzień życia (wylęgarnia)' : `do ${max}. dnia życia`;
   if(b.lay && /(^|\. )nie (w okresie nieśności|zaleca się szczepienia kur w okresie nieśności|u kur nieśnych)/i.test(v.lay || '')) return 'nie w nieśności';
   if(bk === 'kury-brojlery' && /nie u brojlerów/i.test(v.lay || '')) return 'nie u brojlerów';
   const ms = RT.filter(r => v.r && v.r[r]).map(r => routeMin(v, r));
-  if(ms.length && ms.every(m => isNum(m) && dol < m)) return `od ${Math.min(...ms)}. dnia życia`;   // każda droga dopiero później
+  if(isNum(dol) && ms.length && ms.every(m => isNum(m) && dol < m)) return `od ${Math.min(...ms)}. dnia życia`;   // każda droga dopiero później
   return '';
 }
 // Szczepionki dla tych ptaków (i choroby) z opisem, czemu nie pasują do wieku lub rodzaju ptaków
 function vacCands(dz){
-  const bk = $('bird').value, g = BIRDS[bk].g, dol = dolNow();
-  return VACCINES.filter(v => v.sp.includes(g) && (dz === DZ_ALL || v.dz.includes(dz)) && RT.some(r => v.r && v.r[r]))
+  const bk = birdKey(), g = bk ? BIRDS[bk].g : null, dol = dolSel();
+  if(!dz) dz = DZ_ALL;
+  return VACCINES.filter(v => (!g || v.sp.includes(g)) && (dz === DZ_ALL || v.dz.includes(dz)) && RT.some(r => v.r && v.r[r]))
     .map(v => ({v, note:vacNote(v, bk, dol)}));
 }
 function fillDz(){
-  const dol = dolNow(), v = S.dzAll ? null : curVac(), set = new Set(), hid = new Set();
+  const dol = dolNow(), v = S.dzAll ? null : curVac(), set = new Set(), hid = new Set(), pick = !v && !S.dzAll && S.dzWant == null && !S.picked;
   if(v) v.dz.forEach(d => set.add(d));
   else vacCands(DZ_ALL).forEach(({v:x, note}) => x.dz.forEach(d => (S.showAll || !note ? set : hid).add(d)));
   const list = Object.keys(DISEASES).filter(k => set.has(k)), hidden = Object.keys(DISEASES).filter(k => hid.has(k) && !set.has(k));
   const cur = $('dz').value, want = S.dzWant && list.includes(S.dzWant) ? S.dzWant : cur;
-  $('dz').innerHTML = [{v:DZ_ALL, l:v ? '— pokaż wszystkie choroby —' : '— wszystkie choroby —'}, ...list.map(k => ({v:k, l:DISEASES[k]}))]
+  $('dz').innerHTML = [...(pick ? [{v:'', l:'— wybierz chorobę —'}] : []), {v:DZ_ALL, l:v ? '— pokaż wszystkie choroby —' : '— wszystkie choroby —'}, ...list.map(k => ({v:k, l:DISEASES[k]}))]
     .map(o => `<option value="${esc(o.v)}">${esc(o.l)}</option>`).join('');
-  $('dz').value = S.dzAll ? DZ_ALL : list.includes(want) ? want : (!v ? DZ_ALL : (list[0] || DZ_ALL));
+  $('dz').value = S.dzAll ? DZ_ALL : list.includes(want) ? want : pick ? '' : (!v ? DZ_ALL : (list[0] || DZ_ALL));
   $('dz-hint').textContent = v ? (v.dz.length > 1 ? `szczepionka skojarzona: ${v.dz.join(' + ')}` : 'zawężone do szczepionki – inne: „pokaż wszystkie choroby”')
-    : hidden.length ? `W ${dol}. dniu życia nie ma szczepionki przeciw: ${hidden.join(', ')}.` : '';
+    : hidden.length && ageKnown() ? `W ${dol}. dniu życia nie ma szczepionki przeciw: ${hidden.join(', ')}.` : '';
 }
 function vacHint(n, hid){
-  const bk = $('bird').value, age = dolNow() - 1;
+  const bk = birdKey(), age = dolNow() - 1;
+  if(!bk || !ageKnown()){ $('vac-hint').textContent = 'Wybierz drób i wpisz wiek – pokażę tylko szczepionki, które ChPLW pozwala podać.'; return; }
   $('vac-hint').innerHTML = `${n} ${pl(n, 'szczepionka pasuje', 'szczepionki pasują', 'szczepionek pasuje')} do: ${esc(BIRDS[bk].l.toLowerCase())}, ${esc(ageWeeks(age))}`
     + (hid ? ` · ${S.showAll ? `pokazano też ${hid} niepasujących` : `ukryto ${hid} spoza wieku lub rodzaju ptaków`} <button type="button" class="linkbtn" id="vac-all">${S.showAll ? 'ukryj' : 'pokaż'}</button>` : '');
 }
 // opt.keep – zostaw „inną szczepionkę”, jeśli była wybrana; opt.notify – powiedz, gdy wybór trzeba było zmienić
 function fillVac(opt = {}){
-  const bk = $('bird').value, g = BIRDS[bk].g, prev = $('vac').value, pv = prev ? VACCINES.find(x => x.id === prev) : null;
-  let dz = $('dz').value, dzLost = '', all = vacCands(dz), list = all.filter(x => S.showAll || !x.note);
+  const bk = birdKey(), g = bk ? BIRDS[bk].g : null, prev = $('vac').value, pv = prev ? VACCINES.find(x => x.id === prev) : null;
+  let dz = $('dz').value || DZ_ALL, dzLost = '', all = vacCands(dz), list = all.filter(x => S.showAll || !x.note);
   if(!list.length && dz !== DZ_ALL){ dzLost = dz; S.dzAll = true; fillDz(); dz = DZ_ALL; all = vacCands(dz); list = all.filter(x => S.showAll || !x.note); }   // na tę chorobę w tym wieku nie ma szczepionki
   const pref = v => S.rPref && v.r[S.rPref] ? 0 : 1 + (v.r.spray ? 0 : v.r.woda ? 1 : 2);   // najpierw droga wybrana przez użytkownika
   list.sort((a,b) => (!!a.note - !!b.note) || (pref(a.v) - pref(b.v)) || (ST_ORDER[a.v.st] - ST_ORDER[b.v.st]) || a.v.n.localeCompare(b.v.n,'pl'));
   const rs = v => RT.filter(r => v.r[r]).map(r => RT_SHORT[r]).join('/');
   const o = ({v, note}) => `<option value="${esc(v.id)}">${esc(v.n + ' · ' + rs(v) + (v.st === 'u' ? ' (do weryfikacji)' : v.st === 'p' ? ' (dane częściowe)' : '') + (note ? ` – ${note}` : ''))}</option>`;
   const ok = list.filter(x => !x.note), bad = list.filter(x => x.note), ids = list.map(x => x.v.id);
-  $('vac').innerHTML = ok.map(o).join('') + (bad.length ? `<optgroup label="Nie pasują do tych ptaków lub wieku">${bad.map(o).join('')}</optgroup>` : '') + '<option value="">— inna szczepionka (wartości wpisuję ręcznie) —</option>';
-  // wybór użytkownika wraca tylko, gdy pasuje; niepasującą (widoczną po „pokaż”) trzeba wybrać samemu
-  const next = S.vacWant && ok.some(x => x.v.id === S.vacWant) ? S.vacWant : prev && ids.includes(prev) ? prev : prev === '' && opt.keep ? '' : (list[0] ? list[0].v.id : '');
+  // wybór użytkownika wraca tylko, gdy pasuje; niepasującą (widoczną po „pokaż”) trzeba wybrać samemu.
+  // Dopóki użytkownik nic nie wybrał – „wybierz szczepionkę” (chyba że pasuje tylko jedna).
+  const next = S.vacWant && ok.some(x => x.v.id === S.vacWant) ? S.vacWant : prev && ids.includes(prev) ? prev
+    : !S.picked ? (ok.length === 1 && $('dz').value && $('dz').value !== DZ_ALL ? ok[0].v.id : '-')
+    : prev === '' && opt.keep ? '' : (list[0] ? list[0].v.id : '');
+  if(next && next !== '-') S.picked = true;
+  $('vac').innerHTML = (next === '-' ? '<option value="-">— wybierz szczepionkę —</option>' : '') + ok.map(o).join('') + (bad.length ? `<optgroup label="Nie pasują do tych ptaków lub wieku">${bad.map(o).join('')}</optgroup>` : '') + '<option value="">— inna szczepionka (wartości wpisuję ręcznie) —</option>';
   $('vac').value = next;
   const nv = next ? VACCINES.find(x => x.id === next) : null;
   if(next !== prev && opt.notify){
     if(pv && !ids.includes(prev)){
-      const why = !pv.sp.includes(g) ? `nie dla ${g === 'indyki' ? 'indyków' : 'kur'}` : vacNote(pv, bk, dolNow()) || 'nie pasuje';
+      const why = g && !pv.sp.includes(g) ? `nie dla ${g === 'indyki' ? 'indyków' : 'kur'}` : vacNote(pv, bk, dolSel()) || 'nie pasuje';
       toast(`${pv.n}: ${why} – wybrano ${nv ? nv.n : 'inną szczepionkę'}${dzLost ? ` (na ${dzLost} w tym wieku nie ma szczepionki)` : ''}.`, 6000);
     } else if(nv && next === S.vacWant) toast(`Wiek znów pasuje – wybrano ${nv.n}.`);
   }
   vacHint(ok.length, all.length - ok.length);
   if(next !== prev) onVacChange();
 }
-function saveWants(){ S.vacWant = $('vac').value; S.dzWant = $('dz').value; }
+function saveWants(){ S.vacWant = noVac() ? null : $('vac').value; S.dzWant = $('dz').value || null; }
 function toggleShowAll(){ S.showAll = !S.showAll; fillDz(); fillVac({keep:true, notify:true}); buildRoutes(); calc(); }
 function buildRoutes(){
-  const v = curVac(), routes = calcRoutes(v), dol = dolNow(), prev = S.route;
-  const off = r => { const m = routeMin(v, r); return isNum(m) && dol < m; };
+  const nv = noVac(), v = curVac(), routes = nv ? [] : calcRoutes(v), dol = dolSel(), prev = S.route;
+  const off = r => { const m = routeMin(v, r); return isNum(dol) && isNum(m) && dol < m; };
   const ok = routes.filter(r => !off(r));
-  if(!routes.includes(S.route) || (ok.length && off(S.route))) S.route = ok[0] || routes[0];
+  if(routes.length && (!routes.includes(S.route) || (ok.length && off(S.route)))) S.route = ok[0] || routes[0];
   if(routes.includes(prev) && prev !== S.route && off(prev)) toast(`${ROUTES[prev]}: ta szczepionka dopiero od ${routeMin(v, prev)}. dnia życia – wybrano: ${ROUTES[S.route].toLowerCase()}.`);
   // Zawsze cztery drogi. Droga spoza ChPLW tej szczepionki prowadzi do innej szczepionki z tą drogą – pasującej do ptaków i wieku.
-  const g = BIRDS[$('bird').value].g, any = r => VACCINES.some(x => x.sp.includes(g) && x.r && x.r[r]), fit = r => routeCands(r).length > 0;
+  const bk = birdKey(), g = bk ? BIRDS[bk].g : null, any = r => VACCINES.some(x => (!g || x.sp.includes(g)) && x.r && x.r[r]), fit = r => routeCands(r).length > 0;
   $('route').innerHTML = RT.map(r => routes.includes(r)
     ? `<button type="button" data-route="${r}" aria-pressed="${r === S.route}"${off(r) ? ' disabled' : ''}>${esc(ROUTES[r])}${off(r) ? ` <small>od ${routeMin(v, r)}. dnia</small>` : ''}</button>`
-    : `<button type="button" class="alt" data-route="${r}" data-alt="1" aria-pressed="false"${fit(r) ? '' : ' disabled'}>${esc(ROUTES[r])} <small>${fit(r) ? 'inna szczepionka' : any(r) ? 'nie dla tego wieku' : 'brak w bazie'}</small></button>`).join('');
-  RT.forEach(r => { $('in-' + r).hidden = r !== S.route; });
-  $('route-hint').textContent = v ? (routes.length === 1 ? `ChPLW tej szczepionki przewiduje tylko: ${ROUTES[routes[0]].toLowerCase()}.` : `ChPLW: ${routes.map(r => ROUTES[r].toLowerCase()).join(', ')}.`) + (routes.length < RT.length ? ' Przycisk „inna szczepionka” wybierze szczepionkę z tą drogą.' : '') : 'szczepionka spoza bazy – wybierz drogę z ulotki';
+    : `<button type="button" class="alt" data-route="${r}" data-alt="1" aria-pressed="false"${fit(r) ? '' : ' disabled'}>${esc(ROUTES[r])} <small>${fit(r) ? (nv ? 'dobierz szczepionkę' : 'inna szczepionka') : any(r) ? 'nie dla tego wieku' : 'brak w bazie'}</small></button>`).join('');
+  RT.forEach(r => { $('in-' + r).hidden = nv || r !== S.route; });
+  $('route-hint').textContent = nv ? 'Drogi podania pokażę po wyborze szczepionki – albo wybierz drogę, a dobiorę szczepionkę.' : v ? (routes.length === 1 ? `ChPLW tej szczepionki przewiduje tylko: ${ROUTES[routes[0]].toLowerCase()}.` : `ChPLW: ${routes.map(r => ROUTES[r].toLowerCase()).join(', ')}.`) + (routes.length < RT.length ? ' Przycisk „inna szczepionka” wybierze szczepionkę z tą drogą.' : '') : 'szczepionka spoza bazy – wybierz drogę z ulotki';
 }
 // Wybór drogi, której nie ma bieżąca szczepionka: najlepsza szczepionka z tą drogą, pasująca do ptaków
 // i wieku (z S.showAll – także pozostałe, na końcu); najpierw chroniąca przed wybraną chorobą, potem dane pełne.
 function routeCands(r){
-  const bk = $('bird').value, g = BIRDS[bk].g, dol = dolNow(), dz = $('dz').value;
-  const late = v => { const m = routeMin(v, r); return isNum(m) && dol < m ? 1 : 0; }, miss = v => dz !== DZ_ALL && !v.dz.includes(dz) ? 1 : 0;
-  return VACCINES.filter(v => v.sp.includes(g) && v.r && v.r[r]).map(v => ({v, note:vacNote(v, bk, dol)}))
+  const bk = birdKey(), g = bk ? BIRDS[bk].g : null, dol = dolSel(), dz = $('dz').value || DZ_ALL;
+  const late = v => { const m = routeMin(v, r); return isNum(dol) && isNum(m) && dol < m ? 1 : 0; }, miss = v => dz !== DZ_ALL && !v.dz.includes(dz) ? 1 : 0;
+  return VACCINES.filter(v => (!g || v.sp.includes(g)) && v.r && v.r[r]).map(v => ({v, note:vacNote(v, bk, dol)}))
     .filter(c => S.showAll || (!c.note && !late(c.v)))
     .sort((a, b) => (!!a.note - !!b.note) || (late(a.v) - late(b.v)) || (miss(a.v) - miss(b.v)) || (ST_ORDER[a.v.st] - ST_ORDER[b.v.st]) || a.v.n.localeCompare(b.v.n, 'pl'));
 }
 function pickRoute(r){
   const c = routeCands(r)[0]; if(!c) return;
   const best = c.v, dz = $('dz').value;
-  S.rPref = r; S.route = r; S.vacWant = best.id;
-  if(dz !== DZ_ALL && !best.dz.includes(dz)){ S.dzAll = true; fillDz(); }
+  S.rPref = r; S.route = r; S.vacWant = best.id; S.picked = true;
+  if(dz && dz !== DZ_ALL && !best.dz.includes(dz)){ S.dzAll = true; fillDz(); }
   fillVac({keep:true});
   $('vac').value = best.id; onVacChange();
   S.dzAll = true; fillDz(); fillVac({keep:true});   // lista: wszystkie choroby, najpierw szczepionki z tą drogą
@@ -1298,6 +1310,7 @@ function sprayDefault(v, age){
 }
 function applyDefaults(){
   const v = curVac(); const r = (v && v.r) || {}; const age = Math.max(0, Math.round(num('age',0)));
+  if(noVac()){ if(!S.mlTouched) $('s-ml').value = ''; $('s-ml-hint').textContent = ''; return; }
   const sd = sprayDefault(v, age); if(!S.mlTouched) $('s-ml').value = sd.ml; $('s-ml-hint').textContent = sd.hint;
   const w = r.woda;
   $('w-h').textContent = fmtT(w && w.h ? w.h : 2);
@@ -1316,7 +1329,8 @@ function onVacChange(){
   if(v){ S.dzAll = false; fillDz(); fillVac({keep:true}); }   // szczepionka zawęża choroby do swoich
   else fillDz();
   buildRoutes();
-  $('packs').value = v && v.pk && v.pk.length ? v.pk.join(', ') : (S.route === 'inj' ? '500, 1000' : '1000, 2500, 5000, 10000');
+  $('packs').closest('label').hidden = noVac();
+  $('packs').value = noVac() ? '' : v && v.pk && v.pk.length ? v.pk.join(', ') : (S.route === 'inj' ? '500, 1000' : '1000, 2500, 5000, 10000');
   applyDefaults(); calc();
   applyFarmSettings(true);   // ustawienia stałe fermy – po zmianie szczepionki sprawdzone wobec jej ChPLW
 }
@@ -1333,17 +1347,18 @@ function calc(){
   const v = curVac(); const bird = BIRDS[$('bird').value]; const route = S.route;
   const age = Math.max(0, Math.round(num('age',0))); const dol = age + 1;
   const birds = Math.max(0, Math.round(num('birds',0)));
-  $('age-hint').textContent = age >= 14 ? `${ageWeeks(age)} · ${dol}. dzień, ${Math.ceil(dol/7)}. tydzień życia` : `${dol}. dzień życia · ${Math.ceil(dol/7)}. tydzień`;
+  $('age-hint').textContent = !ageKnown() ? '' : age >= 14 ? `${ageWeeks(age)} · ${dol}. dzień, ${Math.ceil(dol/7)}. tydzień życia` : `${dol}. dzień życia · ${Math.ceil(dol/7)}. tydzień`;
   const kk = (v ? v.id : '') + '|' + route; if(S.knowKey !== kk){ S.knowKey = kk; renderKnow(v); }   // opis z ChPLW tylko po zmianie
   $('s-org-wrap').hidden = !(Math.round(num('s-os',1)) > 1 && Math.round(num('s-sec',1)) > 1);
   sprayerUI(); stabUI();   // granice ciśnienia, dmuchawa, podpowiedzi opryskiwacza i stabilizatora – także przed wpisaniem liczby ptaków
-  if(!(birds > 0)){
+  const miss = [!bird && ['bird', 'rodzaj drobiu'], !ageKnown() && ['age', 'wiek'], noVac() && ['vac', 'szczepionkę'], !(birds > 0) && ['birds', 'liczbę ptaków']].filter(Boolean);
+  if(miss.length){
     const R0 = {route, age, birds:0};
-    $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R0) : '';
+    $('farm-alert').innerHTML = route === 'spray' && !noVac() && bird ? farmAlert(R0) : '';
     $('tiles').innerHTML = ''; $('crew').innerHTML = '';
-    $('msgs').innerHTML = '<div class="msg info">Wpisz liczbę ptaków – wtedy policzę fiolki, wodę i czas.</div>';
-    $('res-sub').textContent = ROUTES[route];
-    S.last = {v, bird, R:R0, msgs:[], empty:true};
+    $('msgs').innerHTML = `<div class="msg info">Uzupełnij: ${esc(miss.map(m => m[1]).join(', '))} – wtedy policzę fiolki, wodę i czas.</div>`;
+    $('res-sub').textContent = noVac() ? '' : ROUTES[route];
+    S.last = {v, bird:bird || {l:''}, R:R0, msgs:[], empty:true, miss};
     return;
   }
   let crewH = '';
@@ -1434,6 +1449,7 @@ function calc(){
     if(k > 1 && C.uneven) msgs.push(['warn', `Nierówny podział: ${C.persons.map(o => `osoba ${o.no} – ${secText(o.sec)}`).join(', ')}. Osoby skończą w różnym czasie – lepiej liczba sektorów podzielna przez liczbę osób albo praca razem, sektor po sektorze.`]);
     if(k > 1) msgs.push(['info', `${k} ${plOsoba(k)}: rozpuść wszystkie fiolki w całej objętości wody, wymieszaj i dopiero wtedy rozlej do opryskiwaczy wg tabeli. Opryskiwacze ustaw tak samo – ta sama dysza i ciśnienie.`]);
     if(mode !== 'lanca' && p > 3) msgs.push(['bad','Z dmuchawą pracuj przy 2,0–2,5 bar, maksymalnie 3 bar.']);
+    else if(!(p > 0)) msgs.push(['warn', 'Wpisz ciśnienie robocze (zalecane 2,0–3,0 bar).']);
     else if(p < 2 || p > (mode === 'lanca' && dropWin(v) ? 6 : 3)) msgs.push(['warn', mode === 'lanca' && dropWin(v) ? `Zalecane ciśnienie dla ${NZ.n}: 2,0–3,0 bar; z lancą do 6 bar, jeśli kropla mieści się w oknie z ChPLW.` : `Zalecane ciśnienie dla ${NZ.n}: 2,0–2,5 bar (maks. 3).`]);
     if(mode !== 'lanca' && dol <= 7) msgs.push(['warn','Pisklęta w 1. tygodniu szczep bez dmuchawy (lanca 30–50 cm nad ptakami).']);
     if(mode === 'dm2') msgs.push(['warn','Poziom 2 tylko, gdy zasięg poziomu 1 nie wystarcza.']);
@@ -1553,6 +1569,7 @@ function calc(){
 function extraKV(v){ return [['Dla szczepiącego', v.safe], ['Po szczepieniu', v.ae], ['Przechowywanie', v.store]].filter(x => x[1]).map(([k, t]) => `<dt>${k}</dt><dd>${esc(t)}</dd>`).join(''); }
 function renderKnow(v){
   const box = $('know');
+  if(!v && noVac()){ box.innerHTML = ''; return; }
   if(!v){ box.innerHTML = '<p class="note">Szczepionka spoza bazy – obliczenia na wartościach wpisanych ręcznie.</p>'; return; }
   const r = (v.r && v.r[S.route]) || {};
   box.innerHTML = `<details><summary>Z ChPLW: ${esc(v.n)} <span class="pill ${v.st}">${ST_LABEL[v.st]}</span></summary>
@@ -1594,7 +1611,7 @@ async function copyText(text){
 async function saveReport(btn){
   if(!S.store){ toast('Pamięć aplikacji jeszcze się łączy – spróbuj za chwilę.'); return; }
   const L = S.last; if(!L) return;
-  if(L.empty){ toast('Wpisz liczbę ptaków.'); $('birds').focus(); return; }
+  if(L.empty){ const m = (L.miss || [['birds', 'liczbę ptaków']])[0]; toast(`Uzupełnij: ${(L.miss || [m]).map(x => x[1]).join(', ')}.`); $(m[0]).focus(); return; }
   const doc = Object.assign({}, L.R, {date:$('date').value || todayISO(), farm:$('farm').value.trim(), bird:$('bird').value, birdLabel:L.bird.l, dz:$('dz').value === DZ_ALL ? (L.v ? L.v.dz[0] : '') : $('dz').value, vacId:L.v ? L.v.id : '', vacName:L.v ? L.v.n : 'spoza bazy', notes:$('notes').value.trim(), text:reportText(), createdAt:new Date().toISOString()});
   btn.disabled = true;
   if(S.mode === 'local' && !IN_ARTIFACT && !S.persisted && navigator.storage && navigator.storage.persist){ S.persisted = true; navigator.storage.persist().catch(() => {}); }
@@ -2338,11 +2355,11 @@ function renderKnowledge(){
 }
 function useVaccine(id){
   const v = VACCINES.find(x => x.id === id); if(!v) return;
-  if(!v.sp.includes(BIRDS[$('bird').value].g)) $('bird').value = v.sp[0] === 'indyki' ? 'indyki-rzezne' : 'kury-brojlery';
-  const note = vacNote(v, $('bird').value, dolNow());
+  const bk0 = birdKey(); if(!bk0 || !v.sp.includes(BIRDS[bk0].g)) $('bird').value = v.sp[0] === 'indyki' ? 'indyki-rzezne' : 'kury-brojlery';
+  const note = vacNote(v, $('bird').value, dolSel());
   if(note && !S.showAll){ S.showAll = true; toast(`${v.n}: ${note} – pokazano też szczepionki spoza wieku i rodzaju ptaków.`, 6000); }
   S.dzAll = true; fillDz(); S.dzAll = false; $('dz').value = v.dz[0];
-  S.vacWant = id; fillVac({keep:true}); $('vac').value = id; onVacChange(); saveWants();
+  S.vacWant = id; S.picked = true; fillVac({keep:true}); $('vac').value = id; onVacChange(); saveWants();
   location.hash = 'obliczenia'; window.scrollTo({top:0});
 }
 function renderRules(){
@@ -2510,15 +2527,15 @@ function updateChip(){
 function bind(){
   window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
   $('bird').addEventListener('change', () => {
-    const v = curVac(); if(v && !v.sp.includes(BIRDS[$('bird').value].g)) S.dzAll = true;   // szczepionka nie dla tych ptaków
+    const v = curVac(), bk = birdKey(); if(v && bk && !v.sp.includes(BIRDS[bk].g)) S.dzAll = true;   // szczepionka nie dla tych ptaków
     fillDz(); fillVac({notify:true}); buildRoutes(); applyDefaults(); calc(); saveWants();
   });
   $('dz').addEventListener('change', () => {
-    S.dzAll = $('dz').value === DZ_ALL; S.dzWant = $('dz').value; if(S.vacWant === '') S.vacWant = null;
+    S.dzAll = $('dz').value === DZ_ALL; S.dzWant = $('dz').value || null; if(S.vacWant === '') S.vacWant = null;
     if(S.dzAll){ fillDz(); fillVac({keep:true}); } else { fillVac(); fillDz(); }
     calc(); saveWants();
   });
-  $('vac').addEventListener('change', () => { S.vacWant = $('vac').value; onVacChange(); saveWants(); });
+  $('vac').addEventListener('change', () => { S.vacWant = $('vac').value; if(!noVac()) S.picked = true; onVacChange(); saveWants(); });
   $('vac-hint').addEventListener('click', ev => { if(ev.target.closest('#vac-all')){ ev.preventDefault(); toggleShowAll(); } });
   $('i-site').addEventListener('change', () => { S.siteTouched = true; });
   $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(!b || b.disabled) return; if(b.dataset.alt) pickRoute(b.dataset.route); else { S.rPref = b.dataset.route; setRoute(b.dataset.route); } });
@@ -2533,7 +2550,7 @@ function bind(){
   $('v-obliczenia').addEventListener('input', ev => { if(['bird','dz','vac'].includes(ev.target.id)) return; scheduleCalc(); });
   $('w-dose').addEventListener('change', calc);
   $('save').addEventListener('click', ev => saveReport(ev.currentTarget));
-  $('copy').addEventListener('click', () => { if(S.last && S.last.empty){ toast('Wpisz liczbę ptaków.'); return; } copyText(reportText()); });
+  $('copy').addEventListener('click', () => { if(S.last && S.last.empty){ toast(`Uzupełnij: ${(S.last.miss || [[0, 'liczbę ptaków']]).map(x => x[1]).join(', ')}.`); return; } copyText(reportText()); });
   $('r-q').addEventListener('input', renderReports);
   $('r-list').addEventListener('click', reportAction);
   $('r-list').addEventListener('change', ev => { const x = ev.target.closest('[data-chk]'); if(x) S.sumChk[x.dataset.chk] = x.checked; });
@@ -2576,13 +2593,12 @@ function setNozzle(noz, quiet){
   }
   flowSrcUI();
 }
-function applyDefaultsSpray(){ const sd = sprayDefault(curVac(), Math.max(0, Math.round(num('age',0)))); $('s-ml').value = sd.ml; $('s-ml-hint').textContent = sd.hint; }
+function applyDefaultsSpray(){ if(noVac()) return; const sd = sprayDefault(curVac(), Math.max(0, Math.round(num('age',0)))); $('s-ml').value = sd.ml; $('s-ml-hint').textContent = sd.hint; }
 async function init(){
   initSplash();
   gateInit();
   loadFonts();
-  $('date').value = todayISO();
-  bind(); $('s-noz').dataset.cur = $('s-noz').value; loadEquipment(); flowSrcUI(); fillDz(); $('dz').value = 'ND'; fillVac(); onVacChange();
+  bind(); $('s-noz').dataset.cur = $('s-noz').value; loadEquipment(); flowSrcUI(); fillDz(); fillVac(); onVacChange();   // czysty start – nic nie wybrane
   showTab(location.hash.slice(1) || 'obliczenia');
   let db = null, dl = null;
   try { if(window.claude && typeof window.claude.use === 'function'){ [db, dl] = await Promise.all([window.claude.use('db').catch(() => null), window.claude.use('downloads').catch(() => null)]); } } catch(e){}

@@ -691,12 +691,26 @@ const VACCINES = [
 {id:'poulvac-ib-qx', n:'Poulvac IB QX', m:'Zoetis', t:'żywa', dz:['IB'], s:'QX (D388)', sp:['kury'], st:'p', src:[SRC_REPORT],
  min:{kury:1}, minT:'brojlery od 1. dnia; przyszłe nioski od 7. dnia', pk:null, use:'wg ChPLW', wd:'wg ChPLW', lay:'Sprawdź w ChPLW.', mix:'Sprawdź w ChPLW.', sch:'Wg ChPLW.',
  r:{spray:{note:'Aerozol – objętość i kropla wg ChPLW.'}}},
-{id:'nobilis-ib-491', n:'Nobilis IB 4-91', m:'MSD Animal Health', t:'żywa', dz:['IB'], s:'4-91 (793B)', sp:['kury'], st:'u', src:[{t:'EMA – EPAR Nobilis IB 4-91', u:'https://www.ema.europa.eu/en/medicines/veterinary/EPAR/nobilis-ib-4-91'}],
- min:{kury:1}, minT:'wg ChPLW', pk:null, use:'wg ChPLW', wd:'wg ChPLW', lay:'Sprawdź w ChPLW.', mix:'Wg ulotki Nobilis IB Ma5: można mieszać z IB Ma5.', sch:'Wg ChPLW.',
- r:{spray:{note:'Dane do weryfikacji w ChPLW (EMA).'}, oko:{note:'Dane do weryfikacji.'}}},
-{id:'nobilis-ib-primo-qx', n:'Nobilis IB Primo QX', m:'MSD Animal Health', t:'żywa', dz:['IB'], s:'D388 (QX)', sp:['kury'], st:'u', src:[{t:'EMA – informacja o produkcie (PL)', u:'https://ema.europa.eu/pl/documents/product-information/nobilis-ib-primo-qx-epar-product-information_pl.pdf'}],
- min:{kury:1}, minT:'wg ChPLW', pk:null, use:'wg ChPLW', wd:'wg ChPLW', lay:'Sprawdź w ChPLW.', mix:'Wg ulotki Nobilis IB Ma5: można mieszać z IB Ma5.', sch:'Wg ChPLW.',
- r:{spray:{note:'Dane do weryfikacji w ChPLW (EMA).'}, oko:{note:'Dane do weryfikacji.'}}},
+{id:'nobilis-ib-491', n:'Nobilis IB 4-91', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa', dz:['IB'], s:'IBV, serotyp wariantowy 4-91 (793B), ≥3,6 log10 EID50', sp:['kury'], st:'v', src:[{t:'EMA – EPAR Nobilis IB 4-91: ChPLW i ulotka PL (EU/2/98/006)', u:'https://www.ema.europa.eu/en/medicines/veterinary/EPAR/nobilis-ib-4-91'}],
+ min:{kury:1}, minT:'od 1. dnia życia (oprysk, oko/nos); woda od 7. dnia', pk:[500,1000,2500,5000,10000], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Bezpieczna dla niosek i stad reprodukcyjnych w okresie nieśności.',
+ mix:'Mieszać wolno tylko z Nobilis IB Ma5 (oprysk, oko/nos; odporność po 3 tyg., na 6 tyg.; zmieszane – zużyć w 2 h). Podana pisklętom jednodniowym może osłabić szczepionkę przeciw TRT podaną w ciągu 7 dni.',
+ sch:'Tylko gdy wariant 4-91 ma potwierdzone znaczenie na danym terenie; nie zastępuje innych szczepionek IB. Przyszłe nioski i ptaki hodowlane – powtarzać co 6 tyg. Program ustala lekarz weterynarii.',
+ ae:'Słabe objawy oddechowe przez kilka dni (zależnie od zdrowia kurcząt). Wirus przechodzi na ptaki nieszczepione – izolować je; nie dopuścić do bażantów. Po szczepieniu umyć i zdezynfekować ręce i sprzęt.',
+ store:'2–8°C, chronić przed światłem, nie zamrażać.',
+ r:{spray:{ml:[250,400], dist:'30–40 cm', water:'woda destylowana lub chłodna, czysta', note:'Oprysk gruboziarnisty, najlepiej przy skupionych pisklętach i przyciemnionym świetle; fiolki otwierać pod wodą; opryskiwacz bez osadów, rdzy i środków dezynfekcyjnych, najlepiej tylko do szczepień.'},
+    woda:{rule:'perDay', f:1, max:20, min:7, win:'1–2 h', thirst:'możliwie krótko, nie krócej niż 0,5 h', milk:'2 g/l mleka w proszku odtłuszczonego lub 20 ml/l mleka odtłuszczonego', note:'1000 dawek w 1 l × wiek (dni), maks. 20 l (rasy ciężkie lub upał – do 40 l). Fiolki otwierać pod wodą; podawać wcześnie rano; pasza dostępna; po wypiciu włączyć wodę.'},
+    oko:{ml:30, bird:'1 kropla do oka lub nozdrza z wystandaryzowanego kroplomierza', note:'Sól fizjologiczna lub sterylna woda destylowana: 30 ml na 1000 dawek, 75 ml na 2500. Kropla do nozdrza musi zostać wciągnięta.'}}},
+{id:'nobilis-ib-primo-qx', n:'Nobilis IB Primo QX', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa', dz:['IB'], s:'IBV D388 (QX), 10^4,0–10^5,5 EID50', sp:['kury'], st:'v', src:[{t:'EMA – informacja o produkcie (PL, EU/2/14/174)', u:'https://ema.europa.eu/pl/documents/product-information/nobilis-ib-primo-qx-epar-product-information_pl.pdf'}],
+ min:{kury:1}, minT:'od 1. dnia życia', pk:[1000,2500,5000,10000], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Bezpieczna w okresie nieśności; skuteczności w nieśności nie wykazano – decyzja indywidualna.',
+ mix:'Mieszać wolno tylko z Nobilis IB Ma5 (oprysk, oczy i nozdrza; odporność po 3 tyg., na 8 tyg.) i rozpuszczalnikiem Solvent Oculo/Nasal.',
+ sch:'Tylko gdy wariant podobny do QX ma znaczenie epidemiologiczne; nie wprowadzać do obiektów wolnych od QX. Wszystkie kurczęta w obiekcie szczepić jednocześnie. Odporność po 3 tyg., trwa 8 tyg.',
+ safe:'Przy oprysku: maska i ochrona oczu. Po szczepieniu umyć i zdezynfekować ręce i sprzęt.',
+ ae:'Bardzo rzadko łagodna, przejściowa reakcja oddechowa (także wypływ z nosa), nawet przez 10 dni. Wirus wydalany co najmniej 20 dni – oddzielić od ptaków nieszczepionych i z obniżoną odpornością, chronić ptaki dzikie; po cyklu czyszczenie i dezynfekcja.',
+ store:'Liofilizat 2–8°C, chronić przed światłem, nie zamrażać; rozpuszczalnik poniżej 25°C. Brązowawa zawartość przylegająca do kubeczka – nie używać.',
+ r:{spray:{d:[250,null], water:'woda dobrej jakości (bez chloru i środków dezynfekcyjnych)', note:'Gruba kropla ≥250 µm; objętość wody wg urządzenia. Cały kubeczek rozpuścić od razu po otwarciu, dokładnie wymieszać, podać niezwłocznie.'},
+    oko:{ml:35, bird:'1 kropla do oka lub nozdrza', note:'Solvent Oculo/Nasal (butelka 35 ml) – tylko z kubeczkiem 1000 dawek, przez adapter i kroplomierz; wstrząsnąć. Kropla do nozdrza musi zostać wciągnięta.'}}},
 
 /* ---------- aMPV / TRT ---------- */
 {id:'poulvac-trt', n:'Poulvac TRT', m:'Zoetis', t:'żywa', dz:['aMPV'], s:'aMPV podtyp A', sp:['indyki','kury'], st:'p', src:[SRC_REPORT],
@@ -771,9 +785,14 @@ const VACCINES = [
 {id:'vectormune-nd', n:'Vectormune ND', m:'Ceva', t:'wektorowa HVT', dz:['Marek','ND'], s:'HVT-ND', sp:['kury'], st:'u', src:[],
  min:{kury:1}, max:{kury:1}, minT:'1. dzień lub in ovo', pk:[1000,2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Cevac MD Rispens: można mieszać z Rispens.', sch:'Wylęgarnia.',
  r:{inj:{ml:0.2, site:'s.c., 1. dzień', note:'Do weryfikacji w ChPLW.'}, inovo:{ml:0.05, note:'Do weryfikacji.'}}},
-{id:'innovax-nd-ilt', n:'Innovax-ND-ILT', m:'MSD Animal Health', t:'wektorowa HVT', dz:['Marek','ND','ILT'], s:'HVT-ND-ILT', sp:['kury'], st:'u', src:[],
- min:{kury:1}, max:{kury:1}, minT:'1. dzień lub in ovo', pk:[2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Nobilis IB Ma5: ten sam dzień co IB Ma5.', sch:'Wylęgarnia.',
- r:{inj:{ml:0.2, site:'s.c., 1. dzień', note:'Do weryfikacji w ChPLW.'}, inovo:{ml:0.05, note:'Do weryfikacji.'}}},
+{id:'innovax-nd-ilt', n:'Innovax-ND-ILT', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa wektorowa HVT, związana z komórkami (ciekły azot)', dz:['Marek','ND','ILT'], s:'HVT/NDV/ILT (białko F ND, glikoproteiny gD i gI ILT), 10^3,3–10^4,3 PFU', sp:['kury'], st:'v', src:[{t:'EMA – EPAR Innovax-ND-ILT: ChPLW i ulotka PL (EU/2/20/256)', u:'https://www.ema.europa.eu/en/medicines/veterinary/EPAR/innovax-nd-ilt'}],
+ min:{kury:1}, max:{kury:1}, minT:'1. dzień życia (s.c.) lub 18.–19. dzień inkubacji (in ovo)', pk:[2000,4000], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Bezpieczeństwo w okresie nieśności nie zostało określone.', mix:'Mieszać wolno tylko z Nobilis Rismavac (ten sam rozpuszczalnik, s.c.; MD po 5 dniach). Tego samego dnia, osobno: Nobilis ND Clone 30 lub ND C2 (ND po 2 tyg.) oraz Nobilis IB Ma5 lub IB 4-91.',
+ sch:'Jednorazowo w wylęgarni. Odporność: ND w wieku 5 tyg., ILT w wieku 4 tyg., MD po 9 dniach; trwa: ND i ILT 62 tyg., MD – cały okres zagrożenia.',
+ safe:'Ciekły azot – tylko w dobrze wentylowanym pomieszczeniu. Przy wyjmowaniu ampułek: rękawice, długie rękawy, maska na twarz lub okulary; dłoń z ampułką z dala od ciała i twarzy. Ampułki mogą eksplodować przy gwałtownej zmianie temperatury – rozmrażać tylko w czystej wodzie 25–27°C, nigdy w gorącej ani lodowatej.',
+ ae:'Działania niepożądane nie są znane. Szczep szczepionkowy jest wydalany i może przechodzić na indyki – unikać bezpośredniego i pośredniego kontaktu szczepionych kur z indykami.',
+ store:'Koncentrat w ciekłym azocie (poniżej −140°C), rozpuszczalnik poniżej 25°C. Pojemnik z azotem pionowo, w czystym, suchym, wentylowanym pomieszczeniu oddzielonym od wylęgu i kurcząt. Zamrożona zawartość w wierzchołku ampułki = była rozmrożona – nie używać.',
+ r:{inj:{ml:0.2, site:'s.c. – szyja', bags:[400,800], note:'Aseptyka. Rozpuszczalnik przejrzysty, czerwony, 15–25°C; 400 ml na 2000 dawek, 800 ml na 4000 (lub 2 × 2000). Najwyżej 5 ampułek naraz, z jednej laski; rozmrażać w wodzie 25–27°C, od razu pobrać strzykawką z igłą 18 G do torebki, wypłukać ampułkę, wymieszać (6–8 obrotów); w trakcie szczepienia często delikatnie obracać torebkę. Ampułki: 2000 dawek – klips łososiowo-różowy, 4000 – żółty.'}, inovo:{ml:0.05, note:'18.–19. dzień inkubacji; 400 ml na 8000 dawek, 800 ml na 16 000.'}}},
 {id:'innovax-nd-ibd', n:'Innovax-ND-IBD', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa wektorowa HVT, związana z komórkami (ciekły azot)', dz:['Marek','ND','IBD'], s:'HVT HVP360 (białko F wirusa ND + VP2 wirusa IBD), 10^3,3–10^4,6 PFU', sp:['kury'], st:'v', src:[{t:'EMA – EPAR Innovax-ND-IBD: ChPLW i ulotka PL (EU/2/17/213)', u:'https://www.ema.europa.eu/en/medicines/veterinary/EPAR/innovax-nd-ibd'}],
  min:{kury:1}, max:{kury:1}, minT:'1. dzień życia (s.c.) lub 18.–19. dzień inkubacji (in ovo)', pk:[2000,4000], use:'2 h po rozpuszczeniu', wd:'0 dni',
  lay:'Bezpieczeństwo w okresie nieśności nie zostało określone.', mix:'Mieszać wolno tylko z Nobilis Rismavac (ten sam rozpuszczalnik, s.c.; 400 ml na każde 2000 dawek obu). Tego samego dnia, osobno: Nobilis ND Clone 30 lub ND C2 oraz Nobilis IB Ma5 lub IB 4-91.',
@@ -950,7 +969,7 @@ const BIRDS = {
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.9.2';
+const APP_VERSION = '1.9.3';
 const DATA_DATE = '10.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};

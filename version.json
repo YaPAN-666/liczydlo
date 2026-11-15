@@ -1,10 +1,11 @@
 {
- "wersja": "1.12.0",
+ "wersja": "1.12.1",
  "data": "2026-11-15",
  "zmiany": [
-  "Oprysk: wydatek dysz wyłącznie z katalogu TeeJet (Birchmeier stosuje końcówki TeeJet) albo z pomiaru – usunięty osobny „katalog Birchmeier”.",
-  "Lanca: wybór 1 albo 2 dysz; wydatek = liczba dysz × wydatek jednej dyszy, kropla liczona dla jednej dyszy. Dmuchawa AS 1200: 1 dysza. Pomiar własny – z jednej dyszy.",
-  "Podsumowanie zabiegu rozpoznaje, gdy pracowały dwie dysze zamiast jednej (albo jedna z dwóch była zatkana); zalecenia mogą zmienić liczbę dysz.",
+  "Strona do rozesłania: pobierz.html – duży link do aplikacji, kod QR i instrukcja instalacji.",
+  "(1.12.0) Oprysk: wydatek dysz wyłącznie z katalogu TeeJet (Birchmeier stosuje końcówki TeeJet) albo z pomiaru – usunięty osobny „katalog Birchmeier”.",
+  "(1.12.0) Lanca: wybór 1 albo 2 dysz; wydatek = liczba dysz × wydatek jednej dyszy, kropla liczona dla jednej dyszy. Dmuchawa AS 1200: 1 dysza. Pomiar własny – z jednej dyszy.",
+  "(1.12.0) Podsumowanie zabiegu rozpoznaje, gdy pracowały dwie dysze zamiast jednej (albo jedna z dwóch była zatkana); zalecenia mogą zmienić liczbę dysz.",
   "(1.11.4) Nobilis Reo inac – uzupełnienia z ulotki PL (adiuwant, przechowywanie, wskazówka dla lekarza).",
   "(1.11.3) Szczepionka autogenna – rozbudowany szablon: podstawa prawna, dane z etykiety serii w wyniku i raporcie, wskazówki zależne od adiuwantu.",
   "(1.11.2) Vectormune ND i Vaxxitek HVT+IBD – dane z ChPLW i ulotek PL (EMA).",

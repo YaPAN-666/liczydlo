@@ -1,8 +1,9 @@
 {
- "wersja": "1.12.1",
+ "wersja": "1.13.0",
  "data": "2026-11-15",
  "zmiany": [
-  "Strona do rozesłania: pobierz.html – duży link do aplikacji, kod QR i instrukcja instalacji.",
+  "Zgłoś uwagę: przycisk w nagłówku i formularz w „O aplikacji” – błąd, sugestia, dane szczepionki albo pytanie wysyłane e-mailem do autora, z wersją aplikacji i bieżącym obliczeniem.",
+  "(1.12.1) Strona do rozesłania: pobierz.html – duży link do aplikacji, kod QR i instrukcja instalacji.",
   "(1.12.0) Oprysk: wydatek dysz wyłącznie z katalogu TeeJet (Birchmeier stosuje końcówki TeeJet) albo z pomiaru – usunięty osobny „katalog Birchmeier”.",
   "(1.12.0) Lanca: wybór 1 albo 2 dysz; wydatek = liczba dysz × wydatek jednej dyszy, kropla liczona dla jednej dyszy. Dmuchawa AS 1200: 1 dysza. Pomiar własny – z jednej dyszy.",
   "(1.12.0) Podsumowanie zabiegu rozpoznaje, gdy pracowały dwie dysze zamiast jednej (albo jedna z dwóch była zatkana); zalecenia mogą zmienić liczbę dysz.",

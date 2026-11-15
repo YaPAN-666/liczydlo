@@ -196,6 +196,7 @@ dl.kv dd{margin:0;min-width:0}
 details.howto{margin-top:10px}
 details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 #lic p{margin:0}
+#fb{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 150px)}
 
 /* Pasek „Dostępna nowa wersja” */
 .updbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--brand);color:var(--brand-ink);display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.92rem}
@@ -290,6 +291,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
       <h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 120 100"><rect x="8" y="8" width="104" height="84" rx="10" fill="none" stroke="currentColor" stroke-width="9"/><g stroke="currentColor" stroke-width="4"><line x1="10" y1="34" x2="110" y2="34"/><line x1="10" y1="66" x2="110" y2="66"/></g><g fill="currentColor"><ellipse cx="28" cy="34" rx="9" ry="11"/><ellipse cx="50" cy="34" rx="9" ry="11"/><ellipse cx="92" cy="34" rx="9" ry="11"/><ellipse cx="28" cy="66" rx="9" ry="11"/><ellipse cx="72" cy="66" rx="9" ry="11"/><ellipse cx="92" cy="66" rx="9" ry="11"/></g></svg></span>Liczydło <span class="sub">kalkulator szczepień drobiu</span></h1>
       <div class="headtools">
         <span class="chip" id="chip-mode"><span class="dot"></span><span>Łączenie z pamięcią…</span></span>
+        <a class="btn small ghost" href="#info" id="fb-link">Zgłoś uwagę</a>
         <a class="btn small ghost" href="#info" id="info-link">O aplikacji</a>
       </div>
     </div>
@@ -622,6 +624,29 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
       </div>
       <span class="note" id="i-msg"></span>
       <div id="i-changes"></div>
+    </div>
+    <div class="card" id="fb">
+      <h2>Zgłoś uwagę</h2>
+      <p class="note">Błąd, pomysł, brakująca szczepionka albo pytanie – trafi do autora aplikacji e-mailem.</p>
+      <div class="row">
+        <label>Rodzaj
+          <select id="fb-type">
+            <option value="Błąd">Błąd</option>
+            <option value="Sugestia">Sugestia</option>
+            <option value="Dane szczepionki">Dane szczepionki / ChPLW</option>
+            <option value="Pytanie">Pytanie</option>
+          </select></label>
+        <label>Podpis (opcjonalnie)
+          <input id="fb-name" type="text" autocomplete="name" placeholder="imię, firma lub telefon"></label>
+        <label class="wide">Opis
+          <textarea id="fb-msg" rows="4" placeholder="Co się stało albo co zmienić? Przy błędzie: co było wpisane i co pokazała aplikacja."></textarea></label>
+        <label class="check wide"><input type="checkbox" id="fb-ctx" checked> Dołącz bieżące obliczenie (drób, wiek, szczepionka, droga podania)</label>
+      </div>
+      <div class="tools">
+        <button class="btn" type="button" id="fb-send">Wyślij e-mailem</button>
+        <button class="btn ghost" type="button" id="fb-copy">Kopiuj treść</button>
+      </div>
+      <span class="note" id="fb-addr-note"></span>
     </div>
     <div class="card">
       <h2>Instalacja i aktualizacje</h2>
@@ -1205,7 +1230,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.12.1';
+const APP_VERSION = '1.13.0';
 const DATA_DATE = '15.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -1906,6 +1931,42 @@ function reportText(){
   if(w.length) lines.push('Uwagi z obliczeń: ' + w.join(' '));
   if($('notes').value.trim()) lines.push('Uwagi: ' + $('notes').value.trim());
   return lines.join('\n');
+}
+// Zgłoszenia od użytkowników: gotowy e-mail do autora (aplikacja nie ma serwera).
+// Adres odbiorcy – z pliku kontakt.json obok aplikacji ({"email": "..."}), zapamiętany w telefonie na czas bez sieci.
+// Temat zawsze zaczyna się od „[Liczydło]” – w poczcie łatwo ustawić filtr i etykietę.
+const FB_KEY = 'liczydlo.kontakt.v1';
+let FB_TO = (lsGet(FB_KEY) || {}).email || '';
+async function fbLoad(){
+  try {
+    const r = await fetch('kontakt.json', {cache:'no-store'}); if(!r.ok) throw 0;
+    const e = String((await r.json()).email || '').trim();
+    if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){ FB_TO = e; lsSet(FB_KEY, {email:e}); }
+  } catch(e){}
+  fbPaint();
+}
+function fbPaint(){
+  $('fb-addr-note').textContent = FB_TO ? `Adres: ${FB_TO}. Jeśli poczta się nie otworzy, skopiuj treść i wyślij ją na ten adres.` : 'Adres do zgłoszeń nie jest jeszcze ustawiony – skopiuj treść i przekaż ją autorowi aplikacji.';
+}
+function fbMode(){ try { return IN_ARTIFACT ? 'podgląd w Claude' : matchMedia('(display-mode: standalone)').matches ? 'zainstalowana aplikacja' : 'przeglądarka'; } catch(e){ return 'przeglądarka'; } }
+function fbMail(){
+  const typ = $('fb-type').value, msg = $('fb-msg').value.trim(), name = $('fb-name').value.trim(), L = [msg || '(brak opisu)', '', '---'];
+  if(name) L.push('Podpis: ' + name);
+  L.push('Rodzaj: ' + typ, `Wersja: ${APP_VERSION} (dane szczepionek ${DATA_DATE})`, 'Tryb: ' + fbMode(), 'Urządzenie: ' + navigator.userAgent);
+  if($('fb-ctx').checked){
+    const v = curVac(), bk = birdKey(), age = $('age').value, n = $('birds').value;
+    L.push('Obliczenie: ' + [bk ? BIRDS[bk].l : 'drób nie wybrany', age !== '' ? `wiek ${age} dni` : 'wiek nie wpisany', n ? `${n} ptaków` : null,
+      v ? v.n : 'szczepionka nie wybrana', S.route ? ROUTES[S.route] || S.route : null].filter(Boolean).join(' · '));
+  }
+  return {subject:`[Liczydło] ${typ} – wersja ${APP_VERSION}`, body:L.join('\n')};
+}
+function fbSend(){
+  if(!$('fb-msg').value.trim()){ toast('Wpisz opis zgłoszenia.'); $('fb-msg').focus(); return; }
+  if(!FB_TO){ toast('Adres do zgłoszeń nie jest ustawiony – użyj „Kopiuj treść”.', 5000); return; }
+  const m = fbMail(), a = document.createElement('a');
+  a.href = `mailto:${FB_TO}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
+  document.body.appendChild(a); a.click(); a.remove();
+  toast(IN_ARTIFACT ? 'W podglądzie poczta może się nie otworzyć – użyj „Kopiuj treść”.' : 'Otwieram pocztę – sprawdź wiadomość i wyślij ją.', 6000);
 }
 async function copyText(text){
   try { await navigator.clipboard.writeText(text); toast('Skopiowano.'); return; } catch(e){}
@@ -2855,6 +2916,10 @@ function updateChip(){
 }
 function bind(){
   window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
+  fbPaint(); fbLoad();
+  $('fb-link').addEventListener('click', () => setTimeout(() => { $('fb').scrollIntoView({block:'start'}); $('fb-msg').focus({preventScroll:true}); }, 80));
+  $('fb-send').addEventListener('click', fbSend);
+  $('fb-copy').addEventListener('click', () => { const m = fbMail(); copyText(`${FB_TO ? 'Do: ' + FB_TO + '\n' : ''}Temat: ${m.subject}\n\n${m.body}`); });
   $('bird').addEventListener('change', () => {
     const v = curVac(), bk = birdKey(); if(v && bk && !v.sp.includes(BIRDS[bk].g)) S.dzAll = true;   // szczepionka nie dla tych ptaków
     fillDz(); fillVac({notify:true}); buildRoutes(); applyDefaults(); calc(); saveWants();

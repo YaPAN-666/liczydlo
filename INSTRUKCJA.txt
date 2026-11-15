@@ -1,4 +1,4 @@
-LICZYDŁO APP – wersja 1.10.0
+LICZYDŁO APP – wersja 1.11.0
 =====================================
 
 Zawartość folderu „liczydlo”:
@@ -54,5 +54,5 @@ Zawartość folderu „liczydlo”:
    (Android zapyta o zgodę na instalację z nieznanego źródła). Treść aplikacji nadal
    aktualizuje się z adresu internetowego.
 
-Dane szczepionek: ChPLW i ulotki z Rejestru Produktów Leczniczych – stan na 10.11.2026.
+Dane szczepionek: ChPLW i ulotki z Rejestru Produktów Leczniczych – stan na 15.11.2026.
 Przed zabiegiem obowiązuje aktualna ChPLW serii i decyzja lekarza weterynarii.

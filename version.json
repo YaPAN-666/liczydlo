@@ -1,8 +1,10 @@
 {
- "wersja": "1.10.0",
- "data": "2026-11-13",
+ "wersja": "1.11.0",
+ "data": "2026-11-15",
  "zmiany": [
-  "Czysty start: po uruchomieniu nic nie jest wpisane ani wybrane – drób, wiek, data, choroba i szczepionka czekają na wybór; pola pokazują tylko podpowiedzi (np. „np. 21”, „z ChPLW”).",
-  "Wynik mówi, czego brakuje („Uzupełnij: rodzaj drobiu, wiek, szczepionkę, liczbę ptaków”); dawki z ChPLW pojawiają się po wyborze szczepionki. Ustawienia sprzętu (opryskiwacz, dysza, dozownik, stabilizator) nadal są zapamiętywane."
+  "Kaczki i gęsi: nowe rodzaje drobiu – kaczki pekin i mulardy, kaczki piżmowe, gęsi (rzeźne i stada rodzicielskie); szczepionki dobierane wg gatunku z ChPLW.",
+  "Nowe szczepionki: Deparvax (parwowiroza kaczek i choroba Derzsy’ego – kaczki piżmowe i gęsi; stada zarodowe gęsi 0,4 ml) i Palmivax (choroba Derzsy’ego – kaczki piżmowe); AviPro Salmonella Duo także dla kaczek rzeźnych.",
+  "Nobilis Rismavac + CA 126 – dane z ulotki PL (01/2026): rozpuszczalnik, łaźnia lodowa, zużycie w 2 h, opakowanie 5000 dawek; Nobilis Reo inac uzupełniona z ulotki.",
+  "Iniekcja: przygotowanie szczepionki krok po kroku (ciekły azot, liofilizat, emulsja olejowa); dawka i miejsce wkłucia zależne od gatunku i wieku; w opisie szczepionek postać, przedawkowanie i numer pozwolenia."
  ]
 }

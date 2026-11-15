@@ -190,7 +190,7 @@ dl.kv dd{margin:0;min-width:0}
 #s-org-wrap{grid-column:1/-1}
 .row > label.wide{grid-column:1/-1}
 .seg button small{font-size:.72em;margin-left:4px;opacity:.85}
-#dz-hint:empty,#route-hint:empty{display:none}
+#dz-hint:empty,#route-hint:empty,#bird-hint:empty{display:none}
 .steps{margin:0;padding-left:20px;display:grid;gap:4px;font-size:.88rem;line-height:1.45}
 .steps-h{margin:10px 0 4px;font-size:.76rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 details.howto{margin-top:10px}
@@ -303,12 +303,27 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
           <label>Drób
             <select id="bird">
               <option value="">— wybierz —</option>
-              <option value="kury-brojlery">Kury – brojlery</option>
-              <option value="kury-odchow">Kury – nioski / reprodukcja (odchów)</option>
-              <option value="kury-niesnosc">Kury w okresie nieśności</option>
-              <option value="indyki-rzezne">Indyki rzeźne</option>
-              <option value="indyki-repro">Indyki reprodukcyjne</option>
-            </select></label>
+              <optgroup label="Kury">
+                <option value="kury-brojlery">Kury – brojlery</option>
+                <option value="kury-odchow">Kury – nioski / reprodukcja (odchów)</option>
+                <option value="kury-niesnosc">Kury w okresie nieśności</option>
+              </optgroup>
+              <optgroup label="Indyki">
+                <option value="indyki-rzezne">Indyki rzeźne</option>
+                <option value="indyki-repro">Indyki reprodukcyjne</option>
+              </optgroup>
+              <optgroup label="Kaczki">
+                <option value="kaczki">Kaczki – pekin, mulard (rzeźne)</option>
+                <option value="kaczki-repro">Kaczki – stado rodzicielskie (odchów i nieśność)</option>
+                <option value="kaczki-p">Kaczki piżmowe (rzeźne)</option>
+                <option value="kaczki-p-repro">Kaczki piżmowe – stado rodzicielskie (odchów i nieśność)</option>
+              </optgroup>
+              <optgroup label="Gęsi">
+                <option value="gesi">Gęsi – rzeźne (gąsięta, tuczne)</option>
+                <option value="gesi-repro">Gęsi – stado zarodowe (odchów i nieśność)</option>
+              </optgroup>
+            </select>
+            <span class="hint" id="bird-hint"></span></label>
           <label>Wiek (dni)
             <input id="age" type="number" min="0" step="1" placeholder="np. 21" inputmode="numeric">
             <span class="hint" id="age-hint"></span></label>
@@ -516,7 +531,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
   <div class="card">
     <div class="row tight">
       <label>Szukaj<input id="k-q" type="search" placeholder="nazwa, choroba, szczep"></label>
-      <label>Drób<select id="k-sp"><option value="">kury i indyki</option><option value="kury">kury</option><option value="indyki">indyki</option></select></label>
+      <label>Drób<select id="k-sp"><option value="">wszystkie gatunki</option><option value="kury">kury</option><option value="indyki">indyki</option><option value="kaczki">kaczki (pekin, mulard)</option><option value="kaczki-p">kaczki piżmowe</option><option value="gesi">gęsi</option></select></label>
       <label>Choroba<select id="k-dz"></select></label>
       <label>Droga podania<select id="k-rt"><option value="">wszystkie</option><option value="spray">oprysk</option><option value="woda">woda do picia</option><option value="oko">oko / nos</option><option value="inj">iniekcja</option></select></label>
     </div>
@@ -576,12 +591,17 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 
 <script>
 /* =====================================================================
-   DANE REFERENCYJNE – stan na 10.11.2026
+   DANE REFERENCYJNE – stan na 15.11.2026
    Każda pozycja ma źródło i status:
      v – odczytano z ulotki / ChPLW w Rejestrze Produktów Leczniczych (PL)
      p – dane częściowe: ChPLW zagraniczna, karta UPD lub wcześniejszy odczyt
      u – do weryfikacji (dane ogólne, brak odczytu ChPLW)
    Wiek minimalny (min) zapisany jako dzień życia (1 = dzień wylęgu).
+   Gatunki (sp, min, max): kury, indyki, kaczki (pekin, mulard), kaczki-p (kaczki piżmowe), gesi.
+   Pola dodatkowe: pf – postać, ma – nr pozwolenia, od – przedawkowanie, xb – rodzaje ptaków
+   wykluczone przez ChPLW (z opisem). Iniekcja (r.inj): by – dawka/miejsce zależne od gatunku (g),
+   rodzaju ptaków (b) i wieku w dniach (from/to); btl – butelki w ml (dawek = ml ÷ dawka);
+   solv – rozpuszczalnik; prep – przygotowanie krok po kroku.
    ===================================================================== */
 const RPL = (id, d) => ({t:`Ulotka PL${d ? ' z ' + d : ''} – Rejestr Produktów Leczniczych, ID ${id}`, u:`https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/${id}/leaflet`});
 const RPLC = id => ({t:`ChPLW PL – Rejestr Produktów Leczniczych, ID ${id}`, u:`https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/${id}/characteristic`});
@@ -780,9 +800,27 @@ const VACCINES = [
  min:{kury:1}, max:{kury:1}, minT:'1. dzień życia', pk:[1000,2000,4000], use:'2 h (<25°C)', wd:'0 dni',
  lay:'Nie w okresie nieśności.', mix:'Można mieszać i podawać s.c. z Vectormune ND.', sch:'Jednorazowo w 1. dniu (przyszłe nioski). Szczep wydalany ≥112 dni.',
  r:{inj:{ml:0.2, site:'s.c. – szyja', bags:[200,400,800,1000,1200,1600], note:'Ampułki w ciekłym azocie (−196°C); rozpuszczalnik <25°C.'}}},
-{id:'nobilis-rismavac', n:'Nobilis Rismavac + CA126', m:'MSD Animal Health', t:'żywa (komórkowa)', dz:['Marek'], s:'CVI-988 + HVT FC126', sp:['kury'], st:'u', src:[],
- min:{kury:1}, max:{kury:1}, minT:'1. dzień', pk:[1000,2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Sprawdź w ChPLW.', sch:'Wylęgarnia, 1. dzień.',
- r:{inj:{ml:0.2, site:'s.c. lub i.m., 1. dzień', note:'Do weryfikacji w ChPLW.'}}},
+{id:'nobilis-rismavac', n:'Nobilis Rismavac + CA 126', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa, związana z komórkami (ciekły azot)', pf:'koncentrat i rozpuszczalnik do sporządzania zawiesiny do wstrzykiwań', dz:['Marek'], s:'MDV serotyp 1 CVI-988 (Rispens) + HVT FC-126 – każdy 3,0–4,1 log10 PFU na 0,2 ml', sp:['kury'], st:'v', src:[RPL(16728, '30.01.2026')], ma:'452/98',
+ min:{kury:1}, max:{kury:1}, minT:'jednodniowe pisklęta (1. dzień życia)', pk:[1000,2000,4000,5000], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Bezpieczeństwo w okresie nieśności nie zostało określone.',
+ mix:'Nie mieszać z innymi produktami. Tego samego dnia (podanie i.m.), osobno: szczepionki Intervet z żywym ND Clone 30, IB Ma5, reowirusem 2177, IBD D78 i IB 4-91; z innymi – decyzja indywidualna. Ulotki Innovax-ND-ILT i Innovax-ND-IBD dopuszczają mieszanie z Rismavac w jednym rozpuszczalniku, ulotka Rismavac tego nie wymienia – rozbieżność, ustal z lekarzem.',
+ sch:'Jednorazowo jednodniowym pisklętom – zwłaszcza na terenach z przewagą bardzo zjadliwych szczepów (vvMDV). Odporność rozwija się szybko i jest intensywna 7–9 dni po szczepieniu; trwa co najmniej 2 lata, prawdopodobnie całe życie. Przez pierwsze tygodnie chronić pisklęta przed kontaktem z wirusem choroby Mareka.',
+ safe:'Ciekły azot: ampułki mogą eksplodować przy gwałtownej zmianie temperatury (odmrożenia palców); DMSO w produkcie może podrażniać skórę. Przy wyjmowaniu ampułek: rękawice ochronne, okulary i maska, stać jak najdalej od pojemnika. Pojemnikiem i szczepionką zajmuje się osoba przeszkolona do pracy z ciekłym azotem. Chronić ręce, oczy i ubranie przed szczepionką.',
+ ae:'Nie stwierdzono.', od:'Dawka 10 razy większa – bez reakcji niepożądanych.',
+ store:'Koncentrat w ciekłym azocie (−196°C), rozpuszczalnik poniżej 30°C. Po rozpuszczeniu w łaźni lodowej (2–8°C), zużyć w 2 h. Pojemnik z azotem pionowo, w czystym, suchym, wentylowanym pomieszczeniu oddzielonym od wylęgu i piskląt. Ampułki leżą w pojemniku dnem do góry – zawartość w wierzchołku ampułki znaczy, że szczepionka była rozmrożona: nie używać.',
+ r:{inj:{ml:0.2, site:'s.c. – szyja lub i.m. – udo (noga), 1. dzień', bags:[200,400,800,1000,1200,1600], solv:'200 ml na 1000 dawek, 400 ml na 2000, 800 ml na 4000, 1000 ml na 5000',
+   note:'Butelka z rozpuszczoną szczepionką w łaźni z lodem, często delikatnie wstrząsać; zużyć w 2 h, resztę wyrzucić. Sprzęt sterylizować gotowaniem 20 min lub w autoklawie (121°C, 15 min) – bez chemicznych środków dezynfekcyjnych.',
+   prep:['Wysterylizuj sprzęt do szczepienia: gotowanie w wodzie 20 min albo autoklaw 15 min w 121°C. Bez chemicznych środków dezynfekcyjnych.',
+     'Rozpuszczalnik w temperaturze pokojowej (15–25°C): 200 ml na 1000 dawek, 400 ml na 2000, 800 ml na 4000, 1000 ml na 5000.',
+     'Przed wyjęciem ampułki załóż rękawice ochronne, okulary i maskę; wyjmując ampułkę, stój jak najdalej od pojemnika z azotem.',
+     'Sprawdź, czy szczepionka nie rozmroziła się w transporcie: zawartość w wierzchołku ampułki = była rozmrożona, nie używaj.',
+     'Wyjmuj po jednej ampułce i zużyj ją od razu; laskę z pozostałymi ampułkami natychmiast odłóż do ciekłego azotu.',
+     'Rozmrażaj, zanurzając ampułkę w wodzie 15–25°C – nigdy w gorącej wodzie ani w łaźni lodowej. Osusz, wstrząśnij, odłam szyjkę.',
+     'Zawartość ampułki pobierz sterylną strzykawką 5 lub 10 ml z igłą 18 G (1 mm).',
+     'Wkłuj igłę w korek pojemnika z rozpuszczalnikiem, powoli dobierz rozpuszczalnik do strzykawki i całość powoli wprowadź do rozpuszczalnika, mieszając.',
+     'Kolejną porcją rozpuszczalnika przepłucz ampułkę i wstrzyknij ją do rozpuszczalnika.',
+     'Napełnij wysterylizowaną strzykawkę automatyczną wg instrukcji i ustaw dawkę 0,2 ml.',
+     'W trakcie szczepienia trzymaj butelkę w łaźni z lodem i często delikatnie wstrząsaj. Zużyj w 2 h od rozpuszczenia, resztę wyrzuć; opakowania i resztki spal.']}}},
 {id:'vectormune-nd', n:'Vectormune ND', m:'Ceva', t:'wektorowa HVT', dz:['Marek','ND'], s:'HVT-ND', sp:['kury'], st:'u', src:[],
  min:{kury:1}, max:{kury:1}, minT:'1. dzień lub in ovo', pk:[1000,2000,4000], use:'wg ChPLW', wd:'0 dni', lay:'—', mix:'Wg ulotki Cevac MD Rispens: można mieszać z Rispens.', sch:'Wylęgarnia.',
  r:{inj:{ml:0.2, site:'s.c., 1. dzień', note:'Do weryfikacji w ChPLW.'}, inovo:{ml:0.05, note:'Do weryfikacji.'}}},
@@ -836,12 +874,12 @@ const VACCINES = [
  lay:'Nie w okresie nieśności ani 3 tyg. przed.', mix:'Nie mieszać. Ten sam dzień co AviPro Salmonella Vac E – bez mieszania. Unikać chemioterapeutyków przeciw Salmonella (w razie podania – ponownie szczepić).',
  sch:'Brojlery: 1 dawka od 1. dnia. Nioski i ptaki hodowlane: 1. dzień, 7. tydz., 16. tydz. (≥3 tyg. przed nieśnością).',
  r:{woda:{rule:'perDay', f:1, win:'do 4 h', milk:'2–4 g/l mleka w proszku lub 20–40 ml/l (10 min przed)', note:'Ilość wg wodomierza z dnia poprzedniego; rozpuścić w 1 l wody, potem połączyć z wodą w wiadrze 10 l tuż przed podaniem.'}}},
-{id:'avipro-salm-duo', n:'AviPro Salmonella Duo', m:'Elanco (Lohmann)', t:'żywa', dz:['Salmonella'], s:'SE Sm24/Rif12/Ssq + ST Nal2/Rif9/Rtt', sp:['kury','indyki'], st:'v', src:[RPL(623)],
- min:{kury:1, indyki:1}, minT:'od 1. dnia życia', pk:[1000,2000,4000], use:'4 h',
- wd:'Kury: 21 dni (tkanki i jaja) po 1.–3. szczepieniu, 0 dni po 4. Indyki: tkanki 70 dni po 1. szczepieniu, 49 dni po powtórnym.',
- lay:'Kury: nie 3 tyg. przed nieśnością (w nieśności wg schematu). Indyki: nie w nieśności ani 5 tyg. przed.', mix:'Nie mieszać. Unikać chemioterapeutyków przeciw Salmonella.',
- sch:'Kury: 1. dzień, 6.–8. tydz., ok. 16. tydz., ok. 50. tydz. Indyki rzeźne: 1. dzień i 6. tydz. Indyki repro: 1. dzień, 6., 16., 23.–24. tydz. U indyków tylko w stadach ze stwierdzonym SE/ST.',
- r:{woda:{rule:'measured', h:3, win:'do 4 h', thirst:'do 2–3 h', milk:'2–4 g/l (≥10 min przed)', note:'Ilość wypijana w 3 h (wodomierz z dnia poprzedniego lub tabele firm hodowlanych); w upale, u ciężkich ras i starszych indyków więcej. Całą fiolkę na jeden budynek.'}}},
+{id:'avipro-salm-duo', n:'AviPro Salmonella Duo', m:'Elanco (Lohmann)', t:'żywa', dz:['Salmonella'], s:'SE Sm24/Rif12/Ssq + ST Nal2/Rif9/Rtt', sp:['kury','indyki','kaczki'], st:'v', src:[RPL(623, '01/2026')],
+ min:{kury:1, indyki:1, kaczki:1}, minT:'od 1. dnia życia', pk:[1000,2000,4000], use:'4 h', xb:{'kaczki-repro':'nie dla kaczek – przyszłych niosek'},
+ wd:'Kury: 21 dni (tkanki i jaja) po 1.–3. szczepieniu, 0 dni po 4. Indyki: tkanki 70 dni po 1. szczepieniu, 49 dni po powtórnym. Kaczki: 21 dni (tkanki jadalne i jaja).',
+ lay:'Kury: nie 3 tyg. przed nieśnością (w nieśności wg schematu). Indyki: nie w nieśności ani 5 tyg. przed. Kaczki: tylko kaczki rzeźne – nie u kaczek przeznaczonych na nioski.', mix:'Nie mieszać. Unikać chemioterapeutyków przeciw Salmonella.',
+ sch:'Kury: 1. dzień, 6.–8. tydz., ok. 16. tydz., ok. 50. tydz. Indyki rzeźne: 1. dzień i 6. tydz. Indyki repro: 1. dzień, 6., 16., 23.–24. tydz. U indyków tylko w stadach ze stwierdzonym SE/ST. Kaczki rzeźne: jedna dawka od 1. dnia życia – tylko przeciw S. Typhimurium (ogranicza kolonizację narządów wewnętrznych); odporność po 22 dniach, trwa 43 dni; przeciwciała matczyne mogą osłabić odpowiedź.',
+ r:{woda:{rule:'measured', h:3, win:'do 4 h', thirst:'do 2–3 h', milk:'2–4 g/l (≥10 min przed)', note:'Ilość wypijana w 3 h (wodomierz z dnia poprzedniego lub tabele firm hodowlanych); w upale, u ciężkich ras i starszych indyków więcej. Całą fiolkę na jeden budynek. Kaczki: tak samo – woda wypijana w 3 h, w trakcie bez dostępu do innej wody.'}}},
 {id:'cevac-salmovac', n:'Cevac Salmovac', m:'Ceva', t:'żywa', dz:['Salmonella'], s:'S. Enteritidis 441/014', sp:['kury'], st:'v', src:[RPL(19791)],
  min:{kury:1}, minT:'od 1. dnia życia (nioski i stada hodowlane; nie brojlery)', pk:[1000,2500,5000], use:'4 h', wd:'Tkanki 6 tyg.; jaja 3 tyg.',
  lay:'Nie w okresie nieśności ani 3 tyg. przed. Nie u brojlerów.', mix:'Nie mieszać. Bez antybiotyków 3 dni przed i 3 dni po (inaczej powtórzyć).',
@@ -892,12 +930,18 @@ const VACCINES = [
  min:{kury:106}, minT:'ok. 16.–20. tydz. (stada rodzicielskie)', pk:[1000], use:'3 h po otwarciu', wd:'0 dni',
  lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać. Inne inaktywowane Intervet – w osobnych wstrzyknięciach.', sch:'≥4 tyg. (ok. 6 tyg.) po szczepionce żywej.',
  r:{inj:{ml:0.5, site:'i.m. (udo/pierś) lub s.c. (kark)', bottles:[{d:1000,ml:500}], note:'Przed użyciem doprowadzić do 15–25°C.'}}},
-{id:'nobilis-reo-inac', n:'Nobilis Reo inac', m:'MSD Animal Health (Intervet International B.V.)', t:'inaktywowana – emulsja olejowa (parafina ciekła)', dz:['Reo'], s:'1733, 2408 (≥7,4 log2 jedn. ELISA)', sp:['kury'], st:'v', src:[RPL(20119, '23.05.2025')],
+{id:'nobilis-reo-inac', n:'Nobilis Reo inac', m:'MSD Animal Health (Intervet International B.V.)', t:'inaktywowana – emulsja olejowa (parafina ciekła)', dz:['Reo'], s:'1733, 2408 (≥7,4 log2 jedn. ELISA)', sp:['kury'], st:'v', src:[RPL(20119, '23.05.2025')], pf:'emulsja do wstrzykiwań', ma:'625/98',
  min:{kury:106}, minT:'ok. 16.–20. tydz., nie później niż 4 tyg. przed nieśnością', pk:[1000], use:'3 h po otwarciu', wd:'0 dni',
  lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać. Ten sam dzień co Nobilis Reo ERS inac i RT+IBmulti+G+ND – osobno.', sch:'Booster dla przyszłych stad rodzicielskich i niosek towarowych: najlepiej ≥6 tyg. (nie wcześniej niż 4 tyg.) po szczepionce żywej przeciw reowirusom. Odporność po 4 tyg., na jeden okres nieśności; przeciwciała matczyne chronią potomstwo w pierwszych tygodniach życia.',
  safe:'Zawiera olej mineralny. Przypadkowe wstrzyknięcie sobie może spowodować silny ból i obrzęk, zwłaszcza w palec lub staw, a rzadko utratę palca. Od razu do lekarza – nawet przy bardzo małej ilości – z ulotką; jeśli ból trwa dłużej niż 12 h po pomocy, ponownie do lekarza.',
- ae:'Bardzo często obrzęk w miejscu wstrzyknięcia; nieznaczny obrzęk może być widoczny kilka tygodni.', store:'2–8°C, nie zamrażać, chronić przed światłem.',
- r:{inj:{ml:0.5, site:'i.m. (mięśnie ud lub piersiowe) lub s.c. (grzbietowa okolica szyi)', bottles:[{d:1000,ml:500}], note:'Doprowadzić do 15–25°C i wstrząsnąć przed użyciem; sterylne strzykawki i igły (aseptyka).'}}},
+ ae:'Bardzo często obrzęk w miejscu wstrzyknięcia; nieznaczny obrzęk może być widoczny kilka tygodni.', od:'Dawka dwukrotnie większa – bez objawów niepożądanych.', store:'2–8°C, nie zamrażać, chronić przed światłem.',
+ r:{inj:{ml:0.5, site:'i.m. (mięśnie ud lub piersiowe) lub s.c. (grzbietowa okolica szyi)', bottles:[{d:1000,ml:500}], note:'Doprowadzić do 15–25°C i wstrząsnąć przed użyciem; sterylne strzykawki i igły (aseptyka).',
+   prep:['Wyjmij szczepionkę z lodówki wcześniej – ma osiągnąć temperaturę pokojową 15–25°C.',
+     'Przed użyciem wstrząśnij zawartością butelki; wstrząsaj też w trakcie szczepienia.',
+     'Zachowaj aseptykę – sterylne strzykawki i igły.',
+     'Ustaw aparat na 0,5 ml: domięśniowo w mięśnie ud lub piersiowe albo podskórnie w grzbietową okolicę szyi.',
+     'Otwartą butelkę zużyj w 3 h.',
+     'Uważaj na palce – przypadkowe wstrzyknięcie sobie emulsji olejowej wymaga natychmiastowej pomocy lekarskiej (zabierz ulotkę).']}}},
 {id:'gallimune-407', n:'Gallimune 407 ND+IB+EDS+ART', m:'Boehringer Ingelheim', t:'inaktywowana', dz:['ND','IB','EDS','aMPV'], s:'Ulster 2C, Mass 41, V127, VCO3', sp:['kury'], st:'v', src:[RPL(25468)],
  min:{kury:127}, minT:'od 18. tygodnia życia', pk:[500,1000], use:'zużyć natychmiast', wd:'0 dni',
  lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać z innymi produktami.', sch:'Stada rodzicielskie i nioski towarowe.',
@@ -908,9 +952,43 @@ const VACCINES = [
  min:{kury:1}, minT:'wg ChPLW', pk:[1000,5000], use:'wg ChPLW', wd:'0 dni', lay:'Nie u kur nieśnych.', mix:'Sprawdź w ChPLW.',
  sch:'Brojlery; podanie doustne – sposób (woda, pasza, oprysk piskląt) wg ChPLW. Opakowania: 1000 dawek (4 ml), 5000 dawek (20 ml).', r:{}},
 
+/* ---------- Drób wodny: kaczki piżmowe i gęsi ---------- */
+{id:'deparvax', n:'Deparvax', m:'Ceva-Phylaxia (Węgry)', t:'inaktywowana – emulsja olejowa', pf:'emulsja do wstrzykiwań dla kaczek piżmowych i gęsi', dz:['MDPV','Derzsy'], s:'parwowirus kaczek, szczep FM (≥7,7 log2 VN) + wirus choroby Derzsy’ego, szczep LB (≥7,9 log2 VN), inaktywowane – miana na dawkę dla młodych ptaków', sp:['kaczki-p','gesi'], st:'v', src:[{t:'Ulotka PL – tekst z Rejestru Produktów Leczniczych (KtoMaLek.pl)', u:'https://ktomalek.pl/deparvax-ulotka-cena-zastosowanie-apteka-emulsja-do-wstrzykiwan-1-daw-min-7-7-log2-min-7-9-log2-1-but-po-100-ml/ub-3240721'}, SRC_UPD('600000041278')], ma:'1727/06',
+ min:{'kaczki-p':1, gesi:1}, minT:'od 1. dnia życia; rewakcynacja: kaczęta piżmowe 14.–15. dzień, gąsięta 14.–21. dzień; stada zarodowe gęsi 6 i 3 tyg. przed nieśnością', pk:[500,2500], use:'zużyć od razu po otwarciu', wd:'0 dni',
+ lay:'Nie w okresie nieśności ani 3 tyg. przed.', mix:'Nie mieszać z innymi produktami. Brak danych o podawaniu z innymi szczepionkami – decyzja lekarza.',
+ sch:'Kaczki piżmowe i gęsi: 1. dzień życia; kaczęta powtórnie w 14.–15. dniu (wysoka odporność do 5.–9. tyg.), gąsięta w 14.–21. dniu. Odporność czynna w wieku 2–3 tyg. Stada zarodowe gęsi: 0,4 ml 6 i 3 tyg. przed nieśnością i przed każdym kolejnym okresem nieśności (ostatnie szczepienie 3 tyg. przed) – przeciwciała matczyne chronią gąsięta co najmniej do 2. tyg. życia. Szczepione jednodniówki chronić przed zakażeniem przez 14 dni; ptaki bez przeciwciał matczynych zakażone w jaju lub przed 10.–14. dniem mogą nie być w pełni chronione.',
+ safe:'Zawiera olej mineralny. Przypadkowe wstrzyknięcie sobie, nawet małej ilości, może spowodować silny ból i obrzęk, a w skrajnych przypadkach martwicę lub utratę palca – od razu do lekarza z ulotką; jeśli ból trwa dłużej niż 12 h po udzieleniu pomocy, ponownie do lekarza. Szczepionkę rozlaną na skórę lub do oka zmyć wodą (oko – od razu pomoc lekarska).',
+ ae:'Kaczki: bez zmian w miejscu wstrzyknięcia, drobne guzki (niewchłonięta szczepionka) do 35 dni. Gęsi (0,2 ml): u ok. połowy ptaków drobne guzki do 62 dni; gęsi zarodowe (0,4 ml s.c.): do 35 dni.',
+ od:'Bezpieczna w dawce podwójnej.', store:'2–8°C, w suchym miejscu, chronić przed bezpośrednim światłem słonecznym, nie zamrażać.',
+ r:{inj:{ml:0.2, btl:[100,500], site:'s.c. – szyja lub i.m. – udo; starsze kaczki z rozwiniętymi mięśniami piersiowymi także i.m. – pierś',
+   by:[{g:'gesi', site:'s.c. – szyja (gęsi tylko podskórnie)'},
+       {b:['gesi-repro'], from:140, ml:0.4, l:'stado zarodowe – 6 i 3 tyg. przed nieśnością'},
+       {b:['kaczki-p-repro'], from:140, warn:'ChPLW przewiduje szczepienie stad rodzicielskich tylko u gęsi (0,4 ml s.c.); u kaczek piżmowych – kaczęta jednodniowe i rosnące (0,2 ml).'}],
+   note:'Przed użyciem doprowadzić do temperatury pokojowej i dobrze wstrząsnąć; sprzęt sterylny. Butelka 100 ml = 500 dawek po 0,2 ml (250 po 0,4 ml); 500 ml = 2500 (1250).',
+   prep:['Wyjmij szczepionkę z lodówki odpowiednio wcześniej – ma osiągnąć temperaturę pokojową; dobrze wstrząśnij, wstrząsaj też w trakcie.',
+     'Używaj sterylnego sprzętu. Ustaw aparat na dawkę z ChPLW (0,2 ml; stada zarodowe gęsi 0,4 ml) i sprawdź ją cylindrem.',
+     'Gęsi szczep tylko podskórnie w szyję. Kaczęta – podskórnie w szyję lub w mięsień uda; starsze kaczki także w mięśnie piersiowe.',
+     'Szczep tylko zdrowe ptaki. Otwartą butelkę zużyj od razu – resztek nie przechowuj.',
+     'Uważaj na palce – przypadkowe wstrzyknięcie sobie emulsji olejowej wymaga natychmiastowej pomocy lekarskiej (zabierz ulotkę).']}}},
+{id:'palmivax', n:'Palmivax', m:'Boehringer Ingelheim (dawniej Merial)', t:'żywa (atenuowana)', pf:'liofilizat i rozpuszczalnik do sporządzania zawiesiny do wstrzykiwań', dz:['Derzsy'], s:'wirus choroby Derzsy’ego, szczep H (Hoekstra), żywy atenuowany', sp:['kaczki-p'], st:'p', src:[SRC_UPD('600000059548'), {t:'ChPLW Niemcy (Zul.-Nr. 44a/83, vetisearch.de) – dawkowanie i schemat', u:'https://vetisearch.de/spcs/show/3474'}],
+ min:{'kaczki-p':7}, minT:'kaczęta od szczepionych rodziców 14.–21. dzień (z jaj z końca nieśności 7.–14. dzień); od nieszczepionych rodziców od 7. dnia; stada rodzicielskie ≥2 tyg. przed nieśnością', pk:[100,500], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Bezpieczeństwo w okresie nieśności nie zostało określone. Nie szczepić stad rodzicielskich w czasie pierzenia.', mix:'Mieszać tylko z dołączonym rozpuszczalnikiem. Brak danych o podawaniu z innymi produktami – decyzja lekarza.',
+ sch:'Szczepienie działa, gdy przypada tuż przed spadkiem przeciwciał matczynych: kaczęta od szczepionych rodziców raz w 3. tyg. (14.–21. dzień), z jaj z końca okresu nieśności w 7.–14. dniu; od rodziców nieszczepionych od 7. dnia. Stada rodzicielskie: przypominające najpóźniej 2 tyg. przed nieśnością; ptaki nieszczepione jako pisklęta – 2 dawki co 2 tyg., ostatnia ≥2 tyg. przed nieśnością; przypominające przed każdym okresem nieśności. Odporność po 2 tyg., trwa 4 tyg. (okres wrażliwości piskląt). W Polsce ChPLW wymienia tylko kaczki piżmowe (w Niemczech także gęsi).',
+ ae:'Nieznane.', od:'Dawka 10 razy większa – bez działań niepożądanych (ChPLW DE).', store:'Liofilizat 2–8°C, chronić przed światłem, nie zamrażać; rozpuszczalnika nie zamrażać.',
+ r:{inj:{ml:0.5, site:'s.c. (szyja) lub i.m. (od 4. tygodnia)', bags:[50,250], solv:'50 ml na 100 dawek, 250 ml na 500 dawek (0,5 ml na ptaka)',
+   by:[{to:27, site:'s.c. (szyja); domięśniowo dopiero od 4. tygodnia'},
+       {b:['kaczki-p-repro'], from:140, l:'stado rodzicielskie – ≥2 tyg. przed nieśnością, nie w czasie pierzenia'}],
+   note:'Dawka 0,5 ml niezależnie od wieku. Sprzęt sterylny, bez środków dezynfekcyjnych i antyseptycznych. Rozpuszczoną szczepionkę zużyć w 2 h.',
+   prep:['Sprzęt do szczepienia sterylny – bez środków dezynfekcyjnych i antyseptycznych.',
+     'Strzykawką 5 ml pobierz ok. 2 ml rozpuszczalnika, wstrzyknij do fiolki z liofilizatem i wstrząsaj do rozpuszczenia.',
+     'Całą zawartość fiolki pobierz i wstrzyknij z powrotem do butelki z rozpuszczalnikiem; fiolkę przepłucz rozpuszczalnikiem jeszcze 1–2 razy.',
+     'Butelka z rozpuszczalnikiem zawiera teraz całą szczepionkę: 250 ml = 500 dawek po 0,5 ml, 50 ml = 100 dawek. Dobrze wstrząśnij przed użyciem.',
+     'Ustaw aparat na 0,5 ml niezależnie od wieku; domięśniowo dopiero od 4. tygodnia życia.',
+     'Zużyj w 2 h od rozpuszczenia.']}}},
+
 /* ---------- Szablon ---------- */
-{id:'autogenna', n:'Szczepionka autogenna (stadna) – szablon', m:'laboratorium', t:'inaktywowana (autogenna)', dz:['inne'], s:'wg receptury', sp:['kury','indyki'], st:'u', src:[],
- min:{}, minT:'wg zlecenia lekarza', pk:[500,1000], use:'wg etykiety', wd:'wg etykiety', lay:'wg etykiety', mix:'wg etykiety', sch:'Pasterelloza, różyca, E. coli, ORT i inne – wg receptury lekarza weterynarii.',
+{id:'autogenna', n:'Szczepionka autogenna (stadna) – szablon', m:'laboratorium', t:'inaktywowana (autogenna)', dz:['inne'], s:'wg receptury', sp:['kury','indyki','kaczki','kaczki-p','gesi'], st:'u', src:[],
+ min:{}, minT:'wg zlecenia lekarza', pk:[500,1000], use:'wg etykiety', wd:'wg etykiety', lay:'wg etykiety', mix:'wg etykiety', sch:'Pasterelloza, różyca, E. coli, ORT i inne – wg receptury lekarza weterynarii. U kaczek i gęsi m.in. riemerelloza (Riemerella anatipestifer), pasterelloza i E. coli – na te choroby drobiu wodnego w Rejestrze nie znaleziono szczepionek z pozwoleniem (stan 15.11.2026).',
  r:{inj:{ml:0.5, site:'s.c. wg receptury', note:'Uzupełnij objętość i opakowania wg etykiety laboratorium.'}}}
 ];
 
@@ -927,7 +1005,7 @@ const VMD_TEEJET = [[2,153],[4,132],[6,122]];
 const TXVK18_TEEJET = [[2,0.968],[3,1.18],[4,1.37],[5,1.53],[6,1.67]];
 // VMD kropli TX-VK18 wg danych TeeJet [bar, µm] (Dv0,1 / Dv0,9 przy 2 bar: 115 / 331 µm)
 const VMD_VK18 = [[2,235],[4,203],[6,188]];
-const DISEASES = {'ND':'Rzekomy pomór drobiu (ND)','IB':'Zakaźne zapalenie oskrzeli (IB)','IBD':'Choroba Gumboro (IBD)','aMPV':'Metapneumowirus – TRT/SHS','Marek':'Choroba Mareka','ILT':'Zakaźne zapalenie krtani i tchawicy (ILT)','AE':'Zakaźne zapalenie mózgu i rdzenia (AE)','CAV':'Zakaźna anemia kurcząt (CAV)','EDS':'Zespół spadku nieśności (EDS)','Reo':'Reowirusy','Salmonella':'Salmonelloza','E. coli':'Kolibakterioza (E. coli)','Pasteurella':'Cholera drobiu (pasterelloza)','ORT':'ORT (Ornithobacterium)','MG':'Mykoplazmoza (MG)','HE':'Krwotoczne zapalenie jelit indyków (HE)','Kokcydioza':'Kokcydioza','inne':'Inne'};
+const DISEASES = {'ND':'Rzekomy pomór drobiu (ND)','IB':'Zakaźne zapalenie oskrzeli (IB)','IBD':'Choroba Gumboro (IBD)','aMPV':'Metapneumowirus – TRT/SHS','Marek':'Choroba Mareka','ILT':'Zakaźne zapalenie krtani i tchawicy (ILT)','AE':'Zakaźne zapalenie mózgu i rdzenia (AE)','CAV':'Zakaźna anemia kurcząt (CAV)','EDS':'Zespół spadku nieśności (EDS)','Reo':'Reowirusy','Salmonella':'Salmonelloza','E. coli':'Kolibakterioza (E. coli)','Pasteurella':'Cholera drobiu (pasterelloza)','ORT':'ORT (Ornithobacterium)','MG':'Mykoplazmoza (MG)','HE':'Krwotoczne zapalenie jelit indyków (HE)','Derzsy':'Choroba Derzsy’ego – parwowiroza gęsi (GPV)','MDPV':'Parwowiroza kaczek piżmowych (MDPV)','Kokcydioza':'Kokcydioza','inne':'Inne'};
 const ROUTES = {spray:'Oprysk',woda:'Woda do picia',oko:'Oko / nos',inj:'Iniekcja',inovo:'In ovo'};
 
 </script>
@@ -965,13 +1043,38 @@ const BIRDS = {
   'kury-odchow':{l:'Kury – nioski / reprodukcja (odchów)', g:'kury', repro:true},
   'kury-niesnosc':{l:'Kury w okresie nieśności', g:'kury', repro:true, lay:true},
   'indyki-rzezne':{l:'Indyki rzeźne', g:'indyki'},
-  'indyki-repro':{l:'Indyki reprodukcyjne', g:'indyki'}
+  'indyki-repro':{l:'Indyki reprodukcyjne', g:'indyki', layWarn:180, lw:'Indyki w nieśności'},
+  // Drób wodny: „kaczka” (pekin; mulard jako mieszaniec) i „kaczka piżmowa” to w ChPLW różne gatunki
+  'kaczki':{l:'Kaczki – pekin, mulard (rzeźne)', g:'kaczki', h:'Mulard to mieszaniec kaczki piżmowej i pekin. Szczepionki dla kaczek piżmowych u mulardów – tylko decyzją lekarza (widać je po „pokaż”).'},
+  'kaczki-repro':{l:'Kaczki – stado rodzicielskie (odchów i nieśność)', g:'kaczki', repro:true, layWarn:140, lw:'Stado rodzicielskie – sprawdź planowany początek nieśności'},
+  'kaczki-p':{l:'Kaczki piżmowe (rzeźne)', g:'kaczki-p', h:'Kaczka piżmowa (Cairina moschata) – w ChPLW osobny gatunek, nie „kaczka”.'},
+  'kaczki-p-repro':{l:'Kaczki piżmowe – stado rodzicielskie (odchów i nieśność)', g:'kaczki-p', repro:true, layWarn:140, lw:'Stado rodzicielskie – sprawdź planowany początek nieśności'},
+  'gesi':{l:'Gęsi – rzeźne (gąsięta, tuczne)', g:'gesi'},
+  'gesi-repro':{l:'Gęsi – stado zarodowe (odchów i nieśność)', g:'gesi', repro:true, layWarn:140, lw:'Stado zarodowe – sprawdź planowany początek nieśności', h:'Dawkę dla stada zarodowego (Deparvax 0,4 ml) liczę od wieku 20 tygodni; młodsze ptaki – jak gąsięta.'}
 };
 const RT = ['spray','woda','oko','inj'];
 const ST_LABEL = {v:'ChPLW PL', p:'dane częściowe', u:'do weryfikacji'};
 const ST_ORDER = {v:0, p:1, u:2};
-const APP_VERSION = '1.10.0';
-const DATA_DATE = '10.11.2026';
+const SP_LABEL = {kury:'kury', indyki:'indyki', kaczki:'kaczki (pekin, mulard)', 'kaczki-p':'kaczki piżmowe', gesi:'gęsi'};
+const SP_GEN = {kury:'kur', indyki:'indyków', kaczki:'kaczek pekin i mulardów', 'kaczki-p':'kaczek piżmowych', gesi:'gęsi'};
+const SP_FIRST = {kury:'kury-brojlery', indyki:'indyki-rzezne', kaczki:'kaczki', 'kaczki-p':'kaczki-p', gesi:'gesi'};
+const WATERFOWL = ['kaczki', 'kaczki-p', 'gesi'];
+function spText(sp){ return (sp || []).map(s => SP_LABEL[s] || s).join(', '); }
+// Iniekcja wg ChPLW dla tych ptaków i wieku: dawka i miejsce z r.inj, zmieniane po kolei przez reguły r.inj.by
+// (g – gatunek, b – rodzaje ptaków, from/to – wiek w dniach). Wynik: ml, site, l (opis reguły), warn.
+function injFor(v, bk, age){
+  const r = (v && v.r && v.r.inj) || {}, o = Object.assign({}, r, {l:'', warn:''}), b = BIRDS[bk];
+  (r.by || []).forEach(x => {
+    if(x.g && !(b && b.g === x.g)) return;
+    if(x.b && !x.b.includes(bk)) return;
+    if(isNum(x.from) && !(age >= x.from)) return;
+    if(isNum(x.to) && !(age <= x.to)) return;
+    ['ml', 'site', 'l', 'warn'].forEach(k => { if(x[k] != null) o[k] = x[k]; });
+  });
+  return o;
+}
+const APP_VERSION = '1.11.0';
+const DATA_DATE = '15.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};
 let calcQueued = false, sumTimer = null;
@@ -1122,7 +1225,7 @@ function fillVac2(v, bird, dol){
     .map(x => ({x, note:vacNote(x, bk, dol)})).filter(o => S.showAll || !o.note).sort((a, b) => (!!a.note - !!b.note) || a.x.n.localeCompare(b.x.n, 'pl'));
   fillSelect(sel, list.map(({x, note}) => ({v:x.id, l:x.n + (note ? ` – ${note}` : '')})));
   if(!list.length) sel.innerHTML = '';
-  if(sel.value !== sel.dataset.cur){ sel.dataset.cur = sel.value; const x = VACCINES.find(y => y.id === sel.value); if(x && isNum(x.r.inj.ml)) $('i-ml2').value = x.r.inj.ml; }
+  if(sel.value !== sel.dataset.cur){ sel.dataset.cur = sel.value; const x = VACCINES.find(y => y.id === sel.value); const d = x ? injFor(x, bk, (dol || 1) - 1) : {}; if(isNum(d.ml)) $('i-ml2').value = d.ml; }
 }
 // Miejsce wkłucia – tylko te, które wymienia ChPLW; igły wg Aviagen dla szczepionek inaktywowanych (olejowych)
 const SITES = {'im-p':'i.m. – mięsień piersiowy', 'im-u':'i.m. – udo', 'sc':'s.c. – szyja'};
@@ -1201,6 +1304,7 @@ function ageWeeks(age){ const w = Math.floor(age / 7), d = age % 7; return age <
 function routeMin(v, r){ const o = v && v.r && v.r[r]; return o && isNum(o.min) ? o.min : null; }
 function vacNote(v, bk, dol){
   const b = BIRDS[bk]; if(!v || !b) return '';
+  if(v.xb && v.xb[bk]) return v.xb[bk];   // ChPLW wyklucza ten rodzaj ptaków (np. kaczki – przyszłe nioski)
   const min = v.min ? v.min[b.g] : null, max = v.max ? v.max[b.g] : null;
   if(isNum(dol) && isNum(min) && dol < min) return `od ${min}. dnia życia`;
   if(isNum(dol) && isNum(max) && dol > max) return max === 1 ? 'tylko 1. dzień życia (wylęgarnia)' : `do ${max}. dnia życia`;
@@ -1256,7 +1360,7 @@ function fillVac(opt = {}){
   const nv = next ? VACCINES.find(x => x.id === next) : null;
   if(next !== prev && opt.notify){
     if(pv && !ids.includes(prev)){
-      const why = g && !pv.sp.includes(g) ? `nie dla ${g === 'indyki' ? 'indyków' : 'kur'}` : vacNote(pv, bk, dolSel()) || 'nie pasuje';
+      const why = g && !pv.sp.includes(g) ? `nie dla ${SP_GEN[g] || g}` : vacNote(pv, bk, dolSel()) || 'nie pasuje';
       toast(`${pv.n}: ${why} – wybrano ${nv ? nv.n : 'inną szczepionkę'}${dzLost ? ` (na ${dzLost} w tym wieku nie ma szczepionki)` : ''}.`, 6000);
     } else if(nv && next === S.vacWant) toast(`Wiek znów pasuje – wybrano ${nv.n}.`);
   }
@@ -1320,8 +1424,20 @@ function applyDefaults(){
   $('w-milk').value = milk != null ? milk : 0;
   $('w-milk-hint').textContent = w && w.milk ? 'ChPLW: ' + w.milk : (v ? 'ChPLW (w bazie) nie podaje ilości mleka' : 'zwykle 2–4 g/l');
   if(r.oko && isNum(r.oko.ml)) $('o-ml').value = r.oko.ml;
-  if(r.inj && isNum(r.inj.ml)) $('i-ml').value = r.inj.ml;
-  const so = siteOpts(r.inj && r.inj.site); fillSelect($('i-site'), so); if(!S.siteTouched) $('i-site').value = so[0].v;
+  applyInjDefaults(true);
+}
+// Dawka, miejsce wkłucia i opakowania wg ChPLW dla tych ptaków i wieku (np. stada zarodowe gęsi 0,4 ml).
+// force – po zmianie szczepionki lub ptaków; bez force (zmiana wieku) – tylko gdy zmieniła się wartość z ChPLW.
+function applyInjDefaults(force){
+  if(noVac()) return false;
+  const v = curVac(), ri = injFor(v, birdKey(), Math.max(0, Math.round(num('age',0))));
+  const key = `${v ? v.id : ''}|${ri.ml}|${ri.site}`;
+  if(!force && key === S.injKey) return false;
+  S.injKey = key;
+  if(isNum(ri.ml)) $('i-ml').value = ri.ml;
+  if(ri.btl && isNum(ri.ml) && ri.ml > 0) $('packs').value = ri.btl.map(b => Math.round(b / ri.ml)).join(', ');   // butelki w ml → dawek przy tej dawce
+  const so = siteOpts(ri.site); fillSelect($('i-site'), so); if(!S.siteTouched) $('i-site').value = so[0].v;
+  return true;
 }
 function onVacChange(){
   S.mlTouched = false; $('w-meas').value = '';
@@ -1347,6 +1463,7 @@ function calc(){
   const v = curVac(); const bird = BIRDS[$('bird').value]; const route = S.route;
   const age = Math.max(0, Math.round(num('age',0))); const dol = age + 1;
   const birds = Math.max(0, Math.round(num('birds',0)));
+  $('bird-hint').textContent = (bird && bird.h) || '';
   $('age-hint').textContent = !ageKnown() ? '' : age >= 14 ? `${ageWeeks(age)} · ${dol}. dzień, ${Math.ceil(dol/7)}. tydzień życia` : `${dol}. dzień życia · ${Math.ceil(dol/7)}. tydzień`;
   const kk = (v ? v.id : '') + '|' + route; if(S.knowKey !== kk){ S.knowKey = kk; renderKnow(v); }   // opis z ChPLW tylko po zmianie
   $('s-org-wrap').hidden = !(Math.round(num('s-os',1)) > 1 && Math.round(num('s-sec',1)) > 1);
@@ -1379,7 +1496,7 @@ function calc(){
     if(vn && !/dnia|dzień/.test(vn)) msgs.push(['bad', `${v.n}: ${vn} (ChPLW: ${v.lay}).`]);
     else if(bird.lay && v.lay) msgs.push(['warn', 'Nieśność – ChPLW: ' + v.lay]);
     if($('bird').value === 'kury-odchow' && age >= 84 && /przed/i.test(v.lay || '')) msgs.push(['warn', `Odchów, ${ageWeeks(age)} – ChPLW: ${v.lay} Sprawdź planowany początek nieśności.`]);
-    if($('bird').value === 'indyki-repro' && age >= 180 && v.lay) msgs.push(['warn', 'Indyki w nieśności – ChPLW: ' + v.lay]);
+    if(isNum(bird.layWarn) && age >= bird.layWarn && v.lay && v.lay !== '—') msgs.push(['warn', `${bird.lw} – ChPLW: ${v.lay}`]);
     if(v.st === 'u') msgs.push(['warn', 'Dane tej szczepionki są do weryfikacji – sprawdź dawkę i sposób podania w aktualnej ChPLW.']);
     if(v.safe) msgs.push(['warn', `Dla szczepiącego (ChPLW): ${v.safe}`]);   // każda droga podania
     if(v.ae) msgs.push(['info', `Po szczepieniu (ChPLW): ${v.ae}`]);
@@ -1480,7 +1597,8 @@ function calc(){
       if(res.l){ L = mid(res.l); range = res.l; basis = res.basis; }
       else { L = Math.min(40, Math.max(1, age)); basis = 'orientacyjnie: 1 l × wiek (maks. 40 l) na 1000';
         msgs.push(['warn', !v ? 'Szczepionka spoza bazy – wpisz zmierzone zużycie stada; teraz wynik orientacyjny.' : w && w.rule === 'measured' ? `ChPLW: woda = ilość wypijana przez stado w ${fmtT(w.h || 2)} h. Wpisz zmierzone zużycie – teraz wynik orientacyjny.` : 'Brak reguły w ChPLW (w bazie) – wpisz zmierzone zużycie; teraz wynik orientacyjny.']);
-        if(bird.g === 'indyki') msgs.push(['warn','U indyków ilość wody zawsze ustalaj z pomiaru zużycia.']); }
+        if(bird.g === 'indyki') msgs.push(['warn','U indyków ilość wody zawsze ustalaj z pomiaru zużycia.']);
+        else if(WATERFOWL.includes(bird.g)) msgs.push(['warn','U kaczek i gęsi ilość wody zawsze ustalaj z pomiaru zużycia – reguła 1 l × wiek pochodzi z ChPLW dla kurcząt.']); }
       V = L * birds / 1000;
     }
     const sid = stabId(), milk = sid === 'mleko' ? Math.max(0, num('w-milk',0)) : 0, wmode = $('w-mode').value, pct = pf($('w-pct').value), doz = wmode === 'doz';
@@ -1519,17 +1637,18 @@ function calc(){
     Object.assign(R, {diluent_ml:total, ml1000:ml});
   }
   if(route === 'inj'){
-    const r = (v && v.r && v.r.inj) || {}; const ml = Math.max(0, num('i-ml',0)); const Vml = birds * ml * (1 + loss/100);
+    const r = injFor(v, $('bird').value, age); const ml = Math.max(0, num('i-ml',0)); const Vml = birds * ml * (1 + loss/100);
     tiles.push({k:'Objętość szczepionki', v:fmt(Vml/1000,2) + ' l', s:`${fmt0(Vml)} ml z zapasem ${fmtT(loss)}%`, main:true});
-    tiles.push({k:'Dawka', v:fmtT(ml,2) + ' ml', s:r.site || ''});
-    if(isNum(r.ml) && Math.abs(r.ml - ml) > 1e-9) msgs.push(['warn', `Dawka różni się od ChPLW (${fmtT(r.ml,2)} ml).`]);
+    tiles.push({k:'Dawka', v:fmtT(ml,2) + ' ml', s:[r.l, r.site].filter(Boolean).join(' · ')});
+    if(isNum(r.ml) && Math.abs(r.ml - ml) > 1e-9) msgs.push(['warn', `Dawka różni się od ChPLW (${fmtT(r.ml,2)} ml${r.l ? ' – ' + r.l : ''}).`]);
+    if(v && r.warn) msgs.push(['warn', `${v.n}: ${r.warn}`]);
     if(bp && r.bags){ const parts = Object.entries(bp.use).map(([d,n]) => { const nd = Number(d) * ml; const bag = r.bags.find(b => b >= nd - 1e-9); return `${n} × ${d} d → ${bag ? bag + ' ml' : fmt0(nd) + ' ml'}`; }); msgs.push(['info', 'Rozpuszczalnik: ' + parts.join('; ') + '.']); }
     // Aparat podwójny: druga szczepionka z drugiej butelki, druga igła – dwie iniekcje jednym ruchem
     const two = $('i-app').value === '2'; $('i-vac2-wrap').hidden = $('i-ml2-wrap').hidden = !two;
     let inj2 = null;
     if(two){
       fillVac2(v, bird, dol);
-      const v2 = VACCINES.find(x => x.id === $('i-vac2').value) || null, ml2 = Math.max(0, num('i-ml2',0)), r2 = (v2 && v2.r && v2.r.inj) || {};
+      const v2 = VACCINES.find(x => x.id === $('i-vac2').value) || null, ml2 = Math.max(0, num('i-ml2',0)), r2 = injFor(v2, $('bird').value, age);
       if(!v2) msgs.push(['warn', $('i-vac2').options.length ? 'Wybierz drugą szczepionkę do aparatu podwójnego.' : 'W bazie nie ma drugiej szczepionki iniekcyjnej dla tych ptaków w tym wieku.']);
       else {
         const V2 = birds * ml2 * (1 + loss/100), need2 = Math.ceil(birds * (1 + loss/100)), bp2 = bestPacks(need2, v2.pk || []);
@@ -1545,16 +1664,21 @@ function calc(){
     // Igły, miejsce, temperatura i sprawdzenie aparatu
     const oil = v && /inaktyw/i.test(v.t || ''), temp = String(r.note || '').match(/\d+\s*[–-]\s*\d+\s*°C/);
     const site = SITES[$('i-site').value] ? $('i-site').value : 'im-p';
-    if(oil) tiles.splice(tiles.findIndex(t => t.k === 'Dawka') + 1, 0, {k:'Igła', v:NEEDLE[site], s:`${SITES[site]} · Aviagen, szczepionka inaktywowana`});
-    if(oil){
+    const avi = oil && (bird.g === 'kury' || bird.g === 'indyki');   // zalecenia Aviagen (igły, miejsce) dotyczą kur – nie drobiu wodnego
+    if(avi) tiles.splice(tiles.findIndex(t => t.k === 'Dawka') + 1, 0, {k:'Igła', v:NEEDLE[site], s:`${SITES[site]} · Aviagen, szczepionka inaktywowana`});
+    if(oil && !avi) msgs.push(['info', `Miejsce wkłucia wg ChPLW: ${(r.site || 'sprawdź w ChPLW').replace(/\.$/, '')}. Igła i technika – wg instrukcji aparatu i lekarza weterynarii (zalecenia Aviagen dotyczą kur).`]);
+    if(avi){
       msgs.push(['info', 'Igły (Aviagen, szczepionki inaktywowane): s.c. 18–19 G, 10–12 mm; i.m. 18 G, 6 mm. Nową igłę zakładaj co najmniej co 500 ptaków, tępą lub zadziorowaną – od razu.']);
       msgs.push(['info', 'Mokre pióra w miejscu wkłucia znaczą, że szczepionka nie trafiła – popraw technikę (Aviagen).']);
       msgs.push(['info', 'Miejsce (Aviagen): i.m. – górna 1/3 mięśnia piersiowego, 2,5–3,8 cm od grzebienia mostka, igła pod kątem 45°; s.c. – dolna 1/3 szyi, z dala od głowy i nasady szyi. Udo tylko gdy konieczne – ChPLW: ' + (r.site || 'sprawdź').replace(/\.$/, '') + '.']);
+    }
+    if(oil){
       msgs.push(['info', `Szczepionkę wyjmij z lodówki wcześniej, doprowadź do ${temp ? temp[0].replace(/\s+/g, '') + ' (ChPLW)' : 'temperatury z ChPLW'} i dobrze wstrząśnij; wstrząsaj też w trakcie. Zimna szczepionka – zwłaszcza emulsja olejowa – jest gęsta i aparat może nie podać pełnej dawki.`]);
-    } else if(v) msgs.push(['info', `Szczepionka żywa ${r.site ? '(' + r.site + ')' : ''}: przygotowanie i rozpuszczalnik wg ChPLW; zużyj w ${v.use}. Igła wg instrukcji aparatu.`]);
+    } else if(v) msgs.push(['info', `Szczepionka żywa ${r.site ? '(' + r.site + ')' : ''}: ${r.prep ? 'przygotowanie krok po kroku – pod wynikiem' : 'przygotowanie i rozpuszczalnik wg ChPLW'}; zużyj w ${v.use}. Igła wg instrukcji aparatu.`]);
+    if(v && r.prep && r.prep.length) crewH = injSteps(r);
     msgs.push(['info', `Przed szczepieniem sprawdź dawkę aparatu: 10 dawek do cylindra miarowego = ${fmtT(ml * 10, 1)} ml${inj2 ? ` (druga strona: ${fmtT(inj2.dose_ml * 10, 1)} ml)` : ''}.`]);
 
-    Object.assign(R, {vaccine_ml:Vml, dose_ml:ml, injApp:two ? 2 : 1, inj2, injSite:SITES[site], needle:oil ? NEEDLE[site] : null});
+    Object.assign(R, {vaccine_ml:Vml, dose_ml:ml, injApp:two ? 2 : 1, inj2, injSite:SITES[site], needle:avi ? NEEDLE[site] : null});
   }
 
   $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R) : '';
@@ -1566,7 +1690,13 @@ function calc(){
   S.last = {v, bird, R, msgs};
 }
 // Dodatkowe dane z ulotki: bezpieczeństwo szczepiącego, odczyny po szczepieniu, przechowywanie
-function extraKV(v){ return [['Dla szczepiącego', v.safe], ['Po szczepieniu', v.ae], ['Przechowywanie', v.store]].filter(x => x[1]).map(([k, t]) => `<dt>${k}</dt><dd>${esc(t)}</dd>`).join(''); }
+function extraKV(v){ return [['Postać', v.pf], ['Dla szczepiącego', v.safe], ['Po szczepieniu', v.ae], ['Przedawkowanie', v.od], ['Przechowywanie', v.store], ['Pozwolenie', v.ma]].filter(x => x[1]).map(([k, t]) => `<dt>${k}</dt><dd>${esc(t)}</dd>`).join(''); }
+// Przygotowanie szczepionki do iniekcji krok po kroku – z ChPLW (pole prep)
+function injSteps(r){
+  const L = a => a.filter(Boolean).map(x => `<li>${esc(x)}</li>`).join('');
+  return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – przygotowanie szczepionki (ChPLW)</summary>
+    <ol class="steps">${L(r.prep)}</ol>${r.solv ? `<p class="note">Rozpuszczalnik wg ChPLW: ${esc(r.solv)}.</p>` : ''}</details>`;
+}
 function renderKnow(v){
   const box = $('know');
   if(!v && noVac()){ box.innerHTML = ''; return; }
@@ -2334,20 +2464,21 @@ function describeRoute(k, r){
     if(isNum(r.min)) p.push(`od ${r.min}. dnia`); if(r.win) p.push(`wypić w ${r.win}`); if(r.thirst) p.push(`wstrzymanie wody ${r.thirst}`); if(r.milk) p.push(`mleko wg ChPLW: ${r.milk}`);
     d = p.join(' · '); }
   if(k === 'oko') d = [isNum(r.ml) ? `${fmtT(r.ml,1)} ml na 1000 dawek` : '', r.bird, r.water].filter(Boolean).join(' · ');
-  if(k === 'inj') d = [isNum(r.ml) ? `${fmtT(r.ml,2)} ml na ptaka` : 'dawka wg ChPLW', r.site, r.bottles ? r.bottles.map(b => `${b.d} dawek = ${b.ml} ml`).join(', ') : ''].filter(Boolean).join(' · ');
+  if(k === 'inj') d = [isNum(r.ml) ? `${fmtT(r.ml,2)} ml na ptaka` : 'dawka wg ChPLW', r.site, r.bottles ? r.bottles.map(b => `${b.d} dawek = ${b.ml} ml`).join(', ') : '', r.btl ? 'butelki ' + r.btl.map(b => `${b} ml`).join(' i ') : '',
+    ...(r.by || []).filter(x => x.l || x.g).map(x => `${x.l || SP_LABEL[x.g] || x.g}: ${[isNum(x.ml) ? fmtT(x.ml,2) + ' ml' : '', x.site].filter(Boolean).join(', ')}`).filter(s => !/: $/.test(s)), r.solv ? 'rozpuszczalnik: ' + r.solv : ''].filter(Boolean).join(' · ');
   if(k === 'inovo') d = [isNum(r.ml) ? `${fmtT(r.ml,3)} ml na jajo` : 'dawka wg ChPLW', r.range ? `zakres ${fmtRange(r.range)} ml` : ''].filter(Boolean).join(' · ');
-  return `<dt>${esc(ROUTES[k])}</dt><dd>${esc(d || 'wg ChPLW')}${r.note ? `<br><span class="note">${esc(r.note)}</span>` : ''}</dd>`;
+  return `<dt>${esc(ROUTES[k])}</dt><dd>${esc(d || 'wg ChPLW')}${r.note ? `<br><span class="note">${esc(r.note)}</span>` : ''}${r.prep && r.prep.length ? `<details class="howto"><summary>Przygotowanie krok po kroku (${r.prep.length})</summary><ol class="steps">${r.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ol></details>` : ''}</dd>`;
 }
 function renderKnowledge(){
   if(!$('k-dz').options.length) fillSelect($('k-dz'), [{v:'', l:'wszystkie'}, ...Object.entries(DISEASES).map(([k,l]) => ({v:k, l}))]);
   const q = $('k-q').value.trim().toLowerCase(), sp = $('k-sp').value, dz = $('k-dz').value, rt = $('k-rt').value;
   const rows = VACCINES.filter(v => (!q || [v.n, v.m, v.s, v.dz.join(' '), v.dz.map(d => DISEASES[d] || '').join(' ')].join(' ').toLowerCase().includes(q)) && (!sp || v.sp.includes(sp)) && (!dz || v.dz.includes(dz)) && (!rt || (v.r && v.r[rt]))).sort((a,b) => a.n.localeCompare(b.n,'pl'));
   $('k-count').textContent = `${rows.length} z ${VACCINES.length} szczepionek`;
-  $('k-list').innerHTML = rows.map(v => `<button type="button" class="item${S.selVac === v.id ? ' sel' : ''}" data-id="${esc(v.id)}"><span class="t">${esc(v.n)} <span class="pill ${v.st}">${ST_LABEL[v.st]}</span></span><span class="s">${esc(v.dz.join(' + '))} · ${esc(v.sp.join(', '))} · ${esc(Object.keys(v.r || {}).map(k => ROUTES[k].toLowerCase()).join(', ') || 'droga wg ChPLW')}</span></button>`).join('') || '<div class="empty">Brak szczepionek dla wybranych filtrów.</div>';
+  $('k-list').innerHTML = rows.map(v => `<button type="button" class="item${S.selVac === v.id ? ' sel' : ''}" data-id="${esc(v.id)}"><span class="t">${esc(v.n)} <span class="pill ${v.st}">${ST_LABEL[v.st]}</span></span><span class="s">${esc(v.dz.join(' + '))} · ${esc(spText(v.sp))} · ${esc(Object.keys(v.r || {}).map(k => ROUTES[k].toLowerCase()).join(', ') || 'droga wg ChPLW')}</span></button>`).join('') || '<div class="empty">Brak szczepionek dla wybranych filtrów.</div>';
   const v = S.selVac ? VACCINES.find(x => x.id === S.selVac) : null; const box = $('k-detail');
   if(!v){ box.innerHTML = '<div class="empty"><b>Wybierz szczepionkę z listy.</b><span>Zobaczysz drogi podania, objętości wody, krople, wiek, opakowania, karencję i źródło ChPLW.</span></div>'; return; }
   box.innerHTML = `<div class="card-h"><h2>${esc(v.n)}</h2><span class="pill ${v.st}">${ST_LABEL[v.st]}</span></div>
-    <dl class="kv"><dt>Producent</dt><dd>${esc(v.m)}</dd><dt>Rodzaj</dt><dd>${esc(v.t)}</dd><dt>Choroby</dt><dd>${esc(v.dz.map(d => DISEASES[d] || d).join('; '))}</dd><dt>Szczep</dt><dd>${esc(v.s)}</dd><dt>Drób</dt><dd>${esc(v.sp.join(', '))}</dd><dt>Wiek</dt><dd>${esc(v.minT)}</dd><dt>Schemat</dt><dd>${esc(v.sch)}</dd>
+    <dl class="kv"><dt>Producent</dt><dd>${esc(v.m)}</dd><dt>Rodzaj</dt><dd>${esc(v.t)}</dd><dt>Choroby</dt><dd>${esc(v.dz.map(d => DISEASES[d] || d).join('; '))}</dd><dt>Szczep</dt><dd>${esc(v.s)}</dd><dt>Drób</dt><dd>${esc(spText(v.sp))}</dd><dt>Wiek</dt><dd>${esc(v.minT)}</dd><dt>Schemat</dt><dd>${esc(v.sch)}</dd>
       ${Object.entries(v.r || {}).map(([k,r]) => describeRoute(k, r)).join('')}
       <dt>Opakowania</dt><dd>${v.pk && v.pk.length ? esc(v.pk.join(', ')) + ' dawek' : 'sprawdź w ChPLW'}</dd><dt>Zużyć w</dt><dd>${esc(v.use)}</dd><dt>Karencja</dt><dd>${esc(v.wd)}</dd><dt>Nieśność</dt><dd>${esc(v.lay)}</dd><dt>Łączenie</dt><dd>${esc(v.mix)}</dd>${extraKV(v)}
       <dt>Źródło</dt><dd>${v.src && v.src.length ? v.src.map(linkSrc).join('<br>') : 'brak odczytu – sprawdź w <a href="https://rejestry.ezdrowie.gov.pl/rpl/search/public" target="_blank" rel="noopener">Rejestrze Produktów Leczniczych</a>'}</dd></dl>
@@ -2355,7 +2486,7 @@ function renderKnowledge(){
 }
 function useVaccine(id){
   const v = VACCINES.find(x => x.id === id); if(!v) return;
-  const bk0 = birdKey(); if(!bk0 || !v.sp.includes(BIRDS[bk0].g)) $('bird').value = v.sp[0] === 'indyki' ? 'indyki-rzezne' : 'kury-brojlery';
+  const bk0 = birdKey(); if(!bk0 || !v.sp.includes(BIRDS[bk0].g)) $('bird').value = SP_FIRST[v.sp[0]] || 'kury-brojlery';
   const note = vacNote(v, $('bird').value, dolSel());
   if(note && !S.showAll){ S.showAll = true; toast(`${v.n}: ${note} – pokazano też szczepionki spoza wieku i rodzaju ptaków.`, 6000); }
   S.dzAll = true; fillDz(); S.dzAll = false; $('dz').value = v.dz[0];
@@ -2392,7 +2523,15 @@ function renderRules(){
     <li>Igły do szczepionek inaktywowanych (Aviagen): s.c. 18–19 G, 10–12 mm; i.m. 18 G, 6 mm; nowa igła co najmniej co 500 ptaków. I.m. – górna 1/3 piersi, 2,5–3,8 cm od mostka, pod kątem 45°; udo tylko gdy konieczne.</li>
     <li>Przycisk „Iniekcja” jest zawsze widoczny: przy szczepionce bez iniekcji w ChPLW wybiera szczepionkę iniekcyjną, a lista zaczyna się od szczepionek iniekcyjnych. Szczepionki podawane 1. dnia życia (wylęgarnia: Marek, HVT, immunokompleks) u starszych ptaków są na końcu listy.</li>
     <li>Szczepionki z olejem mineralnym (np. Nobilis Reo inac – parafina ciekła): przypadkowe wstrzyknięcie sobie, zwłaszcza w palec lub staw, wymaga natychmiastowej pomocy lekarskiej, nawet przy bardzo małej ilości – zabierz ulotkę. Strzykawki i igły sterylne.</li>
-    <li>Aparat podwójny podaje dwie szczepionki jednym ruchem – każdą z własnej butelki i własną igłą, w dwa różne miejsca. Dwie szczepionki tego samego dnia tylko wtedy, gdy pozwala na to ChPLW obu, albo decyzją lekarza weterynarii.</li></ul></div>
+    <li>Aparat podwójny podaje dwie szczepionki jednym ruchem – każdą z własnej butelki i własną igłą, w dwa różne miejsca. Dwie szczepionki tego samego dnia tylko wtedy, gdy pozwala na to ChPLW obu, albo decyzją lekarza weterynarii.</li>
+    <li>Szczepionki w ciekłym azocie (Nobilis Rismavac + CA 126, Innovax, Cevac MD Rispens): rękawice, okulary i maska przy wyjmowaniu ampułek; rozmrażać tylko w wodzie o temperaturze z ChPLW (Rismavac 15–25°C, Innovax 25–27°C) – nigdy w gorącej ani w lodowatej; po rozpuszczeniu zużyć w 2 h (Rismavac – butelka w łaźni z lodem). Przygotowanie krok po kroku pokazuje wynik przy drodze „Iniekcja”.</li></ul></div>
+  <div><h3>Kaczki i gęsi</h3><ul class="list">
+    <li>ChPLW rozróżnia gatunki: „kaczki” (pekin; mulard jako mieszaniec – decyzja lekarza), „kaczki piżmowe” i „gęsi”. Aplikacja dobiera szczepionki osobno dla każdego z nich.</li>
+    <li>Szczepionki z pozwoleniem w Polsce dla drobiu wodnego (stan 15.11.2026): Deparvax (Ceva) – parwowiroza kaczek i choroba Derzsy’ego u kaczek piżmowych i gęsi; Palmivax (Boehringer) – choroba Derzsy’ego u kaczek piżmowych; AviPro Salmonella Duo – kaczki rzeźne (woda do picia).</li>
+    <li>Deparvax: 0,2 ml w 1. dniu i powtórnie (kaczęta 14.–15. dzień, gąsięta 14.–21. dzień); stada zarodowe gęsi 0,4 ml 6 i 3 tyg. przed nieśnością. Gęsi tylko podskórnie. Emulsja olejowa – ostrożnie z palcami.</li>
+    <li>Palmivax: 0,5 ml niezależnie od wieku, domięśniowo dopiero od 4. tygodnia; termin wg przeciwciał matczynych (zwykle 14.–21. dzień, od rodziców nieszczepionych od 7. dnia).</li>
+    <li>Wirusowe zapalenie wątroby kaczek, pomór kaczek, riemerelloza, pasterelloza, krwotoczne zapalenie nerek i jelit gęsi, reowirusy kaczek piżmowych – w Rejestrze nie znaleziono szczepionek z pozwoleniem; w praktyce szczepionki autogenne (szablon w bazie) albo decyzja lekarza weterynarii.</li>
+    <li>Woda do picia u kaczek i gęsi – zawsze wg zmierzonego zużycia; reguły z ChPLW dla kurcząt nie pasują.</li></ul></div>
   <div><h3>Obowiązek szczepień ND</h3><p class="note">Rozporządzenie MRiRW z 11.03.2026 (Dz.U. poz. 335): kury i indyki w zakładach przemieszczających drób lub jaja albo sprzedających je bezpośrednio oraz w wylęgarniach; powyżej 350 szt. – program szczepień w planie bioasekuracji. Przykładowe programy: przewodnik GIW ND v5 (2025).</p></div>
   <div><h3>Źródła</h3><ul class="list">
     <li><a href="https://rejestry.ezdrowie.gov.pl/rpl/search/public" target="_blank" rel="noopener">Rejestr Produktów Leczniczych</a> – ulotki i ChPLW (linki przy każdej szczepionce)</li>
@@ -2400,7 +2539,8 @@ function renderRules(){
     <li><a href="https://eseu.aviagen.com/assets/Tech_Center/Broiler_Breeder_Tech_Articles/English/AviagenBrief_DrinkingWaterVaccination_Sept08.pdf" target="_blank" rel="noopener">Aviagen – szczepienie przez wodę</a> · katalog i instrukcja Birchmeier AS 1200 (zdjęcia z 9.11.2026)</li>
     <li>Birchmeier: <a href="https://www.birchmeier.pl/web/global/leaflet/rec-15-ac1/Birchmeier_REC_15_AC1_Battery_backpack_sprayer_12076702.pdf" target="_blank" rel="noopener">karta REC 15 AC1</a> · <a href="https://www.birchmeier.pl/web/global/leaflet/accu-power-line/Birchmeier_Accu-Power_line_12076802.pdf" target="_blank" rel="noopener">ulotka linii Accu-Power</a> · <a href="https://www.birchmeier.pl/web/global/gebrauchsanleitungen/rec_15_ac1/Birchmeier_REC_15_AC1_AC2_AC5_Manual-Akku-Rueckenspruehgeraet_12081203_DA_FI_SV_PL.pdf" target="_blank" rel="noopener">instrukcja REC 15 (PL)</a></li>
     <li>Szczepienie przez wodę: <a href="https://www.msd-animal-health.co.za/wp-content/uploads/sites/30/2020/03/Drinking-water-vaccination-booklet_tcm57-20025.pdf" target="_blank" rel="noopener">MSD</a> · <a href="https://www.zoetisus.com/content/_assets/docs/Poultry/Vaccine-Administration/Protocol-for-Live-Vaccination-via-Drinking-Water-Broiler.pdf" target="_blank" rel="noopener">Zoetis</a> · <a href="https://aa-na.aviagen.com/assets/Tech_Center/LIR_Tech_Articles/Indian-River-Be-Smart-Drinking-Water-Vaccination.pdf" target="_blank" rel="noopener">Aviagen</a> · <a href="https://farmanimal.elanco.com/us/poultry/article/best-practices-water-vaccination" target="_blank" rel="noopener">Elanco</a> · <a href="https://zootecnicainternational.com/featured/water-vaccination-cage-aviary-systems-guide/" target="_blank" rel="noopener">Zootecnica</a> · <a href="https://www.nawodnienia.eu/pdf/dos-d25re2,112271068.pdf" target="_blank" rel="noopener">Dosatron D25RE2</a></li>
-    <li>Iniekcja: <a href="https://eseu.aviagen.com/assets/Tech_Center/LIR_Tech_Articles/IRBeSmart-BacterinUsage-2019-EN.pdf" target="_blank" rel="noopener">Aviagen – szczepionki inaktywowane</a> · <a href="https://www.thama-vet.com/double-dose-syringe-improving-poultry-health-with-single-shot-efficiency/" target="_blank" rel="noopener">ThaMa – aparat podwójny</a></li></ul>
+    <li>Iniekcja: <a href="https://eseu.aviagen.com/assets/Tech_Center/LIR_Tech_Articles/IRBeSmart-BacterinUsage-2019-EN.pdf" target="_blank" rel="noopener">Aviagen – szczepionki inaktywowane</a> · <a href="https://www.thama-vet.com/double-dose-syringe-improving-poultry-health-with-single-shot-efficiency/" target="_blank" rel="noopener">ThaMa – aparat podwójny</a></li>
+    <li>Drób wodny: Deparvax – <a href="https://ktomalek.pl/deparvax-ulotka-cena-zastosowanie-apteka-emulsja-do-wstrzykiwan-1-daw-min-7-7-log2-min-7-9-log2-1-but-po-100-ml/ub-3240721" target="_blank" rel="noopener">ulotka PL</a> · <a href="https://medicines.health.europa.eu/veterinary/pl/600000041278" target="_blank" rel="noopener">UPD</a>; Palmivax – <a href="https://medicines.health.europa.eu/veterinary/pl/600000059548" target="_blank" rel="noopener">UPD (pozwolenie PL)</a> · <a href="https://vetisearch.de/spcs/show/3474" target="_blank" rel="noopener">ChPLW DE</a>; AviPro Salmonella Duo – <a href="https://rejestry.ezdrowie.gov.pl/api/rpl/medicinal-products/623/leaflet" target="_blank" rel="noopener">ulotka 01/2026</a></li></ul>
     <p class="note">Przed zabiegiem obowiązuje aktualna ChPLW serii i decyzja lekarza weterynarii.</p></div>`;
 }
 
@@ -2546,7 +2686,7 @@ function bind(){
   ['w-mode', 'w-pct', 'w-stab', 'w-stab-amt', 'w-stab-unit'].forEach(id => $(id).addEventListener('change', saveEquipment));
   $('crew').addEventListener('toggle', ev => { if(ev.target.matches && ev.target.matches('details.howto')) S.howtoOpen = ev.target.open; }, true);
   let ageTimer = null;   // wiek wpisywany cyfra po cyfrze – listy po chwili, nie po każdej cyfrze
-  $('age').addEventListener('input', () => { clearTimeout(ageTimer); ageTimer = setTimeout(() => { if(!S.mlTouched) applyDefaultsSpray(); refreshGuides(); }, 300); });
+  $('age').addEventListener('input', () => { clearTimeout(ageTimer); ageTimer = setTimeout(() => { if(!S.mlTouched) applyDefaultsSpray(); refreshGuides(); if(applyInjDefaults(false)) calc(); }, 300); });
   $('v-obliczenia').addEventListener('input', ev => { if(['bird','dz','vac'].includes(ev.target.id)) return; scheduleCalc(); });
   $('w-dose').addEventListener('change', calc);
   $('save').addEventListener('click', ev => saveReport(ev.currentTarget));
@@ -2703,7 +2843,7 @@ function loadFonts(){
 function renderInfo(){
   licInfo();
   $('i-ver').textContent = APP_VERSION;
-  $('i-data').textContent = `ChPLW i ulotki – stan na ${DATA_DATE}; ${VACCINES.length} szczepionek`;
+  $('i-data').textContent = `ChPLW i ulotki – stan na ${DATA_DATE}; ${VACCINES.length} ${pl(VACCINES.length, 'szczepionka', 'szczepionki', 'szczepionek')}`;
   $('i-mode').textContent = S.mode === 'db' ? 'w pamięci aplikacji (Claude)' : IN_ARTIFACT ? 'tylko w tej przeglądarce' : 'w tym telefonie (kopia w zakładce Raporty)';
   if(!IN_ARTIFACT) fetchVersion().then(j => { if(j.zmiany && j.zmiany.length) $('i-changes').innerHTML = `<h3>Zmiany w wersji ${esc(j.wersja)}</h3><ul class="list">${j.zmiany.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`; }).catch(() => {});
 }

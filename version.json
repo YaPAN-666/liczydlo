@@ -1,8 +1,9 @@
 {
- "wersja": "1.11.1",
+ "wersja": "1.11.2",
  "data": "2026-11-15",
  "zmiany": [
-  "Czytelniejszy wybór drobiu: najpierw gatunek (kury, indyki, kaczki, gęsi), potem grupa ptaków tego gatunku; kaczki pekin/mulard i piżmowe w osobnych, podpisanych wierszach.",
+  "Vectormune ND i Vaxxitek HVT+IBD – dane z ChPLW i ulotek PL (EMA): skład, dawka 0,2 ml podskórnie i 0,05 ml do jaja, rozpuszczalnik wg tabel z ulotki, przygotowanie krok po kroku, łączenie z innymi szczepionkami, opakowania; status „ChPLW PL” zamiast „do weryfikacji”.",
+  "(1.11.1) Czytelniejszy wybór drobiu: najpierw gatunek (kury, indyki, kaczki, gęsi), potem grupa ptaków tego gatunku; kaczki pekin/mulard i piżmowe w osobnych, podpisanych wierszach.",
   "(1.11.0) Kaczki i gęsi: nowe rodzaje drobiu – kaczki pekin i mulardy, kaczki piżmowe, gęsi (rzeźne i stada rodzicielskie); szczepionki dobierane wg gatunku z ChPLW.",
   "(1.11.0) Nowe szczepionki: Deparvax (parwowiroza kaczek i choroba Derzsy’ego – kaczki piżmowe i gęsi; stada zarodowe gęsi 0,4 ml) i Palmivax (choroba Derzsy’ego – kaczki piżmowe); AviPro Salmonella Duo także dla kaczek rzeźnych.",
   "(1.11.0) Nobilis Rismavac + CA 126 – dane z ulotki PL (01/2026): rozpuszczalnik, łaźnia lodowa, zużycie w 2 h, opakowanie 5000 dawek; Nobilis Reo inac uzupełniona z ulotki.",

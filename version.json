@@ -1,10 +1,11 @@
 {
- "wersja": "1.11.0",
+ "wersja": "1.11.1",
  "data": "2026-11-15",
  "zmiany": [
-  "Kaczki i gęsi: nowe rodzaje drobiu – kaczki pekin i mulardy, kaczki piżmowe, gęsi (rzeźne i stada rodzicielskie); szczepionki dobierane wg gatunku z ChPLW.",
-  "Nowe szczepionki: Deparvax (parwowiroza kaczek i choroba Derzsy’ego – kaczki piżmowe i gęsi; stada zarodowe gęsi 0,4 ml) i Palmivax (choroba Derzsy’ego – kaczki piżmowe); AviPro Salmonella Duo także dla kaczek rzeźnych.",
-  "Nobilis Rismavac + CA 126 – dane z ulotki PL (01/2026): rozpuszczalnik, łaźnia lodowa, zużycie w 2 h, opakowanie 5000 dawek; Nobilis Reo inac uzupełniona z ulotki.",
-  "Iniekcja: przygotowanie szczepionki krok po kroku (ciekły azot, liofilizat, emulsja olejowa); dawka i miejsce wkłucia zależne od gatunku i wieku; w opisie szczepionek postać, przedawkowanie i numer pozwolenia."
+  "Czytelniejszy wybór drobiu: najpierw gatunek (kury, indyki, kaczki, gęsi), potem grupa ptaków tego gatunku; kaczki pekin/mulard i piżmowe w osobnych, podpisanych wierszach.",
+  "(1.11.0) Kaczki i gęsi: nowe rodzaje drobiu – kaczki pekin i mulardy, kaczki piżmowe, gęsi (rzeźne i stada rodzicielskie); szczepionki dobierane wg gatunku z ChPLW.",
+  "(1.11.0) Nowe szczepionki: Deparvax (parwowiroza kaczek i choroba Derzsy’ego – kaczki piżmowe i gęsi; stada zarodowe gęsi 0,4 ml) i Palmivax (choroba Derzsy’ego – kaczki piżmowe); AviPro Salmonella Duo także dla kaczek rzeźnych.",
+  "(1.11.0) Nobilis Rismavac + CA 126 – dane z ulotki PL (01/2026): rozpuszczalnik, łaźnia lodowa, zużycie w 2 h, opakowanie 5000 dawek; Nobilis Reo inac uzupełniona z ulotki.",
+  "(1.11.0) Iniekcja: przygotowanie szczepionki krok po kroku (ciekły azot, liofilizat, emulsja olejowa); dawka i miejsce wkłucia zależne od gatunku i wieku; w opisie szczepionek postać, przedawkowanie i numer pozwolenia."
  ]
 }

@@ -230,6 +230,20 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
   #route button:nth-child(n+3){border-top:1px solid var(--line)}
 }
 .linkbtn{border:0;background:none;padding:0 2px;font:inherit;color:var(--brand);text-decoration:underline;cursor:pointer}
+
+/* Drób w dwóch krokach: gatunek (duże przyciski), pod nim – na przyciemnionym tle ze strzałką do gatunku – grupy ptaków */
+.birdpick{display:grid;gap:7px;min-width:0;font-size:.84rem;color:var(--muted)}
+#sp-seg{display:grid;grid-template-columns:repeat(4,1fr)}
+#sp-seg button{min-width:0;padding:10px 4px;font-family:var(--f-head);font-size:1.1rem;font-weight:600;letter-spacing:.02em;color:var(--ink)}
+#sp-seg button[aria-pressed="true"]{color:var(--brand-ink)}
+.grp{position:relative;display:grid;gap:6px;padding:10px;border-radius:8px;background:var(--surface-2)}
+.grp:not([data-sp=""])::before{content:"";position:absolute;top:-7px;left:calc((var(--sp-i, 0) + .5) * 25% - 7px);border:7px solid transparent;border-top:0;border-bottom-color:var(--surface-2)}
+.grp-h{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.grp-h:not(:first-child){margin-top:4px}
+.grp .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface)}
+.grp .seg button{min-width:0;padding:8px 6px;line-height:1.25;color:var(--ink)}
+.grp .seg button[aria-pressed="true"]{color:var(--brand-ink)}
+.grp .seg button small{display:block;margin:2px 0 0;font-size:.74em;font-weight:400;opacity:.8}
 </style>
 </head>
 <body>
@@ -300,8 +314,18 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
           <datalist id="farm-list"></datalist>
           <label>Data zabiegu
             <input id="date" type="date"></label>
-          <label>Drób
-            <select id="bird">
+        </div>
+        <div class="birdpick">
+          <span id="bird-h">Drób</span>
+          <div class="seg" id="sp-seg" role="group" aria-labelledby="bird-h">
+            <button type="button" data-sp="kury" aria-pressed="false">Kury</button>
+            <button type="button" data-sp="indyki" aria-pressed="false">Indyki</button>
+            <button type="button" data-sp="kaczki" aria-pressed="false">Kaczki</button>
+            <button type="button" data-sp="gesi" aria-pressed="false">Gęsi</button>
+          </div>
+          <div class="grp" id="grp" data-sp=""></div>
+          <!-- ukryta lista: trzyma wybór dla obliczeń i raportów; ustawiają ją przyciski wyżej -->
+          <select id="bird" hidden>
               <option value="">— wybierz —</option>
               <optgroup label="Kury">
                 <option value="kury-brojlery">Kury – brojlery</option>
@@ -323,7 +347,9 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
                 <option value="gesi-repro">Gęsi – stado zarodowe (odchów i nieśność)</option>
               </optgroup>
             </select>
-            <span class="hint" id="bird-hint"></span></label>
+          <span class="hint" id="bird-hint"></span>
+        </div>
+        <div class="row">
           <label>Wiek (dni)
             <input id="age" type="number" min="0" step="1" placeholder="np. 21" inputmode="numeric">
             <span class="hint" id="age-hint"></span></label>
@@ -1060,6 +1086,36 @@ const SP_GEN = {kury:'kur', indyki:'indyków', kaczki:'kaczek pekin i mulardów'
 const SP_FIRST = {kury:'kury-brojlery', indyki:'indyki-rzezne', kaczki:'kaczki', 'kaczki-p':'kaczki-p', gesi:'gesi'};
 const WATERFOWL = ['kaczki', 'kaczki-p', 'gesi'];
 function spText(sp){ return (sp || []).map(s => SP_LABEL[s] || s).join(', '); }
+// Wybór drobiu w dwóch krokach: gatunek, potem grupa tego gatunku (kierunek użytkowania).
+// Ukryty <select id="bird"> trzyma wybór dla obliczeń i raportów – ustawiają go przyciski.
+const SPECIES = {
+  kury:   {l:'Kury',   rows:[{b:[['kury-brojlery', 'Brojlery', 'rzeźne'], ['kury-odchow', 'Odchów', 'nioski, reprodukcja'], ['kury-niesnosc', 'Nieśność', 'kury nieśne']]}]},
+  indyki: {l:'Indyki', rows:[{b:[['indyki-rzezne', 'Rzeźne', ''], ['indyki-repro', 'Reprodukcyjne', 'stado rodzicielskie']]}]},
+  kaczki: {l:'Kaczki', rows:[{l:'Pekin, mulard', b:[['kaczki', 'Rzeźne', ''], ['kaczki-repro', 'Stado rodzicielskie', 'odchów i nieśność']]},
+                             {l:'Kaczki piżmowe', b:[['kaczki-p', 'Rzeźne', ''], ['kaczki-p-repro', 'Stado rodzicielskie', 'odchów i nieśność']]}]},
+  gesi:   {l:'Gęsi',   rows:[{b:[['gesi', 'Rzeźne', 'gąsięta, tuczne'], ['gesi-repro', 'Stado zarodowe', 'odchów i nieśność']]}]}
+};
+const SP_KEYS = Object.keys(SPECIES);
+function spOfBird(bk){ return SP_KEYS.find(sp => SPECIES[sp].rows.some(r => r.b.some(x => x[0] === bk))) || null; }
+function renderBirdPick(){
+  const bk = birdKey(), sp = bk ? spOfBird(bk) : (SPECIES[S.spPick] ? S.spPick : null);
+  S.spPick = sp;
+  document.querySelectorAll('#sp-seg [data-sp]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sp === sp)));
+  const key = `${sp}|${bk}`; if(S.grpKey === key) return; S.grpKey = key;
+  const box = $('grp'); box.dataset.sp = sp || ''; box.style.setProperty('--sp-i', String(sp ? SP_KEYS.indexOf(sp) : 0));
+  if(!sp){ box.innerHTML = '<span class="note">Wybierz gatunek, potem grupę ptaków.</span>'; return; }
+  const P = SPECIES[sp];
+  box.innerHTML = P.rows.map(r => `${r.l ? `<span class="grp-h">${esc(r.l)}</span>` : ''}<div class="seg" role="group" aria-label="${esc(r.l || P.l)}">${r.b.map(([k, l, s]) => `<button type="button" data-bird="${k}" aria-pressed="${k === bk}">${esc(l)}${s ? `<small>${esc(s)}</small>` : ''}</button>`).join('')}</div>`).join('');
+}
+function setBird(k){ if($('bird').value === k) return; $('bird').value = k; $('bird').dispatchEvent(new Event('change')); }
+function pickSpecies(sp){
+  if(!SPECIES[sp]) return;
+  const bk = birdKey(); if(bk && spOfBird(bk) === sp) return;   // ten sam gatunek – grupa zostaje
+  S.spPick = sp;
+  if(bk) setBird(''); else calc();   // inny gatunek – grupę wybiera się od nowa; wynik od razu prosi o grupę
+}
+// Brakujące pole: przy drobiu – pierwszy przycisk grupy (albo gatunku)
+function focusField(id){ const el = id === 'bird' ? (document.querySelector('#grp [data-bird]') || document.querySelector('#sp-seg [data-sp]')) : $(id); if(el) el.focus(); }
 // Iniekcja wg ChPLW dla tych ptaków i wieku: dawka i miejsce z r.inj, zmieniane po kolei przez reguły r.inj.by
 // (g – gatunek, b – rodzaje ptaków, from/to – wiek w dniach). Wynik: ml, site, l (opis reguły), warn.
 function injFor(v, bk, age){
@@ -1073,10 +1129,10 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.11.0';
+const APP_VERSION = '1.11.1';
 const DATA_DATE = '15.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
-const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null};
+const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
 let calcQueued = false, sumTimer = null;
 // Kilka zdarzeń „input” w jednej klatce ekranu = jedno przeliczenie.
 function scheduleCalc(){ if(calcQueued) return; calcQueued = true; requestAnimationFrame(() => { calcQueued = false; calc(); }); }
@@ -1460,6 +1516,7 @@ function setRoute(r){
 
 /* ---------- Obliczenia: wynik ---------- */
 function calc(){
+  renderBirdPick();   // przyciski „Drób” zawsze zgodne z wyborem (także po „Licz z tą szczepionką”)
   const v = curVac(); const bird = BIRDS[$('bird').value]; const route = S.route;
   const age = Math.max(0, Math.round(num('age',0))); const dol = age + 1;
   const birds = Math.max(0, Math.round(num('birds',0)));
@@ -1468,7 +1525,7 @@ function calc(){
   const kk = (v ? v.id : '') + '|' + route; if(S.knowKey !== kk){ S.knowKey = kk; renderKnow(v); }   // opis z ChPLW tylko po zmianie
   $('s-org-wrap').hidden = !(Math.round(num('s-os',1)) > 1 && Math.round(num('s-sec',1)) > 1);
   sprayerUI(); stabUI();   // granice ciśnienia, dmuchawa, podpowiedzi opryskiwacza i stabilizatora – także przed wpisaniem liczby ptaków
-  const miss = [!bird && ['bird', 'rodzaj drobiu'], !ageKnown() && ['age', 'wiek'], noVac() && ['vac', 'szczepionkę'], !(birds > 0) && ['birds', 'liczbę ptaków']].filter(Boolean);
+  const miss = [!bird && ['bird', S.spPick ? 'grupę ptaków' : 'rodzaj drobiu'], !ageKnown() && ['age', 'wiek'], noVac() && ['vac', 'szczepionkę'], !(birds > 0) && ['birds', 'liczbę ptaków']].filter(Boolean);
   if(miss.length){
     const R0 = {route, age, birds:0};
     $('farm-alert').innerHTML = route === 'spray' && !noVac() && bird ? farmAlert(R0) : '';
@@ -1501,7 +1558,7 @@ function calc(){
     if(v.safe) msgs.push(['warn', `Dla szczepiącego (ChPLW): ${v.safe}`]);   // każda droga podania
     if(v.ae) msgs.push(['info', `Po szczepieniu (ChPLW): ${v.ae}`]);
   }
-  if($('bird').value === 'kury-niesnosc' && age < 112) msgs.push(['warn', `Kury w okresie nieśności, a wiek ${ageWeeks(age)} – sprawdź wiek albo wybierz „Kury – nioski / reprodukcja (odchów)”.`]);
+  if($('bird').value === 'kury-niesnosc' && age < 112) msgs.push(['warn', `Kury w okresie nieśności, a wiek ${ageWeeks(age)} – sprawdź wiek albo wybierz w „Drób”: Kury → Odchów.`]);
   if(bp && bp.total > need && (route === 'spray' || route === 'woda')) msgs.push(['info', `Nadwyżka ${fmt0(bp.total - need)} dawek – rozpuść wszystkie otwarte fiolki w całej wodzie; nie dziel fiolek.`]);
 
   if(route === 'spray'){
@@ -1741,7 +1798,7 @@ async function copyText(text){
 async function saveReport(btn){
   if(!S.store){ toast('Pamięć aplikacji jeszcze się łączy – spróbuj za chwilę.'); return; }
   const L = S.last; if(!L) return;
-  if(L.empty){ const m = (L.miss || [['birds', 'liczbę ptaków']])[0]; toast(`Uzupełnij: ${(L.miss || [m]).map(x => x[1]).join(', ')}.`); $(m[0]).focus(); return; }
+  if(L.empty){ const m = (L.miss || [['birds', 'liczbę ptaków']])[0]; toast(`Uzupełnij: ${(L.miss || [m]).map(x => x[1]).join(', ')}.`); focusField(m[0]); return; }
   const doc = Object.assign({}, L.R, {date:$('date').value || todayISO(), farm:$('farm').value.trim(), bird:$('bird').value, birdLabel:L.bird.l, dz:$('dz').value === DZ_ALL ? (L.v ? L.v.dz[0] : '') : $('dz').value, vacId:L.v ? L.v.id : '', vacName:L.v ? L.v.n : 'spoza bazy', notes:$('notes').value.trim(), text:reportText(), createdAt:new Date().toISOString()});
   btn.disabled = true;
   if(S.mode === 'local' && !IN_ARTIFACT && !S.persisted && navigator.storage && navigator.storage.persist){ S.persisted = true; navigator.storage.persist().catch(() => {}); }
@@ -2677,6 +2734,8 @@ function bind(){
   });
   $('vac').addEventListener('change', () => { S.vacWant = $('vac').value; if(!noVac()) S.picked = true; onVacChange(); saveWants(); });
   $('vac-hint').addEventListener('click', ev => { if(ev.target.closest('#vac-all')){ ev.preventDefault(); toggleShowAll(); } });
+  $('sp-seg').addEventListener('click', ev => { const b = ev.target.closest('[data-sp]'); if(b) pickSpecies(b.dataset.sp); });
+  $('grp').addEventListener('click', ev => { const b = ev.target.closest('[data-bird]'); if(b) setBird(b.dataset.bird); });
   $('i-site').addEventListener('change', () => { S.siteTouched = true; });
   $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(!b || b.disabled) return; if(b.dataset.alt) pickRoute(b.dataset.route); else { S.rPref = b.dataset.route; setRoute(b.dataset.route); } });
   $('s-ml').addEventListener('input', () => { S.mlTouched = true; });

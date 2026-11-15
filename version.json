@@ -1,10 +1,9 @@
 {
- "wersja": "1.11.3",
+ "wersja": "1.11.4",
  "data": "2026-11-15",
  "zmiany": [
-  "Szczepionka autogenna (stadna) – rozbudowany szablon: podstawa prawna (rozp. UE 2019/6 art. 106 ust. 5, Prawo farmaceutyczne art. 3 ust. 4 pkt 6), tylko inaktywowana, tylko dla stada, z którego pochodzi szczep, na receptę.",
-  "Iniekcja szczepionki autogennej: dane z etykiety serii (drobnoustroje, adiuwant, laboratorium, seria, ważność, nr gospodarstwa) – trafiają do raportu; dawkę wpisuje się z etykiety.",
-  "Adiuwant zmienia wskazówki: olej – silniejszy odczyn, raczej s.c., ogrzanie, ostrzeżenie o przypadkowym wstrzyknięciu; wodorotlenek glinu – łagodniej, wstrząsać, nie zamrażać; bez adiuwantu – słabsza odporność. Bakterie Gram-ujemne – ostrzeżenie o endotoksynach.",
+  "Nobilis Reo inac – uzupełnienia z ulotki PL (23.05.2025): adiuwant (parafina ciekła 215 mg na dawkę), wygląd emulsji, przechowywanie po otwarciu, „szczepić tylko zdrowe ptaki” oraz wskazówka dla lekarza przy przypadkowym wstrzyknięciu sobie oleju.",
+  "(1.11.3) Szczepionka autogenna – rozbudowany szablon: podstawa prawna, dane z etykiety serii w wyniku i raporcie, wskazówki zależne od adiuwantu.",
   "(1.11.2) Vectormune ND i Vaxxitek HVT+IBD – dane z ChPLW i ulotek PL (EMA).",
   "(1.11.1) Czytelniejszy wybór drobiu: najpierw gatunek, potem grupa ptaków.",
   "(1.11.0) Kaczki i gęsi; Deparvax, Palmivax; Nobilis Rismavac + CA 126 i Nobilis Reo inac z ulotek; iniekcja krok po kroku."

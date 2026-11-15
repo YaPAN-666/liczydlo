@@ -244,6 +244,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 .grp .seg button{min-width:0;padding:8px 6px;line-height:1.25;color:var(--ink)}
 .grp .seg button[aria-pressed="true"]{color:var(--brand-ink)}
 .grp .seg button small{display:block;margin:2px 0 0;font-size:.74em;font-weight:400;opacity:.8}
+.sub-h{font-size:.95rem;margin:14px 0 6px}
 </style>
 </head>
 <body>
@@ -499,6 +500,35 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
             <select id="i-vac2"></select></label>
           <label id="i-ml2-wrap" hidden>Dawka drugiej (ml)
             <input id="i-ml2" type="number" min="0.01" step="0.05" placeholder="z ChPLW" inputmode="decimal"></label>
+        </div>
+        <div id="auto-wrap" hidden>
+          <h3 class="sub-h">Szczepionka autogenna – dane z etykiety serii</h3>
+          <div class="row">
+            <label class="wide">Drobnoustroje (szczepy)
+              <input id="a-strain" list="a-strains" autocomplete="off" placeholder="np. E. coli O78, Pasteurella multocida">
+              <datalist id="a-strains">
+                <option value="Escherichia coli"><option value="Pasteurella multocida"><option value="Ornithobacterium rhinotracheale (ORT)">
+                <option value="Gallibacterium anatis"><option value="Enterococcus cecorum"><option value="Avibacterium paragallinarum">
+                <option value="Erysipelothrix rhusiopathiae (różyca)"><option value="Staphylococcus aureus"><option value="Riemerella anatipestifer">
+              </datalist></label>
+            <label class="wide">Adiuwant
+              <select id="a-adj">
+                <option value="">— wybierz z etykiety —</option>
+                <option value="oil">Emulsja olejowa (olej mineralny)</option>
+                <option value="al">Wodorotlenek glinu (żel)</option>
+                <option value="none">Bez adiuwantu (zawiesina wodna)</option>
+                <option value="other">Inny – wg etykiety</option>
+              </select>
+              <span class="hint" id="a-adj-hint"></span></label>
+            <label>Laboratorium
+              <input id="a-lab" autocomplete="off" placeholder="wytwórca serii"></label>
+            <label>Nr serii
+              <input id="a-lot" autocomplete="off" placeholder="z etykiety"></label>
+            <label>Ważna do
+              <input id="a-exp" type="date"></label>
+            <label>Nr gospodarstwa
+              <input id="a-farm" autocomplete="off" placeholder="źródło szczepu"></label>
+          </div>
         </div>
       </div>
     </div>
@@ -1050,9 +1080,13 @@ const VACCINES = [
      'Zużyj w 2 h od rozpuszczenia.']}}},
 
 /* ---------- Szablon ---------- */
-{id:'autogenna', n:'Szczepionka autogenna (stadna) – szablon', m:'laboratorium', t:'inaktywowana (autogenna)', dz:['inne'], s:'wg receptury', sp:['kury','indyki','kaczki','kaczki-p','gesi'], st:'u', src:[],
- min:{}, minT:'wg zlecenia lekarza', pk:[500,1000], use:'wg etykiety', wd:'wg etykiety', lay:'wg etykiety', mix:'wg etykiety', sch:'Pasterelloza, różyca, E. coli, ORT i inne – wg receptury lekarza weterynarii. U kaczek i gęsi m.in. riemerelloza (Riemerella anatipestifer), pasterelloza i E. coli – na te choroby drobiu wodnego w Rejestrze nie znaleziono szczepionek z pozwoleniem (stan 15.11.2026).',
- r:{inj:{ml:0.5, site:'s.c. wg receptury', note:'Uzupełnij objętość i opakowania wg etykiety laboratorium.'}}}
+{id:'autogenna', n:'Szczepionka autogenna (stadna) – szablon', m:'uprawnione laboratorium – na receptę lekarza weterynarii', t:'inaktywowana (autogenna)', dz:['E. coli','Pasteurella','ORT','inne'], s:'szczep(y) wyizolowane w tym stadzie – wg etykiety serii', sp:['kury','indyki','kaczki','kaczki-p','gesi'], st:'u', auto:true,
+ src:[{t:'Rozporządzenie (UE) 2019/6, art. 106 ust. 5 – szczepionki autogenne', u:'https://eur-lex.europa.eu/eli/reg/2019/6/oj'}, {t:'Prawo farmaceutyczne, art. 3 ust. 4 pkt 6 (tekst jedn. Dz.U. 2026 poz. 612)', u:'https://eli.gov.pl/eli/DU/2026/612/ogl/pol/pdf'}, {t:'Aviagen – stosowanie bakteryn (adiuwant, igły, miejsca, czas przed nieśnością)', u:'https://eseu.aviagen.com/assets/Tech_Center/LIR_Tech_Articles/IRBeSmart-BacterinUsage-2019-EN.pdf'}],
+ min:{}, minT:'wg recepty i etykiety serii; bakteryny zwykle dwie dawki przed nieśnością (Aviagen: pierwsza w 8.–10. tyg., ostatnia w 18.–19. tyg.)', pk:[], use:'wg etykiety serii', wd:'wg etykiety serii – podaje laboratorium; nie zakładaj 0 dni bez potwierdzenia',
+ lay:'wg etykiety serii; ostatnią iniekcję podać przed nieśnością (Aviagen: do 18.–19. tyg.) – iniekcja tuż przed nieśnością może obniżyć start i szczyt nieśności', mix:'Nie mieszać z innymi szczepionkami; łączenie i odstępy – decyzja lekarza weterynarii.',
+ sch:'Tylko szczepionka inaktywowana, dla ptaków z tej samej jednostki epidemiologicznej, z której wyizolowano szczep (albo z potwierdzonym powiązaniem epidemiologicznym) – rozp. (UE) 2019/6, art. 106 ust. 5; bez pozwolenia na dopuszczenie do obrotu – art. 3 ust. 4 pkt 6 Prawa farmaceutycznego. Stosowana, gdy szczepionka rejestrowana jest niedostępna lub nie chroni przed szczepem z fermy; wymaga recepty lekarza weterynarii. U kaczek i gęsi m.in. riemerelloza (Riemerella anatipestifer), pasterelloza i E. coli – na te choroby drobiu wodnego w Rejestrze nie znaleziono szczepionek z pozwoleniem (stan 15.11.2026).',
+ store:'Zwykle 2–8°C, nie zamrażać – wg etykiety serii.',
+ r:{inj:{site:'s.c. (szyja – dystalna 1/3, albo fałd pachwinowy) lub i.m. (pierś) – wg etykiety serii', note:'Dawka, opakowanie, adiuwant, termin ważności i karencja – z etykiety serii laboratorium.'}}}
 ];
 
 
@@ -1166,7 +1200,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.11.2';
+const APP_VERSION = '1.11.3';
 const DATA_DATE = '15.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -1320,6 +1354,16 @@ function fillVac2(v, bird, dol){
   if(!list.length) sel.innerHTML = '';
   if(sel.value !== sel.dataset.cur){ sel.dataset.cur = sel.value; const x = VACCINES.find(y => y.id === sel.value); const d = x ? injFor(x, bk, (dol || 1) - 1) : {}; if(isNum(d.ml)) $('i-ml2').value = d.ml; }
 }
+// Adiuwanty szczepionek autogennych (Aviagen: olej – silniejszy odczyn, wyższe przeciwciała; glin – łagodniej)
+const ADJ = {
+  oil:{l:'emulsja olejowa (olej mineralny)', h:'najsilniejsza i najdłuższa odporność, ale wyraźniejszy odczyn; raczej s.c.',
+    m:'Emulsja olejowa: wyższe miano przeciwciał, ale silniejszy odczyn w miejscu wkłucia niż przy glinie; i.m. często zostawia bliznę w mięśniu, dlatego przy bakterynach zaleca się raczej s.c. – szyja (dystalna 1/3) lub fałd pachwinowy (Aviagen). Wyjmij z lodówki 24 h wcześniej, doprowadź do temperatury pokojowej (część producentów zaleca łaźnię wodną do 37°C – wg etykiety); gęsta – igła 18 G.'},
+  al:{l:'wodorotlenek glinu (żel)', h:'łagodniejszy odczyn, zwykle niższe miano niż olej; wstrząsać – osad',
+    m:'Wodorotlenek glinu: łagodniejszy odczyn w miejscu wkłucia niż emulsja olejowa, zwykle niższe miano przeciwciał (Aviagen). Zawiesina opada – wstrząsaj przed i w trakcie szczepienia; nie zamrażaj (żel się niszczy). Podanie s.c. lub i.m. wg etykiety.'},
+  none:{l:'bez adiuwantu (zawiesina wodna)', h:'najsłabsza i najkrótsza odporność – schemat wg recepty',
+    m:'Bez adiuwantu: odporność zwykle słabsza i krótsza niż z adiuwantem – liczba dawek i odstęp wg recepty lekarza weterynarii. Wstrząsnąć przed użyciem.'},
+  other:{l:'inny – wg etykiety', h:'przygotowanie i miejsce wg etykiety serii', m:'Adiuwant inny niż olej i glin – przygotowanie, temperatura i miejsce podania wyłącznie wg etykiety serii.'}
+};
 // Miejsce wkłucia – tylko te, które wymienia ChPLW; igły wg Aviagen dla szczepionek inaktywowanych (olejowych)
 const SITES = {'im-p':'i.m. – mięsień piersiowy', 'im-u':'i.m. – udo', 'sc':'s.c. – szyja'};
 const NEEDLE = {'im-p':'18 G · 6 mm', 'im-u':'18 G · 6 mm', 'sc':'18–19 G · 10–12 mm'};
@@ -1517,6 +1561,8 @@ function applyDefaults(){
   $('w-milk').value = milk != null ? milk : 0;
   $('w-milk-hint').textContent = w && w.milk ? 'ChPLW: ' + w.milk : (v ? 'ChPLW (w bazie) nie podaje ilości mleka' : 'zwykle 2–4 g/l');
   if(r.oko && isNum(r.oko.ml)) $('o-ml').value = r.oko.ml;
+  $('auto-wrap').hidden = !(v && v.auto);   // autogenna: dane z etykiety serii
+  if(v && v.auto && !(v.r && v.r.inj && isNum(v.r.inj.ml))) $('i-ml').value = '';
   applyInjDefaults(true);
 }
 // Dawka, miejsce wkłucia i opakowania wg ChPLW dla tych ptaków i wieku (np. stada zarodowe gęsi 0,4 ml).
@@ -1539,7 +1585,7 @@ function onVacChange(){
   else fillDz();
   buildRoutes();
   $('packs').closest('label').hidden = noVac();
-  $('packs').value = noVac() ? '' : v && v.pk && v.pk.length ? v.pk.join(', ') : (S.route === 'inj' ? '500, 1000' : '1000, 2500, 5000, 10000');
+  $('packs').value = noVac() || (v && v.auto) ? '' : v && v.pk && v.pk.length ? v.pk.join(', ') : (S.route === 'inj' ? '500, 1000' : '1000, 2500, 5000, 10000');
   applyDefaults(); calc();
   applyFarmSettings(true);   // ustawienia stałe fermy – po zmianie szczepionki sprawdzone wobec jej ChPLW
 }
@@ -1547,7 +1593,7 @@ function setRoute(r){
   S.route = r;
   document.querySelectorAll('#route [data-route]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.route === r)));
   RT.forEach(k => { $('in-' + k).hidden = k !== r; });
-  const v = curVac(); if(!(v && v.pk && v.pk.length) && r === 'inj') $('packs').value = '500, 1000';
+  const v = curVac(); if(!(v && v.pk && v.pk.length) && !(v && v.auto) && r === 'inj') $('packs').value = '500, 1000';
   calc();
 }
 
@@ -1756,11 +1802,26 @@ function calc(){
       }
     }
     // Igły, miejsce, temperatura i sprawdzenie aparatu
-    const oil = v && /inaktyw/i.test(v.t || ''), temp = String(r.note || '').match(/\d+\s*[–-]\s*\d+\s*°C/);
+    // Autogenna: adiuwant z etykiety serii decyduje o temperaturze, odczynie i ostrzeżeniach; drobnoustroje – o endotoksynach
+    const auto = !!(v && v.auto), adj = auto ? $('a-adj').value : '', strain = auto ? $('a-strain').value.trim() : '';
+    const inact = v && /inaktyw/i.test(v.t || ''), oil = inact && (!auto || adj === 'oil'), temp = String(r.note || '').match(/\d+\s*[–-]\s*\d+\s*°C/);
+    if(!(ml > 0)) msgs.push(['warn', `Wpisz dawkę na ptaka (ml)${auto ? ' z etykiety serii' : ''}.`]);
+    if(auto){
+      $('a-adj-hint').textContent = ADJ[adj] ? ADJ[adj].h : 'od adiuwantu zależy temperatura, odczyn i ostrzeżenia';
+      if(!adj) msgs.push(['warn', 'Wybierz adiuwant z etykiety serii – od niego zależą przygotowanie, odczyn w miejscu wkłucia i ostrzeżenia.']);
+      else msgs.push(['info', ADJ[adj].m]);
+      if(adj === 'oil') msgs.push(['warn', 'Dla szczepiącego: szczepionka z olejem mineralnym – przypadkowe wstrzyknięcie sobie (zwłaszcza w palec lub staw) może dać silny ból i obrzęk, a rzadko utratę palca. Od razu do lekarza, nawet przy bardzo małej ilości, z etykietą serii (ostrzeżenie jak w ChPLW szczepionek olejowych, np. Nobilis Reo inac).']);
+      if(/coli|pasteur|ornith|ORT|gallibact|riemerell|salmonell|avibact|bordetell/i.test(strain)) msgs.push(['warn', 'Bakterie Gram-ujemne (np. E. coli, Pasteurella, ORT, Gallibacterium) zawierają endotoksyny: nie zamrażaj i nie przegrzewaj szczepionki – uwolnione endotoksyny mogą dać ciężkie odczyny i padnięcia (Aviagen).']);
+      if(!strain) msgs.push(['info', 'Wpisz drobnoustroje z etykiety serii – trafią do raportu i podpowiedzą ostrzeżenia.']);
+      const bk = $('bird').value;
+      if(bk === 'kury-niesnosc' || bk === 'indyki-repro') msgs.push(['warn', 'Ptaki w nieśności: iniekcja bakteryny może obniżyć nieśność – zwykle ostatnią dawkę podaje się przed nieśnością (Aviagen: do 18.–19. tyg.); decyzja lekarza weterynarii.']);
+      else if(bk === 'kury-odchow') msgs.push(['info', 'Odchów: bakteryny zwykle dwie dawki – pierwsza w 8.–10. tyg., ostatnia w 18.–19. tyg., aby ptaki zdążyły wrócić do formy przed nieśnością (Aviagen). Odstęp wg recepty.']);
+      if(!$('a-lot').value.trim()) msgs.push(['info', 'Wpisz nr serii, laboratorium i nr gospodarstwa – szczepionka autogenna jest tylko dla stada (jednostki epidemiologicznej), z którego pochodzi szczep.']);
+    }
     const site = SITES[$('i-site').value] ? $('i-site').value : 'im-p';
-    const avi = oil && (bird.g === 'kury' || bird.g === 'indyki');   // zalecenia Aviagen (igły, miejsce) dotyczą kur – nie drobiu wodnego
+    const avi = inact && (bird.g === 'kury' || bird.g === 'indyki');   // zalecenia Aviagen (igły, miejsce) dotyczą kur – nie drobiu wodnego
     if(avi) tiles.splice(tiles.findIndex(t => t.k === 'Dawka') + 1, 0, {k:'Igła', v:NEEDLE[site], s:`${SITES[site]} · Aviagen, szczepionka inaktywowana`});
-    if(oil && !avi) msgs.push(['info', `Miejsce wkłucia wg ChPLW: ${(r.site || 'sprawdź w ChPLW').replace(/\.$/, '')}. Igła i technika – wg instrukcji aparatu i lekarza weterynarii (zalecenia Aviagen dotyczą kur).`]);
+    if(inact && !avi) msgs.push(['info', `Miejsce wkłucia wg ChPLW: ${(r.site || 'sprawdź w ChPLW').replace(/\.$/, '')}. Igła i technika – wg instrukcji aparatu i lekarza weterynarii (zalecenia Aviagen dotyczą kur).`]);
     if(avi){
       msgs.push(['info', 'Igły (Aviagen, szczepionki inaktywowane): s.c. 18–19 G, 10–12 mm; i.m. 18 G, 6 mm. Nową igłę zakładaj co najmniej co 500 ptaków, tępą lub zadziorowaną – od razu.']);
       msgs.push(['info', 'Mokre pióra w miejscu wkłucia znaczą, że szczepionka nie trafiła – popraw technikę (Aviagen).']);
@@ -1768,11 +1829,12 @@ function calc(){
     }
     if(oil){
       msgs.push(['info', `Szczepionkę wyjmij z lodówki wcześniej, doprowadź do ${temp ? temp[0].replace(/\s+/g, '') + ' (ChPLW)' : 'temperatury z ChPLW'} i dobrze wstrząśnij; wstrząsaj też w trakcie. Zimna szczepionka – zwłaszcza emulsja olejowa – jest gęsta i aparat może nie podać pełnej dawki.`]);
-    } else if(v) msgs.push(['info', `Szczepionka żywa ${r.site ? '(' + r.site + ')' : ''}: ${r.prep ? 'przygotowanie krok po kroku – pod wynikiem' : 'przygotowanie i rozpuszczalnik wg ChPLW'}; zużyj w ${v.use}. Igła wg instrukcji aparatu.`]);
+    } else if(v && !inact) msgs.push(['info', `Szczepionka żywa ${r.site ? '(' + r.site + ')' : ''}: ${r.prep ? 'przygotowanie krok po kroku – pod wynikiem' : 'przygotowanie i rozpuszczalnik wg ChPLW'}; zużyj w ${v.use}. Igła wg instrukcji aparatu.`]);
     if(v && r.prep && r.prep.length) crewH = injSteps(r);
     msgs.push(['info', `Przed szczepieniem sprawdź dawkę aparatu: 10 dawek do cylindra miarowego = ${fmtT(ml * 10, 1)} ml${inj2 ? ` (druga strona: ${fmtT(inj2.dose_ml * 10, 1)} ml)` : ''}.`]);
 
-    Object.assign(R, {vaccine_ml:Vml, dose_ml:ml, injApp:two ? 2 : 1, inj2, injSite:SITES[site], needle:avi ? NEEDLE[site] : null});
+    Object.assign(R, {vaccine_ml:Vml, dose_ml:ml, injApp:two ? 2 : 1, inj2, injSite:SITES[site], needle:avi ? NEEDLE[site] : null,
+      auto:auto ? {strain, adj:ADJ[adj] ? ADJ[adj].l : '', lab:$('a-lab').value.trim(), lot:$('a-lot').value.trim(), exp:$('a-exp').value, farmId:$('a-farm').value.trim()} : null});
   }
 
   $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R) : '';
@@ -1821,7 +1883,7 @@ function reportText(){
     if(R.modId && S.mods[R.modId]) lines.push(`Ustawienia wg zaleceń z ${fmtDate(S.mods[R.modId].date)}: ${changesText(S.mods[R.modId].changes) || (S.mods[R.modId].actions || []).join(' ') || 'lista kontrolna'}`); }
   if(R.route === 'woda'){ lines.push(`Woda: ${fmt0(R.water_l)} l (${fmt(R.l1000,1)} l na 1000; ${R.waterBasis})`); if(R.stab) lines.push(`Stabilizator: ${R.stab.txt}${R.stab.rule ? ` (${R.stab.rule})` : ''}`); else if(R.milk_kg > 0) lines.push(`Mleko w proszku: ${fmt(R.milk_kg,2)} kg`); if(R.doser) lines.push(`Dozownik: ${fmtT(R.doser.pct)}% – roztwór do wiadra ${fmt(R.doser.stock_l,1)} l (wszystkie fiolki${R.stab || R.milk_kg > 0 ? ' i stabilizator' : ''})`); }
   if(R.route === 'oko') lines.push(`Rozpuszczalnik: ${fmt0(R.diluent_ml)} ml (${fmtT(R.ml1000,1)} ml na 1000 dawek)`);
-  if(R.route === 'inj'){ lines.push(`Iniekcja: ${fmtT(R.dose_ml,2)} ml na ptaka, razem ${fmt0(R.vaccine_ml)} ml${R.injApp === 2 ? ' – aparat podwójny' : ''}`); if(R.injSite) lines.push(`Miejsce: ${R.injSite}${R.needle ? `; igła ${R.needle}` : ''}`); if(R.inj2) lines.push(`Druga szczepionka (aparat podwójny): ${R.inj2.vacName} – ${fmtT(R.inj2.dose_ml,2)} ml na ptaka, razem ${fmt0(R.inj2.vaccine_ml)} ml${R.inj2.packs ? `, ${R.inj2.packs} dawek` : ''}`); }
+  if(R.route === 'inj'){ lines.push(`Iniekcja: ${fmtT(R.dose_ml,2)} ml na ptaka, razem ${fmt0(R.vaccine_ml)} ml${R.injApp === 2 ? ' – aparat podwójny' : ''}`); if(R.auto) lines.push(`Szczepionka autogenna: ${R.auto.strain || 'drobnoustroje – nie wpisano'}; adiuwant: ${R.auto.adj || 'nie wybrano'}${R.auto.lab ? `; laboratorium: ${R.auto.lab}` : ''}${R.auto.lot ? `; seria: ${R.auto.lot}` : ''}${R.auto.exp ? `; ważna do: ${R.auto.exp}` : ''}${R.auto.farmId ? `; gospodarstwo (jednostka epidemiologiczna): ${R.auto.farmId}` : ''}`); if(R.injSite) lines.push(`Miejsce: ${R.injSite}${R.needle ? `; igła ${R.needle}` : ''}`); if(R.inj2) lines.push(`Druga szczepionka (aparat podwójny): ${R.inj2.vacName} – ${fmtT(R.inj2.dose_ml,2)} ml na ptaka, razem ${fmt0(R.inj2.vaccine_ml)} ml${R.inj2.packs ? `, ${R.inj2.packs} dawek` : ''}`); }
   if(v) lines.push(`Karencja: ${v.wd}`);
   const w = L.msgs.filter(m => m[0] === 'bad' || m[0] === 'warn').map(m => m[1]);
   if(w.length) lines.push('Uwagi z obliczeń: ' + w.join(' '));
@@ -2774,6 +2836,7 @@ function bind(){
   $('sp-seg').addEventListener('click', ev => { const b = ev.target.closest('[data-sp]'); if(b) pickSpecies(b.dataset.sp); });
   $('grp').addEventListener('click', ev => { const b = ev.target.closest('[data-bird]'); if(b) setBird(b.dataset.bird); });
   $('i-site').addEventListener('change', () => { S.siteTouched = true; });
+  ['a-adj', 'a-strain', 'a-lab', 'a-lot', 'a-exp', 'a-farm'].forEach(id => $(id).addEventListener('input', () => scheduleCalc()));
   $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(!b || b.disabled) return; if(b.dataset.alt) pickRoute(b.dataset.route); else { S.rPref = b.dataset.route; setRoute(b.dataset.route); } });
   $('s-ml').addEventListener('input', () => { S.mlTouched = true; });
   $('s-src').addEventListener('change', flowSrcUI);

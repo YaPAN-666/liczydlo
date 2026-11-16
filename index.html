@@ -197,6 +197,15 @@ details.howto{margin-top:10px}
 details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 #lic p{margin:0}
 #fb{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 150px)}
+#gate-form,#gate-key{display:grid;gap:10px;width:100%;max-width:300px;text-align:left}
+#gate-key .btn{justify-content:center}
+#gate-kin,#k-in{text-transform:uppercase;letter-spacing:.04em}
+.opbar{display:grid;gap:8px;margin-bottom:14px}
+.opbar .msg{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.opbar .msg span{min-width:0;overflow-wrap:anywhere}
+.opbar .x{flex:none;font:inherit;font-size:1rem;line-height:1;background:transparent;border:0;color:var(--muted);cursor:pointer;padding:2px 4px}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.03em}
+#priv ul{margin:0;padding-left:20px;display:grid;gap:4px;font-size:.88rem}
 
 /* Pasek „Dostępna nowa wersja” */
 .updbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--brand);color:var(--brand-ink);display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.92rem}
@@ -275,8 +284,14 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
         <input id="gate-pass" type="password" autocomplete="current-password" enterkeyhint="go"></label>
       <button class="btn" type="submit" id="gate-ok">Odblokuj</button>
     </form>
+    <form id="gate-key" hidden>
+      <label>Numer licencji
+        <input id="gate-kin" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD-EFGH-JKLM-NPQR" enterkeyhint="go"></label>
+      <button class="btn" type="submit" id="gate-kok">Aktywuj licencję</button>
+    </form>
     <span class="note" id="gate-err" role="alert"></span>
     <div class="tools">
+      <button class="btn" type="button" id="gate-upd" hidden>Aktualizuj teraz</button>
       <button class="btn ghost" type="button" id="gate-retry">Sprawdź ponownie</button>
       <button class="btn ghost" type="button" id="gate-export">Zapisz kopię raportów</button>
     </div>
@@ -304,6 +319,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 </header>
 
 <main>
+<div class="opbar" id="opbar" hidden></div>
 <!-- ============ OBLICZENIA ============ -->
 <section class="view" id="v-obliczenia">
   <div class="cols">
@@ -616,6 +632,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
         <dt>Wersja</dt><dd id="i-ver"></dd>
         <dt>Dane szczepionek</dt><dd id="i-data"></dd>
         <dt>Raporty</dt><dd id="i-mode"></dd>
+        <dt>Identyfikator kopii</dt><dd><span class="code" id="i-code">–</span></dd>
       </dl>
       <div class="tools">
         <button class="btn" type="button" id="i-install" hidden>Zainstaluj na telefonie</button>
@@ -626,7 +643,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
     </div>
     <div class="card" id="fb">
       <h2>Sugestie i zgłoszenia</h2>
-      <p class="note">Błąd, pomysł, brakująca szczepionka albo pytanie – trafi do autora aplikacji e-mailem.</p>
+      <p class="note" id="fb-lead">Błąd, pomysł, brakująca szczepionka albo pytanie – trafi do autora aplikacji.</p>
       <div class="row">
         <label>Rodzaj
           <select id="fb-type">
@@ -642,7 +659,8 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
         <label class="check wide"><input type="checkbox" id="fb-ctx" checked> Dołącz bieżące obliczenie (drób, wiek, szczepionka, droga podania)</label>
       </div>
       <div class="tools">
-        <button class="btn" type="button" id="fb-send">Wyślij e-mailem</button>
+        <button class="btn" type="button" id="fb-send">Wyślij</button>
+        <button class="btn ghost" type="button" id="fb-mail" hidden>E-mailem</button>
         <button class="btn ghost" type="button" id="fb-copy">Kopiuj treść</button>
       </div>
       <span class="note" id="fb-addr-note"></span>
@@ -664,8 +682,30 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
       <dl class="kv">
         <dt>Operator</dt><dd>Studio Pracy Umysłowej – Paweł Czarnocki</dd>
         <dt>Status licencji</dt><dd id="i-lic">–</dd>
+        <dt>Klucz licencyjny</dt><dd id="i-key">brak</dd>
       </dl>
-      <p class="note">Przy uruchomieniu, gdy jest internet, aplikacja sprawdza u operatora, czy może działać. Operator może zablokować wszystkie kopie albo wprowadzić hasło. Raporty zapisane w telefonie można zawsze zapisać jako kopię – także na ekranie blokady.</p>
+      <form class="row" id="k-form">
+        <label class="wide">Numer licencji albo link
+          <input id="k-in" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD-EFGH-JKLM-NPQR"></label>
+      </form>
+      <div class="tools">
+        <button class="btn" type="submit" form="k-form" id="k-act">Aktywuj licencję</button>
+        <button class="btn ghost" type="button" id="k-free" hidden>Przenieś licencję (zwolnij to urządzenie)</button>
+      </div>
+      <span class="note" id="k-msg"></span>
+      <p class="note">Przy uruchomieniu, gdy jest internet, aplikacja sprawdza u operatora, czy może działać. Operator może zablokować wszystkie kopie albo jedną kopię, wprowadzić hasło albo wymagać aktualizacji. Licencja jest przypisana do urządzenia – przy zmianie telefonu stuknij „Przenieś licencję” na starym telefonie (albo poproś operatora) i aktywuj ją na nowym. Raporty zapisane w telefonie można zawsze zapisać jako kopię – także na ekranie blokady.</p>
+    </div>
+    <div class="card" id="priv">
+      <h2>Prywatność – co aplikacja wysyła</h2>
+      <ul>
+        <li><b>Kopia aplikacji</b> – gdy jest internet, przy uruchomieniu i co 30 minut: losowy identyfikator tej kopii, wersja aplikacji, rodzaj systemu i przeglądarki, skrót parametrów urządzenia (ekran, strefa czasowa, język), data pierwszego i ostatniego użycia oraz liczba uruchomień. Służy do liczenia kopii, blokad i przypisania licencji do urządzenia.</li>
+        <li><b>Zgłoszenia</b> – tylko to, co wpiszesz i wyślesz w „Sugestie i zgłoszenia”.</li>
+        <li><b>Statystyki</b> – tylko za Twoją zgodą: nazwa szczepionki, droga podania i rodzaj drobiu z obliczeń. Bez ferm, liczby ptaków, raportów i bez identyfikatora kopii.</li>
+        <li>Raporty, fermy i ustawienia <b>nie opuszczają telefonu</b>.</li>
+      </ul>
+      <label class="check" id="op-stats-wrap" hidden><input type="checkbox" id="op-stats"> Zgadzam się na anonimowe statystyki (pomagają ustalić, które szczepionki rozwijać w bazie)</label>
+      <span class="note" id="op-state"></span>
+      <p class="note">Administrator danych: Studio Pracy Umysłowej – Paweł Czarnocki. Identyfikator kopii staje się daną osobową dopiero po przypisaniu go do osoby (np. przy licencji). Podstawa: prawnie uzasadniony interes operatora – zabezpieczenie i rozwój aplikacji (art. 6 ust. 1 lit. f RODO); statystyki – Twoja zgoda (art. 6 ust. 1 lit. a RODO), którą możesz w każdej chwili wycofać. Masz prawo dostępu do danych, ich sprostowania, usunięcia i sprzeciwu – napisz przez „Sugestie i zgłoszenia”, podając identyfikator kopii.</p>
     </div>
   </div>
   <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span><br><span class="ks">kill-switch enabled app</span></p>
@@ -1229,7 +1269,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.13.1';
+const APP_VERSION = '1.14.0';
 const DATA_DATE = '15.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -1643,6 +1683,7 @@ function setRoute(r){
 
 /* ---------- Obliczenia: wynik ---------- */
 function calc(){
+  opStatSoon();
   renderBirdPick();   // przyciski „Drób” zawsze zgodne z wyborem (także po „Licz z tą szczepionką”)
   const v = curVac(); const bird = BIRDS[$('bird').value]; const route = S.route;
   const age = Math.max(0, Math.round(num('age',0))); const dol = age + 1;
@@ -1945,7 +1986,10 @@ async function fbLoad(){
   fbPaint();
 }
 function fbPaint(){
-  $('fb-addr-note').textContent = FB_TO ? `Adres: ${FB_TO}. Jeśli poczta się nie otworzy, skopiuj treść i wyślij ją na ten adres.` : 'Adres do zgłoszeń nie jest jeszcze ustawiony – skopiuj treść i przekaż ją autorowi aplikacji.';
+  const op = opOn();
+  $('fb-mail').hidden = !op || !FB_TO;
+  $('fb-addr-note').textContent = op ? `Zgłoszenie trafia prosto do autora aplikacji (wymaga internetu).${FB_TO ? ` Bez internetu: „E-mailem” albo skopiuj treść i wyślij na ${FB_TO}.` : ''}`
+    : FB_TO ? `Adres: ${FB_TO}. Jeśli poczta się nie otworzy, skopiuj treść i wyślij ją na ten adres.` : 'Adres do zgłoszeń nie jest jeszcze ustawiony – skopiuj treść i przekaż ją autorowi aplikacji.';
 }
 function fbMode(){ try { return IN_ARTIFACT ? 'podgląd w Claude' : matchMedia('(display-mode: standalone)').matches ? 'zainstalowana aplikacja' : 'przeglądarka'; } catch(e){ return 'przeglądarka'; } }
 function fbMail(){
@@ -1959,7 +2003,24 @@ function fbMail(){
   }
   return {subject:`[Liczydło] ${typ} – wersja ${APP_VERSION}`, body:L.join('\n')};
 }
-function fbSend(){
+function fbCtxLine(){
+  const v = curVac(), bk = birdKey(), age = $('age').value, n = $('birds').value;
+  return [bk ? BIRDS[bk].l : 'drób nie wybrany', age !== '' ? `wiek ${age} dni` : 'wiek nie wpisany', n ? `${n} ptaków` : null,
+    v ? v.n : 'szczepionka nie wybrana', S.route ? ROUTES[S.route] || S.route : null].filter(Boolean).join(' · ');
+}
+async function fbSend(){
+  if(!$('fb-msg').value.trim()){ toast('Wpisz opis zgłoszenia.'); $('fb-msg').focus(); return; }
+  if(!opOn()){ fbMailSend(); return; }
+  const btn = $('fb-send'); btn.disabled = true; btn.textContent = 'Wysyłam…';
+  try {
+    await opFeedback({type:$('fb-type').value, msg:$('fb-msg').value.trim().slice(0, 4000), name:$('fb-name').value.trim().slice(0, 120), ctx:$('fb-ctx').checked ? fbCtxLine().slice(0, 600) : ''});
+    $('fb-msg').value = ''; toast('Wysłano do autora aplikacji – dziękujemy!', 5000);
+  } catch(e){
+    toast(FB_TO ? 'Nie udało się wysłać (brak internetu?) – otwieram e-mail jako zapas.' : 'Nie udało się wysłać – sprawdź internet albo skopiuj treść.', 6000);
+    if(FB_TO) setTimeout(fbMailSend, 600);
+  } finally { btn.disabled = false; btn.textContent = 'Wyślij'; }
+}
+function fbMailSend(){
   if(!$('fb-msg').value.trim()){ toast('Wpisz opis zgłoszenia.'); $('fb-msg').focus(); return; }
   if(!FB_TO){ toast('Adres do zgłoszeń nie jest ustawiony – użyj „Kopiuj treść”.', 5000); return; }
   const m = fbMail(), a = document.createElement('a');
@@ -2810,11 +2871,17 @@ function gateNorm(j){
   return {blokada:o.blokada === true, haslo:typeof o.haslo === 'string' ? o.haslo.trim() : '', komunikat:typeof o.komunikat === 'string' ? o.komunikat.trim().slice(0, 500) : '',
     dni:Math.max(0, Math.min(365, parseInt(o.maksDniBezInternetu != null ? o.maksDniBezInternetu : o.dni, 10) || 0))};   // dni – zapis w telefonie
 }
+function gatePass(){ return (G.ctl && G.ctl.haslo) || opGate().pass || ''; }
 function gateState(){
-  const c = G.ctl; if(!c) return 'open';
+  const c = G.ctl || {}, o = opGate(); G.why = ''; G.days = 0;
   if(c.blokada) return 'lock';
-  if(c.dni > 0 && G.at && Date.now() - Date.parse(G.at) > c.dni * 864e5) return 'stale';
-  if(c.haslo){ const a = lsGet(PASS_KEY); if(!a || a.h !== c.haslo) return 'pass'; }
+  if(o.lock){ G.why = o.lock; return 'oplock'; }
+  if(o.old){ G.why = o.old; return 'old'; }
+  if(o.key){ G.why = o.key; return 'key'; }
+  const lim = [c.dni, o.days].filter(x => x > 0), at = Math.max(Date.parse(G.at || '') || 0, Date.parse(OP.at || '') || 0);
+  G.days = lim.length ? Math.min(...lim) : 0;
+  if(G.days > 0 && at && Date.now() - at > G.days * 864e5) return 'stale';
+  const h = gatePass(); if(h){ const a = lsGet(PASS_KEY); if(!a || a.h !== h) return 'pass'; }
   return 'open';
 }
 function gateRender(){
@@ -2823,11 +2890,14 @@ function gateRender(){
   ['main', 'header.appbar'].forEach(s => { const el = document.querySelector(s); if(el) el.inert = st !== 'open'; });
   if(st === 'open'){ if(was) $('gate-err').textContent = ''; return; }
   const c = G.ctl || {};
-  $('gate-h').textContent = st === 'lock' ? 'Aplikacja zablokowana' : st === 'pass' ? 'Podaj hasło' : 'Potwierdź licencję';
+  $('gate-h').textContent = st === 'lock' || st === 'oplock' ? 'Aplikacja zablokowana' : st === 'pass' ? 'Podaj hasło' : st === 'old' ? 'Wymagana aktualizacja' : st === 'key' ? 'Wymagana licencja' : 'Potwierdź licencję';
   $('gate-msg').textContent = st === 'lock' ? (c.komunikat || 'Operator zawiesił udostępnianie aplikacji.')
+    : st === 'oplock' || st === 'old' || st === 'key' ? G.why
     : st === 'pass' ? (c.komunikat || 'Dostęp do aplikacji wymaga hasła od operatora.')
-    : `Aplikacja nie łączyła się z internetem od ponad ${c.dni} ${pl(c.dni, 'dnia', 'dni', 'dni')}. Połącz telefon z internetem i stuknij „Sprawdź ponownie”.`;
+    : `Aplikacja nie łączyła się z internetem od ponad ${G.days} ${pl(G.days, 'dnia', 'dni', 'dni')}. Połącz telefon z internetem i stuknij „Sprawdź ponownie”.`;
   $('gate-form').hidden = st !== 'pass';
+  $('gate-key').hidden = st !== 'key';
+  $('gate-upd').hidden = st !== 'old';
 }
 // Wynik: true – odczytano stan od operatora; false – brak internetu lub błąd (zostaje ostatni znany stan)
 function gateCheck(){
@@ -2839,6 +2909,7 @@ function gateCheck(){
       const r = await fetch(GATE_URL + '?t=' + Date.now(), {cache:'no-store'});
       if(r.ok || r.status === 404){ G.ctl = gateNorm(r.ok ? await r.json() : {}); G.at = new Date().toISOString(); lsSet(GATE_KEY, {ctl:G.ctl, at:G.at}); ok = true; }
     } catch(e){}
+    try { if(await opSync()) ok = true; } catch(e){}
     G.net = ok; G.busy = null; gateRender(); licInfo();
     return ok;
   })();
@@ -2857,41 +2928,365 @@ async function passOk(pass, rec){
 }
 async function gateUnlock(ev){
   ev.preventDefault();
-  const inp = $('gate-pass'), err = $('gate-err'), btn = $('gate-ok'), c = G.ctl;
-  if(!c || !c.haslo){ gateRender(); return; }
+  const inp = $('gate-pass'), err = $('gate-err'), btn = $('gate-ok'), hash = gatePass();
+  if(!hash){ gateRender(); return; }
   if(!inp.value){ err.textContent = 'Wpisz hasło.'; return; }
   if(!(window.crypto && crypto.subtle)){ err.textContent = 'Hasło działa w aplikacji otwartej z jej adresu (https).'; return; }
   btn.disabled = true; err.textContent = 'Sprawdzam hasło…';
-  let ok = false; try { ok = await passOk(inp.value, c.haslo); } catch(e){}
+  let ok = false; try { ok = await passOk(inp.value, hash); } catch(e){}
   if(!ok) await new Promise(r => setTimeout(r, 700));   // spowalnia zgadywanie
   btn.disabled = false;
-  if(ok){ lsSet(PASS_KEY, {h:c.haslo, at:new Date().toISOString()}); inp.value = ''; err.textContent = ''; gateRender(); toast('Odblokowano.'); }
+  if(ok){ lsSet(PASS_KEY, {h:hash, at:new Date().toISOString()}); inp.value = ''; err.textContent = ''; gateRender(); toast('Odblokowano.'); }
   else { err.textContent = 'Nieprawidłowe hasło.'; inp.select(); }
 }
 async function gateRetry(){
   const err = $('gate-err'); err.textContent = 'Sprawdzam…';
+  OP.last = 0;   // sprawdź u operatora od razu
   const ok = await gateCheck();
   if(G.state === 'open') return;
-  err.textContent = !ok ? 'Brak połączenia z serwerem aplikacji – sprawdź internet.' : G.state === 'lock' ? 'Blokada nadal obowiązuje.' : G.state === 'pass' ? '' : 'Nie udało się potwierdzić licencji.';
+  err.textContent = !ok ? 'Brak połączenia z serwerem aplikacji – sprawdź internet.' : G.state === 'lock' || G.state === 'oplock' ? 'Blokada nadal obowiązuje.' : G.state === 'pass' || G.state === 'key' ? '' : G.state === 'old' ? 'Ta wersja nadal jest za stara – stuknij „Aktualizuj teraz”.' : 'Nie udało się potwierdzić licencji.';
 }
 function licInfo(){
   const el = $('i-lic'); if(!el) return;
   if(IN_ARTIFACT){ el.textContent = 'podgląd w Claude – bez sprawdzania'; return; }
   const c = G.ctl, when = G.at ? new Date(G.at).toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) : null;
-  const st = G.state === 'lock' ? 'zablokowana' : G.state === 'pass' ? 'wymaga hasła' : G.state === 'stale' ? 'wymaga potwierdzenia przez internet' : c && c.haslo ? 'aktywna, z hasłem' : 'aktywna';
-  el.textContent = when ? `${st} · sprawdzono ${when}` : 'jeszcze nie sprawdzono – połącz z internetem';
+  const st = G.state === 'lock' || G.state === 'oplock' ? 'zablokowana' : G.state === 'pass' ? 'wymaga hasła' : G.state === 'old' ? 'wymaga aktualizacji' : G.state === 'key' ? 'wymaga klucza' : G.state === 'stale' ? 'wymaga potwierdzenia przez internet' : gatePass() ? 'aktywna, z hasłem' : 'aktywna';
+  const opAt = OP.at ? Date.parse(OP.at) : 0, gAt = G.at ? Date.parse(G.at) : 0, last = Math.max(opAt, gAt);
+  const whenAll = last ? new Date(last).toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) : when;
+  el.textContent = whenAll ? `${st} · sprawdzono ${whenAll}` : 'jeszcze nie sprawdzono – połącz z internetem';
 }
 function gateInit(){
   const s = lsGet(GATE_KEY); if(s && s.ctl){ G.ctl = gateNorm(s.ctl); G.at = s.at || null; }
   gateRender();
   $('gate-form').addEventListener('submit', gateUnlock);
   $('gate-retry').addEventListener('click', gateRetry);
+  $('gate-upd').addEventListener('click', opUpdateNow);
+  $('gate-key').addEventListener('submit', ev => { ev.preventDefault(); licActivate($('gate-kin').value, $('gate-err')); });
   $('gate-export').addEventListener('click', exportBackup);
   if(IN_ARTIFACT) return;
   gateCheck();
   document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') gateCheck(); });
   window.addEventListener('online', () => gateCheck());
   setInterval(() => gateCheck(), 30 * 60 * 1000);
+}
+
+/* ---------- Panel operatora (projekt Firebase „Operator”) ----------
+   Plik operator.json obok aplikacji: {"projectId": "...", "apiKey": "...", "app": "liczydlo"} – bez niego nic nie jest wysyłane.
+   Aplikacja łączy się bez logowania przez REST Firestore; reguły bazy pozwalają jej tylko na:
+   meldowanie swojej kopii (kod, wersja, system, daty użycia), odczyt ustawień aplikacji i swojego wpisu (blokada),
+   wysłanie zgłoszenia i anonimowych statystyk (za zgodą) oraz dopisanie/zwolnienie swojego urządzenia w licencji.
+   Licencje to klucze podpisane ECDSA P-256 – podpis sprawdzany tu, także bez internetu. */
+const OP_KEY = 'liczydlo.operator.v1', OP_ID_KEY = 'liczydlo.kopia.v1', OP_LIC_KEY = 'liczydlo.klucz.v1', OP_STAT_KEY = 'liczydlo.statystyki.v1', OP_BAR_KEY = 'liczydlo.komunikat.v1';
+const OP_ALPH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const OP = {cfg:null, app:null, inst:null, at:null, id:null, lic:null, last:0, busy:null, counted:false, seen:new Set(), statT:null};
+function opRnd(n){ const b = crypto.getRandomValues(new Uint8Array(n)); return Array.from(b, v => OP_ALPH[v % 32]).join(''); }
+function opToday(d = new Date()){ return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function verCmp(a, b){ const x = String(a || '0').split('.').map(Number), y = String(b || '0').split('.').map(Number); for(let i = 0; i < Math.max(x.length, y.length); i++){ const d = (x[i] || 0) - (y[i] || 0); if(d) return d < 0 ? -1 : 1; } return 0; }
+function opOn(){ return !IN_ARTIFACT && !!(OP.cfg && OP.cfg.projectId && OP.cfg.apiKey); }
+function opLoad(){
+  if(OP.id) return;
+  const s = lsGet(OP_KEY) || {}; OP.cfg = s.cfg || null; OP.app = s.app || null; OP.inst = s.inst || null; OP.at = s.at || null;
+  let id = lsGet(OP_ID_KEY);
+  if(!id || !id.id){ id = {id:opRnd(24), code:`LICZ-${opRnd(4)}-${opRnd(4)}`, first:new Date().toISOString(), day:''}; lsSet(OP_ID_KEY, id); }
+  OP.id = id; OP.lic = lsGet(OP_LIC_KEY);
+}
+function opSave(){ lsSet(OP_KEY, {cfg:OP.cfg, app:OP.app, inst:OP.inst, at:OP.at}); }
+function opOs(){ const u = navigator.userAgent; return /Android/i.test(u) ? 'Android' : /iPhone|iPad|iPod/i.test(u) || (/Macintosh/.test(u) && navigator.maxTouchPoints > 1) ? 'iOS' : /Windows/i.test(u) ? 'Windows' : /Mac OS/i.test(u) ? 'macOS' : /Linux/i.test(u) ? 'Linux' : 'inny'; }
+async function opFp(){
+  try {
+    const d = window.devicePixelRatio || 1, wh = [Math.round(screen.width * d), Math.round(screen.height * d)].sort((a, b) => a - b).join('x');
+    const s = [opOs(), wh, Intl.DateTimeFormat().resolvedOptions().timeZone || '', navigator.language || '', navigator.hardwareConcurrency || '', navigator.deviceMemory || ''].join('|');
+    const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)));
+    return Array.from(h.slice(0, 6), b => b.toString(16).padStart(2, '0')).join('');
+  } catch(e){ return ''; }
+}
+// --- Firestore REST ---
+function fsV(v){
+  if(v === null || v === undefined) return {nullValue:null};
+  if(typeof v === 'boolean') return {booleanValue:v};
+  if(typeof v === 'number') return Number.isInteger(v) ? {integerValue:String(v)} : {doubleValue:v};
+  if(typeof v === 'string') return {stringValue:v};
+  if(Array.isArray(v)) return {arrayValue:{values:v.map(fsV)}};
+  return {mapValue:{fields:fsF(v)}};
+}
+function fsF(o){ const f = {}; for(const k in o) f[k] = fsV(o[k]); return f; }
+function fsP(v){
+  if(!v || typeof v !== 'object') return null;
+  if('stringValue' in v) return v.stringValue; if('booleanValue' in v) return v.booleanValue;
+  if('integerValue' in v) return Number(v.integerValue); if('doubleValue' in v) return v.doubleValue;
+  if('timestampValue' in v) return v.timestampValue; if('nullValue' in v) return null;
+  if('arrayValue' in v) return (v.arrayValue.values || []).map(fsP);
+  if('mapValue' in v){ const o = {}, f = v.mapValue.fields || {}; for(const k in f) o[k] = fsP(f[k]); return o; }
+  return null;
+}
+const fsRoot = () => `projects/${OP.cfg.projectId}/databases/(default)/documents`;
+const fsUrl = p => `https://firestore.googleapis.com/v1/${fsRoot()}${p ? '/' + p : ''}`;
+const fsAppPath = (sub = '') => `apps/${OP.cfg.app || 'liczydlo'}${sub ? '/' + sub : ''}`;
+async function fsGet(path){
+  const r = await fetch(`${fsUrl(path)}?key=${encodeURIComponent(OP.cfg.apiKey)}`, {cache:'no-store'});
+  if(r.status === 404) return null;
+  if(!r.ok) throw Object.assign(new Error('HTTP ' + r.status), {status:r.status});
+  const j = await r.json(); return fsP({mapValue:{fields:j.fields || {}}});
+}
+async function fsCommit(writes){
+  const r = await fetch(`https://firestore.googleapis.com/v1/${fsRoot()}:commit?key=${encodeURIComponent(OP.cfg.apiKey)}`,
+    {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({writes})});
+  if(!r.ok){ let m = ''; try { m = (await r.json()).error.status; } catch(e){} throw Object.assign(new Error(m || 'HTTP ' + r.status), {status:r.status, code:m}); }
+  return true;
+}
+const fsName = p => `${fsRoot()}/${p}`;
+const NOW = f => ({fieldPath:f, setToServerValue:'REQUEST_TIME'});
+// --- meldowanie kopii, ustawienia aplikacji, blokada ---
+async function opCfgLoad(){
+  try {
+    const r = await fetch('./operator.json', {cache:'no-store'});
+    if(r.status === 404){ OP.cfg = null; opSave(); return; }
+    if(!r.ok) return;
+    const j = await r.json(), c = {projectId:String(j.projectId || '').trim(), apiKey:String(j.apiKey || '').trim(), app:String(j.app || 'liczydlo').trim()};
+    OP.cfg = c.projectId && c.apiKey ? c : null; opSave();
+  } catch(e){}
+}
+async function opReport(){
+  const id = OP.id, today = opToday(), newDay = id.day !== today, L = OP.lic;
+  const base = {ver:APP_VERSION, os:opOs(), ua:navigator.userAgent.slice(0, 300), mode:fbMode().slice(0, 30), fp:await opFp(), lic:L && L.kid ? L.kid : '', stats:!!lsGet(OP_STAT_KEY + '.zgoda'), lastDay:today};
+  const name = fsName(fsAppPath('installs/' + id.id)), inc = [];
+  if(!OP.counted) inc.push({fieldPath:'uses', increment:{integerValue:'1'}});
+  if(newDay) inc.push({fieldPath:'days', increment:{integerValue:'1'}});
+  try {
+    await fsCommit([{update:{name, fields:fsF(base)}, updateMask:{fieldPaths:Object.keys(base)}, updateTransforms:[NOW('last'), ...inc], currentDocument:{exists:true}}]);
+  } catch(e){
+    if(e.status !== 404 && e.code !== 'NOT_FOUND') throw e;
+    await fsCommit([{update:{name, fields:fsF({...base, code:id.code, fp0:base.fp, uses:1, days:1})}, updateTransforms:[NOW('first'), NOW('last')], currentDocument:{exists:false}}]);
+  }
+  OP.counted = true; if(newDay){ id.day = today; lsSet(OP_ID_KEY, id); }
+}
+// Wynik: true – połączono z panelem; false – brak konfiguracji, internetu albo błąd (zostaje ostatni znany stan).
+async function opSync(force){
+  opLoad();
+  if(IN_ARTIFACT) return false;
+  if(OP.busy) return OP.busy;
+  if(!force && OP.last && Date.now() - OP.last < 4 * 60 * 1000) return true;
+  OP.busy = (async () => {
+    let ok = false;
+    try {
+      await opCfgLoad();
+      if(!opOn()) return false;
+      const app = await fsGet(fsAppPath());
+      if(app){
+        OP.app = app; OP.at = new Date().toISOString(); OP.last = Date.now(); ok = true;
+        try { await opReport(); } catch(e){ console.warn('operator: meldunek', e); }
+        try { const i = await fsGet(fsAppPath('installs/' + OP.id.id)); OP.inst = i ? {blocked:i.blocked === true, blockMsg:String(i.blockMsg || '').slice(0, 500)} : null; } catch(e){}
+        try { await licCheck(); } catch(e){ console.warn('operator: licencja', e); }
+        try { await opStatFlush(); } catch(e){}
+        opSave();
+      }
+    } catch(e){ console.warn('operator', e); }
+    return ok;
+  })();
+  try { return await OP.busy; } finally { OP.busy = null; gateRender(); opPaint(); fbPaint(); }
+}
+function opGate(){
+  const a = OP.app, i = OP.inst, o = {};
+  if(!a || !opOn()) return o;
+  if(a.block && a.block.on) o.lock = a.block.msg || 'Operator zawiesił udostępnianie aplikacji.';
+  else if(i && i.blocked) o.lock = i.blockMsg || `Operator zablokował tę kopię aplikacji (${OP.id ? OP.id.code : ''}).`;
+  if(a.minVer && verCmp(APP_VERSION, a.minVer) < 0) o.old = (a.minMsg ? a.minMsg + ' ' : '') + `Masz wersję ${APP_VERSION}, wymagana jest co najmniej ${a.minVer}. Stuknij „Aktualizuj teraz” (potrzebny internet). Zapisane raporty zostają.`;
+  const mode = (a.lic || {}).mode || 'free';
+  if(mode !== 'free' && !licValid()){
+    const left = opTrialLeft();
+    if(mode === 'paid' || left <= 0) o.key = mode === 'paid' ? 'Aplikacja wymaga licencji. Wpisz numer licencji od operatora albo otwórz link aktywacyjny.' : 'Okres próbny się skończył. Wpisz numer licencji od operatora albo otwórz link aktywacyjny.';
+  }
+  o.days = parseInt(a.offlineDays, 10) || 0; o.pass = typeof a.pass === 'string' ? a.pass : '';
+  return o;
+}
+function opTrialLeft(){ const a = OP.app || {}, d = parseInt((a.lic || {}).trialDays, 10) || 30; return d - Math.floor((Date.now() - Date.parse(OP.id.first)) / 864e5); }
+async function opUpdateNow(){
+  const err = $('gate-err'); err.textContent = 'Pobieram nową wersję…';
+  try {
+    if(S.reg){ await S.reg.update(); const w = S.reg.waiting || S.reg.installing; if(w){ if(S.reg.waiting) S.reg.waiting.postMessage({type:'SKIP_WAITING'}); else w.addEventListener('statechange', () => { if(w.state === 'installed') w.postMessage({type:'SKIP_WAITING'}); }); setTimeout(() => location.reload(), 6000); return; } }
+    const j = await fetchVersion();
+    if(j.wersja && verCmp(j.wersja, APP_VERSION) > 0){ location.reload(); return; }
+    err.textContent = 'Na serwerze nie ma jeszcze nowszej wersji – spróbuj za kilka minut.';
+  } catch(e){ err.textContent = 'Brak internetu – połącz telefon i spróbuj ponownie.'; }
+}
+// --- komunikaty: od operatora, koniec licencji, okres próbny ---
+function opPaint(){
+  opLoad();
+  const box = $('opbar'); if(!box) return;
+  const a = OP.app || {}, items = [], today = opToday();
+  if(!IN_ARTIFACT && a.banner && a.banner.on && a.banner.text && (!a.banner.from || a.banner.from <= today) && (!a.banner.to || a.banner.to >= today) && lsGet(OP_BAR_KEY) !== a.banner.id)
+    items.push({cls:a.banner.level === 'warn' ? 'warn' : 'info', text:a.banner.text, key:a.banner.id});
+  const L = OP.lic, remind = (a.lic || {}).remindDays ?? 14;
+  if(L && licValid() && L.p && L.p.e){
+    const left = Math.ceil((Date.parse(L.p.e + 'T23:59:59') - Date.now()) / 864e5);
+    if(left <= remind && lsGet(OP_BAR_KEY) !== 'lic-' + today) items.push({cls:'warn', text:`Licencja wygasa ${new Date(L.p.e).toLocaleDateString('pl-PL')} (za ${left} ${pl(left, 'dzień', 'dni', 'dni')}). Skontaktuj się z operatorem, aby ją przedłużyć.`, key:'lic-' + today});
+  }
+  if((a.lic || {}).mode === 'trial' && !licValid()){
+    const left = opTrialLeft();
+    if(left > 0 && lsGet(OP_BAR_KEY) !== 'trial-' + today) items.push({cls:left <= 7 ? 'warn' : 'info', text:`Okres próbny: ${left === 1 ? 'został 1 dzień' : `zostało ${left} dni`}. Numer licencji wpiszesz w „O aplikacji / Sugestie”.`, key:'trial-' + today});
+  }
+  box.innerHTML = items.map(i => `<div class="msg ${i.cls}" role="status"><span>${esc(i.text)}</span><button class="x" type="button" data-bar="${esc(i.key)}" aria-label="Zamknij komunikat">✕</button></div>`).join('');
+  box.hidden = !items.length;
+  opPaintInfo();
+}
+function opPaintInfo(){
+  if(!$('i-code')) return;
+  opLoad();
+  const L = OP.lic, a = OP.app || {};
+  $('i-code').textContent = IN_ARTIFACT ? 'podgląd w Claude' : OP.id.code;
+  let k = 'brak';
+  if(L && L.kid){
+    const st = !L.ok ? 'czeka na sprawdzenie podpisu (połącz z internetem)' : L.revoked ? 'unieważniona przez operatora' : L.bound === false ? 'zwolniona z tego urządzenia' : licExpired(L) ? 'wygasła' : L.bound === null ? 'aktywna – przypisanie do urządzenia po połączeniu z internetem' : 'aktywna, przypisana do tego urządzenia';
+    k = `${L.kid.replace(/(.{4})(?=.)/g, '$1-')} · ${st}${L.p && L.p.n ? ' · ' + L.p.n : ''}${L.p && L.p.e ? ' · do ' + new Date(L.p.e).toLocaleDateString('pl-PL') : L.p ? ' · bezterminowo' : ''}`;
+  } else if((a.lic || {}).mode === 'trial'){ const left = opTrialLeft(); k = left > 0 ? `brak – okres próbny, zostało ${left} ${pl(left, 'dzień', 'dni', 'dni')}` : 'brak – okres próbny minął'; }
+  else if(opOn() && OP.app) k = 'brak – aplikacja jest obecnie darmowa, klucz nie jest wymagany';
+  $('i-key').textContent = k;
+  $('k-free').hidden = !(L && L.kid && L.bound !== false);
+  $('op-stats-wrap').hidden = !(opOn() && a.stats);
+  $('op-stats').checked = !!lsGet(OP_STAT_KEY + '.zgoda');
+  $('op-state').textContent = IN_ARTIFACT ? 'Podgląd w Claude niczego nie wysyła.' : !opOn() ? 'Połączenie z panelem operatora jest nieaktywne – aplikacja niczego nie wysyła.'
+    : OP.at ? `Ostatnie połączenie z panelem: ${new Date(OP.at).toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'})}.` : 'Jeszcze nie połączono z panelem.';
+}
+// --- zgłoszenia ---
+async function opFeedback(f){
+  opLoad(); if(!opOn()) throw new Error('off');
+  const d = {...f, ver:APP_VERSION, code:OP.id.code, iid:OP.id.id, mode:fbMode().slice(0, 40), ua:navigator.userAgent.slice(0, 300), status:'nowe'};
+  Object.keys(d).forEach(k => { if(d[k] === '') delete d[k]; });
+  try { await fsCommit([{update:{name:fsName(fsAppPath('feedback/' + opRnd(20))), fields:fsF(d)}, updateTransforms:[NOW('created')], currentDocument:{exists:false}}]); }
+  catch(e){
+    if(e.status !== 403) throw e;   // kopia jeszcze się nie zameldowała – bez identyfikatora też można
+    delete d.iid; await fsCommit([{update:{name:fsName(fsAppPath('feedback/' + opRnd(20))), fields:fsF(d)}, updateTransforms:[NOW('created')], currentDocument:{exists:false}}]);
+  }
+}
+// --- anonimowe statystyki (za zgodą) ---
+function opStatSoon(){ if(IN_ARTIFACT) return; clearTimeout(OP.statT); OP.statT = setTimeout(opStatNote, 6000); }
+function opStatNote(){
+  const a = OP.app; if(!opOn() || !a || !a.stats || !lsGet(OP_STAT_KEY + '.zgoda')) return;
+  const v = curVac(), bk = birdKey(), route = S.route;
+  if(!v || !bk || !route || !ageKnown() || !(num('birds', 0) > 0)) return;
+  const key = v.id + '|' + route + '|' + bk; if(OP.seen.has(key)) return; OP.seen.add(key);
+  const s = lsGet(OP_STAT_KEY) || {day:opToday(), n:0, vac:{}, route:{}, bird:{}};
+  if(s.n >= 900) return;
+  const add = (m, k) => { if(Object.keys(m).length < 60 || m[k]) m[k] = (m[k] || 0) + 1; };
+  s.n++; add(s.vac, v.n.slice(0, 120)); add(s.route, route); add(s.bird, (BIRDS[bk].l || bk).slice(0, 60));
+  lsSet(OP_STAT_KEY, s);
+}
+async function opStatFlush(){
+  const s = lsGet(OP_STAT_KEY), a = OP.app;
+  if(!s || !s.n || !a || !a.stats || !lsGet(OP_STAT_KEY + '.zgoda')) return;
+  await fsCommit([{update:{name:fsName(fsAppPath('stats/' + opRnd(20))), fields:fsF({day:s.day, ver:APP_VERSION, n:s.n, vac:s.vac, route:s.route, bird:s.bird})}, updateTransforms:[NOW('created')], currentDocument:{exists:false}}]);
+  try { localStorage.removeItem(OP_STAT_KEY); } catch(e){}
+}
+// --- licencje ---
+function b64ud(s){ s = s.replace(/-/g, '+').replace(/_/g, '/'); while(s.length % 4) s += '='; return b64d(s); }
+async function licVerify(token){
+  const m = /^L1\.([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/.exec(String(token || '').trim()), pub = OP.app && OP.app.pub;
+  if(!m || !pub || !pub.x || !(window.crypto && crypto.subtle)) return null;
+  try {
+    const key = await crypto.subtle.importKey('jwk', {kty:'EC', crv:'P-256', x:pub.x, y:pub.y, ext:true}, {name:'ECDSA', namedCurve:'P-256'}, false, ['verify']);
+    const body = b64ud(m[1]);
+    if(!await crypto.subtle.verify({name:'ECDSA', hash:'SHA-256'}, key, b64ud(m[2]), body)) return null;
+    return JSON.parse(new TextDecoder().decode(body));
+  } catch(e){ return null; }
+}
+function licExpired(L){ return !!(L && L.p && L.p.e && opToday() > L.p.e); }
+function licValid(){ const L = OP.lic; return !!(L && L.ok && L.p && L.p.a === ((OP.cfg && OP.cfg.app) || 'liczydlo') && !L.revoked && L.bound !== false && !licExpired(L)); }
+function licStore(L){ OP.lic = L; if(L) lsSet(OP_LIC_KEY, L); else { try { localStorage.removeItem(OP_LIC_KEY); } catch(e){} } }
+async function licBind(doc, kid){
+  const dev = doc.devices || [];
+  if(dev.includes(OP.id.id)) return true;
+  if(dev.length >= (doc.max || 1)) return false;
+  await fsCommit([{transform:{document:fsName('licenses/' + kid), fieldTransforms:[{fieldPath:'devices', appendMissingElements:{values:[{stringValue:OP.id.id}]}}]}, currentDocument:{exists:true}}]);
+  return true;
+}
+// wpis: numer licencji (16 znaków), klucz „L1.…” albo link z ?klucz=
+async function licActivate(input, out){
+  opLoad();
+  const say = (m, bad) => { const el = out || $('k-msg'); if(el) el.textContent = m; if(bad === false) toast(m, 5000); };
+  let s = String(input || '').trim();
+  try { const u = new URL(s); s = u.searchParams.get('klucz') || s; } catch(e){}
+  let token = /^L1\./.test(s) ? s : '', kid = token ? '' : s.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if(!token && kid.length !== 16){ say('Wpisz numer licencji (16 znaków, np. ABCD-EFGH-JKLM-NPQR) albo otwórz link aktywacyjny.'); return false; }
+  if(IN_ARTIFACT){ say('Licencję aktywuje się w aplikacji otwartej z jej adresu (nie w podglądzie).'); return false; }
+  say('Sprawdzam licencję…');
+  if(!OP.app || !opOn() || (!token && !navigator.onLine)) await opSync(true);
+  let doc = null;
+  if(opOn()){ try { doc = await fsGet('licenses/' + (kid || (licPeek(token) || {}).k || 'x')); } catch(e){ doc = undefined; } }
+  if(!token){
+    if(doc === undefined || !opOn()){ say('Do aktywacji numerem potrzebny jest internet. Połącz telefon albo użyj linku aktywacyjnego.'); return false; }
+    if(!doc || !doc.token){ say('Nie ma licencji o tym numerze – sprawdź, czy numer jest wpisany poprawnie.'); return false; }
+    token = doc.token;
+  }
+  if(!OP.app || !OP.app.pub){ licStore({token, kid:(licPeek(token) || {}).k || kid, ok:false, bound:null, at:new Date().toISOString()}); say('Licencja zapisana – zostanie sprawdzona po połączeniu z internetem.', false); opPaint(); return true; }
+  if(doc && doc.token && doc.token !== token) token = doc.token;   // operator zmienił licencję (np. przedłużył)
+  const p = await licVerify(token);
+  if(!p){ say('Ten klucz jest nieprawidłowy (podpis się nie zgadza).'); return false; }
+  if(p.a !== ((OP.cfg && OP.cfg.app) || 'liczydlo')){ say('Ten klucz jest dla innej aplikacji.'); return false; }
+  if(p.e && opToday() > p.e){ say(`Ta licencja wygasła ${new Date(p.e).toLocaleDateString('pl-PL')}.`); return false; }
+  const L = {token, kid:p.k, p, ok:true, revoked:false, bound:null, at:new Date().toISOString()};
+  if(doc === null && opOn()){ say('Ta licencja nie istnieje – mogła zostać usunięta przez operatora.'); return false; }
+  if(doc && doc.revoked){ say('Ta licencja została unieważniona przez operatora.'); return false; }
+  if(doc){
+    let bound = false; try { bound = await licBind(doc, p.k); } catch(e){ bound = null; }
+    if(bound === false){ say(`Limit urządzeń dla tej licencji (${doc.max || 1}) jest już zajęty. Zwolnij licencję na starym telefonie („Przenieś licencję”) albo poproś operatora o zwolnienie miejsca.`); return false; }
+    L.bound = bound;
+  }
+  licStore(L); OP.last = 0; opSync(true);
+  say(L.bound ? 'Licencja aktywna i przypisana do tego urządzenia.' : 'Licencja zapisana – przypisanie do urządzenia nastąpi po połączeniu z internetem.', false);
+  $('k-in').value = ''; $('gate-kin').value = '';
+  gateRender(); opPaint(); licInfo();
+  return true;
+}
+function licPeek(token){ try { return JSON.parse(new TextDecoder().decode(b64ud(String(token).split('.')[1]))); } catch(e){ return null; } }
+async function licCheck(){
+  const L = OP.lic; if(!L || !L.token) return;
+  if(!L.ok){ const p = await licVerify(L.token); if(!p){ licStore(null); return; } Object.assign(L, {ok:true, p, kid:p.k}); }
+  const doc = await fsGet('licenses/' + L.kid);
+  if(!doc){ L.revoked = true; licStore(L); return; }
+  L.revoked = doc.revoked === true;
+  if(doc.token && doc.token !== L.token){ const p = await licVerify(doc.token); if(p){ L.token = doc.token; L.p = p; } }
+  const dev = doc.devices || [];
+  if(dev.includes(OP.id.id)) L.bound = true;
+  else if(L.bound === null && !L.revoked){ try { L.bound = await licBind(doc, L.kid); } catch(e){} }
+  else L.bound = false;
+  licStore(L);
+}
+async function licRelease(){
+  const L = OP.lic; if(!L) return;
+  const msg = $('k-msg');
+  if(!opOn() || !navigator.onLine){ msg.textContent = 'Do zwolnienia licencji potrzebny jest internet.'; return; }
+  msg.textContent = 'Zwalniam licencję…';
+  try {
+    if(L.bound !== false) await fsCommit([{transform:{document:fsName('licenses/' + L.kid), fieldTransforms:[{fieldPath:'devices', removeAllFromArray:{values:[{stringValue:OP.id.id}]}}]}, currentDocument:{exists:true}}]);
+    licStore(null); OP.last = 0; opSync(true);
+    msg.textContent = 'Licencja zwolniona z tego urządzenia – możesz ją aktywować na nowym telefonie tym samym numerem lub linkiem.';
+    gateRender(); opPaint(); licInfo();
+  } catch(e){ msg.textContent = 'Nie udało się zwolnić licencji – spróbuj ponownie.'; }
+}
+function opInit(){
+  opLoad();
+  $('opbar').addEventListener('click', e => { const b = e.target.closest('[data-bar]'); if(b){ lsSet(OP_BAR_KEY, b.dataset.bar); opPaint(); } });
+  $('k-form').addEventListener('submit', e => { e.preventDefault(); licActivate($('k-in').value); });
+  $('k-free').addEventListener('click', () => {
+    const b = $('k-free');
+    if(b.dataset.sure){ delete b.dataset.sure; b.textContent = 'Przenieś licencję (zwolnij to urządzenie)'; licRelease(); return; }
+    b.dataset.sure = '1'; b.textContent = 'Na pewno? Stuknij ponownie, aby zwolnić';
+    setTimeout(() => { if(b.dataset.sure){ delete b.dataset.sure; b.textContent = 'Przenieś licencję (zwolnij to urządzenie)'; } }, 6000);
+  });
+  $('op-stats').addEventListener('change', e => {
+    if(e.target.checked) lsSet(OP_STAT_KEY + '.zgoda', {at:new Date().toISOString()});
+    else { try { localStorage.removeItem(OP_STAT_KEY + '.zgoda'); localStorage.removeItem(OP_STAT_KEY); } catch(_){} }
+    toast(e.target.checked ? 'Dziękujemy – statystyki są anonimowe.' : 'Zgoda wycofana – statystyki nie będą wysyłane.');
+    OP.last = 0; opSync(true);
+  });
+  opPaint();
+  // link aktywacyjny: …/?klucz=L1.…
+  let key = null; try { key = new URLSearchParams(location.search).get('klucz'); } catch(e){}
+  if(key && !IN_ARTIFACT){
+    try { history.replaceState(null, '', location.pathname + '#info'); } catch(e){}
+    showTab('info');
+    setTimeout(() => { $('k-in').value = key.length > 40 ? 'link aktywacyjny' : key; licActivate(key).then(ok => { if(ok) $('lic').scrollIntoView({block:'center'}); }); }, 400);
+  }
 }
 
 /* ---------- Nawigacja i start ---------- */
@@ -2917,6 +3312,7 @@ function bind(){
   window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
   fbPaint(); fbLoad();
   $('fb-send').addEventListener('click', fbSend);
+  $('fb-mail').addEventListener('click', fbMailSend);
   $('fb-copy').addEventListener('click', () => { const m = fbMail(); copyText(`${FB_TO ? 'Do: ' + FB_TO + '\n' : ''}Temat: ${m.subject}\n\n${m.body}`); });
   $('bird').addEventListener('change', () => {
     const v = curVac(), bk = birdKey(); if(v && bk && !v.sp.includes(BIRDS[bk].g)) S.dzAll = true;   // szczepionka nie dla tych ptaków
@@ -2991,7 +3387,9 @@ function setNozzle(noz, quiet){
 function applyDefaultsSpray(){ if(noVac()) return; const sd = sprayDefault(curVac(), Math.max(0, Math.round(num('age',0)))); $('s-ml').value = sd.ml; $('s-ml-hint').textContent = sd.hint; }
 async function init(){
   initSplash();
+  opLoad();
   gateInit();
+  opInit();
   loadFonts();
   bind(); $('s-noz').dataset.cur = $('s-noz').value; loadEquipment(); flowSrcUI(); fillDz(); fillVac(); onVacChange();   // czysty start – nic nie wybrane
   showTab(location.hash.slice(1) || 'obliczenia');
@@ -3096,7 +3494,7 @@ function loadFonts(){
   if(l.sheet) on(); else l.addEventListener('load', on, {once:true});
 }
 function renderInfo(){
-  licInfo();
+  licInfo(); opPaintInfo(); fbPaint();
   $('i-ver').textContent = APP_VERSION;
   $('i-data').textContent = `ChPLW i ulotki – stan na ${DATA_DATE}; ${VACCINES.length} ${pl(VACCINES.length, 'szczepionka', 'szczepionki', 'szczepionek')}`;
   $('i-mode').textContent = S.mode === 'db' ? 'w pamięci aplikacji (Claude)' : IN_ARTIFACT ? 'tylko w tej przeglądarce' : 'w tym telefonie (kopia w zakładce Raporty)';

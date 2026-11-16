@@ -1,4 +1,4 @@
-LICZYDŁO APP – wersja 1.13.1
+LICZYDŁO APP – wersja 1.14.0
 =====================================
 
 Zawartość folderu „liczydlo”:
@@ -7,6 +7,7 @@ Zawartość folderu „liczydlo”:
   sw.js                 – praca bez internetu i aktualizacje
   version.json          – numer wersji i lista zmian
   operator.html         – strona operatora: blokada wszystkich kopii i hasło
+  operator.json         – połączenie z panelem „Operator” (kopie, licencje, zgłoszenia); bez tego pliku aplikacja niczego nie wysyła
   icons/                – ikony aplikacji
 
 1. UMIESZCZENIE W INTERNECIE (raz) – GitHub Pages, bezpłatnie

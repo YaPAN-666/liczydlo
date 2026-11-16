@@ -1,8 +1,13 @@
 {
- "wersja": "1.13.1",
- "data": "2026-11-15",
+ "wersja": "1.14.0",
+ "data": "2026-11-16",
  "zmiany": [
-  "Jeden przycisk w nagłówku: „O aplikacji / Sugestie” – informacje o aplikacji i formularz zgłoszeń w jednym miejscu.",
+  "Połączenie z panelem operatora: każda kopia aplikacji ma swój identyfikator (O aplikacji) i melduje się, gdy jest internet – operator widzi liczbę kopii i od ilu dni są używane.",
+  "Licencje: numer licencji albo link/kod QR aktywacyjny od operatora; licencja przypisana do urządzenia, „Przenieś licencję” przy zmianie telefonu. Aplikacja pozostaje darmowa – klucz nie jest wymagany.",
+  "Operator może wyświetlić komunikat (pasek u góry), wymagać aktualizacji starej wersji oraz zablokować jedną kopię albo wszystkie.",
+  "Sugestie i zgłoszenia trafiają prosto do panelu autora; e-mail zostaje jako zapas bez internetu.",
+  "Anonimowe statystyki (szczepionka, droga podania, drób) – tylko za zgodą. Nowa karta „Prywatność – co aplikacja wysyła”.",
+  "(1.13.1) Jeden przycisk w nagłówku: „O aplikacji / Sugestie” – informacje o aplikacji i formularz zgłoszeń w jednym miejscu.",
   "(1.13.0) Zgłoś uwagę: przycisk w nagłówku i formularz w „O aplikacji” – błąd, sugestia, dane szczepionki albo pytanie wysyłane e-mailem do autora, z wersją aplikacji i bieżącym obliczeniem.",
   "(1.12.1) Strona do rozesłania: pobierz.html – duży link do aplikacji, kod QR i instrukcja instalacji.",
   "(1.12.0) Oprysk: wydatek dysz wyłącznie z katalogu TeeJet (Birchmeier stosuje końcówki TeeJet) albo z pomiaru – usunięty osobny „katalog Birchmeier”.",

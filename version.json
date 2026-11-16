@@ -1,8 +1,11 @@
 {
- "wersja": "1.14.1",
+ "wersja": "1.15.0",
  "data": "2026-11-16",
  "zmiany": [
-  "Poprawka: kopia aplikacji poprawnie zgłasza się w panelu operatora przy pierwszym połączeniu.",
+  "„Poproś o licencję” jednym stuknięciem – na ekranie „Wymagana licencja” i w „O aplikacji”. Licencja wydana przez administratora włącza się sama.",
+  "Przy blokadzie: „Napisz do administratora”.",
+  "Okres próbny jest zapamiętany przy urządzeniu – ponowna instalacja na tym samym telefonie nie daje nowego okresu próbnego.",
+  "(1.14.1) Poprawka: kopia aplikacji poprawnie zgłasza się w panelu operatora przy pierwszym połączeniu.",
   "(1.14.0) Połączenie z panelem operatora: każda kopia aplikacji ma swój identyfikator (O aplikacji) i melduje się, gdy jest internet – operator widzi liczbę kopii i od ilu dni są używane.",
   "(1.14.0) Licencje: numer licencji albo link/kod QR aktywacyjny od operatora; licencja przypisana do urządzenia, „Przenieś licencję” przy zmianie telefonu. Aplikacja pozostaje darmowa – klucz nie jest wymagany.",
   "(1.14.0) Operator może wyświetlić komunikat (pasek u góry), wymagać aktualizacji starej wersji oraz zablokować jedną kopię albo wszystkie.",

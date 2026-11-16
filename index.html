@@ -199,6 +199,9 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 #fb{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 150px)}
 #gate-form,#gate-key{display:grid;gap:10px;width:100%;max-width:300px;text-align:left}
 #gate-key .btn{justify-content:center}
+#gate-req{display:grid;gap:8px;width:100%;max-width:300px;text-align:left;border-top:1px solid var(--line);padding-top:12px}
+#gate-req .btn{justify-content:center}
+#gate-req-done,#k-req-done{font-size:.9rem}
 #gate-kin,#k-in{text-transform:uppercase;letter-spacing:.04em}
 .opbar{display:grid;gap:8px;margin-bottom:14px}
 .opbar .msg{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
@@ -289,6 +292,15 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
         <input id="gate-kin" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD-EFGH-JKLM-NPQR" enterkeyhint="go"></label>
       <button class="btn" type="submit" id="gate-kok">Aktywuj licencję</button>
     </form>
+    <div id="gate-req" hidden>
+      <p class="note" id="gate-req-lead">Nie masz licencji? Wyślij prośbę – administrator wyda ją jednym kliknięciem, a aplikacja włączy się sama.</p>
+      <label>Imię i nazwisko lub firma (opcjonalnie)
+        <input id="gate-rname" type="text" autocomplete="name" maxlength="120"></label>
+      <label>Telefon (opcjonalnie)
+        <input id="gate-rphone" type="tel" autocomplete="tel" maxlength="30"></label>
+      <button class="btn" type="button" id="gate-rsend">Poproś o licencję</button>
+      <p class="note" id="gate-req-done" hidden></p>
+    </div>
     <span class="note" id="gate-err" role="alert"></span>
     <div class="tools">
       <button class="btn" type="button" id="gate-upd" hidden>Aktualizuj teraz</button>
@@ -691,7 +703,9 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
       <div class="tools">
         <button class="btn" type="submit" form="k-form" id="k-act">Aktywuj licencję</button>
         <button class="btn ghost" type="button" id="k-free" hidden>Przenieś licencję (zwolnij to urządzenie)</button>
+        <button class="btn ghost" type="button" id="k-req" hidden>Poproś o licencję</button>
       </div>
+      <p class="note" id="k-req-done" hidden></p>
       <span class="note" id="k-msg"></span>
       <p class="note">Przy uruchomieniu, gdy jest internet, aplikacja sprawdza u operatora, czy może działać. Operator może zablokować wszystkie kopie albo jedną kopię, wprowadzić hasło albo wymagać aktualizacji. Licencja jest przypisana do urządzenia – przy zmianie telefonu stuknij „Przenieś licencję” na starym telefonie (albo poproś operatora) i aktywuj ją na nowym. Raporty zapisane w telefonie można zawsze zapisać jako kopię – także na ekranie blokady.</p>
     </div>
@@ -1269,7 +1283,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.14.1';
+const APP_VERSION = '1.15.0';
 const DATA_DATE = '15.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2897,6 +2911,7 @@ function gateRender(){
     : `Aplikacja nie łączyła się z internetem od ponad ${G.days} ${pl(G.days, 'dnia', 'dni', 'dni')}. Połącz telefon z internetem i stuknij „Sprawdź ponownie”.`;
   $('gate-form').hidden = st !== 'pass';
   $('gate-key').hidden = st !== 'key';
+  opReqPaint(st);
   $('gate-upd').hidden = st !== 'old';
 }
 // Wynik: true – odczytano stan od operatora; false – brak internetu lub błąd (zostaje ostatni znany stan)
@@ -3076,8 +3091,11 @@ async function opSync(force){
       if(app){
         OP.app = app; OP.at = new Date().toISOString(); OP.last = Date.now(); ok = true;
         try { await opReport(); } catch(e){ console.warn('operator: meldunek', e); }
-        try { const i = await fsGet(fsAppPath('installs/' + OP.id.id)); OP.inst = i ? {blocked:i.blocked === true, blockMsg:String(i.blockMsg || '').slice(0, 500)} : null; } catch(e){}
+        try { const i = await fsGet(fsAppPath('installs/' + OP.id.id)); OP.inst = i ? {blocked:i.blocked === true, blockMsg:String(i.blockMsg || '').slice(0, 500), grant:typeof i.grant === 'string' ? i.grant : ''} : null; } catch(e){}
+        try { await opTrialDevice(); } catch(e){}
+        try { await opReqCheck(); } catch(e){}
         try { await licCheck(); } catch(e){ console.warn('operator: licencja', e); }
+        if(OP.inst && OP.inst.grant && OP.inst.grant !== OP.id.rel && (!OP.lic || OP.lic.kid !== OP.inst.grant)){ try { await licActivate(OP.inst.grant, null, true); } catch(e){} }
         try { await opStatFlush(); } catch(e){}
         opSave();
       }
@@ -3100,7 +3118,66 @@ function opGate(){
   o.days = parseInt(a.offlineDays, 10) || 0; o.pass = typeof a.pass === 'string' ? a.pass : '';
   return o;
 }
-function opTrialLeft(){ const a = OP.app || {}, d = parseInt((a.lic || {}).trialDays, 10) || 30; return d - Math.floor((Date.now() - Date.parse(OP.id.first)) / 864e5); }
+function opTrialStart(){ const a = Date.parse(OP.id.first) || Date.now(), b = Date.parse(OP.id.tfirst || '') || a; return Math.min(a, b); }
+function opTrialLeft(){ const a = OP.app || {}, d = parseInt((a.lic || {}).trialDays, 10) || 30; return d - Math.floor((Date.now() - opTrialStart()) / 864e5); }
+// Okres próbny zapamiętany przy urządzeniu: pierwszy start zapisany pod skrótem parametrów urządzenia (bez danych osobowych).
+// Ponowna instalacja albo wyczyszczenie danych na tym samym telefonie odczyta wcześniejszą datę.
+async function opTrialDevice(){
+  const id = OP.id, fp = await opFp(); if(!fp || id.fpDone === fp) return;
+  const p = fsAppPath('devices/' + fp), d = await fsGet(p);
+  if(d && d.first){ id.tfirst = d.first; }
+  else { try { await fsCommit([{update:{name:fsName(p), fields:fsF({code:id.code})}, updateTransforms:[NOW('first')], currentDocument:{exists:false}}]); } catch(e){ if(![400, 403, 409].includes(e.status)) throw e; } }
+  id.fpDone = fp; lsSet(OP_ID_KEY, id);
+}
+// --- prośba o licencję / kontakt z administratorem (jedna na urządzenie, aż administrator ją załatwi) ---
+const OP_REQ_KEY = 'liczydlo.prosba.v1';
+function opReqPaint(st){
+  const req = lsGet(OP_REQ_KEY), on = opOn() && !!OP.app && (st === 'key' || st === 'oplock');
+  $('gate-req').hidden = !on; if(!on) return;
+  $('gate-req-lead').textContent = st === 'key' ? 'Nie masz licencji? Wyślij prośbę – administrator wyda ją jednym kliknięciem, a aplikacja włączy się sama.'
+    : 'Chcesz odblokować aplikację? Wyślij wiadomość do administratora – po odblokowaniu lub wydaniu licencji aplikacja włączy się sama.';
+  $('gate-rsend').textContent = st === 'key' ? 'Poproś o licencję' : 'Napisz do administratora';
+  const done = !!(req && req.at);
+  $('gate-rsend').hidden = done; $('gate-rname').closest('label').hidden = done; $('gate-rphone').closest('label').hidden = done;
+  $('gate-req-done').hidden = !done;
+  if(done) $('gate-req-done').textContent = `Prośba wysłana ${new Date(req.at).toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})}. Kod tej kopii: ${OP.id.code}. Aplikacja sprawdza co minutę, czy administrator już odpowiedział.`;
+  if(done) opReqPoll();
+}
+function opReqPaintInfo(){
+  if(!$('k-req')) return;
+  const req = lsGet(OP_REQ_KEY), can = opOn() && !!OP.app && !licValid();
+  $('k-req').hidden = !can || !!(req && req.at);
+  $('k-req-done').hidden = !(req && req.at);
+  if(req && req.at) $('k-req-done').textContent = `Prośba o licencję wysłana ${new Date(req.at).toLocaleDateString('pl-PL')} – licencja włączy się sama, gdy administrator ją wyda.`;
+}
+async function opRequest(type, name, phone){
+  opLoad(); if(!opOn()) throw new Error('off');
+  const d = {type, name:String(name || '').trim().slice(0, 120), phone:String(phone || '').trim().slice(0, 30), code:OP.id.code, ver:APP_VERSION, os:opOs(), mode:fbMode().slice(0, 30), status:'nowa'};
+  Object.keys(d).forEach(k => { if(d[k] === '') delete d[k]; });
+  try { await fsCommit([{update:{name:fsName(fsAppPath('requests/' + OP.id.id)), fields:fsF(d)}, updateTransforms:[NOW('created')], currentDocument:{exists:false}}]); }
+  catch(e){ if(![400, 403, 409].includes(e.status)) throw e; }   // prośba już jest w panelu
+  lsSet(OP_REQ_KEY, {at:new Date().toISOString(), type});
+}
+async function opReqSend(btn, type, name, phone, out){
+  btn.disabled = true; const txt = btn.textContent; btn.textContent = 'Wysyłam…';
+  try { await opRequest(type, name, phone); toast('Prośba wysłana do administratora.', 5000); }
+  catch(e){ if(out) out.textContent = 'Nie udało się wysłać – sprawdź internet i spróbuj ponownie.'; }
+  finally { btn.disabled = false; btn.textContent = txt; gateRender(); opReqPaintInfo(); }
+}
+// Administrator załatwił prośbę (usunął ją albo wydał licencję) – można wysłać kolejną
+async function opReqCheck(){
+  const req = lsGet(OP_REQ_KEY); if(!req) return;
+  const d = await fsGet(fsAppPath('requests/' + OP.id.id));
+  if(!d || d.status !== 'nowa'){ try { localStorage.removeItem(OP_REQ_KEY); } catch(e){} }
+}
+let opReqT = null;
+function opReqPoll(){
+  if(opReqT) return;
+  opReqT = setInterval(() => {
+    if(G.state === 'open' || !lsGet(OP_REQ_KEY)){ clearInterval(opReqT); opReqT = null; return; }
+    if(navigator.onLine !== false) opSync(true);
+  }, 60000);
+}
 async function opUpdateNow(){
   const err = $('gate-err'); err.textContent = 'Pobieram nową wersję…';
   try {
@@ -3135,6 +3212,7 @@ function opPaintInfo(){
   opLoad();
   const L = OP.lic, a = OP.app || {};
   $('i-code').textContent = IN_ARTIFACT ? 'podgląd w Claude' : OP.id.code;
+  opReqPaintInfo();
   let k = 'brak';
   if(L && L.kid){
     const st = !L.ok ? 'czeka na sprawdzenie podpisu (połącz z internetem)' : L.revoked ? 'unieważniona przez operatora' : L.bound === false ? 'zwolniona z tego urządzenia' : licExpired(L) ? 'wygasła' : L.bound === null ? 'aktywna – przypisanie do urządzenia po połączeniu z internetem' : 'aktywna, przypisana do tego urządzenia';
@@ -3201,7 +3279,7 @@ async function licBind(doc, kid){
   return true;
 }
 // wpis: numer licencji (16 znaków), klucz „L1.…” albo link z ?klucz=
-async function licActivate(input, out){
+async function licActivate(input, out, auto){
   opLoad();
   const say = (m, bad) => { const el = out || $('k-msg'); if(el) el.textContent = m; if(bad === false) toast(m, 5000); };
   let s = String(input || '').trim();
@@ -3210,7 +3288,8 @@ async function licActivate(input, out){
   if(!token && kid.length !== 16){ say('Wpisz numer licencji (16 znaków, np. ABCD-EFGH-JKLM-NPQR) albo otwórz link aktywacyjny.'); return false; }
   if(IN_ARTIFACT){ say('Licencję aktywuje się w aplikacji otwartej z jej adresu (nie w podglądzie).'); return false; }
   say('Sprawdzam licencję…');
-  if(!OP.app || !opOn() || (!token && !navigator.onLine)) await opSync(true);
+  if(!auto && (!OP.app || !opOn() || (!token && !navigator.onLine))) await opSync(true);   // „auto” wywołuje sam opSync
+
   let doc = null;
   if(opOn()){ try { doc = await fsGet('licenses/' + (kid || (licPeek(token) || {}).k || 'x')); } catch(e){ doc = undefined; } }
   if(!token){
@@ -3232,8 +3311,9 @@ async function licActivate(input, out){
     if(bound === false){ say(`Limit urządzeń dla tej licencji (${doc.max || 1}) jest już zajęty. Zwolnij licencję na starym telefonie („Przenieś licencję”) albo poproś operatora o zwolnienie miejsca.`); return false; }
     L.bound = bound;
   }
-  licStore(L); OP.last = 0; opSync(true);
-  say(L.bound ? 'Licencja aktywna i przypisana do tego urządzenia.' : 'Licencja zapisana – przypisanie do urządzenia nastąpi po połączeniu z internetem.', false);
+  licStore(L); try { localStorage.removeItem(OP_REQ_KEY); } catch(e){}
+  if(!auto){ OP.last = 0; opSync(true); }
+  say(auto ? 'Administrator wydał licencję – aplikacja jest aktywna.' : L.bound ? 'Licencja aktywna i przypisana do tego urządzenia.' : 'Licencja zapisana – przypisanie do urządzenia nastąpi po połączeniu z internetem.', false);
   $('k-in').value = ''; $('gate-kin').value = '';
   gateRender(); opPaint(); licInfo();
   return true;
@@ -3259,6 +3339,7 @@ async function licRelease(){
   msg.textContent = 'Zwalniam licencję…';
   try {
     if(L.bound !== false) await fsCommit([{transform:{document:fsName('licenses/' + L.kid), fieldTransforms:[{fieldPath:'devices', removeAllFromArray:{values:[{stringValue:OP.id.id}]}}]}, currentDocument:{exists:true}}]);
+    OP.id.rel = L.kid; lsSet(OP_ID_KEY, OP.id);   // nie włączaj jej z powrotem automatycznie
     licStore(null); OP.last = 0; opSync(true);
     msg.textContent = 'Licencja zwolniona z tego urządzenia – możesz ją aktywować na nowym telefonie tym samym numerem lub linkiem.';
     gateRender(); opPaint(); licInfo();
@@ -3268,6 +3349,8 @@ function opInit(){
   opLoad();
   $('opbar').addEventListener('click', e => { const b = e.target.closest('[data-bar]'); if(b){ lsSet(OP_BAR_KEY, b.dataset.bar); opPaint(); } });
   $('k-form').addEventListener('submit', e => { e.preventDefault(); licActivate($('k-in').value); });
+  $('gate-rsend').addEventListener('click', () => opReqSend($('gate-rsend'), G.state === 'key' ? 'licencja' : 'kontakt', $('gate-rname').value, $('gate-rphone').value, $('gate-err')));
+  $('k-req').addEventListener('click', () => opReqSend($('k-req'), 'licencja', '', '', $('k-msg')));
   $('k-free').addEventListener('click', () => {
     const b = $('k-free');
     if(b.dataset.sure){ delete b.dataset.sure; b.textContent = 'Przenieś licencję (zwolnij to urządzenie)'; licRelease(); return; }

@@ -1,10 +1,14 @@
 {
- "wersja": "1.16.2",
+ "wersja": "1.16.3",
  "data": "2026-11-17",
  "zmiany": [
-  "Ekran blokady: „Napisz do administratora” naprawione. Druga wiadomość z tego samego telefonu (np. po wcześniejszej prośbie o licencję) po cichu ginęła, a aplikacja pisała „wysłana”. Teraz trafia do panelu Operator (zakładka Prośby), a gdy wysłanie się nie uda, aplikacja to pokazuje.",
-  "Na ekranie blokady pole „Wiadomość” – treść widać w panelu Operator.",
-  "Formularz kontaktu z administratorem także przy blokadzie z pliku kontrolnego.",
+  "Szczepionki – dane z polskich ChPLW i ulotek (8 pozycji potwierdzonych): Nobilis Gumboro D78, Nobilis Ma5 + Clone 30, Nobilis MG 6/85, Nobilis Rhino CV, Aviffa-RTI, Poulvac E. coli, Poulvac IB QX, Palmivax; Nemovac – moc dawki.",
+  "Poprawki: Poulvac IB QX – szczep L1148 (nie D388), oprysk 150–500 ml na 1000; Poulvac E. coli – tylko kury i tylko oprysk (0,1–0,5 ml na ptaka); Ma5 + Clone 30 – 0,25 l tylko dla piskląt jednodniowych, starsze 1 l na 1000.",
+  "Gumboro D78: woda wg wieku (maks. 40 l) dla ptaków 2.–28. dnia, oprysk 1 l na 1000. Aviffa-RTI: oko 50 ml, oprysk 250 ml, woda od 7. dnia; u kur od 10. tygodnia, bez brojlerów. MG 6/85: 250–400 ml, bez brojlerów.",
+  "Palmivax wg ChPLW PL: od rodziców nieszczepionych już w 1. dniu, podskórnie u nasady szyi, stada reprodukcyjne 1–2 tyg. przed nieśnością.",
+  "(1.16.2) Ekran blokady: „Napisz do administratora” naprawione. Druga wiadomość z tego samego telefonu (np. po wcześniejszej prośbie o licencję) po cichu ginęła, a aplikacja pisała „wysłana”. Teraz trafia do panelu Operator (zakładka Prośby), a gdy wysłanie się nie uda, aplikacja to pokazuje.",
+  "(1.16.2) Na ekranie blokady pole „Wiadomość” – treść widać w panelu Operator.",
+  "(1.16.2) Formularz kontaktu z administratorem także przy blokadzie z pliku kontrolnego.",
   "(1.16.1) Raporty – podsumowanie zabiegu: rubryki w równej siatce (czas – minuty i sekundy, zużyta woda, ciśnienie), pod każdą wartość z planu.",
   "(1.16.1) Bez przycisku „Przelicz” – podsumowanie liczy się od razu i na bieżąco.",
   "(1.16.1) „Zapisz w raporcie” zmienione na „Uwzględnij zmiany w raporcie końcowym”.",

@@ -232,6 +232,36 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 .modcard{gap:10px}
 .modcard .card-h b{font-weight:600}
 .sumbox{display:grid;gap:8px;margin-top:8px}
+/* Podsumowanie zabiegu: rubryki w równej siatce – 2 × 2 na telefonie, 4 w rzędzie na szerszym ekranie */
+.sumcard{display:grid;gap:6px}
+.sumcard h3{margin:0}
+.sumgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:6px 0 2px;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+.sumgrid label{white-space:nowrap}
+.sumgrid input{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:1rem;text-align:right}
+.sumgrid .hint{overflow:hidden;text-overflow:ellipsis}
+@media (min-width:700px){.sumgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.sumcard .sumsave{margin-top:6px}
+/* Raport w aplikacji: karta z nagłówkiem, sekcjami, etykietami w kolumnie i podpisem (ten sam tekst co .txt) */
+.rep{margin-top:6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:12px 14px;font-size:.86rem;color:var(--ink);line-height:1.45;cursor:auto}
+.rep-h{display:grid;gap:2px;padding-bottom:8px;border-bottom:2px solid var(--brand)}
+.rep-h b{font-size:.92rem;letter-spacing:.08em}
+.rep-h span{color:var(--muted);font-size:.82rem}
+.rep h4{margin:12px 0 4px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);font-weight:600}
+.rep dl{display:grid;grid-template-columns:minmax(7.5em,max-content) minmax(0,1fr);gap:3px 12px;margin:0}
+.rep dt{color:var(--muted)}
+.rep dd{margin:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.rep ul{margin:2px 0;padding-left:18px;display:grid;gap:3px}
+.rep ul.chk{list-style:none;padding-left:2px}
+.rep ul.chk li{padding-left:1.35em;text-indent:-1.35em}
+.rep ul.chk li.ok{color:var(--muted)}
+.rep p{margin:2px 0}
+.rep hr{border:0;border-top:1px dashed var(--line);margin:12px 0 0}
+.rep-sub{margin-top:8px;font-weight:600;font-size:.82rem}
+.rep-f{margin-top:10px;display:grid;gap:6px;justify-items:center;text-align:center}
+.rep-f > span{font-size:.72rem;color:var(--muted)}
+.rep-f .credit{margin:0}
+/* Raport zapisany w starszym formacie – tekst jak dotąd */
+.formula.report{white-space:pre-wrap;margin-top:6px;color:var(--ink);background:var(--bg);border:1px solid var(--line);line-height:1.5;font-size:.78rem;padding:10px 12px}
 
 /* Droga podania: zawsze cztery przyciski; „inna szczepionka” – przejście do szczepionki z tą drogą */
 #route{display:grid;grid-template-columns:repeat(4,1fr)}
@@ -1435,7 +1465,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.16.0';
+const APP_VERSION = '1.16.1';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2126,31 +2156,114 @@ function renderKnow(v){
     <dt>Źródło</dt><dd>${v.src && v.src.length ? v.src.map(linkSrc).join('<br>') : 'brak odczytu ChPLW'}</dd></dl></details>`;
 }
 
-/* ---------- Raport ---------- */
+/* ---------- Raport ----------
+   Raport tekstowy (podgląd, Kopiuj, Udostępnij, Pobierz .txt): nagłówek, sekcje z etykietami
+   wyrównanymi kropkami, uwagi jako punkty, stopka z wersją aplikacji i podpisem autora.
+   Podsumowanie zabiegu wstawia się przed stopką („Uwzględnij zmiany w raporcie końcowym”). */
+const RW = 44, R_HEAD = '═'.repeat(RW), R_SEP = '─'.repeat(RW), NB = '\u00a0';
+// Liczba z jednostką i „8 × 5000” zostają w jednym wierszu (twarda spacja)
+function rnb(t){ return String(t).replace(/(\d) (?=(?:l|ml|bar|min|s|dni|d|szt\.|µm|kg|g|h|tyg\.|dawek|l\/min|°C)(?!\p{L}))/gu, '$1' + NB).replace(/(min) (?=\d)/g, '$1' + NB).replace(/ × /g, NB + '×' + NB); }
+// Zawijanie do szerokości raportu: dalszy ciąg wartości pod wartością, punktu pod punktem
+function rwrap(prefix, text, ind){
+  const out = []; let cur = prefix, has = false;
+  for(const w of rnb(text == null ? '' : text).trim().split(/ +/).filter(Boolean)){
+    if(has && cur.length + 1 + w.length > RW){ out.push(cur); cur = ' '.repeat(ind) + w; }
+    else cur += (has ? ' ' : '') + w;
+    has = true;
+  }
+  out.push(cur.replace(/\s+$/, ''));
+  return out.join('\n');
+}
+function rkv(k, v){ if(v == null || v === '') return null; const pre = `  ${k} ${'.'.repeat(Math.max(2, 15 - k.length))} `; return rwrap(pre, v, pre.length); }
+function rbul(a, ind = '  '){ return (a || []).filter(Boolean).map(x => rwrap(ind + '• ', x, ind.length + 2)); }
+function repFooter(){ return ['', R_SEP, `Liczydło APP ${APP_VERSION} · ChPLW ${DATA_DATE}`, 'Studio Pracy Umysłowej', 'Paweł Czarnocki']; }
+// Tekst raportu bez podsumowania i stopki – także raporty zapisane w starszym formacie
+function repBase(text){
+  const L = String(text || '').split('\n');
+  let e = L.findIndex(l => /^PODSUMOWANIE ZABIEGU/.test(l));
+  if(e < 0) e = L.findIndex((l, i) => i > 0 && L[i - 1] === R_SEP && /^Liczydło APP /.test(l));
+  if(e < 0) e = L.length;
+  while(e > 0 && (L[e - 1] === R_SEP || !L[e - 1].trim())) e--;
+  return L.slice(0, e).join('\n');
+}
+// Raport w aplikacji: ten sam tekst co .txt, pokazany jako karta – etykiety w kolumnie, punkty, podpis
+function repHTML(text){
+  const L = String(text || '').split('\n');
+  if(L[0] !== R_HEAD) return `<div class="formula report">${esc(text || '')}</div>`;   // raport zapisany w starszym formacie
+  const e = L.indexOf(R_HEAD, 1), head = e > 0 ? L.slice(1, e) : [], it = [];
+  let last = null;
+  for(let i = e > 0 ? e + 1 : 1; i < L.length; i++){
+    const l = L[i], ind = l.length - l.trimStart().length; let m;
+    if(!l.trim()){ last = null; continue; }
+    if(l === R_SEP){ it.push(last = {t:'sep', ind:0}); continue; }
+    if(ind === 0){
+      if(last && last.t === 'foot') last.a.push(l);
+      else if(/^Liczydło APP /.test(l)) it.push(last = {t:'foot', a:[l], ind:0});
+      else it.push(last = {t:'h', x:l, ind:0});
+      continue;
+    }
+    if((m = l.match(/^\s+• (.*)$/))){ it.push(last = {t:'li', x:m[1], ind}); continue; }
+    if((m = l.match(/^\s+\[([ x])\] (.*)$/))){ it.push(last = {t:'chk', ok:m[1] === 'x', x:m[2], ind}); continue; }
+    if(ind === 2 && (m = l.match(/^ {2}(\S.*?) \.{2,} (.*)$/))){ it.push(last = {t:'kv', k:m[1], x:m[2], ind}); continue; }
+    if(ind === 2 && (m = l.match(/^ {2}(\S.*):$/))){ it.push(last = {t:'sub', x:m[1], ind}); continue; }
+    if(last && 'x' in last && last.t !== 'h' && last.t !== 'sub' && ind > last.ind){ last.x += ' ' + l.trim(); continue; }
+    it.push(last = {t:'p', x:l.trim(), ind});
+  }
+  let h = `<div class="rep"><div class="rep-h"><b>${esc(head[0] || '')}</b>${head.slice(1).map(x => `<span>${esc(x)}</span>`).join('')}</div>`, i = 0;
+  const run = t => { const a = []; while(i < it.length && it[i].t === t) a.push(it[i++]); return a; };
+  while(i < it.length){
+    const x = it[i];
+    if(x.t === 'kv'){ h += `<dl>${run('kv').map(y => `<dt>${esc(y.k)}</dt><dd>${esc(y.x)}</dd>`).join('')}</dl>`; continue; }
+    if(x.t === 'li'){ h += `<ul>${run('li').map(y => `<li>${esc(y.x)}</li>`).join('')}</ul>`; continue; }
+    if(x.t === 'chk'){ h += `<ul class="chk">${run('chk').map(y => `<li${y.ok ? ' class="ok"' : ''}>${y.ok ? '☑' : '☐'} ${esc(y.x)}</li>`).join('')}</ul>`; continue; }
+    if(x.t === 'h') h += `<h4>${esc(x.x)}</h4>`;
+    else if(x.t === 'sep') h += '<hr>';
+    else if(x.t === 'sub') h += `<div class="rep-sub">${esc(x.x)}</div>`;
+    else if(x.t === 'p') h += `<p>${esc(x.x)}</p>`;
+    else if(x.t === 'foot') h += `<div class="rep-f"><span>${esc(x.a[0])}</span>${x.a[1] ? `<p class="credit">${esc(x.a[1])}${x.a[2] ? `<br><span>${esc(x.a[2])}</span>` : ''}</p>` : ''}</div>`;
+    i++;
+  }
+  return h + '</div>';
+}
 function reportText(){
-  const L = S.last; if(!L) return ''; const R = L.R; const v = L.v;
-  const lines = [];
-  lines.push(`RAPORT SZCZEPIENIA – ${fmtDate($('date').value || todayISO())}`);
-  lines.push(`Ferma: ${$('farm').value.trim() || '—'}`);
-  lines.push(`Drób: ${L.bird.l} · wiek ${R.age} dni · ${fmt0(R.birds)} szt.`);
-  const dzT = v ? v.dz.map(d => DISEASES[d] || d).join(' + ') : $('dz').value === DZ_ALL ? '—' : (DISEASES[$('dz').value] || $('dz').value);
-  lines.push(`Szczepienie: ${dzT} – ${v ? v.n : 'szczepionka spoza bazy'} (${ROUTES[R.route].toLowerCase()})`);
-  lines.push(`Szczepionka: ${R.packs} dawek (razem ${fmt0(R.doses)})`);
-  if(R.route === 'spray'){ lines.push(`Woda: ${fmt(R.water_l,2)} l (${fmtT(R.ml1000)} ml na 1000 ptaków)`); lines.push(`Opryskiwacz: ${R.sprayerName || 'Birchmeier REC 15 AC1'}, dysza ${nnTxt(R.nozzles || 1, NOZ[nozOf(R.nozzle)].n)}, ${fmtT(R.pressure)} bar, ${fmt(R.flow,3)} l/min (${R.flowSrc}), ${R.mode.toLowerCase()}`);
-    const k = R.persons || 1, n = R.sectors || 1;
+  const L = S.last; if(!L) return ''; const R = L.R, v = L.v;
+  const farm = $('farm').value.trim(), dzSel = $('dz').value;
+  const dzT = v ? v.dz.map(d => DISEASES[d] || d).join(' + ') : dzSel === DZ_ALL ? '' : (DISEASES[dzSel] || dzSel);
+  const out = [R_HEAD, 'RAPORT SZCZEPIENIA DROBIU', rwrap('', `${fmtDate($('date').value || todayISO())} · ${farm || 'ferma bez nazwy'}`, 0), R_HEAD];
+  const sec = (title, rows) => { rows = rows.filter(Boolean); if(rows.length) out.push('', title, ...rows); };
+  sec('STADO', [rkv('Drób', L.bird.l), rkv('Wiek', `${R.age} ${R.age === 1 ? 'dzień' : 'dni'}${R.age >= 14 ? ` (${ageWeeks(R.age)})` : ''}`), rkv('Liczba ptaków', fmt0(R.birds) + ' szt.')]);
+  sec('SZCZEPIENIE', [rkv('Choroba', dzT), rkv('Szczepionka', v ? v.n : 'spoza bazy'), rkv('Droga podania', ROUTES[R.route].toLowerCase()),
+    R.doses ? rkv('Fiolki', `${R.packs} = ${fmt0(R.doses)} dawek`) : null, v ? rkv('Karencja', v.wd) : null]);
+  if(R.route === 'spray'){
+    const k = R.persons || 1, n = R.sectors || 1, m = R.modId && S.mods[R.modId];
+    const rows = [rkv('Woda', `${fmt(R.water_l,2)} l (${fmtT(R.ml1000)} ml na 1000)`), rkv('Opryskiwacz', R.sprayerName || 'Birchmeier REC 15 AC1'),
+      rkv('Dysza', nnTxt(R.nozzles || 1, NOZ[nozOf(R.nozzle)].n)), rkv('Ciśnienie', fmtT(R.pressure) + ' bar'), rkv('Wydatek', `${fmt(R.flow,3)} l/min (${R.flowKey === 'reczne' ? 'pomiar' : 'TeeJet'})`),
+      rkv('Tryb pracy', String(R.mode || '').toLowerCase())];
     if(k > 1){
-      lines.push(`Czas zabiegu: ${fmtMin(R.minutes)} – ${k} ${plOsoba(k)} jednocześnie, ${n} ${plSektor(n)}, ${orgText(R.org, n)}${n > 1 ? `; ${fmtMin(R.sectorMin)} na sektor` : ''}`);
-      (R.crew || []).forEach(o => lines.push(`  Osoba ${o.no}: ${R.org === 'razem' ? 'razem' : secText(o.sec)} · ${fmt(o.l,2)} l roztworu · ${fmtMin(o.min)}`));
-    } else lines.push(`Czas oprysku: ${fmtMin(R.minutes)}${n > 1 ? ` – ${n} ${plSektor(n)} po ${fmtMin(R.sectorMin)}` : ''}`);
-    if(R.modId && S.mods[R.modId]) lines.push(`Ustawienia wg zaleceń z ${fmtDate(S.mods[R.modId].date)}: ${changesText(S.mods[R.modId].changes) || (S.mods[R.modId].actions || []).join(' ') || 'lista kontrolna'}`); }
-  if(R.route === 'woda'){ lines.push(`Woda: ${fmt0(R.water_l)} l (${fmt(R.l1000,1)} l na 1000; ${R.waterBasis})`); if(R.stab) lines.push(`Stabilizator: ${R.stab.txt}${R.stab.rule ? ` (${R.stab.rule})` : ''}`); else if(R.milk_kg > 0) lines.push(`Mleko w proszku: ${fmt(R.milk_kg,2)} kg`); if(R.doser) lines.push(`Dozownik: ${fmtT(R.doser.pct)}% – roztwór do wiadra ${fmt(R.doser.stock_l,1)} l (wszystkie fiolki${R.stab || R.milk_kg > 0 ? ' i stabilizator' : ''})`); }
-  if(R.route === 'oko') lines.push(`Rozpuszczalnik: ${fmt0(R.diluent_ml)} ml (${fmtT(R.ml1000,1)} ml na 1000 dawek)`);
-  if(R.route === 'inj'){ lines.push(`Iniekcja: ${fmtT(R.dose_ml,2)} ml na ptaka, razem ${fmt0(R.vaccine_ml)} ml${R.injApp === 2 ? ' – aparat podwójny' : ''}`); if(R.auto) lines.push(`Szczepionka autogenna: ${R.auto.strain || 'drobnoustroje – nie wpisano'}; adiuwant: ${R.auto.adj || 'nie wybrano'}${R.auto.lab ? `; laboratorium: ${R.auto.lab}` : ''}${R.auto.lot ? `; seria: ${R.auto.lot}` : ''}${R.auto.exp ? `; ważna do: ${R.auto.exp}` : ''}${R.auto.farmId ? `; gospodarstwo (jednostka epidemiologiczna): ${R.auto.farmId}` : ''}`); if(R.injSite) lines.push(`Miejsce: ${R.injSite}${R.needle ? `; igła ${R.needle}` : ''}`); if(R.inj2) lines.push(`Druga szczepionka (aparat podwójny): ${R.inj2.vacName} – ${fmtT(R.inj2.dose_ml,2)} ml na ptaka, razem ${fmt0(R.inj2.vaccine_ml)} ml${R.inj2.packs ? `, ${R.inj2.packs} dawek` : ''}`); }
-  if(v) lines.push(`Karencja: ${v.wd}`);
+      rows.push(rkv('Czas zabiegu', fmtMin(R.minutes)), rkv('Osoby', `${k} – ${orgText(R.org, n)}`), n > 1 ? rkv('Sektory', `${n}, po ${fmtMin(R.sectorMin)}`) : null);
+      (R.crew || []).forEach(o => rows.push(rkv(`Osoba ${o.no}`, `${R.org === 'razem' ? 'razem' : secText(o.sec)} · ${fmt(o.l,2)} l · ${fmtMin(o.min)}`)));
+    } else rows.push(rkv('Czas oprysku', fmtMin(R.minutes)), n > 1 ? rkv('Sektory', `${n}, po ${fmtMin(R.sectorMin)}`) : null);
+    if(m) rows.push(rkv('Wg zaleceń', `z ${fmtDate(m.date)}: ${changesText(m.changes) || (m.actions || []).join(' ') || 'lista kontrolna'}`));
+    sec('OPRYSK', rows);
+  }
+  if(R.route === 'woda') sec('WODA DO PICIA', [rkv('Woda', `${fmt0(R.water_l)} l (${fmt(R.l1000,1)} l na 1000)`), rkv('Wyliczenie', R.waterBasis),
+    R.stab ? rkv('Stabilizator', R.stab.txt + (R.stab.rule ? ` (${R.stab.rule})` : '')) : R.milk_kg > 0 ? rkv('Mleko', fmt(R.milk_kg,2) + ' kg mleka w proszku') : null,
+    R.doser ? rkv('Dozownik', `${fmtT(R.doser.pct)}% – roztwór do wiadra ${fmt(R.doser.stock_l,1)} l (wszystkie fiolki${R.stab || R.milk_kg > 0 ? ' i stabilizator' : ''})`) : null]);
+  if(R.route === 'oko') sec('KROPLA DO OKA / NOSA', [rkv('Rozpuszczalnik', `${fmt0(R.diluent_ml)} ml (${fmtT(R.ml1000,1)} ml na 1000)`)]);
+  if(R.route === 'inj'){
+    const a = R.auto, i2 = R.inj2;
+    sec('INIEKCJA', [rkv('Dawka', `${fmtT(R.dose_ml,2)} ml na ptaka`), rkv('Razem', `${fmt0(R.vaccine_ml)} ml szczepionki`), R.injApp === 2 ? rkv('Aparat', 'podwójny – dwie butelki, dwie igły') : null,
+      rkv('Miejsce', R.injSite), rkv('Igła', R.needle),
+      i2 ? rkv('Szczepionka 2', `${i2.vacName} – ${fmtT(i2.dose_ml,2)} ml na ptaka, razem ${fmt0(i2.vaccine_ml)} ml${i2.packs ? `, ${i2.packs} dawek` : ''}`) : null]);
+    if(a) sec('SZCZEPIONKA AUTOGENNA', [rkv('Drobnoustroje', a.strain || 'nie wpisano'), rkv('Adiuwant', a.adj || 'nie wybrano'), rkv('Laboratorium', a.lab), rkv('Seria', a.lot),
+      rkv('Ważna do', /^\d{4}-\d{2}-\d{2}$/.test(a.exp || '') ? fmtDate(a.exp) : a.exp), rkv('Gospodarstwo', a.farmId ? `${a.farmId} (jednostka epidemiologiczna)` : '')]);
+  }
   const w = L.msgs.filter(m => m[0] === 'bad' || m[0] === 'warn').map(m => m[1]);
-  if(w.length) lines.push('Uwagi z obliczeń: ' + w.join(' '));
-  if($('notes').value.trim()) lines.push('Uwagi: ' + $('notes').value.trim());
-  return lines.join('\n');
+  if(w.length) out.push('', 'UWAGI Z OBLICZEŃ', ...rbul(w));
+  const notes = $('notes').value.trim();
+  if(notes) out.push('', 'UWAGI', ...notes.split('\n').map(x => x.trim()).filter(Boolean).map(x => rwrap('  ', x, 4)));
+  out.push(...repFooter());
+  return out.join('\n');
 }
 // Zgłoszenia od użytkowników: gotowy e-mail do autora (aplikacja nie ma serwera).
 // Adres odbiorcy – z pliku kontakt.json obok aplikacji ({"email": "..."}), zapamiętany w telefonie na czas bez sieci.
@@ -2243,10 +2356,10 @@ function renderReports(){
       <span class="t">${fmtDate(r.date)} · ${esc(r.farm || 'bez nazwy fermy')}${r.sum ? (typeof r.sum.ok === 'boolean' ? ` <span class="pill ${r.sum.ok ? 'done' : 'late'}">${r.sum.ok ? 'zgodnie z planem' : 'problemy'}</span>` : ' <span class="pill">podsumowany</span>') : ''}${r.modId ? ' <span class="pill plan">wg zaleceń</span>' : ''}</span>
       <span class="s">${esc(r.birdLabel || '')} · ${esc(String(r.age))} dni · ${fmt0(r.birds)} szt. · ${esc(r.vacName)} (${esc((ROUTES[r.route] || '').toLowerCase())}) · ${esc(r.packs)} · ${main}</span>
       ${open && S.sum === r.id ? sumPanel(r) : ''}
-      ${open ? `<div class="formula" style="white-space:pre-wrap;margin-top:6px">${esc(r.text || '')}</div>
+      ${open ? `${repHTML(r.text)}
       <div class="tools">${r.route === 'spray' ? `<button class="btn small" type="button" data-act="sum">${S.sum === r.id ? 'Zamknij podsumowanie' : 'Podsumowanie'}</button>` : ''}<button class="btn small ghost" type="button" data-act="copy">Kopiuj</button>${canShare() ? '<button class="btn small ghost" type="button" data-act="share">Udostępnij</button>' : ''}${(S.dl || !IN_ARTIFACT) ? '<button class="btn small ghost" type="button" data-act="dl">Pobierz (.txt)</button>' : ''}<button class="btn small danger" type="button" data-act="del">Usuń</button></div>` : ''}</div>`;
   }).join('') || '<div class="empty">Brak raportów pasujących do wyszukiwania.</div>';
-  if(S.sum && S.open === S.sum && S.reps[S.sum] && S.reps[S.sum].sum) sumCalc(S.reps[S.sum]);   // zapisane podsumowanie – od razu z wynikiem
+  if(S.sum && S.open === S.sum && S.reps[S.sum]) sumCalc(S.reps[S.sum]);   // podsumowanie liczy się od razu i na bieżąco – bez przycisku „Przelicz”
 }
 async function reportAction(ev){
   const item = ev.target.closest('.item'); if(!item) return; const id = item.dataset.id; const r = S.reps[id];
@@ -2259,7 +2372,6 @@ async function reportAction(ev){
     const own = Object.values(S.mods).find(m => m.srcReport === id); if(own) (own.checklist || []).forEach(c => { S.sumChk[c.t] = !!c.ok; });
     renderReports(); return;
   }
-  if(btn.dataset.act === 'sum-calc'){ ev.stopPropagation(); return sumCalc(r); }
   if(btn.dataset.act === 'sum-save'){ ev.stopPropagation(); return sumSave(id, r, false); }
   if(btn.dataset.act === 'sum-perm'){ ev.stopPropagation(); return sumSave(id, r, true); }
   if(btn.dataset.act === 'copy') return copyText(r.text || '');
@@ -2472,26 +2584,20 @@ function paramsText(P){ return Object.keys(PARAM).filter(k => P && P[k] != null 
 
 function sumPanel(r){
   const s = r.sum || {}, n = r.sectors || 1, k = r.persons || 1, m = r.modId && S.mods[r.modId];
-  return `<div class="card flat" style="margin-top:8px" data-sum="1">
+  const at = s.at ? new Date(s.at) : null;
+  return `<div class="card flat sumcard" style="margin-top:8px" data-sum="1">
     <h3>Podsumowanie zabiegu</h3>
-    <span class="note">Plan: ${fmt(r.water_l,2)} l · ${esc(r.sprayerName || SPRAYERS.rec15.n)}, dysza ${esc(nnTxt(repNN(r), NOZ[nozOf(r.nozzle)].n))} · ${fmt(r.flow,3)} l/min (${esc(r.flowSrc || '')}) · ${fmtMin(r.minutes)}${n > 1 ? ` w ${n} ${plSektor(n)}` : ''}${k > 1 ? ` · ${k} ${plOsoba(k)}, ${esc(orgText(r.org, n))}` : ''} · ${fmtT(r.ml1000)} ml na 1000 dawek · ${esc(r.mode || '')}</span>
+    <span class="note">Plan: ${esc(r.sprayerName || SPRAYERS.rec15.n)}, dysza ${esc(nnTxt(repNN(r), NOZ[nozOf(r.nozzle)].n))}, ${fmt(r.flow,3)} l/min (${esc(r.flowSrc || '')}) · ${fmtT(r.ml1000)} ml na 1000 ptaków · ${esc(String(r.mode || '').toLowerCase())}${n > 1 ? ` · ${n} ${plSektor(n)}` : ''}${k > 1 ? ` · ${k} ${plOsoba(k)}, ${esc(orgText(r.org, n))}` : ''}</span>
     ${m ? `<span class="note">Ten zabieg sprawdza zalecenia z ${fmtDate(m.date)}: ${esc(changesText(m.changes) || (m.actions || []).join(' ') || 'lista kontrolna')}.</span>` : ''}
-    <div class="row tight">
-      <label>${k > 1 ? 'Rzeczywisty czas zabiegu – od startu do końca, minuty' : 'Rzeczywisty czas oprysku – łącznie, minuty'}
-        <input id="sum-min" type="text" inputmode="numeric" autocomplete="off" value="${esc(String(isNum(s.min) ? s.min : ''))}" placeholder="np. 24"></label>
-      <label>i sekundy
-        <input id="sum-sec" type="text" inputmode="numeric" autocomplete="off" value="${esc(String(isNum(s.sec) ? s.sec : ''))}" placeholder="0"></label>
-      <label>Zużyta objętość (l)
-        <input id="sum-v" type="text" inputmode="decimal" autocomplete="off" value="${esc(String(isNum(s.used) ? fmt(s.used,2) : fmt(r.water_l,2)))}"></label>
-      <label>Ciśnienie na manometrze (bar)
-        <input id="sum-p" type="text" inputmode="decimal" autocomplete="off" value="${esc(String(isNum(s.bar) ? fmtT(s.bar) : fmtT(r.pressure)))}"></label>
+    <div class="sumgrid">
+      <label>Czas – minuty<input id="sum-min" type="text" inputmode="numeric" autocomplete="off" value="${esc(String(isNum(s.min) ? s.min : ''))}" placeholder="np. 24"><span class="hint">plan ${fmtMin(r.minutes)}</span></label>
+      <label>Czas – sekundy<input id="sum-sec" type="text" inputmode="numeric" autocomplete="off" value="${esc(String(isNum(s.sec) ? s.sec : ''))}" placeholder="0"><span class="hint">0–59</span></label>
+      <label>Zużyta woda (l)<input id="sum-v" type="text" inputmode="decimal" autocomplete="off" value="${esc(String(isNum(s.used) ? fmt(s.used,2) : fmt(r.water_l,2)))}"><span class="hint">plan ${fmt(r.water_l,2)} l</span></label>
+      <label>Ciśnienie (bar)<input id="sum-p" type="text" inputmode="decimal" autocomplete="off" value="${esc(String(isNum(s.bar) ? fmtT(s.bar) : fmtT(r.pressure)))}"><span class="hint">plan ${fmtT(r.pressure)} bar</span></label>
     </div>
-    <div class="tools">
-      <button class="btn small" type="button" data-act="sum-calc">Przelicz</button>
-      <button class="btn small ghost" type="button" data-act="sum-save">Zapisz w raporcie</button>
-      <span class="note">Potwierdź parametry albo popraw te, które w kurniku wyszły inaczej.</span>
-    </div>
+    <span class="note">${k > 1 ? 'Czas: cały zabieg – od startu do końca, wszystkie osoby.' : 'Czas: łączny czas natrysku.'} Ciśnienie – odczyt z manometru. Popraw tylko to, co w kurniku wyszło inaczej niż w planie – wynik liczy się na bieżąco.</span>
     <div id="sum-out"></div>
+    <div class="tools sumsave"><button class="btn small" type="button" data-act="sum-save">Uwzględnij zmiany w raporcie końcowym</button>${at ? `<span class="note">Uwzględnione ${at.toLocaleDateString('pl-PL')} o ${at.toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'})}</span>` : ''}</div>
   </div>`;
 }
 function sumRead(){
@@ -2686,7 +2792,7 @@ function sumHTML(d, r){
     if(d.ok){
       h += `<div class="msg ok" style="margin-top:8px"><b>Zalecenia z ${fmtDate(m.date)} zadziałały.</b> ${ct ? 'Zmienione: ' + esc(ct) + '. ' : ''}Zabieg zmieścił się w czasie i przebiegł zgodnie z planem.</div>`;
       if((m.changes || []).length && m.status !== 'stala' && m.farmKey) h += `<div class="msg info" style="margin-top:8px"><b>Wprowadzić sprawdzone ustawienia na stałe dla fermy „${esc(m.farm)}”?</b> Przy kolejnych szczepieniach na tej fermie aplikacja ustawi je sama: ${esc(paramsText(repConfig(r)))}.
-        <div class="tools" style="margin-top:6px"><button class="btn small" type="button" data-act="sum-perm">Tak, na stałe</button><button class="btn small ghost" type="button" data-act="sum-save">Nie, tylko zapisz</button></div></div>`;
+        <div class="tools" style="margin-top:6px"><button class="btn small" type="button" data-act="sum-perm">Tak, na stałe</button><span class="note">albo tylko „Uwzględnij zmiany w raporcie końcowym” niżej</span></div></div>`;
     } else h += `<div class="msg bad" style="margin-top:8px"><b>Zalecenia z ${fmtDate(m.date)} nie wystarczyły.</b> ${ct ? 'Zmienione były: ' + esc(ct) + '. ' : ''}Niżej nowe zalecenia – po zapisaniu zastąpią poprzednie.</div>`;
   }
   if(!d.problems.length){
@@ -2723,31 +2829,32 @@ async function sumSave(id, r, perm){
   const box = $('sum-out'); if(box) box.innerHTML = sumHTML(d, r);
   if(!d.calc){ toast('Uzupełnij czas oprysku.'); return; }
   const c = d.calc, now = new Date().toISOString(), key = farmKey(r.farm);
-  const L = ['', 'PODSUMOWANIE ZABIEGU',
-    `Czas rzeczywisty: ${fmtMin(c.t)}${Math.abs(c.ts - c.t) > 1e-6 ? ` (${fmtMin(c.ts)} na sektor)` : ''}${c.k > 1 ? ` · ${c.k} ${plOsoba(c.k)}` : ''}`,
-    `Zużyta objętość: ${fmt(c.V,2)} l (plan ${fmt(r.water_l,2)} l)`,
-    `Ciśnienie na manometrze: ${fmtT(c.p)} bar (plan ${fmtT(r.pressure)} bar)`,
-    `Wydatek rzeczywisty${c.k > 1 ? ' (na opryskiwacz)' : ''}: ${fmt(c.Q,3)} l/min, oczekiwany ${fmt(c.Qexp,3)} l/min (${isNum(c.rr) ? (c.rr >= 1 ? '+' : '−') + fmt0(Math.abs(c.rr - 1) * 100) + '%' : '–'})`];
-  d.msgs.forEach(([, t]) => L.push('- ' + t));
-  if(d.verify) L.push(`Zalecenia z ${fmtDate(d.verify.mod.date)}: ${d.ok ? 'zadziałały' + (perm ? ' – wprowadzone na stałe' : '') : 'nie wystarczyły'}`);
-  if(d.changes.length) L.push('Zmiany na następny zabieg: ' + changesText(d.changes));
-  if(d.alt) L.push('Inna możliwość (bez zmniejszania wody): ' + changesText(d.alt.changes) + '; ' + predText(d.alt.pred));
-  if(d.alt2) L.push('Z dodatkową osobą: ' + changesText(d.alt2.changes) + '; ' + predText(d.alt2.pred));
-  d.actions.forEach(a => L.push('Zalecenie: ' + a));
-  if(d.checklist.length) L.push('Do sprawdzenia: ' + d.checklist.map(x => (S.sumChk[x] ? '[x] ' : '[ ] ') + x).join('; '));
-  if(!d.problems.length) L.push('Zabieg zgodny z planem.');
-  const base = String(r.text || '').split('\nPODSUMOWANIE ZABIEGU')[0].replace(/\s+$/,'');
+  const dev = isNum(c.rr) ? (c.rr >= 1 ? '+' : '−') + fmt0(Math.abs(c.rr - 1) * 100) + '%' : '–';
+  const L = ['', R_SEP, `PODSUMOWANIE ZABIEGU · ${fmtDate(todayISO())}`,
+    rkv(c.k > 1 ? 'Czas zabiegu' : 'Czas oprysku', `${fmtMin(c.t)}${Math.abs(c.ts - c.t) > 1e-6 ? ` (${fmtMin(c.ts)} na sektor)` : ''}${c.k > 1 ? ` · ${c.k} ${plOsoba(c.k)}` : ''}`),
+    rkv('Zużyta woda', `${fmt(c.V,2)} l (plan ${fmt(r.water_l,2)} l)`),
+    rkv('Ciśnienie', `${fmtT(c.p)} bar (plan ${fmtT(r.pressure)} bar)`),
+    rkv('Wydatek', `${fmt(c.Q,3)} l/min (${dev})${c.k > 1 ? ' na opryskiwacz' : ''}`), rkv('Oczekiwany', `${fmt(c.Qexp,3)} l/min`),
+    rkv('Wynik', d.problems.length ? 'niezgodnie z planem' : 'zgodnie z planem')];
+  if(d.verify) L.push(rkv('Zalecenia', `z ${fmtDate(d.verify.mod.date)} – ${d.ok ? 'zadziałały' + (perm ? ', wprowadzone na stałe' : '') : 'nie wystarczyły'}`));
+  const sub = (t, a) => { a = a.filter(Boolean); if(a.length) L.push('', '  ' + t, ...a); };
+  sub('Uwagi:', rbul(d.msgs.map(x => x[1]), '    '));
+  sub('Zmiany na następny zabieg:', rbul(d.changes.filter(x => PARAM[x.k]).map(x => `${PARAM[x.k].l.toLowerCase()}: ${PARAM[x.k].f(x.from)} → ${PARAM[x.k].f(x.to)}`), '    '));
+  sub('Inne możliwości:', rbul([d.alt ? `bez zmniejszania wody: ${changesText(d.alt.changes)}; ${predText(d.alt.pred)}` : '', d.alt2 ? `z dodatkową osobą: ${changesText(d.alt2.changes)}; ${predText(d.alt2.pred)}` : ''], '    '));
+  sub('Zalecenia:', rbul(d.actions, '    '));
+  sub('Do sprawdzenia:', d.checklist.map(x => rwrap(`    ${S.sumChk[x] ? '[x]' : '[ ]'} `, x, 8)));
+  const base = repBase(r.text);
   const sum = {min:inp.min, sec:inp.sec, used:c.V, bar:c.p, flow:c.Q, dev:c.rr, ok:d.ok, at:now};
   try {
     const rep = Object.assign({}, r); delete rep.id;
-    await S.store.set(id, Object.assign(rep, {sum, text:base + L.join('\n')}));
-    let msg = 'Podsumowanie zapisane w raporcie.';
+    await S.store.set(id, Object.assign(rep, {sum, text:[base, ...L.filter(x => x != null), ...repFooter()].join('\n')}));
+    let msg = 'Uwzględniono w raporcie końcowym.';
     if(d.verify){
       const m = d.verify.mod;
       const upd = Object.assign({}, m, {verifiedAt:now, verifyReport:id, verdict:d.ok ? 'ok' : 'problem',
         status:d.ok ? (perm ? 'stala' : (m.status === 'stala' ? 'stala' : 'skuteczna')) : 'nieskuteczna'});
-      if(d.ok && perm){ upd.permanentAt = now; await saveFarmSettings(m, now, r); msg = `Zapisano. Ustawienia wprowadzone na stałe dla fermy „${m.farm}”.`; }
-      else if(d.ok) msg = 'Zapisano. Zalecenia zadziałały – na stałe możesz je wprowadzić też później, w zakładce Zmiany.';
+      if(d.ok && perm){ upd.permanentAt = now; await saveFarmSettings(m, now, r); msg = `Uwzględniono w raporcie końcowym. Ustawienia wprowadzone na stałe dla fermy „${m.farm}”.`; }
+      else if(d.ok) msg = 'Uwzględniono w raporcie końcowym. Zalecenia zadziałały – na stałe możesz je wprowadzić też później, w zakładce Zmiany.';
       await S.store.set(d.verify.id, upd);
     }
     const own = Object.entries(S.mods).find(([, m]) => m.srcReport === id);
@@ -2761,7 +2868,7 @@ async function sumSave(id, r, perm){
         alt:d.alt ? {changes:d.alt.changes, t:d.alt.pred.t, ts:d.alt.pred.ts, n:d.alt.pred.n, k:d.alt.pred.k || 1} : null,
         alt2:d.alt2 ? {changes:d.alt2.changes, t:d.alt2.pred.t, ts:d.alt2.pred.ts, n:d.alt2.pred.n, k:d.alt2.pred.k || 1} : null,
         status:own && own[1].status !== 'zalecona' ? own[1].status : 'zalecona'});
-      msg = key ? `Zapisano. Przy kolejnym szczepieniu na fermie „${r.farm}” aplikacja przypomni o zaleceniach.` : 'Zapisano. Wpisuj nazwę fermy w raporcie – wtedy aplikacja przypomni o zaleceniach przy kolejnym szczepieniu.';
+      msg = key ? `Uwzględniono w raporcie końcowym. Przy kolejnym szczepieniu na fermie „${r.farm}” aplikacja przypomni o zaleceniach.` : 'Uwzględniono w raporcie końcowym. Wpisuj nazwę fermy w raporcie – wtedy aplikacja przypomni o zaleceniach przy kolejnym szczepieniu.';
     } else if(own && own[1].status === 'zalecona') await S.store.remove(own[0]);
     toast(msg);
   } catch(e){ toast(errText(e)); }

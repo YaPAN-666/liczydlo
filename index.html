@@ -293,6 +293,8 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 .grp .seg button small{display:block;margin:2px 0 0;font-size:.74em;font-weight:400;opacity:.8}
 .sub-h{font-size:.95rem;margin:14px 0 6px}
 details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6px 0}details.chlog .list{margin-top:6px}
+
+.adocs{border:1px solid var(--line,#d7ddd8);border-radius:10px;padding:8px 12px;margin:10px 0 0;display:grid;gap:6px}.adocs legend{font-weight:600;font-size:.9rem;padding:0 4px}.adocs .chk{display:flex;gap:8px;align-items:flex-start;font-size:.9rem}
 </style>
 </head>
 <body>
@@ -587,7 +589,8 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
             <input id="i-ml2" type="number" min="0.01" step="0.05" placeholder="z ChPLW" inputmode="decimal"></label>
         </div>
         <div id="auto-wrap" hidden>
-          <h3 class="sub-h">Szczepionka autogenna – dane z etykiety serii</h3>
+          <h3 class="sub-h">Szczepionka autogenna – dane z dokumentów serii</h3>
+          <p class="note">Szczepionka autogenna nie ma ChPLW (nie wymaga pozwolenia na dopuszczenie do obrotu). Dawkę, drogę podania, przechowywanie i karencję bierze się z instrukcji stosowania dołączonej przez laboratorium do serii, a skład i adiuwant – z certyfikatu (specyfikacji) serii.</p>
           <div class="row">
             <label class="wide">Drobnoustroje (szczepy)
               <input id="a-strain" list="a-strains" autocomplete="off" placeholder="np. E. coli O78, Pasteurella multocida">
@@ -613,7 +616,14 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
               <input id="a-exp" type="date"></label>
             <label>Nr gospodarstwa
               <input id="a-farm" autocomplete="off" placeholder="źródło szczepu"></label>
+            <label>Karencja
+              <input id="a-wd" autocomplete="off" placeholder="z instrukcji serii, np. 0 dni"></label>
           </div>
+          <fieldset class="adocs"><legend>Dokumenty serii (od laboratorium)</legend>
+            <label class="chk"><input type="checkbox" id="a-doc-cert"> Certyfikat / specyfikacja serii – skład, adiuwant, badania jałowości i bezpieczeństwa</label>
+            <label class="chk"><input type="checkbox" id="a-doc-instr"> Instrukcja stosowania – dawka, droga podania, przechowywanie, karencja</label>
+            <label class="chk"><input type="checkbox" id="a-doc-order"> Zlecenie (recepta) lekarza weterynarii dla tej jednostki epidemiologicznej</label>
+          </fieldset>
         </div>
       </div>
     </div>
@@ -1483,12 +1493,13 @@ const VACCINES = [
 
 /* ---------- Szablon ---------- */
 {id:'autogenna', n:'Szczepionka autogenna (stadna) – szablon', m:'uprawnione laboratorium – na receptę lekarza weterynarii', t:'inaktywowana (autogenna)', dz:['E. coli','Pasteurella','ORT','inne'], s:'szczep(y) wyizolowane w tym stadzie – wg etykiety serii', sp:['kury','indyki','kaczki','kaczki-p','gesi'], st:'sz', auto:true,
+ docs:'Brak ChPLW – szczepionka autogenna jest wytwarzana na zlecenie lekarza weterynarii z drobnoustrojów (zwykle inaktywowanych bakterii, np. E. coli, Pasteurella multocida, Enterococcus cecorum) wyizolowanych w danym stadzie i nie wymaga pozwolenia na dopuszczenie do obrotu. Do każdej serii laboratorium dołącza: specyfikację / certyfikat serii (szczepy, adiuwant – np. emulsja olejowa lub wodorotlenek glinu, wyniki badań jałowości i bezpieczeństwa), instrukcję stosowania (dawka – np. 0,25–0,5 ml, droga – zwykle podskórnie lub domięśniowo, przechowywanie – zwykle 2–8°C, karencja) oraz formularz zlecenia lekarza dla jednostki epidemiologicznej. Szczegóły – u laboratorium-wytwórcy; ChPLW szczepionek zarejestrowanych – w Rejestrze Produktów Leczniczych.',
  src:[{t:'Rozporządzenie (UE) 2019/6, art. 106 ust. 5 – szczepionki autogenne', u:'https://eur-lex.europa.eu/eli/reg/2019/6/oj'}, {t:'Prawo farmaceutyczne, art. 3 ust. 4 pkt 6 (tekst jedn. Dz.U. 2026 poz. 612)', u:'https://eli.gov.pl/eli/DU/2026/612/ogl/pol/pdf'}, {t:'Aviagen – stosowanie bakteryn (adiuwant, igły, miejsca, czas przed nieśnością)', u:'https://eseu.aviagen.com/assets/Tech_Center/LIR_Tech_Articles/IRBeSmart-BacterinUsage-2019-EN.pdf'}],
  min:{}, minT:'wg recepty i etykiety serii; bakteryny zwykle dwie dawki przed nieśnością (Aviagen: pierwsza w 8.–10. tyg., ostatnia w 18.–19. tyg.)', pk:[], use:'wg etykiety serii', wd:'wg etykiety serii – podaje laboratorium; nie zakładaj 0 dni bez potwierdzenia',
  lay:'wg etykiety serii; ostatnią iniekcję podać przed nieśnością (Aviagen: do 18.–19. tyg.) – iniekcja tuż przed nieśnością może obniżyć start i szczyt nieśności', mix:'Nie mieszać z innymi szczepionkami; łączenie i odstępy – decyzja lekarza weterynarii.',
  sch:'Tylko szczepionka inaktywowana, dla ptaków z tej samej jednostki epidemiologicznej, z której wyizolowano szczep (albo z potwierdzonym powiązaniem epidemiologicznym) – rozp. (UE) 2019/6, art. 106 ust. 5; bez pozwolenia na dopuszczenie do obrotu – art. 3 ust. 4 pkt 6 Prawa farmaceutycznego. Stosowana, gdy szczepionka rejestrowana jest niedostępna lub nie chroni przed szczepem z fermy; wymaga recepty lekarza weterynarii. U kaczek i gęsi m.in. riemerelloza (Riemerella anatipestifer), pasterelloza i E. coli – na te choroby drobiu wodnego w Rejestrze nie znaleziono szczepionek z pozwoleniem (stan 15.11.2026).',
  store:'Zwykle 2–8°C, nie zamrażać – wg etykiety serii.',
- r:{inj:{site:'s.c. (szyja – dystalna 1/3, albo fałd pachwinowy) lub i.m. (pierś) – wg etykiety serii', note:'Dawka, opakowanie, adiuwant, termin ważności i karencja – z etykiety serii laboratorium.'}}}
+ r:{inj:{site:'s.c. (szyja – dystalna 1/3, albo fałd pachwinowy) lub i.m. (pierś) – wg instrukcji serii', note:'Dawka (zwykle 0,25–0,5 ml), opakowanie, adiuwant, termin ważności i karencja – z instrukcji stosowania i certyfikatu serii od laboratorium (brak ChPLW).'}}}
 ];
 
 
@@ -1605,7 +1616,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.17.1';
+const APP_VERSION = '1.17.2';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2252,6 +2263,9 @@ function calc(){
       const bk = $('bird').value;
       if(bk === 'kury-niesnosc' || bk === 'indyki-repro') msgs.push(['warn', 'Ptaki w nieśności: iniekcja bakteryny może obniżyć nieśność – zwykle ostatnią dawkę podaje się przed nieśnością (Aviagen: do 18.–19. tyg.); decyzja lekarza weterynarii.']);
       else if(bk === 'kury-odchow') msgs.push(['info', 'Odchów: bakteryny zwykle dwie dawki – pierwsza w 8.–10. tyg., ostatnia w 18.–19. tyg., aby ptaki zdążyły wrócić do formy przed nieśnością (Aviagen). Odstęp wg recepty.']);
+      if(!$('a-doc-instr').checked) msgs.push(['warn', 'Brak ChPLW: dawkę, drogę podania, przechowywanie i karencję weź z instrukcji stosowania dołączonej do serii przez laboratorium (zaznacz, gdy ją masz). Typowo 0,25–0,5 ml podskórnie lub domięśniowo, 2–8°C – ale obowiązuje instrukcja serii.']);
+      if(!$('a-doc-cert').checked) msgs.push(['info', 'Skład (wyizolowane szczepy) i adiuwant sprawdź w certyfikacie / specyfikacji serii – zawiera też wyniki badań jałowości i bezpieczeństwa.']);
+      if(!$('a-wd').value.trim()) msgs.push(['info', 'Wpisz karencję z instrukcji serii – nie zakładaj 0 dni bez potwierdzenia.']);
       if(!$('a-lot').value.trim()) msgs.push(['info', 'Wpisz nr serii, laboratorium i nr gospodarstwa – szczepionka autogenna jest tylko dla stada (jednostki epidemiologicznej), z którego pochodzi szczep.']);
     }
     // Szczepionki z pozwoleniem: adiuwant z ChPLW (adj) – olej mineralny albo wodorotlenek glinu
@@ -2274,7 +2288,8 @@ function calc(){
     msgs.push(['info', `Przed szczepieniem sprawdź dawkę aparatu: 10 dawek do cylindra miarowego = ${fmtT(ml * 10, 1)} ml${inj2 ? ` (druga strona: ${fmtT(inj2.dose_ml * 10, 1)} ml)` : ''}.`]);
 
     Object.assign(R, {vaccine_ml:Vml, dose_ml:ml, injApp:two ? 2 : 1, inj2, injSite:SITES[site], needle:avi ? (r.needle || NEEDLE[site]) : null,
-      auto:auto ? {strain, adj:ADJ[adj] ? ADJ[adj].l : '', lab:$('a-lab').value.trim(), lot:$('a-lot').value.trim(), exp:$('a-exp').value, farmId:$('a-farm').value.trim()} : null});
+      auto:auto ? {strain, adj:ADJ[adj] ? ADJ[adj].l : '', lab:$('a-lab').value.trim(), lot:$('a-lot').value.trim(), exp:$('a-exp').value, farmId:$('a-farm').value.trim(), wd:$('a-wd').value.trim(),
+        docs:[['a-doc-cert', 'certyfikat serii'], ['a-doc-instr', 'instrukcja stosowania'], ['a-doc-order', 'zlecenie lekarza wet.']].filter(([id]) => $(id).checked).map(x => x[1])} : null});
   }
 
   $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R) : '';
@@ -2286,7 +2301,7 @@ function calc(){
   S.last = {v, bird, R, msgs};
 }
 // Dodatkowe dane z ulotki: bezpieczeństwo szczepiącego, odczyny po szczepieniu, przechowywanie
-function extraKV(v){ return [['Postać', v.pf], ['Adiuwant', v.adjT], ['Dla szczepiącego', v.safe], ['Po szczepieniu', v.ae], ['Przedawkowanie', v.od], ['Przechowywanie', v.store], ['Pozwolenie', v.ma]].filter(x => x[1]).map(([k, t]) => `<dt>${k}</dt><dd>${esc(t)}</dd>`).join(''); }
+function extraKV(v){ return [['Dokumentacja', v.docs], ['Postać', v.pf], ['Adiuwant', v.adjT], ['Dla szczepiącego', v.safe], ['Po szczepieniu', v.ae], ['Przedawkowanie', v.od], ['Przechowywanie', v.store], ['Pozwolenie', v.ma]].filter(x => x[1]).map(([k, t]) => `<dt>${k}</dt><dd>${esc(t)}</dd>`).join(''); }
 // Przygotowanie szczepionki do iniekcji krok po kroku – z ChPLW (pole prep)
 function injSteps(r){
   const L = a => a.filter(Boolean).map(x => `<li>${esc(x)}</li>`).join('');
@@ -2381,7 +2396,7 @@ function reportText(){
   const sec = (title, rows) => { rows = rows.filter(Boolean); if(rows.length) out.push('', title, ...rows); };
   sec('STADO', [rkv('Drób', L.bird.l), rkv('Wiek', `${R.age} ${R.age === 1 ? 'dzień' : 'dni'}${R.age >= 14 ? ` (${ageWeeks(R.age)})` : ''}`), rkv('Liczba ptaków', fmt0(R.birds) + ' szt.')]);
   sec('SZCZEPIENIE', [rkv('Choroba', dzT), rkv('Szczepionka', v ? v.n : 'spoza bazy'), rkv('Droga podania', ROUTES[R.route].toLowerCase()),
-    R.doses ? rkv('Fiolki', `${R.packs} = ${fmt0(R.doses)} dawek`) : null, v ? rkv('Karencja', v.wd) : null]);
+    R.doses ? rkv('Fiolki', `${R.packs} = ${fmt0(R.doses)} dawek`) : null, v ? rkv('Karencja', v.auto ? ($('a-wd').value.trim() ? `${$('a-wd').value.trim()} (instrukcja serii)` : 'wg instrukcji serii – nie wpisano') : v.wd) : null]);
   if(R.route === 'spray'){
     const k = R.persons || 1, n = R.sectors || 1, m = R.modId && S.mods[R.modId];
     const rows = [rkv('Woda', `${fmt(R.water_l,2)} l (${fmtT(R.ml1000)} ml na 1000)`), rkv('Opryskiwacz', R.sprayerName || 'Birchmeier REC 15 AC1'),
@@ -2404,7 +2419,8 @@ function reportText(){
       rkv('Miejsce', R.injSite), rkv('Igła', R.needle),
       i2 ? rkv('Szczepionka 2', `${i2.vacName} – ${fmtT(i2.dose_ml,2)} ml na ptaka, razem ${fmt0(i2.vaccine_ml)} ml${i2.packs ? `, ${i2.packs} dawek` : ''}`) : null]);
     if(a) sec('SZCZEPIONKA AUTOGENNA', [rkv('Drobnoustroje', a.strain || 'nie wpisano'), rkv('Adiuwant', a.adj || 'nie wybrano'), rkv('Laboratorium', a.lab), rkv('Seria', a.lot),
-      rkv('Ważna do', /^\d{4}-\d{2}-\d{2}$/.test(a.exp || '') ? fmtDate(a.exp) : a.exp), rkv('Gospodarstwo', a.farmId ? `${a.farmId} (jednostka epidemiologiczna)` : '')]);
+      rkv('Ważna do', /^\d{4}-\d{2}-\d{2}$/.test(a.exp || '') ? fmtDate(a.exp) : a.exp), rkv('Gospodarstwo', a.farmId ? `${a.farmId} (jednostka epidemiologiczna)` : ''),
+      rkv('Dokumenty', a.docs && a.docs.length ? a.docs.join(', ') : 'nie potwierdzono'), rkv('Podstawa', 'brak ChPLW – dokumenty serii od laboratorium')]);
   }
   const w = L.msgs.filter(m => m[0] === 'bad' || m[0] === 'warn').map(m => m[1]);
   if(w.length) out.push('', 'UWAGI Z OBLICZEŃ', ...rbul(w));
@@ -3875,7 +3891,8 @@ function bind(){
   $('sp-seg').addEventListener('click', ev => { const b = ev.target.closest('[data-sp]'); if(b) pickSpecies(b.dataset.sp); });
   $('grp').addEventListener('click', ev => { const b = ev.target.closest('[data-bird]'); if(b) setBird(b.dataset.bird); });
   $('i-site').addEventListener('change', () => { S.siteTouched = true; });
-  ['a-adj', 'a-strain', 'a-lab', 'a-lot', 'a-exp', 'a-farm'].forEach(id => $(id).addEventListener('input', () => scheduleCalc()));
+  ['a-adj', 'a-strain', 'a-lab', 'a-lot', 'a-exp', 'a-farm', 'a-wd'].forEach(id => $(id).addEventListener('input', () => scheduleCalc()));
+  ['a-doc-cert', 'a-doc-instr', 'a-doc-order'].forEach(id => $(id).addEventListener('change', () => scheduleCalc()));
   $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(!b || b.disabled) return; if(b.dataset.alt) pickRoute(b.dataset.route); else { S.rPref = b.dataset.route; setRoute(b.dataset.route); } });
   $('s-ml').addEventListener('input', () => { S.mlTouched = true; });
   $('s-src').addEventListener('change', flowSrcUI);

@@ -707,8 +707,6 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
       </div>
       <div class="tools">
         <button class="btn" type="button" id="fb-send">Wyślij</button>
-        <button class="btn ghost" type="button" id="fb-mail" hidden>E-mailem</button>
-        <button class="btn ghost" type="button" id="fb-copy">Kopiuj treść</button>
       </div>
       <span class="note" id="fb-addr-note"></span>
     </div>
@@ -1584,7 +1582,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.16.7';
+const APP_VERSION = '1.16.8';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2407,9 +2405,8 @@ async function fbLoad(){
 }
 function fbPaint(){
   const op = opOn();
-  $('fb-mail').hidden = !op || !FB_TO;
-  $('fb-addr-note').textContent = op ? `Zgłoszenie trafia prosto do autora aplikacji (wymaga internetu).${FB_TO ? ` Bez internetu: „E-mailem” albo skopiuj treść i wyślij na ${FB_TO}.` : ''}`
-    : FB_TO ? `Adres: ${FB_TO}. Jeśli poczta się nie otworzy, skopiuj treść i wyślij ją na ten adres.` : 'Adres do zgłoszeń nie jest jeszcze ustawiony – skopiuj treść i przekaż ją autorowi aplikacji.';
+  $('fb-addr-note').textContent = op ? 'Zgłoszenie trafia prosto do autora aplikacji (wymaga internetu).'
+    : FB_TO ? '„Wyślij” otworzy pocztę z gotową wiadomością do autora aplikacji.' : 'Wysyłanie zgłoszeń nie jest jeszcze ustawione.';
 }
 function fbMode(){ try { return IN_ARTIFACT ? 'podgląd w Claude' : matchMedia('(display-mode: standalone)').matches ? 'zainstalowana aplikacja' : 'przeglądarka'; } catch(e){ return 'przeglądarka'; } }
 function fbMail(){
@@ -2436,17 +2433,16 @@ async function fbSend(){
     await opFeedback({type:$('fb-type').value, msg:$('fb-msg').value.trim().slice(0, 4000), name:$('fb-name').value.trim().slice(0, 120), ctx:$('fb-ctx').checked ? fbCtxLine().slice(0, 600) : ''});
     $('fb-msg').value = ''; toast('Wysłano do autora aplikacji – dziękujemy!', 5000);
   } catch(e){
-    toast(FB_TO ? 'Nie udało się wysłać (brak internetu?) – otwieram e-mail jako zapas.' : 'Nie udało się wysłać – sprawdź internet albo skopiuj treść.', 6000);
-    if(FB_TO) setTimeout(fbMailSend, 600);
+    toast('Nie udało się wysłać – sprawdź internet i spróbuj ponownie. Treść zgłoszenia została w polu.', 6000);
   } finally { btn.disabled = false; btn.textContent = 'Wyślij'; }
 }
 function fbMailSend(){
   if(!$('fb-msg').value.trim()){ toast('Wpisz opis zgłoszenia.'); $('fb-msg').focus(); return; }
-  if(!FB_TO){ toast('Adres do zgłoszeń nie jest ustawiony – użyj „Kopiuj treść”.', 5000); return; }
+  if(!FB_TO){ toast('Wysyłanie zgłoszeń nie jest jeszcze ustawione.', 5000); return; }
   const m = fbMail(), a = document.createElement('a');
   a.href = `mailto:${FB_TO}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
   document.body.appendChild(a); a.click(); a.remove();
-  toast(IN_ARTIFACT ? 'W podglądzie poczta może się nie otworzyć – użyj „Kopiuj treść”.' : 'Otwieram pocztę – sprawdź wiadomość i wyślij ją.', 6000);
+  toast(IN_ARTIFACT ? 'W podglądzie poczta może się nie otworzyć.' : 'Otwieram pocztę – sprawdź wiadomość i wyślij ją.', 6000);
 }
 async function copyText(text){
   try { await navigator.clipboard.writeText(text); toast('Skopiowano.'); return; } catch(e){}
@@ -3811,8 +3807,6 @@ function bind(){
   window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
   fbPaint(); fbLoad();
   $('fb-send').addEventListener('click', fbSend);
-  $('fb-mail').addEventListener('click', fbMailSend);
-  $('fb-copy').addEventListener('click', () => { const m = fbMail(); copyText(`${FB_TO ? 'Do: ' + FB_TO + '\n' : ''}Temat: ${m.subject}\n\n${m.body}`); });
   $('bird').addEventListener('change', () => {
     const v = curVac(), bk = birdKey(); if(v && bk && !v.sp.includes(BIRDS[bk].g)) S.dzAll = true;   // szczepionka nie dla tych ptaków
     fillDz(); fillVac({notify:true}); buildRoutes(); applyDefaults(); calc(); saveWants();

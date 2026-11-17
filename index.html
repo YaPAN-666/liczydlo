@@ -609,7 +609,13 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
               </select>
               <span class="hint" id="a-adj-hint"></span></label>
             <label>Laboratorium
-              <input id="a-lab" autocomplete="off" placeholder="wytwórca serii"></label>
+              <input id="a-lab" list="a-labs" autocomplete="off" placeholder="wpisz lub wybierz">
+              <datalist id="a-labs">
+                <option value="Lab-Vet Sp. z o.o. (Tarnowo Podgórne)"><option value="RB VAC Sp. z o.o. (Zielona Góra)">
+                <option value="INVAC Polska Sp. z o.o. (Otyn)"><option value="AGRO-VET Laboratorium Weterynaryjne (Wrocław)">
+                <option value="Vet Lab Group (Gietrzwałd)"><option value="SLW Biolab (Ostróda)">
+              </datalist>
+              <span class="hint">podpowiedzi to tylko sugestia – można wpisać inne laboratorium</span></label>
             <label>Nr serii
               <input id="a-lot" autocomplete="off" placeholder="z etykiety"></label>
             <label>Ważna do
@@ -1616,7 +1622,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.17.2';
+const APP_VERSION = '1.17.3';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};

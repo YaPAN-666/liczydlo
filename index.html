@@ -330,6 +330,8 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
         <input id="gate-rname" type="text" autocomplete="name" maxlength="120"></label>
       <label>Telefon (opcjonalnie)
         <input id="gate-rphone" type="tel" autocomplete="tel" maxlength="30"></label>
+      <label>Wiadomość (opcjonalnie)
+        <textarea id="gate-rmsg" rows="3" maxlength="1000" placeholder="np. proszę o odblokowanie – technik firmy X"></textarea></label>
       <button class="btn" type="button" id="gate-rsend">Poproś o licencję</button>
       <p class="note" id="gate-req-done" hidden></p>
     </div>
@@ -1465,7 +1467,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.16.1';
+const APP_VERSION = '1.16.2';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -3418,15 +3420,15 @@ async function opTrialDevice(){
 // --- prośba o licencję / kontakt z administratorem (jedna na urządzenie, aż administrator ją załatwi) ---
 const OP_REQ_KEY = 'liczydlo.prosba.v1';
 function opReqPaint(st){
-  const req = lsGet(OP_REQ_KEY), on = opOn() && !!OP.app && (st === 'key' || st === 'oplock');
+  const req = lsGet(OP_REQ_KEY), on = opOn() && !!OP.app && (st === 'key' || st === 'oplock' || st === 'lock');
   $('gate-req').hidden = !on; if(!on) return;
   $('gate-req-lead').textContent = st === 'key' ? 'Nie masz licencji? Wyślij prośbę – administrator wyda ją jednym kliknięciem, a aplikacja włączy się sama.'
     : 'Chcesz odblokować aplikację? Wyślij wiadomość do administratora – po odblokowaniu lub wydaniu licencji aplikacja włączy się sama.';
   $('gate-rsend').textContent = st === 'key' ? 'Poproś o licencję' : 'Napisz do administratora';
   const done = !!(req && req.at);
-  $('gate-rsend').hidden = done; $('gate-rname').closest('label').hidden = done; $('gate-rphone').closest('label').hidden = done;
+  $('gate-rsend').hidden = done; ['gate-rname', 'gate-rphone', 'gate-rmsg'].forEach(k => { $(k).closest('label').hidden = done; });
   $('gate-req-done').hidden = !done;
-  if(done) $('gate-req-done').textContent = `Prośba wysłana ${new Date(req.at).toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})}. Kod tej kopii: ${OP.id.code}. Aplikacja sprawdza co minutę, czy administrator już odpowiedział.`;
+  if(done) $('gate-req-done').textContent = `${req.type === 'kontakt' ? 'Wiadomość wysłana' : 'Prośba wysłana'} ${new Date(req.at).toLocaleString('pl-PL', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})} – administrator widzi ją w panelu Operator (zakładka Prośby). Kod tej kopii: ${OP.id.code}. Aplikacja co minutę sprawdza, czy już odpowiedział.`;
   if(done) opReqPoll();
 }
 function opReqPaintInfo(){
@@ -3436,18 +3438,20 @@ function opReqPaintInfo(){
   $('k-req-done').hidden = !(req && req.at);
   if(req && req.at) $('k-req-done').textContent = `Prośba o licencję wysłana ${new Date(req.at).toLocaleDateString('pl-PL')} – licencja włączy się sama, gdy administrator ją wyda.`;
 }
-async function opRequest(type, name, phone){
+// Jeden wpis na kopię (identyfikator wpisu = identyfikator kopii). Zapis bez warunku „wpisu jeszcze nie ma”:
+// nowa prośba albo ponowienie poprzedniej – także już załatwionej (reguły panelu pozwalają kopii nadpisać tylko
+// swój wpis i tylko jako „nowa”). Do 1.16.1 druga prośba tej samej kopii po cichu ginęła, a aplikacja pisała „wysłana”.
+async function opRequest(type, name, phone, msg){
   opLoad(); if(!opOn()) throw new Error('off');
-  const d = {type, name:String(name || '').trim().slice(0, 120), phone:String(phone || '').trim().slice(0, 30), code:OP.id.code, ver:APP_VERSION, os:opOs(), mode:fbMode().slice(0, 30), status:'nowa'};
+  const d = {type, name:String(name || '').trim().slice(0, 120), phone:String(phone || '').trim().slice(0, 30), msg:String(msg || '').trim().slice(0, 1000), code:OP.id.code, ver:APP_VERSION, os:opOs(), mode:fbMode().slice(0, 30), status:'nowa'};
   Object.keys(d).forEach(k => { if(d[k] === '') delete d[k]; });
-  try { await fsCommit([{update:{name:fsName(fsAppPath('requests/' + OP.id.id)), fields:fsF(d)}, updateTransforms:[NOW('created')], currentDocument:{exists:false}}]); }
-  catch(e){ if(![400, 403, 409].includes(e.status)) throw e; }   // prośba już jest w panelu
+  await fsCommit([{update:{name:fsName(fsAppPath('requests/' + OP.id.id)), fields:fsF(d)}, updateTransforms:[NOW('created')]}]);
   lsSet(OP_REQ_KEY, {at:new Date().toISOString(), type});
 }
-async function opReqSend(btn, type, name, phone, out){
-  btn.disabled = true; const txt = btn.textContent; btn.textContent = 'Wysyłam…';
-  try { await opRequest(type, name, phone); toast('Prośba wysłana do administratora.', 5000); }
-  catch(e){ if(out) out.textContent = 'Nie udało się wysłać – sprawdź internet i spróbuj ponownie.'; }
+async function opReqSend(btn, type, name, phone, out, msg){
+  btn.disabled = true; const txt = btn.textContent; btn.textContent = 'Wysyłam…'; if(out) out.textContent = '';
+  try { await opRequest(type, name, phone, msg); toast(type === 'kontakt' ? 'Wiadomość wysłana do administratora.' : 'Prośba o licencję wysłana do administratora.', 5000); if($('gate-rmsg')) $('gate-rmsg').value = ''; }
+  catch(e){ if(out) out.textContent = navigator.onLine === false ? 'Brak internetu – połącz telefon i spróbuj ponownie.' : `Nie udało się wysłać${e.code ? ` (${e.code})` : ''} – spróbuj ponownie za chwilę. Jeśli to się powtarza, zadzwoń do administratora i podaj kod kopii ${OP.id ? OP.id.code : ''}.`; }
   finally { btn.disabled = false; btn.textContent = txt; gateRender(); opReqPaintInfo(); }
 }
 // Administrator załatwił prośbę (usunął ją albo wydał licencję) – można wysłać kolejną
@@ -3635,7 +3639,7 @@ function opInit(){
   opLoad();
   $('opbar').addEventListener('click', e => { const b = e.target.closest('[data-bar]'); if(b){ lsSet(OP_BAR_KEY, b.dataset.bar); opPaint(); } });
   $('k-form').addEventListener('submit', e => { e.preventDefault(); licActivate($('k-in').value); });
-  $('gate-rsend').addEventListener('click', () => opReqSend($('gate-rsend'), G.state === 'key' ? 'licencja' : 'kontakt', $('gate-rname').value, $('gate-rphone').value, $('gate-err')));
+  $('gate-rsend').addEventListener('click', () => opReqSend($('gate-rsend'), G.state === 'key' ? 'licencja' : 'kontakt', $('gate-rname').value, $('gate-rphone').value, $('gate-err'), $('gate-rmsg').value));
   $('k-req').addEventListener('click', () => opReqSend($('k-req'), 'licencja', '', '', $('k-msg')));
   $('k-free').addEventListener('click', () => {
     const b = $('k-free');

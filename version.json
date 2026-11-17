@@ -1,10 +1,12 @@
 {
- "wersja": "1.18.0",
+ "wersja": "1.18.1",
  "data": "2026-11-17",
  "zmiany": [
-  "Sprzęt Birchmeier wg ulotki linii Accu-Power: nowy opryskiwacz C 50 AC1 (wózek, zbiornik 50 l, 1–6 bar) – współpracuje z dmuchawą AS 1200; REC 15 PC1 – maks. wydatek 1,1 l/min (było 1,4); przy opryskiwaczach czas pracy i litry na jedno ładowanie akumulatora.",
-  "Dmuchawa AS 1200: dane z ulotki (2 akumulatory 10 Ah, poziomy 1–5 i turbo, zasięg do 13 m); do szczepienia tylko poziom 1–2.",
-  "Woda do picia: gdy wiek wypada między wierszami tabeli z ChPLW (np. Cevac Bron 120 L, Cevac New L), aplikacja podaje zakres między sąsiednimi wierszami z ostrzeżeniem, zamiast samego wyniku orientacyjnego.",
+  "Instrukcje Birchmeier (AS 1200 GR1 2026, REX 15, REC 15, tabela dysz): dmuchawa AS 1200 pasuje także do REB 15; pełna tabela poziomów AS 1200 (prędkość powietrza i czas pracy), ochronniki słuchu od poziomu max, AS 1200 nie do środków dezynfekcyjnych.",
+  "Z dmuchawą i dyszą TX-VK6 aplikacja ostrzega, że tabela dysz Birchmeiera do AS 1200 podaje ok. 2 razy większy wydatek (0,66 l/min przy 2 bar) niż katalog TeeJet – zmierz wydatek cylindrem i wpisz jako pomiar własny.",
+  "(1.18.0) Sprzęt Birchmeier wg ulotki linii Accu-Power: nowy opryskiwacz C 50 AC1 (wózek, zbiornik 50 l, 1–6 bar) – współpracuje z dmuchawą AS 1200; REC 15 PC1 – maks. wydatek 1,1 l/min (było 1,4); przy opryskiwaczach czas pracy i litry na jedno ładowanie akumulatora.",
+  "(1.18.0) Dmuchawa AS 1200: dane z ulotki (2 akumulatory 10 Ah, poziomy 1–5 i max, zasięg do 13 m); do szczepienia tylko poziom 1–2.",
+  "(1.18.0) Woda do picia: gdy wiek wypada między wierszami tabeli z ChPLW (np. Cevac Bron 120 L, Cevac New L), aplikacja podaje zakres między sąsiednimi wierszami z ostrzeżeniem, zamiast samego wyniku orientacyjnego.",
   "(1.17.3) Szczepionka autogenna: pole „Laboratorium” podpowiada laboratoria w Polsce oferujące autoszczepionki (Lab-Vet, RB VAC, INVAC Polska, AGRO-VET, Vet Lab Group, SLW Biolab) – to tylko sugestia, można wpisać inne.",
   "(1.17.2) Szczepionka autogenna: jasna informacja, że nie ma ChPLW – dane bierze się z dokumentów serii od laboratorium (certyfikat/specyfikacja, instrukcja stosowania, zlecenie lekarza). Nowe pola: karencja i lista dokumentów serii; obie trafiają do raportu.",
   "(1.17.1) Paracox-5 wg polskiej ChPLW: od 1. dnia na paszę lub rozpylanie na pisklęta (0,21–0,28 ml na ptaka), z wodą od 3. dnia (2–4 ml na ptaka); poprawiony skład; nie w nieśności.",

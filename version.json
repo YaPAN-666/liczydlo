@@ -1,8 +1,11 @@
 {
- "wersja": "1.16.8",
+ "wersja": "1.17.0",
  "data": "2026-11-17",
  "zmiany": [
-  "Sugestie i zgłoszenia: zostaje tylko przycisk „Wyślij” – bez „E-mailem” i „Kopiuj treść”.",
+  "Przy pierwszym uruchomieniu trzeba wpisać nazwę użytkownika (wymagane). Nazwa jest przypisana do tej kopii i urządzenia, trafia do panelu Operator i ułatwia licencje oraz udostępnienia; później zmienia ją tylko administrator.",
+  "Po powrocie internetu blokada sprawdza się od nowa także wtedy, gdy w tej chwili trwało sprawdzanie bez sieci.",
+  "Nazwa użytkownika widoczna w „O aplikacji” i wpisywana automatycznie w zgłoszeniach oraz prośbach o licencję.",
+  "(1.16.8) Sugestie i zgłoszenia: zostaje tylko przycisk „Wyślij” – bez „E-mailem” i „Kopiuj treść”.",
   "(1.16.7) O aplikacji: widać tylko ostatnią zmianę, pełny spis rozwija się po kliknięciu „Spis zmian w wersjach”.",
   "(1.16.7) TAbic IB VAR wg pełnej ChPLW PL: gruba kropla 50–300 ml lub aerozol 100–150 ml na 1000, dysze 60–70 cm; od 1. dnia, także u niosek.",
   "(1.16.7) Nowa: Adenipravac-ND/IB (Hipra) – 0,5 ml domięśniowo lub podskórnie w 18. tygodniu; nie w nieśności ani 4 tyg. przed.",

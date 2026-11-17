@@ -185,6 +185,8 @@ dl.kv dd{margin:0;min-width:0}
 #gate-form .btn{justify-content:center}
 #gate-err:empty{display:none}
 .gate .tools{justify-content:center}
+.gate.who{z-index:56}
+#who-form{text-align:center}#who-form label{display:grid;gap:6px;width:100%;max-width:340px;text-align:left}#who-form .btn{justify-content:center;min-width:220px}#who-err:empty{display:none}#who-err{color:var(--bad,#b3261e)}
 .toast{z-index:59}
 .updbar{z-index:58}
 #crew:empty{display:none}
@@ -308,6 +310,20 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
     <div class="tap" aria-hidden="true">dotknij ekranu, aby rozpocząć</div>
   </div>
   <div class="brand"><span class="studio">Studio Pracy Umysłowej</span><span class="author">Paweł Czarnocki</span><span class="ks">kill-switch enabled app</span></div>
+</div>
+
+<div class="gate who" id="who" role="dialog" aria-modal="true" aria-labelledby="who-h" hidden>
+  <form class="gate-in" id="who-form" novalidate>
+    <svg class="gate-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <h2 id="who-h">Nazwa użytkownika</h2>
+    <p>Przed pierwszym użyciem wpisz nazwę użytkownika. Zostanie przypisana do tej kopii aplikacji na tym urządzeniu – służy do obsługi licencji i udostępnień.</p>
+    <label>Nazwa użytkownika (wymagana)
+      <input id="who-name" type="text" autocomplete="name" maxlength="60" enterkeyhint="done" placeholder="np. Jan Kowalski – firma X" required></label>
+    <span class="note err" id="who-err" role="alert"></span>
+    <button class="btn" type="submit" id="who-ok">Zapisz i rozpocznij</button>
+    <p class="note">Nazwę później może zmienić tylko administrator aplikacji.</p>
+    <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
+  </form>
 </div>
 
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-h" hidden>
@@ -677,6 +693,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
       <dl class="kv">
         <dt>Program</dt><dd>Liczydło APP</dd>
         <dt>Wersja</dt><dd id="i-ver"></dd>
+        <dt>Użytkownik</dt><dd id="i-user">–</dd>
         <dt>Dane szczepionek</dt><dd id="i-data"></dd>
         <dt>Raporty</dt><dd id="i-mode"></dd>
         <dt>Identyfikator kopii</dt><dd><span class="code" id="i-code">–</span></dd>
@@ -1582,7 +1599,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.16.8';
+const APP_VERSION = '1.17.0';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -3289,6 +3306,34 @@ const GATE_URL = './kontrola.json', GATE_KEY = 'liczydlo.licencja.v1', PASS_KEY 
 const G = {ctl:null, at:null, state:'open', busy:null, net:null};
 function lsGet(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
 function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+
+/* ---------- Nazwa użytkownika – wymagana przy pierwszym uruchomieniu, przypisana do tej kopii i urządzenia ---------- */
+const USER_KEY = 'liczydlo.uzytkownik.v1';
+function userName(){ const u = lsGet(USER_KEY); return u && typeof u.name === 'string' ? u.name.trim() : ''; }
+function userPaint(){
+  const n = userName(); if($('i-user')) $('i-user').textContent = n || '–';
+  if(n){ for(const f of ['fb-name', 'gate-rname']) if($(f) && !$(f).value) $(f).value = n; }
+}
+function whoInit(){
+  const box = $('who'); if(!box) return;
+  userPaint();
+  if(userName() || IN_ARTIFACT){ box.hidden = true; return; }
+  box.hidden = false;
+  $('who-form').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const n = $('who-name').value.replace(/\s+/g, ' ').trim();
+    if(n.length < 2 || !/\p{L}/u.test(n)){ $('who-err').textContent = 'Wpisz nazwę użytkownika (co najmniej 2 znaki, w tym litery).'; $('who-name').focus(); return; }
+    lsSet(USER_KEY, {name:n.slice(0, 60), at:new Date().toISOString(), sent:false});
+    box.hidden = true; userPaint(); toast(`Witaj, ${n}!`);
+    if(typeof opSync === 'function') opSync(true).catch(() => {});
+  });
+}
+// Administrator może poprawić nazwę w panelu Operator – wtedy obowiązuje nazwa z panelu
+function userFromPanel(i){
+  if(!i || typeof i.user !== 'string' || !i.user.trim()) return;
+  const u = lsGet(USER_KEY) || {};
+  if(u.name !== i.user || !u.sent){ lsSet(USER_KEY, {...u, name:i.user.trim().slice(0, 60), sent:true}); userPaint(); }
+}
 function gateNorm(j){
   const o = j && typeof j === 'object' ? j : {};
   return {blokada:o.blokada === true, haslo:typeof o.haslo === 'string' ? o.haslo.trim() : '', komunikat:typeof o.komunikat === 'string' ? o.komunikat.trim().slice(0, 500) : '',
@@ -3390,7 +3435,8 @@ function gateInit(){
   if(IN_ARTIFACT) return;
   gateCheck();
   document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') gateCheck(); });
-  window.addEventListener('online', () => gateCheck());
+  // Po odzyskaniu internetu sprawdź od nowa – także gdy trwa jeszcze sprawdzanie rozpoczęte bez sieci
+  window.addEventListener('online', () => { const b = G.busy; if(b) b.finally(() => gateCheck()); else gateCheck(); });
   setInterval(() => gateCheck(), 30 * 60 * 1000);
 }
 
@@ -3473,6 +3519,7 @@ async function opCfgLoad(){
 async function opReport(){
   const id = OP.id, today = opToday(), newDay = id.day !== today, L = OP.lic;
   const base = {ver:APP_VERSION, os:opOs(), ua:navigator.userAgent.slice(0, 300), mode:fbMode().slice(0, 30), fp:await opFp(), lic:L && L.kid ? L.kid : '', stats:!!lsGet(OP_STAT_KEY + '.zgoda'), lastDay:today};
+  const U = lsGet(USER_KEY); if(U && U.name && !U.sent) base.user = String(U.name).slice(0, 60);   // nazwa użytkownika – wysyłana raz
   const name = fsName(fsAppPath('installs/' + id.id)), inc = [];
   if(!OP.counted) inc.push({fieldPath:'uses', increment:{integerValue:'1'}});
   if(newDay) inc.push({fieldPath:'days', increment:{integerValue:'1'}});
@@ -3484,6 +3531,7 @@ async function opReport(){
     await fsCommit([{update:{name, fields:fsF({...base, code:id.code, fp0:base.fp, uses:1, days:1})}, updateTransforms:[NOW('first'), NOW('last')], currentDocument:{exists:false}}]);
   }
   OP.counted = true; if(newDay){ id.day = today; lsSet(OP_ID_KEY, id); }
+  if(base.user) lsSet(USER_KEY, {...U, sent:true});
 }
 // Wynik: true – połączono z panelem; false – brak konfiguracji, internetu albo błąd (zostaje ostatni znany stan).
 async function opSync(force){
@@ -3500,7 +3548,7 @@ async function opSync(force){
       if(app){
         OP.app = app; OP.at = new Date().toISOString(); OP.last = Date.now(); ok = true;
         try { await opReport(); } catch(e){ console.warn('operator: meldunek', e); }
-        try { const i = await fsGet(fsAppPath('installs/' + OP.id.id)); OP.inst = i ? {blocked:i.blocked === true, blockMsg:String(i.blockMsg || '').slice(0, 500), grant:typeof i.grant === 'string' ? i.grant : ''} : null; } catch(e){}
+        try { const i = await fsGet(fsAppPath('installs/' + OP.id.id)); OP.inst = i ? {blocked:i.blocked === true, blockMsg:String(i.blockMsg || '').slice(0, 500), grant:typeof i.grant === 'string' ? i.grant : ''} : null; userFromPanel(i); } catch(e){}
         try { await opTrialDevice(); } catch(e){}
         try { await opReqCheck(); } catch(e){}
         try { await licCheck(); } catch(e){ console.warn('operator: licencja', e); }
@@ -3881,6 +3929,7 @@ function applyDefaultsSpray(){ if(noVac()) return; const sd = sprayDefault(curVa
 async function init(){
   initSplash();
   opLoad();
+  whoInit();
   gateInit();
   opInit();
   loadFonts();

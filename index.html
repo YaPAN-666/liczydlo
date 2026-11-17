@@ -290,6 +290,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 .grp .seg button[aria-pressed="true"]{color:var(--brand-ink)}
 .grp .seg button small{display:block;margin:2px 0 0;font-size:.74em;font-weight:400;opacity:.8}
 .sub-h{font-size:.95rem;margin:14px 0 6px}
+details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6px 0}details.chlog .list{margin-top:6px}
 </style>
 </head>
 <body>
@@ -964,12 +965,12 @@ const VACCINES = [
  ae:'Między 5. a 14. dniem możliwe szmery oskrzelowe (do 15% ptaków), bez objawów ogólnych.', od:'Dawka ponad 10 razy większa – tylko opisane działania.',
  store:'W ciekłym azocie (−196°C), regularnie kontrolować poziom azotu; rozmrożonych ampułek nie zamrażać ponownie. Gotową zawiesinę poniżej 25°C.',
  r:{spray:{ml:[70,300], d:[100,null], water:'czysta, niechlorowana woda', note:'ChPLW PL: 7–30 ml wody na 100 piskląt (70–300 ml na 1000) zależnie od rozpylacza w wylęgarni; krople ≥100 µm nad pisklętami w skrzynkach, pisklęta w zwartej grupie; wentylacja wyłączona w trakcie i po. Ampułki rozmrażać w wodzie 25–30°C, zawartość strzykawką 10 ml do pojemnika, ampułkę płukać 5 ml 2–3 razy.'}}},
-{id:'tabic-ib-var', n:'TAbic IB VAR', m:'Phibro Animal Health', t:'żywa', pf:'tabletki musujące do sporządzania zawiesiny', dz:['IB'], s:'IBV 233A (wariant), 10^3,2–10^5,1 EID50', sp:['kury'], st:'p', ma:'2086/11', src:[{t:'ChPLW PL TAbic IB VAR (skrót, Phibro) – bez punktu o dawkowaniu', u:'https://medicines.health.europa.eu/veterinary/pl/600000016852'}],
- min:{kury:1}, minT:'w każdym wieku od 1. dnia życia (brojlery, nioski reprodukcyjne i towarowe)', pk:[1000,2000,2500,5000,10000], use:'2 h po rozpuszczeniu', wd:'0 dni',
- lay:'Przesłany tekst nie podaje ograniczenia dla nieśności – sprawdź w ulotce serii.', mix:'Nie rozpuszczać w wodzie ze śladami środków dezynfekcyjnych lub detergentów. Inne – sprawdź w ulotce.',
- sch:'Jedno szczepienie – odporność po 21 dniach, co najmniej do 42. dnia; brojlery w 1. i 14. dniu – ochrona do uboju (7.–8. tydz.). Nioski doszczepiać wg programu. Nie zastępuje innych szczepionek IB; wirus łatwo się szerzy – uwaga przy ptakach w różnym wieku. Nie podawać dawek niższych niż zalecane.',
- safe:'Rękawice, okulary i maska ochronna.', ae:'Nie stwierdzono (także przy dawce 10 razy większej).', store:'Tabletek z uszkodzonej części blistra nie używać; rozpuszczonej szczepionki nie zostawiać na później.',
- r:{spray:{note:'Drogą wziewną (oprysk). Przesłany tekst ChPLW nie zawiera punktu o dawkowaniu – ilość wody na 1000 dawek i kropla wg ulotki z opakowania (TAbic IB VAR206: 200–400 ml, kropla 100–200 µm). Szczepić dopiero po całkowitym rozpuszczeniu tabletki.'}}},
+{id:'tabic-ib-var', n:'TAbic IB VAR', m:'Phibro Animal Health', t:'żywa', pf:'tabletka musująca do sporządzania zawiesiny', dz:['IB'], s:'IBV 233A war-1 (wariant), 10^3,2–10^5,1 EID50', sp:['kury'], st:'v', ma:'2086/11', src:[RPLC(24889)],
+ min:{kury:1}, minT:'w każdym wieku od 1. dnia życia (brojlery, nioski, stada reprodukcyjne)', pk:[1000,2000,2500,5000,10000], use:'2 h po rozpuszczeniu (najlepiej od razu)', wd:'0 dni',
+ lay:'Może być stosowana u kur niosek od 1. dnia życia.', mix:'Nie mieszać. Tego samego dnia, bez mieszania, można podać żywe szczepionki przeciw ND. Inne – decyzja indywidualna.',
+ sch:'Od 1. dnia życia; odporność po 21 dniach, trwa 42 dni. Brojlery w 1. i 14. dniu – ochrona do uboju (7.–8. tydz.). Nioski i stada reprodukcyjne doszczepiać wg programu. Gruba kropla – pisklęta jednodniowe (wylęgarnia lub kurnik, zwykły opryskiwacz); aerozol – powtórne szczepienie starszych ptaków. Szczep szerzy się na podatne gatunki.',
+ safe:'Rękawice, okulary i maska ochronna. Po połknięciu lub rozlaniu na skórę – do lekarza z ulotką.', ae:'Brak.', od:'Dawka 10 razy większa (do oka, pisklęta SPF) – bezpieczna.', store:'2–8°C, chronić przed światłem. Tabletek z przebitej części blistra nie używać; niezużytej szczepionki nie zostawiać na inny dzień.',
+ r:{spray:{opts:[{l:'gruba kropla (≥100 µm)', ml:[50,300]},{l:'aerozol (40–100 µm) – powtórne, starsze ptaki', ml:[100,150]}], d:[100,null], dRep:[40,100], dist:'60–70 cm nad ptakami', water:'czysta woda przegotowana, zimna – bez dezynfekcji i detergentów', note:'ChPLW PL: ml wody na 1000 dawek – gruba kropla 50–300, aerozol 100–150 (dokładnie wg wydajności urządzenia; 5000 dawek: 250–1500 / 500–750). Tabletka rozpuszcza się 1–2 min. Światło przyciemnić, wentylację i ogrzewanie wyłączyć; urządzenie myć gorącą przegotowaną wodą.'}}},
 {id:'poulvac-ib-qx', n:'Poulvac IB QX', m:'Zoetis', t:'żywa (atenuowana)', pf:'liofilizat do sporządzania zawiesiny (podanie w aerozolu)', dz:['IB'], s:'IBV L1148 (QX), 10^3,0–10^5,0 EID50', sp:['kury'], st:'v', ma:'2300/13',
  src:[{t:'ChPLW PL – Poulvac IB QX, pozwolenie 2300/13 (Rejestr Produktów Leczniczych – wyszukaj nazwę)', u:'https://rejestry.ezdrowie.gov.pl/rpl/search/public'}, SRC_UPD('600000043490')],
  min:{kury:1}, minB:{'kury-odchow':7}, minT:'brojlery od 1. dnia; przyszłe nioski i ptaki zarodowe od 7. dnia (od 1. dnia, gdy mają przeciwciała matczyne IB)', pk:[2000,5000,10000], use:'2 h po rozpuszczeniu', wd:'0 dni',
@@ -1353,6 +1354,12 @@ const VACCINES = [
  sch:'Stada rodzicielskie: booster po żywych szczepionkach IB, ND i Gumboro (odstęp co najmniej 4 tyg., najlepiej ok. 6). Odporność po 4 tyg.: IB do 65. tyg. życia, ND – co najmniej okres nieśności; przeciwciała przeciw Gumboro chronią potomstwo co najmniej 4 pierwsze tygodnie (u stad do 40. tyg.). Przy wariantach IB – szczepionka Nobilis z wariantami.',
  safe:SAFE_OIL, ae:'Przejściowy lekki obrzęk w miejscu wstrzyknięcia, do ok. 3 tyg.', od:'Dawka podwójna – tylko opisane działania.', store:'2–8°C, chronić przed światłem, nie zamrażać.',
  r:{inj:{ml:0.5, site:'domięśniowo (udo lub pierś) lub podskórnie (grzbietowa część szyi)', bottles:[{d:1000,ml:500}], note:'Doprowadzić do 15–25°C; energicznie wstrząsnąć przed i okresowo w trakcie; sprzęt czysty i jałowy. Otwartą butelkę zużyć w 3 h.'}}},
+{id:'adenipravac-nd-ib', n:'Adenipravac-ND/IB', m:'Laboratorios Hipra', t:'inaktywowana – emulsja olejowa (parafina ciekła)', pf:'emulsja do wstrzykiwań', dz:['ND','IB','EDS'], s:'IB H52 ≥10^6,0 EID50, ND La Sota ≥10^8,0 EID50, EDS’76 adenowirus 127 ≥500 HAU', sp:['kury'], st:'v', src:[RPL(16851)], ma:'1241', adj:'oil', adjT:'parafina ciekła 224,5 mg na dawkę 0,5 ml (olej mineralny)',
+ min:{kury:127}, xb:{'kury-brojlery':'nie u brojlerów – nioski stad reprodukcyjnych i towarowych (ChPLW)'}, minT:'18. tydzień życia, przed nieśnością', pk:[500,1000], use:'zużyć natychmiast po otwarciu', wd:'0 dni',
+ lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać z innymi produktami; inne – decyzja indywidualna.',
+ sch:'Nioski stad reprodukcyjnych i towarowych w 18. tygodniu, przed nieśnością. Pełna odporność po 6–12 tyg., do końca okresu produkcyjnego.',
+ safe:SAFE_OIL, ae:'Nieznane.', od:'Dawka podwójna – małe guzki do 7 dni.', store:'2–8°C, chronić przed światłem, nie zamrażać.',
+ r:{inj:{ml:0.5, site:'domięśniowo (udo lub pierś) lub podskórnie (grzbietowa część szyi)', note:'Ogrzać do 15–25°C, wstrząsnąć przed użyciem; jałowe strzykawki i igły. Otwarte opakowanie zużyć od razu.'}}},
 {id:'nobilis-reo-ib-g-nd', n:'Nobilis Reo+IB+G+ND', m:'MSD Animal Health', t:'inaktywowana – emulsja olejowa (parafina ciekła)', dz:['Reo','IB','IBD','ND'], s:'1733, 2408, M41, D78, Clone 30', sp:['kury'], st:'v', src:[RPL(19215)], ma:'137/95', adj:'oil', adjT:'parafina ciekła 215 mg na dawkę 0,5 ml (olej mineralny)',
  min:{kury:106}, minT:'ok. 16.–20. tydz. (stada rodzicielskie)', pk:[1000], use:'3 h po otwarciu', wd:'0 dni',
  lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać. Inne inaktywowane Intervet – w osobnych wstrzyknięciach.', sch:'≥4 tyg. (ok. 6 tyg.) po żywych szczepionkach przeciw IB, ND, IBD i reowirusom. Pełna odporność po 4 tyg.; trwa co najmniej jeden okres nieśności (IB do 45. tyg., IBD i reowirusy do 40. tyg. życia).',
@@ -1399,7 +1406,7 @@ const VACCINES = [
  store:'2–8°C (także transport), chronić przed światłem, nie zamrażać.',
  r:{inj:{ml:0.3, site:'i.m.', bottles:[{d:500,ml:150},{d:1000,ml:300}], note:'Energicznie wstrząsnąć; aseptyka, sprzęt wyjałowiony; bez strzykawek z tłokiem z gumy naturalnej lub butylowej. Miejsca wstrzyknięcia ulotka nie podaje.'}}},
 /* ---------- Kokcydioza ---------- */
-{id:'paracox-5', n:'Paracox-5', m:'MSD Animal Health', t:'żywa (oocysty)', dz:['Kokcydioza'], s:'5 linii Eimeria: E. acervulina HP, E. maxima CP i MFP, E. mitis HP, E. tenella HP', sp:['kury'], st:'p', src:[{t:'UPD – Paracox-5 (Norwegia, 05-3720): skład, brojlery i pisklęta jednodniowe, doustnie, karencja 0 dni', u:'https://medicines.health.europa.eu/veterinary/en/600000033469'}, {t:'UPD – Paracox-5, pozwolenie PL 1703 (doustnie; karencja 0 dni; ChPLW i ulotka PL w UPD)', u:'https://medicines.health.europa.eu/veterinary/pl/600000033453'}, {t:'UPD – karta produktu', u:'https://medicines.health.europa.eu/veterinary/en/node/98167/printable/pdf'}],
+{id:'paracox-5', n:'Paracox-5', m:'MSD Animal Health', t:'żywa (oocysty)', dz:['Kokcydioza'], s:'5 linii Eimeria (oocyst na dawkę): E. acervulina HP 500, E. maxima CP 500 i MFP 200, E. mitis HP 100, E. tenella HP 1000', sp:['kury'], st:'p', src:[{t:'UPD – Paracox-5 (Norwegia, 05-3720): skład, brojlery i pisklęta jednodniowe, doustnie, karencja 0 dni', u:'https://medicines.health.europa.eu/veterinary/en/600000033469'}, {t:'UPD – Paracox-5, pozwolenie PL 1703 (doustnie; karencja 0 dni; ChPLW i ulotka PL w UPD)', u:'https://medicines.health.europa.eu/veterinary/pl/600000033453'}, {t:'UPD – karta produktu', u:'https://medicines.health.europa.eu/veterinary/en/node/98167/printable/pdf'}],
  min:{kury:1}, minT:'wg ChPLW', pk:[1000,5000], use:'wg ChPLW', wd:'0 dni', lay:'Nie u kur nieśnych.', mix:'Sprawdź w ChPLW.',
  sch:'Brojlery; podanie doustne – sposób (woda, pasza, oprysk piskląt) wg ChPLW. Opakowania: 1000 dawek (4 ml), 5000 dawek (20 ml).', r:{}},
 {id:'paracox-8', n:'Paracox-8', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa (oocysty)', pf:'zawiesina do sporządzania zawiesiny doustnej (+ rozpuszczalnik do rozpylania na kurczęta)', dz:['Kokcydioza'], s:'8 linii Eimeria o skróconym rozwoju: E. acervulina HP, E. brunetti HP, E. maxima CP i MFP, E. mitis HP, E. necatrix HP, E. praecox HP, E. tenella HP', sp:['kury'], st:'v', src:[RPL(17141)], ma:'988/00',
@@ -1577,7 +1584,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.16.6';
+const APP_VERSION = '1.16.7';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -3990,7 +3997,9 @@ function renderInfo(){
   $('i-ver').textContent = APP_VERSION;
   $('i-data').textContent = `ChPLW i ulotki – stan na ${DATA_DATE}; ${VACCINES.length} ${pl(VACCINES.length, 'szczepionka', 'szczepionki', 'szczepionek')}`;
   $('i-mode').textContent = S.mode === 'db' ? 'w pamięci aplikacji (Claude)' : IN_ARTIFACT ? 'tylko w tej przeglądarce' : 'w tym telefonie (kopia w zakładce Raporty)';
-  if(!IN_ARTIFACT) fetchVersion().then(j => { if(j.zmiany && j.zmiany.length) $('i-changes').innerHTML = `<h3>Zmiany w wersji ${esc(j.wersja)}</h3><ul class="list">${j.zmiany.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`; }).catch(() => {});
+  // Widać tylko ostatnią zmianę; pełny spis rozwija się po kliknięciu „Spis zmian w wersjach”
+  if(!IN_ARTIFACT) fetchVersion().then(j => { if(j.zmiany && j.zmiany.length) $('i-changes').innerHTML = `<h3>Ostatnia zmiana (wersja ${esc(j.wersja)})</h3><p class="note">${esc(j.zmiany[0])}</p>`
+    + (j.zmiany.length > 1 ? `<details class="chlog"><summary>Spis zmian w wersjach</summary><ul class="list">${j.zmiany.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : ''); }).catch(() => {});
 }
 </script>
 </body>

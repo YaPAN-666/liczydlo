@@ -1,8 +1,11 @@
 {
- "wersja": "1.16.6",
+ "wersja": "1.16.7",
  "data": "2026-11-17",
  "zmiany": [
-  "Nowe szczepionki z polskich ChPLW: HatchPak IB H120 (wylęgarnia, 1. dzień, 70–300 ml na 1000, ciekły azot), Nobilis IB+G+ND (0,5 ml, stada rodzicielskie 16.–20. tydz.), TAbic IB VAR (szczep 233A – dane częściowe, bez dawkowania).",
+  "O aplikacji: widać tylko ostatnią zmianę, pełny spis rozwija się po kliknięciu „Spis zmian w wersjach”.",
+  "TAbic IB VAR wg pełnej ChPLW PL: gruba kropla 50–300 ml lub aerozol 100–150 ml na 1000, dysze 60–70 cm; od 1. dnia, także u niosek.",
+  "Nowa: Adenipravac-ND/IB (Hipra) – 0,5 ml domięśniowo lub podskórnie w 18. tygodniu; nie w nieśności ani 4 tyg. przed.",
+  "(1.16.6) Nowe szczepionki z polskich ChPLW: HatchPak IB H120 (wylęgarnia, 1. dzień, 70–300 ml na 1000, ciekły azot), Nobilis IB+G+ND (0,5 ml, stada rodzicielskie 16.–20. tydz.), TAbic IB VAR (szczep 233A – dane częściowe, bez dawkowania).",
   "(1.16.5) Nowe szczepionki dopuszczone w Polsce (wg unijnej bazy UPD i polskich ulotek): Primun IB-ND Duo, BIO-VAC ND-IB, Poulvac Bursa Plus, Poulvac AE, Gallimune 302 ND+IB+EDS, Paracox-8.",
   "(1.16.5) Paracox-8 (kokcydioza): 1.–9. dzień życia; rozpylanie na pisklęta 0,21 ml na ptaka (210 ml na 1000 z rozpuszczalnikiem), woda 2 l na 1000; można w nieśności. Paracox-5 – skład 5 linii Eimeria.",
   "(1.16.5) Poulvac AE: przyszłe nioski od 10. tygodnia, 15 l wody na 1000 dawek, mleko 4 g/l. Poulvac Bursa Plus: tylko brojlery od 10. dnia, 1 l na dzień życia, wzór na dzień szczepienia z mian ELISA.",

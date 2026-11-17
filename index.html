@@ -877,6 +877,22 @@ const VACCINES = [
     woda:{rule:'measured', h:2, min:7, thirst:'co najmniej 30 min, możliwie krótko', note:'Ilość wody wg średniego zużycia z 4 dni przed szczepieniem – ma być wypita w 2 h.'},
     oko:{ml:50, bird:'0,05 ml (skalibrowana pipeta)'}}},
 
+{id:'primun-ib-nd-duo', n:'Primun IB-ND Duo', m:'Laboratorios Calier', t:'żywa', pf:'liofilizat do sporządzania zawiesiny', dz:['ND','IB'], s:'ND Hitchner B1 10^6,0–10^7,0 EID50 + IB Massachusetts H120 10^3,0–10^4,0 EID50', sp:['kury'], st:'v', src:[RPL(42457, '10/2026')], ma:'2906/19',
+ min:{kury:1}, minT:'od 1. dnia życia (brojlery i przyszłe nioski)', pk:[1000,5000], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać z innymi produktami; inne szczepionki – decyzja indywidualna.',
+ sch:'Brojlery: 1. dzień i po 3 tyg. (odporność do 6. tyg.). Przyszłe nioski: 1. dzień, 3. tydz. i 7. tydz. (odporność do 10. tyg.). Odporność po 3 tyg. Szczepić całe stado naraz; wirusy wydalane do 18 dni.',
+ safe:'Przy nebulizacji ochrona oczu i dróg oddechowych (wirus ND może dać zapalenie spojówek). Po pracy umyć i zdezynfekować ręce i sprzęt; oko – przemyć wodą i do lekarza.', ae:'Często objawy oddechowe 3–10 dni po szczepieniu, ustępują w ok. 5 dni.', od:'Dawka 10 razy większa – te same objawy (ustępują w 10 dni), porażenie rzęsek nabłonka oddechowego.',
+ store:'2–8°C (także transport), chronić przed światłem; roztwór chronić przed słońcem i temperaturą >25°C.',
+ r:{spray:{byAge:[{to:1, l:'pisklęta jednodniowe', ml:[250,250]},{l:'ptaki starsze', ml:[500,500]}], d:[100,null], dRep:[50,80], dist:'30–40 cm', water:'woda destylowana lub czysta, zimna, niechlorowana, bez jonów metali', note:'Ulotka PL: 250 ml na 1000 piskląt jednodniowych, 500 ml na 1000 starszych; szczepienie pierwotne gruba kropla ≥100 µm, powtórne 50–80 µm; ptaki razem przy słabym świetle; wentylację ograniczyć na 20–30 min.'},
+    woda:{rule:'measured', h:2, thirst:'2–4 h', milk:'2–4 g/l (lub 20–40 ml/l chudego mleka)', note:'Ulotka PL: ilość wody wg wcześniejszego zużycia; więcej poideł; świeża woda dopiero po wypiciu szczepionki.'},
+    oko:{ml:50, bird:'50 µl (ptaki >14 dni) lub 2 × 25 µl (1–14 dni, małe rasy)', water:'jałowa woda destylowana', note:'Ulotka PL: 1000 dawek w 50 ml; kalibrowany kroplomierz trzymany pionowo.'}}},
+{id:'biovac-nd-ib', n:'BIO-VAC ND-IB', m:'Fatro S.p.A.', t:'żywa', pf:'liofilizat do sporządzania zawiesiny', dz:['ND','IB'], s:'ND Hitchner B1 + IB Massachusetts H120', sp:['kury'], st:'p', src:[RPL(16599)],
+ min:{kury:1}, minT:'od 1. dnia życia (brojlery od matek szczepionych inaktywowaną z olejem – 3.–4. dzień)', pk:[1000,2500,5000], use:'do 3 h (wypić jak najszybciej)', wd:'0 dni',
+ lay:'Ulotka (odczyt tekstu) nie podaje ograniczenia dla nieśności – sprawdź w ulotce serii.', mix:'Nie mieszać z innymi produktami; inne – decyzja indywidualna.',
+ sch:'Brojlery, stada hodowlane i nioski: 1. dzień (oprysk grubą kroplą), powtórnie po 3 tyg.; stada hodowlane i nioski – kolejne szczepienie w 2.–4. miesiącu. Odporność po tygodniu, trwa co najmniej 2 miesiące. Pierwsze szczepienie tylko atomizerem ręcznym.',
+ safe:'Chronić oczy; po przygotowaniu umyć i zdezynfekować ręce.', ae:'Nie stwierdzono; po pierwszym szczepieniu możliwe przejściowe łagodne objawy oddechowe.', store:'2–8°C, chronić przed światłem.',
+ r:{spray:{byAge:[{to:7, l:'pisklęta (atomizer ręczny)', ml:[120,120]},{to:28, l:'2–3 tyg.', ml:[160,500]},{to:84, l:'5–7 tyg.', ml:[300,800]},{l:'powyżej 12 tyg.', ml:[600,1200]}], water:'woda destylowana', note:'Ulotka PL (tekst ze skanu – sprawdź w ulotce serii): ml na 1000 dawek – mniejsza wartość atomizer ręczny, większa elektryczny; duża kropla. Pierwsze szczepienie tylko atomizerem ręcznym.'},
+    woda:{rule:'measured', h:3, thirst:'3 h', note:'Ulotka PL (tekst ze skanu): orientacyjnie 7–10 l na 1000 (0–2 tyg.), 10–20 l (3–5 tyg.), 20–60 l (6–12 tyg.), 50–80 l (>12 tyg.); tyle, ile ptaki wypiją w 2–3 h. Poidła bez śladów dezynfekcji.'}}},
 /* ---------- IB ---------- */
 {id:'nobilis-ib-ma5', n:'Nobilis IB Ma5', m:'MSD Animal Health', t:'żywa', dz:['IB'], s:'Ma5 (Massachusetts)', sp:['kury'], st:'v', src:[RPL(18327)],
  min:{kury:1}, minT:'od 1. dnia życia', pk:[1000,2500,5000,10000], use:'2 h', wd:'0 dni',
@@ -1089,6 +1105,12 @@ const VACCINES = [
      'Podawaj podskórnie w szyję; zużyj w 2 h.']},
     inovo:{ml:0.05, note:'Do owodni 18-dniowych zarodków brojlerów, aparatem do szczepienia in ovo (igły 0,4–0,8 × 25–28 mm, 3,5–5 bar). Rozpuszczalnik: 2000 dawek – 100 ml, 4000 – 200 ml, 5000 – 250 ml, 8000 – 400 ml. Prześwietlić jaja i odrzucić martwe zarodki.'}}},
 
+{id:'poulvac-bursa-plus', n:'Poulvac Bursa Plus', m:'Zoetis', t:'żywa', pf:'liofilizat do sporządzania zawiesiny w wodzie do picia', dz:['IBD'], s:'IBDV V877 („pośredni plus”), 10^2,2–10^3,4 EID50', sp:['kury'], st:'v', src:[RPL(23716)], ma:'2007/10',
+ min:{kury:10}, xb:{'kury-odchow':'nie dla niosek ani kur hodowlanych (ChPLW)', 'kury-niesnosc':'nie dla niosek ani kur hodowlanych (ChPLW)'}, minT:'od 10. dnia życia; termin wg przeciwciał matczynych (≤500 j. ELISA)', pk:[1000,2000,5000], use:'zaraz po rozcieńczeniu (ważna 4 h)', wd:'0 dni',
+ lay:'Nie u kur niosek ani kur hodowlanych.', mix:'Nie mieszać; inne – decyzja indywidualna. Szczepienie ND 7 dni później chroni, ale odpowiedź serologiczna słabsza (możliwa przejściowa immunosupresja).',
+ sch:'Jedna dawka od 10. dnia życia, tylko przy przeciwciałach matczynych ≤500 j. ELISA i w epidemiach bardzo zjadliwego IBDV. Dzień szczepienia: J = 1 + (M − 22,36) / 2,82 (M – średnia pierwiastków z mian ELISA 20 jednodniówek, test Idexx FlockCheck), nie wcześniej niż 10. dzień. Odporność od 14. dnia po szczepieniu, trwa 32 dni. Szczep się szerzy – chroń stada nieśne.',
+ safe:'Po szczepieniu umyć i zdezynfekować ręce i sprzęt.', ae:'Spadek limfocytów w torbie Fabrycjusza (10. dzień po szczepieniu 75–100% grudek, 28. dzień 25–75%), odnowa od 21. dnia; możliwa immunosupresja.', store:'2–8°C (także transport), chronić przed światłem, nie zamrażać.',
+ r:{woda:{rule:'perDay', f:1, win:'do 3 h', milk:'2–4 g/l (lub 1 l chudego mleka na 40 l wody)', note:'Ulotka PL: 1 l wody na 1000 dawek na każdy dzień życia (10 dni = 10 l); wypić w 3 h – najlepiej tyle, ile ptaki wypiją w tym czasie (zmierz dzień wcześniej). Woda bez chloru (np. odstana 12 h lub dejonizowana); rury opróżnić ze zwykłej wody; dużych fiolek nie dzielić na kilka kurników.'}}},
 /* ---------- Marek / wektorowe ---------- */
 {id:'cevac-md-rispens', n:'Cevac MD Rispens', m:'Ceva', t:'żywa (komórkowa)', dz:['Marek'], s:'CVI-988 (serotyp 1)', sp:['kury'], st:'v', src:[RPL(44084)],
  min:{kury:1}, max:{kury:1}, minT:'1. dzień życia', pk:[1000,2000,4000], use:'2 h (<25°C)', wd:'0 dni',
@@ -1229,6 +1251,12 @@ const VACCINES = [
  store:'2–8°C (także transport), chronić przed światłem, nie zamrażać.',
  r:{spray:{ml:[100,500], d:[100,null], dist:'30–80 cm', water:'woda niechlorowana w temperaturze pokojowej', note:'ChPLW: 1 dawka = 0,1–0,5 ml zawiesiny na ptaka (100–500 ml na 1000), kropla >100 µm, z 30–80 cm; wentylacja wyłączona do 15 min po szczepieniu. Sprzęt czysty.'}}},
 
+{id:'poulvac-ae', n:'Poulvac AE', m:'Zoetis', t:'żywa', pf:'liofilizat do podania w wodzie do picia', dz:['AE'], s:'AEV Calnek 1143 (AE-67), 10^3,1–10^5,5 EID50', sp:['kury'], st:'v', src:[RPLC(19971)], ma:'1821/08',
+ min:{kury:71}, xb:{'kury-brojlery':'nie u brojlerów – przyszłe nioski towarowe i rodzicielskie (ChPLW)'}, minT:'od 10. tygodnia życia, najpóźniej 4 tyg. przed nieśnością', pk:[1000,2000], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Nie w okresie nieśności ani 4 tyg. przed jej rozpoczęciem.', mix:'Nie mieszać; inne – decyzja indywidualna. Leki i środki higieniczne w wodzie: przerwa 24 h przed i 24 h po wypiciu szczepionki.',
+ sch:'Jedno szczepienie przyszłych niosek i stad rodzicielskich od 10. tygodnia, najpóźniej 4 tyg. przed nieśnością – odporność bierna potomstwa do 12 miesięcy (do końca nieśności). Szczepić wszystkie nieszczepione ptaki na fermie naraz; 42 dni bez kontaktu z nieszczepionymi.',
+ ae:'Nieznane.', od:'Dawka 10 razy większa – bez działań niepożądanych.', store:'2–8°C (także transport), chronić przed światłem, nie zamrażać.',
+ r:{woda:{rule:'fixed', l:[15,15], win:'ok. 1 h', thirst:'2 h', milk:'4 g/l (rozpuścić przed szczepionką)', note:'ChPLW PL: 1000 dawek na 15 l zimnej, niechlorowanej wody; wypić w ok. 1 h. Automatyczne poidła wyłączyć – tylko zwykłe poidła (bez dozowników), miejsce dla 2/3 ptaków naraz, nie w słońcu.'}}},
 /* ---------- Salmonella ---------- */
 {id:'avipro-salm-vac-t', n:'AviPro Salmonella Vac T', m:'Elanco (Lohmann)', t:'żywa', dz:['Salmonella'], s:'S. Typhimurium Nal2/Rif9/Rtt', sp:['kury'], st:'v', src:[RPL(51230)],
  min:{kury:1}, minT:'od 1. dnia życia', pk:[500,1000,1500,2000,2500], use:'4 h', wd:'21 dni (tkanki jadalne i jaja)',
@@ -1343,10 +1371,25 @@ const VACCINES = [
  ae:'Bardzo rzadko obrzęk w miejscu wstrzyknięcia wielkości ziarna grochu – zwykle znika w 2–3 tyg.', od:'Dawka podwójna – tylko opisane działania.', store:'2–8°C, chronić przed światłem, nie zamrażać.',
  r:{inj:{ml:0.5, site:'podskórnie (szyja) lub domięśniowo (pierś lub udo)', bottles:[{d:500,ml:250},{d:1000,ml:500}], note:'Przed użyciem doprowadzić do temperatury pokojowej i dobrze wstrząsnąć; sprzęt jałowy. Otwartą butelkę zużyć w 24 h.'}}},
 
+{id:'gallimune-302', n:'Gallimune 302 ND+IB+EDS', m:'Boehringer Ingelheim', t:'inaktywowana – emulsja olejowa', dz:['ND','IB','EDS'], s:'Ulster 2C ≥50 PD50, Mass 41 ≥18 HI.U, V127 ≥180 HI.U', sp:['kury'], st:'v', src:[RPL(18695)], ma:'1602/04', adj:'oil', adjT:'olej parafinowy 170–186 mg na dawkę 0,3 ml (olej mineralny); tiomersal, formaldehyd', noRubber:true,
+ min:{kury:127}, xb:{'kury-brojlery':'nie u brojlerów – stada rodzicielskie i nioski towarowe (ChPLW)'}, minT:'od 18. tygodnia życia, nie później niż 4 tyg. po żywych szczepionkach ND i IB', pk:[500,1000], use:'zużyć natychmiast po otwarciu', wd:'0 dni',
+ lay:'Nie w okresie nieśności ani 2 tyg. przed.', mix:'Nie mieszać z innymi produktami; inne – decyzja indywidualna.',
+ sch:'Stada rodzicielskie i nioski towarowe: szczepienie przypominające po żywych szczepionkach (ND: Hitchner B1 lub VG/GA-AVINEW; IB: Mass H120), nie później niż 4 tyg. po nich; także uodpornianie przeciw EDS kur wcześniej nieszczepionych. Odporność po 4 tyg., na jeden okres nieśności.',
+ safe:SAFE_OIL, ae:'Bardzo często zmiany w miejscu wstrzyknięcia widoczne w badaniu tkanek (po 3 tyg. u 87% – resztki oleju, jałowe mikronacieki); palpacyjnie bez zmian. Po podwójnej dawce przemijająca apatia i lekki obrzęk.',
+ store:'2–8°C (także transport), chronić przed światłem, nie zamrażać.',
+ r:{inj:{ml:0.3, site:'i.m.', bottles:[{d:500,ml:150},{d:1000,ml:300}], note:'Energicznie wstrząsnąć; aseptyka, sprzęt wyjałowiony; bez strzykawek z tłokiem z gumy naturalnej lub butylowej. Miejsca wstrzyknięcia ulotka nie podaje.'}}},
 /* ---------- Kokcydioza ---------- */
-{id:'paracox-5', n:'Paracox-5', m:'MSD Animal Health', t:'żywa (oocysty)', dz:['Kokcydioza'], s:'5 szczepów Eimeria', sp:['kury'], st:'p', src:[{t:'UPD – Paracox-5, pozwolenie PL 1703 (doustnie; karencja 0 dni; ChPLW i ulotka PL w UPD)', u:'https://medicines.health.europa.eu/veterinary/pl/600000033453'}, {t:'UPD – karta produktu', u:'https://medicines.health.europa.eu/veterinary/en/node/98167/printable/pdf'}],
+{id:'paracox-5', n:'Paracox-5', m:'MSD Animal Health', t:'żywa (oocysty)', dz:['Kokcydioza'], s:'5 linii Eimeria: E. acervulina HP, E. maxima CP i MFP, E. mitis HP, E. tenella HP', sp:['kury'], st:'p', src:[{t:'UPD – Paracox-5 (Norwegia, 05-3720): skład, brojlery i pisklęta jednodniowe, doustnie, karencja 0 dni', u:'https://medicines.health.europa.eu/veterinary/en/600000033469'}, {t:'UPD – Paracox-5, pozwolenie PL 1703 (doustnie; karencja 0 dni; ChPLW i ulotka PL w UPD)', u:'https://medicines.health.europa.eu/veterinary/pl/600000033453'}, {t:'UPD – karta produktu', u:'https://medicines.health.europa.eu/veterinary/en/node/98167/printable/pdf'}],
  min:{kury:1}, minT:'wg ChPLW', pk:[1000,5000], use:'wg ChPLW', wd:'0 dni', lay:'Nie u kur nieśnych.', mix:'Sprawdź w ChPLW.',
  sch:'Brojlery; podanie doustne – sposób (woda, pasza, oprysk piskląt) wg ChPLW. Opakowania: 1000 dawek (4 ml), 5000 dawek (20 ml).', r:{}},
+{id:'paracox-8', n:'Paracox-8', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa (oocysty)', pf:'zawiesina do sporządzania zawiesiny doustnej (+ rozpuszczalnik do rozpylania na kurczęta)', dz:['Kokcydioza'], s:'8 linii Eimeria o skróconym rozwoju: E. acervulina HP, E. brunetti HP, E. maxima CP i MFP, E. mitis HP, E. necatrix HP, E. praecox HP, E. tenella HP', sp:['kury'], st:'v', src:[RPL(17141)], ma:'988/00',
+ min:{kury:1}, max:{kury:9}, minT:'od 1. do 9. dnia życia włącznie', pk:[1000,5000], use:'natychmiast po rozcieńczeniu', wd:'0 dni',
+ lay:'Może być stosowany w okresie nieśności.', mix:'Nie mieszać (poza rozpuszczalnikiem do rozpylania). Żadnych kokcydiostatyków (np. sulfonamidów) przed i po szczepieniu, zwłaszcza przez pierwsze 4 tyg. Inne – decyzja indywidualna.',
+ sch:'Jedna dawka (0,004 ml szczepionki) w 1.–9. dniu życia. Kury na ściółce – oocysty krążą między ptakami i ściółką; między cyklami usunąć ściółkę, wyczyścić i zdezynfekować kurnik. Odporność: pasza lub woda – po 10 dniach, co najmniej 36 tyg.; rozpylanie na kurczęta – po 21 dniach, 10 tyg. Nie szczepić ptaków chorych, zestresowanych, wyziębionych.',
+ safe:'Odzież ochronna, maska i ochrona oczu; umyć ręce zaraz po użyciu.', ae:'Nieznane.', od:'Dawka 5 razy większa lub więcej – możliwy spadek dziennych przyrostów.',
+ store:'2–8°C (także transport), chronić przed światłem; rozpuszczalnik 2–25°C.',
+ r:{spray:{ml:[210,210], water:'świeża, chłodna woda z kranu + rozpuszczalnik (czerwony, z gumą ksantanową)', note:'Ulotka PL – rozpylanie na pisklęta w skrzynkach: 0,21 ml na ptaka, gruba kropla. 1000 dawek: 4 ml szczepionki + 100 ml rozpuszczalnika, uzupełnić wodą do 210 ml (5000 dawek: 20 ml + 500 ml, do 1050 ml). Wydajność urządzenia ustal na 100 ptaków (× 10 = objętość na 1000). Fiolkę wstrząsać 30 s; pisklęta min. 30 min w skrzynce w dobrym świetle. Oprysk na paszę: 1000 dawek w 400 ml wody.'},
+    woda:{rule:'fixed', l:[2,2], thirst:'1–2 h', note:'Ulotka PL: 2 ml rozcieńczonej szczepionki na dawkę (2 l na 1000), zimna woda z kranu; ilość na poidło = 0,004 ml × liczba kurcząt ÷ liczba poideł. Nie wlewać do suchych poideł; pisklęta muszą umieć pić z poideł (smoczkowe – sprawdź).'}}},
 {id:'huveguard-nb', n:'HuveGuard NB', m:'Huvepharma', t:'żywa (oocysty)', pf:'zawiesina do sporządzania zawiesiny doustnej', dz:['Kokcydioza'], s:'oocysty Eimeria – gatunki wg ChPLW', sp:['kury'], st:'v', src:[RPL(38692)], ma:'2660/17',
  min:{kury:1}, minT:'oprysk na ptaki lub paszę od 1. dnia; woda od 3. dnia życia', pk:[1000,5000], use:'4 h po rozcieńczeniu (otwartą fiolkę od razu)', wd:'0 dni',
  lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać. Przed i po szczepieniu nie podawać środków przeciwkokcydiozowych (także sulfonamidów). Inne – decyzja indywidualna.',
@@ -1514,7 +1557,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.16.4';
+const APP_VERSION = '1.16.5';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};

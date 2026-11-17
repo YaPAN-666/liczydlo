@@ -1,10 +1,12 @@
 {
- "wersja": "1.17.0",
+ "wersja": "1.17.1",
  "data": "2026-11-17",
  "zmiany": [
-  "Przy pierwszym uruchomieniu trzeba wpisać nazwę użytkownika (wymagane). Nazwa jest przypisana do tej kopii i urządzenia, trafia do panelu Operator i ułatwia licencje oraz udostępnienia; później zmienia ją tylko administrator.",
-  "Po powrocie internetu blokada sprawdza się od nowa także wtedy, gdy w tej chwili trwało sprawdzanie bez sieci.",
-  "Nazwa użytkownika widoczna w „O aplikacji” i wpisywana automatycznie w zgłoszeniach oraz prośbach o licencję.",
+  "Paracox-5 wg polskiej ChPLW: od 1. dnia na paszę lub rozpylanie na pisklęta (0,21–0,28 ml na ptaka), z wodą od 3. dnia (2–4 ml na ptaka); poprawiony skład; nie w nieśności.",
+  "BIO-VAC ND-IB wg polskiej ChPLW: woda w litrach wg wieku (7–10 l do 2 tyg. … 50–80 l po 12 tyg.), oprysk 120–1200 ml wg wieku i rozpylacza; 1. szczepienie połową dawki; nioski 3. raz w 15.–20. tyg.",
+  "(1.17.0) Przy pierwszym uruchomieniu trzeba wpisać nazwę użytkownika (wymagane). Nazwa jest przypisana do tej kopii i urządzenia, trafia do panelu Operator i ułatwia licencje oraz udostępnienia; później zmienia ją tylko administrator.",
+  "(1.17.0) Po powrocie internetu blokada sprawdza się od nowa także wtedy, gdy w tej chwili trwało sprawdzanie bez sieci.",
+  "(1.17.0) Nazwa użytkownika widoczna w „O aplikacji” i wpisywana automatycznie w zgłoszeniach oraz prośbach o licencję.",
   "(1.16.8) Sugestie i zgłoszenia: zostaje tylko przycisk „Wyślij” – bez „E-mailem” i „Kopiuj treść”.",
   "(1.16.7) O aplikacji: widać tylko ostatnią zmianę, pełny spis rozwija się po kliknięciu „Spis zmian w wersjach”.",
   "(1.16.7) TAbic IB VAR wg pełnej ChPLW PL: gruba kropla 50–300 ml lub aerozol 100–150 ml na 1000, dysze 60–70 cm; od 1. dnia, także u niosek.",

@@ -469,6 +469,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
               <option value="rec15pc">REC 15 PC1</option>
               <option value="rex15">REX 15 AC1</option>
               <option value="reb15">REB 15 AC1</option>
+              <option value="c50">C 50 AC1 (wózek, 50 l)</option>
             </select>
             <span class="hint" id="s-spr-hint"></span></label>
           <label>Dysza
@@ -1622,7 +1623,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.17.3';
+const APP_VERSION = '1.18.0';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -1651,16 +1652,19 @@ const FLOW_SRC = {
 // Opryskiwacze plecakowe Birchmeier „Accu-Power” – ulotka linii (12076802), karta REC 15 AC1 (12076702)
 // i instrukcja REC 15 AC1/AC2/AC5 (12081203): zakres ciśnienia, wydajność pompy przy 0 bar (q0)
 // i przy ciśnieniu maksymalnym (qMax), maks. wydatek oprysku (out), zbiornik. Dmuchawa AS 1200
-// współpracuje tylko z REC 15 i REX 15 (ulotka linii, przypis 4).
+// współpracuje tylko z REC 15, REX 15 i C 50 (ulotka linii 12076802 v0524, przypis 4).
+// Czas pracy i litry na jedno ładowanie akumulatora – z tej samej ulotki (zależnie od ciśnienia).
 const SPRAYERS = {
   rec15:   {n:'Birchmeier REC 15 AC1', pMin:0.5, pMax:6,  q0:2.0, qMax:1.0, out:1.4, tank:15, as:true,
-            h:'0,5–6 bar · zbiornik 15 l · pompa maks. ok. 1,4 l/min · akumulator 4 Ah ≈ 11 h pracy przy 2 bar · praca w 5–30 °C'},
-  rec15pc: {n:'Birchmeier REC 15 PC1', pMin:0.5, pMax:6,  q0:2.0, qMax:1.0, out:1.4, tank:15, as:true,
-            h:'0,5–6 bar · zbiornik 15 l · ta sama pompa co REC 15 AC1 (maks. ok. 1,4 l/min)'},
+            h:'0,5–6 bar · zbiornik 15 l · pompa tłokowa maks. ok. 1,4 l/min · akumulator 18 V 4 Ah: 4,1–17,9 h i 165–240 l na ładowanie · praca w 5–30 °C · współpracuje z AS 1200'},
+  rec15pc: {n:'Birchmeier REC 15 PC1', pMin:0.5, pMax:6,  q0:2.0, qMax:1.0, out:1.1, tank:15, as:true,
+            h:'0,5–6 bar · zbiornik 15 l · pompa jak REC 15 AC1, ale maks. wydatek oprysku ok. 1,1 l/min (wersja z dyszą płaską XR 8001 VS) · akumulator 4 Ah: 1,6–11,6 h'},
   rex15:   {n:'Birchmeier REX 15 AC1', pMin:1,   pMax:10, q0:6.0, qMax:3.5, out:2.8, tank:15, as:true,
-            h:'1–10 bar · zbiornik 15 l · pompa maks. ok. 2,8 l/min · 10 kg'},
+            h:'1–10 bar · zbiornik 15 l · pompa membranowa maks. ok. 2,8 l/min · akumulator 5,2 Ah: 0,7–8,8 h · 10 kg · współpracuje z AS 1200'},
   reb15:   {n:'Birchmeier REB 15 AC1', pMin:0.5, pMax:3,  q0:3.1, qMax:2.3, out:1.9, tank:15, as:false,
-            h:'0,5–3 bar · zbiornik 15 l · pompa maks. ok. 1,9 l/min · nie współpracuje z dmuchawą AS 1200'}
+            h:'0,5–3 bar · zbiornik 15 l · pompa maks. ok. 1,9 l/min · akumulator 2 Ah: 2,4–7,8 h · nie współpracuje z dmuchawą AS 1200'},
+  c50:     {n:'Birchmeier C 50 AC1', pMin:1, pMax:6, q0:6.0, qMax:4.0, out:4.0, tank:50, as:true,
+            h:'opryskiwacz na wózku · 1–6 bar · zbiornik 50 l · wąż 10 m · pompa membranowa 6 l/min (4 l/min przy 6 bar) · akumulator 18 V 8 Ah: 1–16 h · 29,5 kg · współpracuje z AS 1200'}
 };
 // Dmuchawa AS 1200 (instrukcja): prędkość powietrza i czas pracy akumulatora na danym poziomie
 const AS1200 = {dm1:{v:21, t:'5 h 40 min'}, dm2:{v:26, t:'3 h 20 min'}};
@@ -1681,7 +1685,7 @@ function sprayerUI(){
   $('s-p').max = s.pMax; $('s-p').min = s.pMin;
   $('s-spr-hint').textContent = s.h;
   const a = AS1200[mode.value];
-  $('s-mode-hint').textContent = a ? `AS 1200: ${a.v} m/s, 1 dysza, akumulator dmuchawy ok. ${a.t}` : 'lanca 30–50 cm nad ptakami';
+  $('s-mode-hint').textContent = a ? `AS 1200: ${a.v} m/s, 1 dysza, akumulator dmuchawy ok. ${a.t} · poziomy 3–5 i turbo (zasięg do 13 m) to nawiew do ochrony roślin – za silny do szczepienia, aplikacja ich nie liczy` : 'lanca 30–50 cm nad ptakami';
   $('s-nn-wrap').hidden = mode.value !== 'lanca';
   $('s-nn-hint').textContent = 'wydatek lancy = liczba dysz × wydatek jednej dyszy';
   return forced;
@@ -1830,7 +1834,12 @@ function waterRule(w, age, repro, optIdx, bk){
     if(isNum(w.maxHeavy)) res.warn.push(`ChPLW: ciężkie rasy lub upał – do ${w.maxHeavy} l na 1000.`);
     return res;
   }
-  if(w.rule === 'ageTable'){ const row = (w.rows||[]).find(r => a >= r.a && a <= r.b); if(row){ res.l = row.l; res.basis = `ChPLW dla wieku ${row.a}–${row.b > 900 ? '…' : row.b} dni: ${fmtRange(row.l)} l na 1000`; } else res.warn.push('ChPLW nie podaje ilości wody dla tego wieku – wpisz zmierzone zużycie.'); return res; }
+  if(w.rule === 'ageTable'){ const rows = w.rows || [], row = rows.find(r => a >= r.a && a <= r.b);
+    // Wiek między wierszami tabeli ChPLW: zakres od dolnej granicy młodszego wiersza do górnej starszego – z ostrzeżeniem
+    const lo = !row && [...rows].reverse().find(r => r.b < a), hi = !row && rows.find(r => r.a > a);
+    if(row){ res.l = row.l; res.basis = `ChPLW dla wieku ${row.a}–${row.b > 900 ? '…' : row.b} dni: ${fmtRange(row.l)} l na 1000`; }
+    else if(lo && hi){ res.l = [lo.l[0], hi.l[1]]; res.basis = `między wierszami tabeli ChPLW (${lo.a}–${lo.b} i ${hi.a}–${hi.b > 900 ? '…' : hi.b} dni): ${fmtRange(res.l)} l na 1000`; res.warn.push(`ChPLW nie podaje wody dla ${a}. dnia – przyjęto zakres między sąsiednimi wierszami tabeli. Najlepiej wpisz zużycie zmierzone dzień wcześniej.`); }
+    else res.warn.push('ChPLW nie podaje ilości wody dla tego wieku – wpisz zmierzone zużycie.'); return res; }
   if(w.rule === 'fixed'){ res.l = w.l; res.basis = `ChPLW: ${fmtRange(w.l)} l na 1000 dawek`; return res; }
   if(w.rule === 'choice'){ const o = (w.opts||[])[optIdx|0] || (w.opts||[])[0]; if(o){ res.l = o.v; res.basis = `ChPLW: ${o.l}`; } return res; }
   return res;
@@ -2145,7 +2154,7 @@ function calc(){
     const maxL = V * Math.max(...C.persons.map(o => o.share));
     if(tankL && maxL > tankL){ const nf = Math.ceil(maxL / tankL); msgs.push(['warn', `Na ${k > 1 ? 'osobę' : 'opryskiwacz'} przypada ${fmt(maxL,2)} l – więcej niż mieści zbiornik (${sprayerName(SP)}: ${fmtT(tankL)} l). Potrzebne ${nf} ${pl(nf, 'napełnienie', 'napełnienia', 'napełnień')} – przygotuj roztwór w czystym pojemniku i dolewaj${k === 1 ? ' albo dodaj osobę z drugim opryskiwaczem' : ''}.`]); }
     // Opryskiwacz: zakres ciśnienia, wydajność pompy, dmuchawa (dane producenta)
-    if(!SP.as) msgs.push(['info', `${SP.n} nie współpracuje z dmuchawą AS 1200 (wg Birchmeiera tylko REC 15 i REX 15) – szczep lancą.`]);
+    if(!SP.as) msgs.push(['info', `${SP.n} nie współpracuje z dmuchawą AS 1200 (wg Birchmeiera tylko REC 15, REX 15 i C 50) – szczep lancą.`]);
     if(p > SP.pMax + 1e-9) msgs.push(['bad', `${SP.n} pracuje do ${fmtT(SP.pMax)} bar – ustaw niższe ciśnienie.`]);
     else if(p > 0 && p < SP.pMin - 1e-9) msgs.push(['bad', `${SP.n} pracuje od ${fmtT(SP.pMin)} bar.`]);
     const cap = pumpCap(SP, p);
@@ -2579,7 +2588,6 @@ function plOsoba(n){ return pl(n, 'osoba', 'osoby', 'osób'); }
    Czasy liczone jako ułamek czasu jednego opryskiwacza na całą objętość (V/Q):
    wall – cały zabieg od startu do końca, sec – najdłuższy sektor (czas wyłączonej wentylacji). */
 const ORG_L = {osobno:'każda osoba w swoich sektorach', razem:'wszyscy razem, sektor po sektorze'};
-const TANK_L = 15;   // zbiornik Birchmeier REC 15
 function crewPlan(k, n, org){
   k = Math.max(1, Math.round(k) || 1); n = Math.max(1, Math.round(n) || 1);
   const razem = k > 1 && (org === 'razem' || n === 1);
@@ -3282,7 +3290,8 @@ function renderRules(){
     <li>Ochrona szczepiącego: maska na nos i usta oraz okulary ochronne albo hełm z obiegiem powietrza – wymagają ich ChPLW m.in. Poulvac TRT, Poulvac NDW, Nobilis ND Clone 30, Primun Bronchitis H120, Nobilis IB Primo QX i Nobilis MS Live. Po zabiegu umyj ręce i twarz.</li>
     <li>Birchmeier zaleca do szczepienia drobiu dyszę TX-VK6 – to końcówka TeeJet (Birchmeier nie produkuje własnych dysz). Lanca: 1 albo 2 dysze, dmuchawa AS 1200: 1 dysza. Ciśnienie 2,0–2,5 bar (z dmuchawą maks. 3). Przepływ: katalog TeeJet × liczba dysz albo test cylindrem jednej dyszy. Tabela Birchmeiera dla „TXVK-6” (0,66 l/min przy 2 bar) to wydatek lancy z dwiema dyszami.</li>
     <li>TX-VK18 daje ok. 3 razy większy wydatek i kroplę ok. 190–235 µm – pasuje tylko do szczepionek, których ChPLW dopuszcza grubą kroplę. Pompa REC 15 daje najwyżej ok. 1,4 l/min (1,0 l/min przy 6 bar), więc TX-VK18 na REC 15 tylko do ok. 3,9 bar.</li>
-    <li>Opryskiwacze: REC 15 i REC 15 PC1 0,5–6 bar, REX 15 1–10 bar, REB 15 0,5–3 bar; wszystkie mają zbiornik 15 l. Dmuchawa AS 1200 współpracuje tylko z REC 15 i REX 15.</li>
+    <li>Opryskiwacze: REC 15 i REC 15 PC1 0,5–6 bar, REX 15 1–10 bar, REB 15 0,5–3 bar (plecakowe, zbiornik 15 l); C 50 1–6 bar (wózek, zbiornik 50 l, wąż 10 m). Dmuchawa AS 1200 współpracuje tylko z REC 15, REX 15 i C 50. REC 15 PC1 (wersja z dyszą płaską) daje najwyżej ok. 1,1 l/min.</li>
+    <li>Dmuchawa AS 1200: 2 akumulatory 18 V 10 Ah (ładowanie ok. 70 min), 3,5 kg, poziomy 1–5 i turbo, zasięg do 13 m, praca 0,3–5,7 h zależnie od poziomu. Do szczepienia tylko poziom 1 (wyjątkowo 2) – wyższe poziomy to nawiew do ochrony roślin.</li>
     <li>Po zabiegu opróżnij zbiornik, wlej czystą wodę i przepompuj ją przez lancę (instrukcja REC 15). Regularnie czyść filtr w zaworze spustowym, wąż zasysający i dyszę.</li>
     <li>Pisklęta – bez dmuchawy, 30–50 cm nad ptakami. Szczepienia przypominające – dmuchawa AS 1200 poziom 1 (wyjątkowo 2). Wentylacja wyłączona w trakcie i 15–30 min po.</li>
     <li>Cały zabieg – od rozpuszczenia fiolek do końca oprysku – musi zmieścić się w czasie zużycia z ChPLW (pole „Zużyć w”, zwykle 1–3 h). Aplikacja porównuje go z planem.</li>

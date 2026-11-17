@@ -1,11 +1,12 @@
 {
- "wersja": "1.16.5",
+ "wersja": "1.16.6",
  "data": "2026-11-17",
  "zmiany": [
-  "Nowe szczepionki dopuszczone w Polsce (wg unijnej bazy UPD i polskich ulotek): Primun IB-ND Duo, BIO-VAC ND-IB, Poulvac Bursa Plus, Poulvac AE, Gallimune 302 ND+IB+EDS, Paracox-8.",
-  "Paracox-8 (kokcydioza): 1.–9. dzień życia; rozpylanie na pisklęta 0,21 ml na ptaka (210 ml na 1000 z rozpuszczalnikiem), woda 2 l na 1000; można w nieśności. Paracox-5 – skład 5 linii Eimeria.",
-  "Poulvac AE: przyszłe nioski od 10. tygodnia, 15 l wody na 1000 dawek, mleko 4 g/l. Poulvac Bursa Plus: tylko brojlery od 10. dnia, 1 l na dzień życia, wzór na dzień szczepienia z mian ELISA.",
-  "Gallimune 302: 0,3 ml domięśniowo od 18. tygodnia, nie w nieśności ani 2 tyg. przed. BIO-VAC ND-IB – dane ze skanu ulotki (do sprawdzenia w ulotce serii).",
+  "Nowe szczepionki z polskich ChPLW: HatchPak IB H120 (wylęgarnia, 1. dzień, 70–300 ml na 1000, ciekły azot), Nobilis IB+G+ND (0,5 ml, stada rodzicielskie 16.–20. tydz.), TAbic IB VAR (szczep 233A – dane częściowe, bez dawkowania).",
+  "(1.16.5) Nowe szczepionki dopuszczone w Polsce (wg unijnej bazy UPD i polskich ulotek): Primun IB-ND Duo, BIO-VAC ND-IB, Poulvac Bursa Plus, Poulvac AE, Gallimune 302 ND+IB+EDS, Paracox-8.",
+  "(1.16.5) Paracox-8 (kokcydioza): 1.–9. dzień życia; rozpylanie na pisklęta 0,21 ml na ptaka (210 ml na 1000 z rozpuszczalnikiem), woda 2 l na 1000; można w nieśności. Paracox-5 – skład 5 linii Eimeria.",
+  "(1.16.5) Poulvac AE: przyszłe nioski od 10. tygodnia, 15 l wody na 1000 dawek, mleko 4 g/l. Poulvac Bursa Plus: tylko brojlery od 10. dnia, 1 l na dzień życia, wzór na dzień szczepienia z mian ELISA.",
+  "(1.16.5) Gallimune 302: 0,3 ml domięśniowo od 18. tygodnia, nie w nieśności ani 2 tyg. przed. BIO-VAC ND-IB – dane ze skanu ulotki (do sprawdzenia w ulotce serii).",
   "(1.16.4) Szczepionki z polskich ChPLW i ulotek: Nemovac, Avinew Neo, Cevac Transmune, Cevac ND IB EDS K, Cevac Mass L – dane potwierdzone.",
   "(1.16.4) Avinew Neo także dla indyków (oko, oprysk – bez wody); woda u kur od 15. dnia, mleko 2,5 g/l przy wodzie z wodociągu.",
   "(1.16.4) Nemovac: brojlery tylko w wodzie (7.–14. dzień), oprysk tylko dla niosek i stad reprodukcyjnych (ok. 10. tygodnia); nie z innymi szczepionkami.",

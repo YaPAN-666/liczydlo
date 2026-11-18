@@ -208,6 +208,10 @@ dl.kv dd{margin:0;min-width:0}
 .gate .tools{justify-content:center}
 .gate.who{z-index:56}
 .gate.inst{z-index:57}
+.gate.author{z-index:54;background:rgba(14,25,19,.55);backdrop-filter:blur(2px)}
+.author-in{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 20px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.author-txt{text-align:left;display:grid;gap:10px;line-height:1.5}
+.author-sign{font-weight:600}
 .inst-steps{text-align:left;margin:4px 0 0;padding-left:22px;display:grid;gap:8px;max-width:340px}
 #inst .gate-in > div{display:grid;justify-items:center;gap:12px}
 #inst .btn{justify-content:center;min-width:240px;text-decoration:none}
@@ -399,6 +403,20 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
     <p class="note">Nazwę później może zmienić tylko administrator aplikacji.</p>
     <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
   </form>
+</div>
+
+<div class="gate author" id="author" role="dialog" aria-modal="true" aria-labelledby="author-h" hidden>
+  <div class="gate-in author-in">
+    <h2 id="author-h">Słowo od autora</h2>
+    <div class="author-txt">
+      <p><span class="lz-l">L</span>iczydło powstało, żeby ułatwić i usprawnić pracę technikom i lekarzom weterynarii, którzy pracują z drobiem.</p>
+      <p>Zaczynało jako prosty kalkulator, a z czasem wyrosło na rozbudowane narzędzie. Wciąż się rozwija, więc może jeszcze cierpieć na przypadłości wieku pisklęcego.</p>
+      <p>Rozwija się dzięki Waszym sugestiom, uwagom krytycznym i wskazówkom. Wpisujcie je w zakładce <b>O aplikacji → Sugestie i zgłoszenia</b> – będę za nie bardzo wdzięczny.</p>
+      <p class="author-sign">Owocnej pracy!</p>
+    </div>
+    <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
+    <div class="tools"><button class="btn" type="button" id="author-ok">Zaczynam pracę</button><button class="btn ghost" type="button" id="author-fb">Napisz sugestię</button></div>
+  </div>
 </div>
 
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-h" hidden>
@@ -801,6 +819,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
       <div class="tools">
         <button class="btn" type="button" id="i-install" hidden>Zainstaluj na telefonie</button>
         <button class="btn ghost" type="button" id="i-check">Sprawdź aktualizacje</button>
+        <button class="btn ghost" type="button" id="i-author">Słowo od autora</button>
       </div>
       <span class="note" id="i-msg"></span>
       <div id="i-changes"></div>
@@ -1706,7 +1725,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.19.1';
+const APP_VERSION = '1.20.0';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -3461,6 +3480,22 @@ const G = {ctl:null, at:null, state:'open', busy:null, net:null};
 function lsGet(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
 function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
 
+/* ---------- Słowo od autora – raz na urządzeniu, gdy widać już właściwą aplikację; potem w „O aplikacji” ---------- */
+const AUTHOR_KEY = 'liczydlo.slowo.v1';
+function authorShow(){ const a = $('author'); if(!a) return; a.hidden = false; setTimeout(() => $('author-ok').focus(), 50); }
+function authorClose(){ $('author').hidden = true; lsSet(AUTHOR_KEY, {seen:new Date().toISOString()}); }
+function authorReady(){ return ['splash', 'inst', 'who', 'gate'].every(id => !$(id) || $(id).hidden) && !!userName(); }
+function authorInit(){
+  if(!$('author')) return;
+  $('author-ok').addEventListener('click', authorClose);
+  $('author-fb').addEventListener('click', () => { authorClose(); location.hash = '#info'; setTimeout(() => { const f = $('fb'); if(f) f.scrollIntoView({behavior:'smooth', block:'start'}); }, 150); });
+  $('author').addEventListener('click', ev => { if(ev.target === $('author')) authorClose(); });
+  document.addEventListener('keydown', ev => { if(ev.key === 'Escape' && !$('author').hidden) authorClose(); });
+  $('i-author').addEventListener('click', authorShow);
+  if(lsGet(AUTHOR_KEY) || IN_ARTIFACT) return;
+  const t = setInterval(() => { if(lsGet(AUTHOR_KEY)){ clearInterval(t); return; } if(authorReady()){ clearInterval(t); setTimeout(() => { if(authorReady()) authorShow(); }, 400); } }, 600);
+}
+
 /* ---------- Nazwa użytkownika – wymagana przy pierwszym uruchomieniu, przypisana do tej kopii i urządzenia ---------- */
 const USER_KEY = 'liczydlo.uzytkownik.v1';
 function userName(){ const u = lsGet(USER_KEY); return u && typeof u.name === 'string' ? u.name.trim() : ''; }
@@ -4084,7 +4119,7 @@ function setNozzle(noz, quiet){
 }
 function applyDefaultsSpray(){ if(noVac()) return; const sd = sprayDefault(curVac(), Math.max(0, Math.round(num('age',0)))); $('s-ml').value = sd.ml; $('s-ml-hint').textContent = sd.hint; }
 async function init(){
-  initSplash();
+  initSplash(); authorInit();
   initInst();
   opLoad();
   whoInit();

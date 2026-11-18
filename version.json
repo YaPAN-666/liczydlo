@@ -1,8 +1,10 @@
 {
- "wersja": "1.20.0",
+ "wersja": "1.20.1",
  "data": "2026-11-17",
  "zmiany": [
-  "Słowo od autora: pojawia się raz, po pierwszym uruchomieniu i wpisaniu nazwy użytkownika; zamyka się przyciskiem „Zaczynam pracę”. Można je otworzyć ponownie w „O aplikacji”.",
+  "Słowo od autora: tylko przycisk „Zaczynam pracę”, poprawiony tekst.",
+  "Sugestie i zgłoszenia: usunięta opcja „Dołącz bieżące obliczenie” – zgłoszenie zawiera tylko to, co wpiszesz, oraz wersję aplikacji.",
+  "(1.20.0) Słowo od autora: pojawia się raz, po pierwszym uruchomieniu i wpisaniu nazwy użytkownika; zamyka się przyciskiem „Zaczynam pracę”. Można je otworzyć ponownie w „O aplikacji”.",
   "(1.19.1) Bezpieczeństwo szczepiącego (AviGate ND QV4, Primun Bronchitis H120, Poulvac E. coli): zamiast „ostrożnie ze ściółką” – wyjaśnienie, że zaszczepione ptaki wydalają z odchodami wirus (przy E. coli – bakterie) szczepionkowy, więc ściółkę rusza się w rękawicach, bez wzbijania kurzu, a potem myje ręce.",
   "(1.19.0) Wentylacja jedna na cały kurnik: limit liczony dla całego oprysku (technicy pracują jednocześnie, każdy w swoim sektorze), a nie dla jednego sektora.",
   "(1.19.0) Nowe pole „Pora roku”: limit oprysku latem ok. 20 min, wiosną i jesienią ok. 30, zimą ok. 40 min (zimą temperatura rośnie wolniej). Domyślnie wg miesiąca.",

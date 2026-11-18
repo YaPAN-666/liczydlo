@@ -411,11 +411,11 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
     <div class="author-txt">
       <p><span class="lz-l">L</span>iczydło powstało, żeby ułatwić i usprawnić pracę technikom i lekarzom weterynarii, którzy pracują z drobiem.</p>
       <p>Zaczynało jako prosty kalkulator, a z czasem wyrosło na rozbudowane narzędzie. Wciąż się rozwija, więc może jeszcze cierpieć na przypadłości wieku pisklęcego.</p>
-      <p>Rozwija się dzięki Waszym sugestiom, uwagom krytycznym i wskazówkom. Wpisujcie je w zakładce <b>O aplikacji → Sugestie i zgłoszenia</b> – będę za nie bardzo wdzięczny.</p>
+      <p>Aplikacja rozwija się dzięki Waszym sugestiom, uwagom krytycznym i wskazówkom. Wpisujcie je w zakładce <b>O aplikacji → Sugestie i zgłoszenia</b> – będę za nie bardzo wdzięczny.</p>
       <p class="author-sign">Owocnej pracy!</p>
     </div>
     <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
-    <div class="tools"><button class="btn" type="button" id="author-ok">Zaczynam pracę</button><button class="btn ghost" type="button" id="author-fb">Napisz sugestię</button></div>
+    <div class="tools"><button class="btn" type="button" id="author-ok">Zaczynam pracę</button></div>
   </div>
 </div>
 
@@ -839,7 +839,6 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
           <input id="fb-name" type="text" autocomplete="name" placeholder="imię, firma lub telefon"></label>
         <label class="wide">Opis
           <textarea id="fb-msg" rows="4" placeholder="Co się stało albo co zmienić? Przy błędzie: co było wpisane i co pokazała aplikacja."></textarea></label>
-        <label class="check wide"><input type="checkbox" id="fb-ctx" checked> Dołącz bieżące obliczenie (drób, wiek, szczepionka, droga podania)</label>
       </div>
       <div class="tools">
         <button class="btn" type="button" id="fb-send">Wyślij</button>
@@ -1725,7 +1724,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.20.0';
+const APP_VERSION = '1.20.1';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2583,24 +2582,14 @@ function fbMail(){
   const typ = $('fb-type').value, msg = $('fb-msg').value.trim(), name = $('fb-name').value.trim(), L = [msg || '(brak opisu)', '', '---'];
   if(name) L.push('Podpis: ' + name);
   L.push('Rodzaj: ' + typ, `Wersja: ${APP_VERSION} (dane szczepionek ${DATA_DATE})`, 'Tryb: ' + fbMode(), 'Urządzenie: ' + navigator.userAgent);
-  if($('fb-ctx').checked){
-    const v = curVac(), bk = birdKey(), age = $('age').value, n = $('birds').value;
-    L.push('Obliczenie: ' + [bk ? BIRDS[bk].l : 'drób nie wybrany', age !== '' ? `wiek ${age} dni` : 'wiek nie wpisany', n ? `${n} ptaków` : null,
-      v ? v.n : 'szczepionka nie wybrana', S.route ? ROUTES[S.route] || S.route : null].filter(Boolean).join(' · '));
-  }
   return {subject:`[Liczydło] ${typ} – wersja ${APP_VERSION}`, body:L.join('\n')};
-}
-function fbCtxLine(){
-  const v = curVac(), bk = birdKey(), age = $('age').value, n = $('birds').value;
-  return [bk ? BIRDS[bk].l : 'drób nie wybrany', age !== '' ? `wiek ${age} dni` : 'wiek nie wpisany', n ? `${n} ptaków` : null,
-    v ? v.n : 'szczepionka nie wybrana', S.route ? ROUTES[S.route] || S.route : null].filter(Boolean).join(' · ');
 }
 async function fbSend(){
   if(!$('fb-msg').value.trim()){ toast('Wpisz opis zgłoszenia.'); $('fb-msg').focus(); return; }
   if(!opOn()){ fbMailSend(); return; }
   const btn = $('fb-send'); btn.disabled = true; btn.textContent = 'Wysyłam…';
   try {
-    await opFeedback({type:$('fb-type').value, msg:$('fb-msg').value.trim().slice(0, 4000), name:$('fb-name').value.trim().slice(0, 120), ctx:$('fb-ctx').checked ? fbCtxLine().slice(0, 600) : ''});
+    await opFeedback({type:$('fb-type').value, msg:$('fb-msg').value.trim().slice(0, 4000), name:$('fb-name').value.trim().slice(0, 120), ctx:''});
     $('fb-msg').value = ''; toast('Wysłano do autora aplikacji – dziękujemy!', 5000);
   } catch(e){
     toast('Nie udało się wysłać – sprawdź internet i spróbuj ponownie. Treść zgłoszenia została w polu.', 6000);
@@ -3488,7 +3477,6 @@ function authorReady(){ return ['splash', 'inst', 'who', 'gate'].every(id => !$(
 function authorInit(){
   if(!$('author')) return;
   $('author-ok').addEventListener('click', authorClose);
-  $('author-fb').addEventListener('click', () => { authorClose(); location.hash = '#info'; setTimeout(() => { const f = $('fb'); if(f) f.scrollIntoView({behavior:'smooth', block:'start'}); }, 150); });
   $('author').addEventListener('click', ev => { if(ev.target === $('author')) authorClose(); });
   document.addEventListener('keydown', ev => { if(ev.key === 'Escape' && !$('author').hidden) authorClose(); });
   $('i-author').addEventListener('click', authorShow);

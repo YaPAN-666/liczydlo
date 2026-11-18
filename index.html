@@ -583,7 +583,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
             <span class="hint">przy innym ciśnieniu roboczym wydatek zostanie przeliczony</span></label>
           <label>Liczba sektorów
             <input id="s-sec" type="number" min="1" max="6" step="1" placeholder="1" inputmode="numeric">
-            <span class="hint">każdy sektor osobno, z wyłączoną wentylacją</span></label>
+            <span class="hint">sektor = część kurnika jednego technika; wentylacja jedna na cały kurnik</span></label>
           <label>Liczba osób
             <input id="s-os" type="number" min="1" max="6" step="1" placeholder="1" inputmode="numeric">
             <span class="hint">każda osoba z własnym opryskiwaczem</span></label>
@@ -593,6 +593,16 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
               <option value="razem">Wszyscy razem, sektor po sektorze</option>
             </select>
             <span class="hint" id="s-org-hint"></span></label>
+          <label>Pora roku
+            <select id="s-season">
+              <option value="lato">Lato / upał – na zewnątrz ponad ok. 25 °C</option>
+              <option value="umiark">Wiosna / jesień</option>
+              <option value="zima">Zima / chłodno</option>
+            </select>
+            <span class="hint" id="s-season-hint"></span></label>
+          <label>Wentylacja wyłączona po oprysku (min)
+            <input id="s-vent" type="number" min="10" max="60" step="1" inputmode="numeric" autocomplete="off">
+            <span class="hint" id="s-vent-hint"></span></label>
         </div>
       </div>
 
@@ -1696,7 +1706,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.18.7';
+const APP_VERSION = '1.19.0';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2210,9 +2220,14 @@ function calc(){
       tiles.push({k:'Roztwór na osobę', v:same ? fmt(L[0],2) + ' l' : L.map(x => fmt(x,2)).join(' / ') + ' l', s:'całość rozpuść razem, potem rozlej'});
       if(isNum(t1)) crewH = crewHTML(C, V, t1);
     }
-    $('s-org-hint').textContent = C.razem ? 'krótszy czas w każdym sektorze' : 'sektory opryskiwane równolegle';
+    $('s-org-hint').textContent = C.razem ? 'wszyscy razem, sektor po sektorze' : 'każdy technik w swoim sektorze, jednocześnie';
+    const sea = seasonOf($('s-season').value), LIM = tLim(sea), vent = ventMin(v), vc = ventChplw(v), toff = isNum(tw) ? tw + vent : NaN;
+    $('s-season-hint').textContent = SEASONS[sea].h;
+    $('s-vent').placeholder = String(vc || VENT_DEF);
+    $('s-vent-hint').textContent = `${vc ? `ChPLW tej szczepionki: ${vc} min` : `domyślnie ${VENT_DEF} min`} · najmniej ${VENT_MIN} min (Aviagen), dłużej jest lepiej`;
+    if(isNum(toff)) tiles.push({k:'Wentylacja wyłączona', v:fmtMin(toff), s:`oprysk ${fmtMin(tw)} + ${vent} min po oprysku`});
     Object.assign(R, {ml1000:ml, water_l:V, pressure:p, flow:Q, flowPer:q1, nozzles:nn, nnLance:nozN('lanca', $('s-nn').value), flowSrc:qsrc, flowKey:src, flowQ:src === 'reczne' && measured ? qm : null, flowQbar:src === 'reczne' && measured ? qp : null,
-      nozzle:noz, sprayer:SP.id, sprayerName:sprayerName(SP), tank:tankL || null, pMax:SP.pMax || null, mode:$('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, minutes:tw, sprayMin:t1, sectorMin:ts,
+      nozzle:noz, sprayer:SP.id, sprayerName:sprayerName(SP), tank:tankL || null, pMax:SP.pMax || null, mode:$('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, season:sea, ventAfter:vent, minutes:tw, sprayMin:t1, sectorMin:ts,
       crew:k > 1 && isNum(t1) ? C.persons.map(o => ({no:o.no, sec:o.sec, l:V * o.share, min:t1 * o.work})) : null});
     if(src === 'reczne' && !measured) msgs.push(['warn','Wpisz zmierzony przepływ jednej dyszy, inaczej nie policzę czasu oprysku.']);
     if(noz === 'vk18'){
@@ -2223,8 +2238,9 @@ function calc(){
       if(isNum(t1) && q6 > 0 && src !== 'reczne') msgs.push(['info', `Ta sama objętość ${nn > 1 ? nn + ' dyszami' : 'dyszą'} TX-VK6 (katalog TeeJet): ok. ${fmtMin(V / q6 * C.wall)}. Przy TX-VK18 trzeba iść ok. 3 razy szybciej, równym tempem – inaczej początek kurnika dostanie za dużo roztworu, a koniec za mało.`]);
       if(!sp.d) msgs.push(['warn', `ChPLW (w bazie) nie podaje wielkości kropli. TX-VK18 daje kroplę grubą – ok. ${fmt0(vmdAt(Math.min(6, Math.max(2, p)), noz))} µm przy ${fmtT(Math.min(6, Math.max(2, p)))} bar. Sprawdź w ChPLW, czy szczepionka dopuszcza oprysk grubokroplisty.`]);
     }
-    if(isNum(ts) && ts > T_MAX) msgs.push(['bad', `Planowany czas ${fmtMin(ts)}${nsec > 1 ? ' na sektor' : ''} przekracza ${T_MAX} min – granicę wyłączonej wentylacji. Podziel kurnik na sektory, dodaj osobę z opryskiwaczem albo zmień ustawienia w granicach ChPLW.`]);
-    else if(isNum(ts) && ts > T_GOAL) msgs.push(['warn', `Planowany czas ${fmtMin(ts)}${nsec > 1 ? ' na sektor' : ''} – blisko granicy wyłączonej wentylacji (limit ${T_MAX} min).`]);
+    if(isNum(tw) && tw > LIM.max) msgs.push(['bad', `Oprysk potrwa ${fmtMin(tw)} – ponad ${LIM.max} min (${LIM.l}), a wentylacja jest wyłączona w całym kurniku przez cały oprysk i ${vent} min po nim. Dodaj technika z opryskiwaczem (każdy w swoim sektorze) albo zmień ustawienia w granicach ChPLW.`]);
+    else if(isNum(tw) && tw > LIM.goal) msgs.push(['warn', `Oprysk potrwa ${fmtMin(tw)} – blisko limitu ${LIM.max} min (${LIM.l}). Wentylacja wyłączona łącznie ok. ${fmtMin(toff)}.`]);
+    if(isNum(tw)) msgs.push(['info', `Wentylacja: wyłącz przed opryskiem i trzymaj wyłączoną jeszcze ${vent} min po nim, żeby krople opadły. Przerwij i włącz wentylację od razu, jeśli temperatura w kurniku wzrośnie o 2–3 °C ponad zadaną albo ptaki zaczną dyszeć (otwarte dzioby, odsunięte skrzydła).`]);
     const um = useMinutes(v);
     if(um && isNum(tw)){
       if(tw > um) msgs.push(['bad', `Zabieg potrwa ${fmtMin(tw)} – dłużej niż czas zużycia szczepionki po rozpuszczeniu (ChPLW: ${v.use}). Dodaj osobę z drugim opryskiwaczem albo przygotuj roztwór w dwóch partiach – fiolki rozpuszczone osobno dla każdej części kurnika.`]);
@@ -2265,7 +2281,7 @@ function calc(){
       else msgs.push(['ok', `Kropla ok. ${fmt0(vmd)} µm – zgodna z ChPLW (${fmtRange(sp.d)} µm).`]);
     }
     if(sp.water) msgs.push(['info', 'Woda wg ChPLW: ' + sp.water + '.']);
-    if(sp.dist) msgs.push(['info', `Bez dmuchawy: ${sp.dist} nad ptakami. Wentylacja wyłączona w trakcie i 15–30 min po.`]);
+    if(sp.dist) msgs.push(['info', `Bez dmuchawy: ${sp.dist} nad ptakami.`]);
     if(!/mask|okular|gogl|ochron\w* oczu|hełm/i.test((v && v.safe) || '')) msgs.push(['info', 'Ochrona szczepiącego przy oprysku: maska na nos i usta oraz okulary ochronne (gogle) – wymagają ich ChPLW m.in. Poulvac TRT, Poulvac NDW, Nobilis ND Clone 30 i Primun Bronchitis H120. Po zabiegu umyj ręce i twarz.']);
   }
   if(route === 'woda'){
@@ -2501,6 +2517,7 @@ function reportText(){
       rows.push(rkv('Czas zabiegu', fmtMin(R.minutes)), rkv('Osoby', `${k} – ${orgText(R.org, n)}`), n > 1 ? rkv('Sektory', `${n}, po ${fmtMin(R.sectorMin)}`) : null);
       (R.crew || []).forEach(o => rows.push(rkv(`Osoba ${o.no}`, `${R.org === 'razem' ? 'razem' : secText(o.sec)} · ${fmt(o.l,2)} l · ${fmtMin(o.min)}`)));
     } else rows.push(rkv('Czas oprysku', fmtMin(R.minutes)), n > 1 ? rkv('Sektory', `${n}, po ${fmtMin(R.sectorMin)}`) : null);
+    if(isNum(R.ventAfter)) rows.push(rkv('Wentylacja', `wyłączona ok. ${fmtMin(R.minutes + R.ventAfter)} (oprysk + ${R.ventAfter} min po) · ${tLim(R.season).l}`));
     if(m) rows.push(rkv('Wg zaleceń', `z ${fmtDate(m.date)}: ${changesText(m.changes) || (m.actions || []).join(' ') || 'lista kontrolna'}`));
     sec('OPRYSK', rows);
   }
@@ -2644,7 +2661,26 @@ async function reportAction(ev){
    jako modyfikacja (kind:'mod'). Przy kolejnym szczepieniu na tej samej fermie aplikacja
    ostrzega o problemie i pozwala zastosować zmiany; w następnym podsumowaniu sprawdza,
    czy zadziałały, i pyta o wprowadzenie ich na stałe (kind:'farm'). */
-const T_MAX = 30, T_GOAL = 20;   // min na sektor: granica wyłączonej wentylacji i cel z zapasem
+// Wentylacja jest jedna na cały kurnik: technicy opryskują swoje sektory równocześnie, a wentylacja stoi
+// od początku do końca oprysku i jeszcze po nim, aż krople opadną (Aviagen: co najmniej 10 min; ChPLW
+// niektórych szczepionek: 15–20 min). Limit czasu oprysku zależy od pory roku – latem kurnik nagrzewa się
+// szybko, zimą wolniej, ale rośnie CO2, amoniak i wilgotność. Wartości to założenie aplikacji; o przerwaniu
+// zawsze decyduje temperatura w kurniku i zachowanie ptaków.
+const SEASONS = {
+  lato:   {l:'lato / upał', max:20, goal:15, h:'Kurnik nagrzewa się szybko – szczep wcześnie rano (Aviagen). Oprysk do ok. 20 min.'},
+  umiark: {l:'wiosna / jesień', max:30, goal:20, h:'Oprysk do ok. 30 min.'},
+  zima:   {l:'zima / chłodno', max:40, goal:30, h:'Temperatura rośnie wolniej, ale szybciej rośnie CO2, amoniak i wilgotność. Oprysk do ok. 40 min.'}
+};
+const VENT_MIN = 10, VENT_DEF = 15;
+function seasonByDate(d){ const m = (d ? new Date(d) : new Date()).getMonth() + 1; return m >= 6 && m <= 8 ? 'lato' : (m === 12 || m <= 2) ? 'zima' : 'umiark'; }
+function seasonOf(id, date){ return SEASONS[id] ? id : seasonByDate(date); }
+function tLim(id, date){ const s = SEASONS[seasonOf(id, date)]; return {max:s.max, goal:s.goal, l:s.l}; }
+// Czas wyłączonej wentylacji po oprysku z ChPLW (np. „wentylacja wyłączona 20 min po”), inaczej 15 min
+function ventChplw(v){
+  const t = JSON.stringify((v && v.r && v.r.spray) || {}), m = t.match(/wentylac[^."]*?(\d+)(?:\s*[–-]\s*(\d+))?\s*min/i);
+  return m ? Math.max(VENT_MIN, +m[1]) : null;
+}
+function ventMin(v){ const x = pf($('s-vent').value); if(isNum(x) && x > 0) return Math.max(VENT_MIN, Math.round(x)); return ventChplw(v) || VENT_DEF; }
 const MODE_L = {lanca:'bez dmuchawy (lanca)', dm1:'dmuchawa – poziom 1', dm2:'dmuchawa – poziom 2'};
 const MOD_ST = {
   zalecona:     {l:'zalecona – czeka na kolejne szczepienie', c:'due'},
@@ -2666,7 +2702,7 @@ function plOsoba(n){ return pl(n, 'osoba', 'osoby', 'osób'); }
    osobno – każda osoba ma swoje sektory, sektory opryskiwane równolegle (przy n < k
             kilka osób w jednym sektorze); razem – wszyscy w jednym sektorze, sektor po sektorze.
    Czasy liczone jako ułamek czasu jednego opryskiwacza na całą objętość (V/Q):
-   wall – cały zabieg od startu do końca, sec – najdłuższy sektor (czas wyłączonej wentylacji). */
+   wall – cały zabieg od startu do końca, sec – najdłuższy sektor (wentylacja jest wyłączona przez cały zabieg – wall). */
 const ORG_L = {osobno:'każda osoba w swoich sektorach', razem:'wszyscy razem, sektor po sektorze'};
 function crewPlan(k, n, org){
   k = Math.max(1, Math.round(k) || 1); n = Math.max(1, Math.round(n) || 1);
@@ -2783,7 +2819,7 @@ function bestSettings(cur, m, v, birds, limit, opt = {}){
       for(const ml of mls){
         const V = birds / 1000 * ml / 1000, t1 = V / Q, mlcost = pcost + Math.max(0, cur.ml - ml) / 10;
         for(const [n, k, org, wall, sec, ccost] of combos){
-          if(!(t1 * sec <= limit) || !(t1 * wall <= useMax)) continue;
+          if(!(t1 * wall <= limit) || !(t1 * wall <= useMax)) continue;   // wentylacja jedna na kurnik: liczy się cały oprysk
           const cost = mlcost + ccost;
           if(!best || cost < best.cost - 1e-9) best = {p, ml, n, k, org, mode, noz, nn, m:mm, cost, pr:{Q, V, t:t1 * wall, ts:t1 * sec, n, k, org, noz, nn, vmd}};
         }
@@ -2964,13 +3000,13 @@ function sumDiag(r, inp){
       }
     }
   }
-  const tp = r.minutes, perSec = Math.abs(ts - t) > 1e-6;
+  const tp = r.minutes, perSec = Math.abs(ts - t) > 1e-6, LIM = tLim(r.season, r.date || r.created), vA = isNum(r.ventAfter) ? r.ventAfter : VENT_DEF;
   let tline = isNum(tp) && tp > 0 && Math.abs(t - tp) / tp > 0.1 ? `czas ${fmtMin(t)} zamiast planowanych ${fmtMin(tp)}` : null;
-  if(ts > T_MAX){
-    msgs.push(['bad', `Zabieg trwał ${fmtMin(t)}${perSec ? `, czyli ${fmtMin(ts)} na sektor` : ''} – powyżej ${T_MAX} minut, czyli granicy wyłączonej wentylacji.`]);
-    tline = (tline || `czas ${fmtMin(t)}`) + (perSec ? ` (${fmtMin(ts)} na sektor)` : '') + `, powyżej limitu ${T_MAX} min`;
-    chk.push('Wentylacja wyłączona tylko na czas zabiegu i 15–30 min po nim', 'Ptaki obserwowane po zabiegu – duszność, przegrzanie');
-  } else if(ts > T_GOAL) msgs.push(['warn', `Zabieg trwał ${fmtMin(ts)}${perSec ? ' na sektor' : ''} – blisko granicy wyłączonej wentylacji (limit ${T_MAX} min).`]);
+  if(t > LIM.max){
+    msgs.push(['bad', `Oprysk trwał ${fmtMin(t)} – ponad ${LIM.max} min (${LIM.l}). Wentylacja w całym kurniku była wyłączona ok. ${fmtMin(t + vA)} (z ${vA} min po oprysku).`]);
+    tline = (tline || `czas ${fmtMin(t)}`) + `, powyżej limitu ${LIM.max} min (${LIM.l})`;
+    chk.push('Temperatura w kurniku w trakcie oprysku – wzrost nie większy niż 2–3 °C', 'Ptaki obserwowane po zabiegu – duszność, przegrzanie');
+  } else if(t > LIM.goal) msgs.push(['warn', `Oprysk trwał ${fmtMin(t)} – blisko limitu ${LIM.max} min (${LIM.l}).`]);
   if(um && t > um){
     msgs.push(['bad', `Zabieg trwał ${fmtMin(t)} – dłużej niż czas zużycia szczepionki po rozpuszczeniu (ChPLW: ${vac.use}). Roztwór pod koniec mógł mieć niższe miano.`]);
     probs.push(`zabieg dłuższy niż czas zużycia szczepionki po rozpuszczeniu (${vac.use})`);
@@ -3004,10 +3040,10 @@ function sumDiag(r, inp){
   if(m && r.birds > 0 && r.ml1000 > 0 && isNum(cur.p)){
     const now = predict(m, cur.p, cur.ml, cur.n, r.birds, cur.k, cur.org, nozN(cur.mode, cur.nnL));
     const useMax = um ? useTarget(um) : Infinity;
-    const timeBad = now.ts > T_MAX, dropBad = !!win && now.vmd != null && !inWin(win, now.vmd), useBad = now.t > (um || Infinity);
+    const timeBad = now.t > LIM.max, dropBad = !!win && now.vmd != null && !inWin(win, now.vmd), useBad = now.t > (um || Infinity);
     if(timeBad || dropBad || useBad || probs.length) D.pred = now;
     if(timeBad || dropBad || useBad){
-      const lim = timeBad ? T_GOAL : T_MAX, b = bestSettings(cur, m, vac, r.birds, lim, {useMax});
+      const lim = timeBad ? LIM.goal : LIM.max, b = bestSettings(cur, m, vac, r.birds, lim, {useMax});
       if(b){
         D.changes.push(...changeList(cur, b));
         D.pred = b.pr;
@@ -3026,7 +3062,7 @@ function sumDiag(r, inp){
         }
         if(win && b.pr.vmd != null && ((isNum(win[0]) && b.pr.vmd - win[0] < 0.02 * win[0]) || (isNum(win[1]) && win[1] - b.pr.vmd < 0.02 * win[1])) && D.changes.some(c => c.k === 'pressure' || c.k === 'flow'))
           act.push('Prognozowana kropla leży na granicy okna z ChPLW – przed szczepieniem sprawdź ją papierkami wodoczułymi.');
-      } else msgs.push(['bad', `Tą dyszą nie da się zmieścić w ${T_GOAL} min na sektor${um ? ` i w czasie zużycia szczepionki (${vac.use})` : ''} przy zachowaniu okna kropli z ChPLW, nawet w ${Math.max(4, n)} sektorach i z ${Math.max(3, k)} osobami. Potrzebna dysza o większym wydatku – decyzja lekarza weterynarii.`]);
+      } else msgs.push(['bad', `Tą dyszą nie da się zmieścić oprysku w ${LIM.goal} min${um ? ` i w czasie zużycia szczepionki (${vac.use})` : ''} przy zachowaniu okna kropli z ChPLW, nawet w ${Math.max(4, n)} sektorach i z ${Math.max(3, k)} osobami. Potrzebna dysza o większym wydatku – decyzja lekarza weterynarii.`]);
     }
   }
   if(flowTo) D.changes.unshift({k:'flow', from:{key, q:r.flowQ, bar:r.flowQbar}, to:flowTo});
@@ -3062,7 +3098,7 @@ function sumHTML(d, r){
   if(d.alt) h += `<p class="note" style="margin:0">Inna możliwość – bez zmniejszania wody: ${esc(changesText(d.alt.changes))}; ${esc(predText(d.alt.pred))}.</p>`;
   if(d.alt2) h += `<p class="note" style="margin:0">Z dodatkową osobą: ${esc(changesText(d.alt2.changes))}; ${esc(predText(d.alt2.pred))}.</p>`;
   if(d.actions.length) h += `<ul class="list">${d.actions.map(a => `<li>${esc(a)}</li>`).join('')}</ul>`;
-  if(d.pred) h += `<p class="note" style="margin:0">Przewidywany czas przy następnym zabiegu${d.changes.length ? ' z tymi zmianami' : ''}: <b>${esc(predText(d.pred))}</b>, limit ${T_MAX} min na sektor${d.pred.vmd ? ` · kropla ok. ${fmt0(d.pred.vmd)} µm${win ? ` (ChPLW ${fmtRange(win)} µm)` : ''}` : ''}.</p>`;
+  if(d.pred) h += `<p class="note" style="margin:0">Przewidywany czas przy następnym zabiegu${d.changes.length ? ' z tymi zmianami' : ''}: <b>${esc(predText(d.pred))}</b>, limit ${tLim(r.season, r.date || r.created).max} min oprysku${d.pred.vmd ? ` · kropla ok. ${fmt0(d.pred.vmd)} µm${win ? ` (ChPLW ${fmtRange(win)} µm)` : ''}` : ''}.</p>`;
   h += `<p class="note" style="margin:0">${farmKey(r.farm) ? `Po zapisaniu aplikacja zapamięta to zalecenie i przypomni o nim przy kolejnym szczepieniu na fermie „${esc(r.farm)}”.` : 'Raport nie ma nazwy fermy – zalecenie zostanie zapisane, ale aplikacja nie będzie wiedziała, przy której fermie o nim przypomnieć.'}</p></div>`;
   return h;
 }
@@ -3374,7 +3410,7 @@ function renderRules(){
     <li>Dmuchawa AS 1200: 2 akumulatory 18 V 10 Ah (ładowanie ok. 70 min), 3,5 kg, 0,5–10 bar, 5–30 °C, zasięg do 13 m. Poziomy (prędkość powietrza / czas pracy): 1 – 21 m/s / 5 h 40 min, 2 – 26 m/s / 3 h 20 min, 3 – 34 m/s / 1 h 50 min, 4 – 44 m/s / 50 min, 5 – 56 m/s / 25 min, max – 65 m/s / 15 min (od „max” ochronniki słuchu). Do szczepienia tylko poziom 1 (wyjątkowo 2).</li>
     <li>AS 1200 nie jest przeznaczona do kwasów, ługów i środków dezynfekcyjnych (instrukcja) – po szczepieniu przepłucz ją czystą wodą (min. 1 l w opryskiwaczu) i wyczyść dyszę i filtr; nie przedmuchuj dyszy ustami.</li>
     <li>Po zabiegu opróżnij zbiornik, wlej czystą wodę i przepompuj ją przez lancę (instrukcja REC 15). Regularnie czyść filtr w zaworze spustowym, wąż zasysający i dyszę.</li>
-    <li>Pisklęta – bez dmuchawy, 30–50 cm nad ptakami. Szczepienia przypominające – dmuchawa AS 1200 poziom 1 (wyjątkowo 2). Wentylacja wyłączona w trakcie i 15–30 min po.</li>
+    <li>Pisklęta – bez dmuchawy, 30–50 cm nad ptakami. Szczepienia przypominające – dmuchawa AS 1200 poziom 1 (wyjątkowo 2). Wentylacja (jedna na cały kurnik) wyłączona przez cały oprysk i co najmniej 10–15 min po nim, aż krople opadną; dłużej jest lepiej, jeśli temperatura i ptaki na to pozwalają. Limit samego oprysku zależy od pory roku: lato ok. 20 min, wiosna/jesień ok. 30, zima ok. 40.</li>
     <li>Cały zabieg – od rozpuszczenia fiolek do końca oprysku – musi zmieścić się w czasie zużycia z ChPLW (pole „Zużyć w”, zwykle 1–3 h). Aplikacja porównuje go z planem.</li>
     <li>Kilka osób: każda z własnym opryskiwaczem ustawionym tak samo. Wszystkie fiolki rozpuść w całej wodzie, wymieszaj i dopiero wtedy rozlej do opryskiwaczy wg tabeli w wyniku. Osoby w osobnych sektorach skracają cały zabieg; praca razem, sektor po sektorze, skraca też czas w każdym sektorze.</li>
     <li>Zbiornik REC 15 mieści 15 l. Większą objętość na osobę przygotuj w czystym pojemniku i dolewaj w trakcie.</li></ul></div>
@@ -4055,7 +4091,7 @@ async function init(){
   gateInit();
   opInit();
   loadFonts();
-  bind(); $('s-noz').dataset.cur = $('s-noz').value; loadEquipment(); flowSrcUI(); fillDz(); fillVac(); onVacChange();   // czysty start – nic nie wybrane
+  bind(); $('s-noz').dataset.cur = $('s-noz').value; loadEquipment(); $('s-season').value = seasonByDate(); flowSrcUI(); fillDz(); fillVac(); onVacChange();   // czysty start – nic nie wybrane
   showTab(location.hash.slice(1) || 'obliczenia');
   let db = null, dl = null;
   try { if(window.claude && typeof window.claude.use === 'function'){ [db, dl] = await Promise.all([window.claude.use('db').catch(() => null), window.claude.use('downloads').catch(() => null)]); } } catch(e){}

@@ -1,8 +1,10 @@
 {
- "wersja": "1.18.3",
+ "wersja": "1.18.4",
  "data": "2026-11-17",
  "zmiany": [
-  "Link do aplikacji wysłany w WhatsAppie, Messengerze czy SMS-ie pokazuje teraz grafikę Liczydła z opisem – stuknięcie w nią otwiera aplikację.",
+  "Ekran „Zainstaluj Liczydło” z instrukcją (Android i iPhone) i przyciskiem „Zainstaluj teraz”; na stronie tytułowej odnośnik „Jak zainstalować na telefonie?”.",
+  "Link otwarty w Messengerze (i innych komunikatorach): aplikacja proponuje „Otwórz w Chrome” – z wbudowanej przeglądarki komunikatora nie da się zainstalować.",
+  "(1.18.3) Link do aplikacji wysłany w WhatsAppie, Messengerze czy SMS-ie pokazuje teraz grafikę Liczydła z opisem – stuknięcie w nią otwiera aplikację.",
   "(1.18.2) Strona tytułowa: logo Studio Pracy Umysłowej (znak i napis) w kolorach ekranu tytułowego; usunięty dopisek „kill-switch enabled app”.",
   "(1.18.1) Instrukcje Birchmeier (AS 1200 GR1 2026, REX 15, REC 15, tabela dysz): dmuchawa AS 1200 pasuje także do REB 15; pełna tabela poziomów AS 1200 (prędkość powietrza i czas pracy), ochronniki słuchu od poziomu max, AS 1200 nie do środków dezynfekcyjnych.",
   "(1.18.1) Z dmuchawą i dyszą TX-VK6 aplikacja ostrzega, że tabela dysz Birchmeiera do AS 1200 podaje ok. 2 razy większy wydatek (0,66 l/min przy 2 bar) niż katalog TeeJet – zmierz wydatek cylindrem i wpisz jako pomiar własny.",

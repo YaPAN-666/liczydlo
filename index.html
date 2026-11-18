@@ -199,6 +199,11 @@ dl.kv dd{margin:0;min-width:0}
 #gate-err:empty{display:none}
 .gate .tools{justify-content:center}
 .gate.who{z-index:56}
+.gate.inst{z-index:57}
+.inst-steps{text-align:left;margin:4px 0 0;padding-left:22px;display:grid;gap:8px;max-width:340px}
+#inst .gate-in > div{display:grid;justify-items:center;gap:12px}
+#inst .btn{justify-content:center;min-width:240px;text-decoration:none}
+.splash .inst-link{margin-top:22px;background:none;border:0;color:#e8a964;font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:4px;padding:10px 12px;cursor:pointer}
 #who-form{text-align:center}#who-form label{display:grid;gap:6px;width:100%;max-width:340px;text-align:left}#who-form .btn{justify-content:center;min-width:220px}#who-err:empty{display:none}#who-err{color:var(--bad,#b3261e)}
 .toast{z-index:59}
 .updbar{z-index:58}
@@ -323,6 +328,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
     <div class="name">Liczydło</div>
     <div class="app">APP</div>
     <div class="tap" aria-hidden="true">dotknij ekranu, aby rozpocząć</div>
+    <button class="inst-link" type="button" id="splash-inst" hidden>Jak zainstalować na telefonie?</button>
   </div>
   <div class="brand" aria-label="Studio Pracy Umysłowej – Paweł Czarnocki">
     <svg class="mark" viewBox="0 0 112 112" aria-hidden="true">
@@ -334,6 +340,41 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
       <circle cx="82" cy="30" r="10" fill="#e8a964"/>
     </svg>
     <span class="words"><span class="studio">Studio Pracy Umysłowej</span><span class="author"><i aria-hidden="true"></i>Paweł Czarnocki</span></span>
+  </div>
+</div>
+
+<div class="gate inst" id="inst" role="dialog" aria-modal="true" aria-labelledby="inst-h" hidden>
+  <div class="gate-in">
+    <svg class="gate-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v7m-3-3 3 3 3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h2 id="inst-h">Zainstaluj Liczydło</h2>
+    <div id="inst-iab" hidden>
+      <p><b>Link otworzył się w przeglądarce komunikatora</b> (Messenger, Facebook, Instagram…). Z niej nie da się zainstalować aplikacji – otwórz Liczydło w Chrome.</p>
+      <a class="btn" id="inst-chrome" href="#">Otwórz w Chrome</a>
+      <ol class="inst-steps" id="inst-iab-and">
+        <li>Jeśli przycisk nie zadziała: stuknij <b>⋮ w prawym górnym rogu</b>.</li>
+        <li>Wybierz <b>„Otwórz w Chrome”</b> lub „Otwórz w przeglądarce zewnętrznej”.</li>
+      </ol>
+      <ol class="inst-steps" id="inst-iab-ios" hidden>
+        <li>Stuknij <b>⋯</b> (lub ikonę udostępniania) w rogu ekranu.</li>
+        <li>Wybierz <b>„Otwórz w Safari”</b> (lub „Otwórz w przeglądarce”).</li>
+      </ol>
+      <button class="btn ghost" type="button" id="inst-copy">Kopiuj link</button>
+    </div>
+    <div id="inst-web">
+      <button class="btn" type="button" id="inst-go" hidden>Zainstaluj teraz</button>
+      <ol class="inst-steps" id="inst-and">
+        <li>Stuknij <b>⋮ w prawym górnym rogu</b> Chrome.</li>
+        <li>Wybierz <b>„Zainstaluj aplikację”</b> (lub „Dodaj do ekranu głównego”) i potwierdź.</li>
+        <li>Uruchamiaj Liczydło z ikony na ekranie – działa też bez internetu.</li>
+      </ol>
+      <ol class="inst-steps" id="inst-ios" hidden>
+        <li>Otwórz link w <b>Safari</b>.</li>
+        <li>Stuknij przycisk <b>Udostępnij</b> (kwadrat ze strzałką) na dole ekranu.</li>
+        <li>Wybierz <b>„Do ekranu początkowego”</b> i potwierdź „Dodaj”.</li>
+      </ol>
+    </div>
+    <button class="btn ghost" type="button" id="inst-later">Teraz nie – korzystaj w przeglądarce</button>
+    <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
   </div>
 </div>
 
@@ -1646,7 +1687,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.18.3';
+const APP_VERSION = '1.18.4';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -3997,6 +4038,7 @@ function setNozzle(noz, quiet){
 function applyDefaultsSpray(){ if(noVac()) return; const sd = sprayDefault(curVac(), Math.max(0, Math.round(num('age',0)))); $('s-ml').value = sd.ml; $('s-ml-hint').textContent = sd.hint; }
 async function init(){
   initSplash();
+  initInst();
   opLoad();
   whoInit();
   gateInit();
@@ -4045,13 +4087,50 @@ function initSplash(){
   let done = false;
   const hide = () => { if(done) return; done = true; document.removeEventListener('keydown', onKey); sp.classList.add('out'); setTimeout(() => { sp.hidden = true; }, reduce ? 0 : 550); };
   const onKey = ev => { if(ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Escape'){ ev.preventDefault(); hide(); } };
-  sp.addEventListener('click', hide);
+  sp.addEventListener('click', ev => { if(ev.target.closest('#splash-inst')){ hide(); instShow(true); return; } hide(); instMaybe(); });
   document.addEventListener('keydown', onKey);
+}
+
+/* ---------- Instalacja: ekran z instrukcją; przeglądarka komunikatora (Messenger itp.) → „Otwórz w Chrome” ---------- */
+const INST_KEY = 'liczydlo.instalacja.v1';
+const UA = navigator.userAgent || '';
+const IS_IOS = /iPhone|iPad|iPod/.test(UA) || (/Macintosh/.test(UA) && navigator.maxTouchPoints > 1);
+const IS_ANDROID = /Android/i.test(UA);
+// Wbudowane przeglądarki aplikacji – z nich nie da się zainstalować PWA
+const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|FBIOS|Messenger|MessengerLite|Instagram|Line\/|Snapchat|TikTok|musical_ly|BytedanceWebview|Twitter|LinkedInApp|GSA\/|; wv\)/i.test(UA);
+function isStandalone(){ try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch(e){ return false; } }
+function chromeIntent(){
+  const u = location.href.split('#')[0];
+  return 'intent://' + u.replace(/^https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(u) + ';end';
+}
+function instShow(force){
+  const box = $('inst'); if(!box || IN_ARTIFACT || isStandalone()) return;
+  $('inst-iab').hidden = !IN_APP_BROWSER;
+  $('inst-web').hidden = IN_APP_BROWSER;
+  $('inst-chrome').hidden = !IN_APP_BROWSER || !IS_ANDROID;
+  $('inst-iab-and').hidden = IS_IOS; $('inst-iab-ios').hidden = !IS_IOS;
+  $('inst-and').hidden = IS_IOS; $('inst-ios').hidden = !IS_IOS;
+  $('inst-go').hidden = !S.installEvt;
+  box.hidden = false;
+}
+function instMaybe(){
+  if(IN_ARTIFACT || isStandalone()) return;
+  if(IN_APP_BROWSER) return instShow(true);   // w komunikatorze zawsze – stamtąd nie da się zainstalować
+  const st = lsGet(INST_KEY); if(st && st.later) return;
+  instShow(false);
+}
+function initInst(){
+  if(!$('inst')) return;
+  if(!IN_ARTIFACT && !isStandalone()) $('splash-inst').hidden = false;
+  $('inst-chrome').href = chromeIntent();
+  $('inst-copy').addEventListener('click', () => copyText(location.href.split('#')[0]));
+  $('inst-go').addEventListener('click', async () => { await installApp(); $('inst').hidden = true; });
+  $('inst-later').addEventListener('click', () => { lsSet(INST_KEY, {later:true, at:new Date().toISOString()}); $('inst').hidden = true; });
 }
 
 /* ---------- Aplikacja na telefon: instalacja i aktualizacje ---------- */
 function initPWA(){
-  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); S.installEvt = e; $('i-install').hidden = false; });
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); S.installEvt = e; $('i-install').hidden = false; if($('inst-go')) $('inst-go').hidden = false; });
   window.addEventListener('appinstalled', () => { S.installEvt = null; $('i-install').hidden = true; toast('Liczydło zainstalowane na telefonie.'); });
   if(IN_ARTIFACT || !('serviceWorker' in navigator)) return;
   const local = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
@@ -4094,7 +4173,7 @@ async function checkUpdates(){
   } catch(e){ msg.textContent = 'Brak połączenia z internetem – spróbuj później.'; }
 }
 async function installApp(){
-  if(!S.installEvt){ toast('Użyj menu Chrome ⋮ → „Zainstaluj aplikację”.'); return; }
+  if(!S.installEvt){ instShow(true); return; }
   S.installEvt.prompt(); try { await S.installEvt.userChoice; } catch(e){}
   S.installEvt = null; $('i-install').hidden = true;
 }

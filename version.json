@@ -1,9 +1,10 @@
 {
- "wersja": "1.18.1",
+ "wersja": "1.18.2",
  "data": "2026-11-17",
  "zmiany": [
-  "Instrukcje Birchmeier (AS 1200 GR1 2026, REX 15, REC 15, tabela dysz): dmuchawa AS 1200 pasuje także do REB 15; pełna tabela poziomów AS 1200 (prędkość powietrza i czas pracy), ochronniki słuchu od poziomu max, AS 1200 nie do środków dezynfekcyjnych.",
-  "Z dmuchawą i dyszą TX-VK6 aplikacja ostrzega, że tabela dysz Birchmeiera do AS 1200 podaje ok. 2 razy większy wydatek (0,66 l/min przy 2 bar) niż katalog TeeJet – zmierz wydatek cylindrem i wpisz jako pomiar własny.",
+  "Strona tytułowa: logo Studio Pracy Umysłowej (znak i napis) w kolorach ekranu tytułowego; usunięty dopisek „kill-switch enabled app”.",
+  "(1.18.1) Instrukcje Birchmeier (AS 1200 GR1 2026, REX 15, REC 15, tabela dysz): dmuchawa AS 1200 pasuje także do REB 15; pełna tabela poziomów AS 1200 (prędkość powietrza i czas pracy), ochronniki słuchu od poziomu max, AS 1200 nie do środków dezynfekcyjnych.",
+  "(1.18.1) Z dmuchawą i dyszą TX-VK6 aplikacja ostrzega, że tabela dysz Birchmeiera do AS 1200 podaje ok. 2 razy większy wydatek (0,66 l/min przy 2 bar) niż katalog TeeJet – zmierz wydatek cylindrem i wpisz jako pomiar własny.",
   "(1.18.0) Sprzęt Birchmeier wg ulotki linii Accu-Power: nowy opryskiwacz C 50 AC1 (wózek, zbiornik 50 l, 1–6 bar) – współpracuje z dmuchawą AS 1200; REC 15 PC1 – maks. wydatek 1,1 l/min (było 1,4); przy opryskiwaczach czas pracy i litry na jedno ładowanie akumulatora.",
   "(1.18.0) Dmuchawa AS 1200: dane z ulotki (2 akumulatory 10 Ah, poziomy 1–5 i max, zasięg do 13 m); do szczepienia tylko poziom 1–2.",
   "(1.18.0) Woda do picia: gdy wiek wypada między wierszami tabeli z ChPLW (np. Cevac Bron 120 L, Cevac New L), aplikacja podaje zakres między sąsiednimi wierszami z ostrzeżeniem, zamiast samego wyniku orientacyjnego.",

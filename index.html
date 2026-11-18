@@ -14,7 +14,7 @@
 <title>Liczydło</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" data-fonts media="print" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" data-fonts media="print" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@600&display=swap">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}
 
 /* Układ: warsztat zabiegowy – pasek aplikacji z zakładkami, pod nim robocze panele (dane wejściowe | wynik). Na telefonie jedna kolumna. */
@@ -165,10 +165,12 @@ dl.kv dd{margin:0;min-width:0}
 .splash .abacus{width:min(32vw,140px);height:auto;color:#f1f6f2;margin-bottom:22px}
 .splash .name{font-family:var(--f-head);font-weight:700;font-size:clamp(56px,17vw,108px);line-height:1;letter-spacing:.005em;color:#f1f6f2}
 .splash .app{font-family:var(--f-head);font-weight:600;font-size:clamp(18px,5.4vw,30px);letter-spacing:.65em;padding-left:.65em;color:#e8a964}
-.splash .brand{justify-self:center;display:grid;justify-items:center;gap:6px;text-align:center;font-family:var(--f-body);color:#f1f6f2;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
-.splash .brand .studio{font-size:12px;font-weight:500;letter-spacing:.2em;padding-left:.2em;opacity:.88}
-.splash .brand .author{font-size:11px;letter-spacing:.14em;padding-left:.14em;opacity:.66}
-.splash .brand .ks{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;opacity:.5;margin-top:6px}
+.splash .brand{justify-self:center;display:flex;align-items:center;gap:14px;text-align:left;color:#f1f6f2;padding-bottom:calc(26px + env(safe-area-inset-bottom,0px))}
+.splash .brand .mark{width:46px;height:46px;flex:none}
+.splash .brand .words{display:flex;flex-direction:column;gap:5px}
+.splash .brand .studio{font-family:"Space Grotesk",var(--f-head);font-weight:600;font-size:17px;line-height:1.05;letter-spacing:-.01em;color:#f1f6f2}
+.splash .brand .author{display:flex;align-items:center;gap:9px;font-family:var(--f-body);font-weight:500;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#cfe0d6}
+.splash .brand .author i{display:block;width:22px;height:2px;border-radius:2px;background:#e8a964}
 .splash .tap{margin-top:30px;font-size:13px;letter-spacing:.12em;color:#f1f6f2;opacity:0;animation:tapIn .6s ease 1s forwards,tapPulse 2.4s ease-in-out 1.6s infinite}
 @keyframes tapIn{to{opacity:.8}}
 @keyframes tapPulse{0%,100%{opacity:.8}50%{opacity:.4}}
@@ -311,7 +313,17 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
     <div class="app">APP</div>
     <div class="tap" aria-hidden="true">dotknij ekranu, aby rozpocząć</div>
   </div>
-  <div class="brand"><span class="studio">Studio Pracy Umysłowej</span><span class="author">Paweł Czarnocki</span><span class="ks">kill-switch enabled app</span></div>
+  <div class="brand" aria-label="Studio Pracy Umysłowej – Paweł Czarnocki">
+    <svg class="mark" viewBox="0 0 112 112" aria-hidden="true">
+      <rect x="0" y="0" width="112" height="112" rx="24" fill="#f1f6f2"/>
+      <circle cx="56" cy="56" r="32" fill="none" stroke="#23553e" stroke-width="6"/>
+      <line x1="42" y1="48" x2="70" y2="48" stroke="#23553e" stroke-width="6" stroke-linecap="round"/>
+      <line x1="42" y1="60" x2="62" y2="60" stroke="#23553e" stroke-width="6" stroke-linecap="round"/>
+      <line x1="42" y1="72" x2="54" y2="72" stroke="#23553e" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="82" cy="30" r="10" fill="#e8a964"/>
+    </svg>
+    <span class="words"><span class="studio">Studio Pracy Umysłowej</span><span class="author"><i aria-hidden="true"></i>Paweł Czarnocki</span></span>
+  </div>
 </div>
 
 <div class="gate who" id="who" role="dialog" aria-modal="true" aria-labelledby="who-h" hidden>
@@ -1623,7 +1635,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.18.1';
+const APP_VERSION = '1.18.2';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};

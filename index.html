@@ -245,7 +245,8 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 .updbar .btn{background:var(--brand-ink);color:var(--brand);border-color:var(--brand-ink)}
 
 /* Nagłówek z nazwą programu */
-.brandrow h1 .mark svg{width:22px;height:22px;display:block}
+.brandrow h1 .mark{width:36px;height:36px;border-radius:8px;background:#23553e}
+.brandrow h1 .mark svg{width:28px;height:auto;display:block}
 .brandrow h1 .sub{font-family:var(--f-body);font-weight:400;font-size:.78rem;color:var(--muted);letter-spacing:0;align-self:flex-end;margin-bottom:3px}
 .headtools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .credit{text-align:center;font-size:.72rem;letter-spacing:.18em;line-height:1.8;color:var(--muted)}
@@ -440,7 +441,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 <header class="appbar">
   <div class="appbar-in">
     <div class="brandrow">
-      <h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 120 100"><rect x="8" y="8" width="104" height="84" rx="10" fill="none" stroke="currentColor" stroke-width="9"/><g stroke="currentColor" stroke-width="4"><line x1="10" y1="34" x2="110" y2="34"/><line x1="10" y1="66" x2="110" y2="66"/></g><g fill="currentColor"><ellipse cx="28" cy="34" rx="9" ry="11"/><ellipse cx="50" cy="34" rx="9" ry="11"/><ellipse cx="92" cy="34" rx="9" ry="11"/><ellipse cx="28" cy="66" rx="9" ry="11"/><ellipse cx="72" cy="66" rx="9" ry="11"/><ellipse cx="92" cy="66" rx="9" ry="11"/></g></svg></span><span class="nm"><span class="lz-l">L</span>iczydło</span> <span class="sub">kalkulator szczepień drobiu</span></h1>
+      <h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 120 100"><rect x="6" y="6" width="108" height="88" rx="10" fill="none" stroke="#f1f6f2" stroke-width="8"/><g stroke="#f1f6f2" stroke-width="3.5" opacity=".85"><line x1="9" y1="30" x2="111" y2="30"/><line x1="9" y1="50" x2="111" y2="50"/><line x1="9" y1="70" x2="111" y2="70"/></g><g fill="#e8a964"><ellipse cx="24" cy="30" rx="7" ry="8.5"/><ellipse cx="39" cy="30" rx="7" ry="8.5"/><ellipse cx="54" cy="30" rx="7" ry="8.5"/><ellipse cx="24" cy="50" rx="7" ry="8.5"/><ellipse cx="39" cy="50" rx="7" ry="8.5"/><ellipse cx="24" cy="70" rx="7" ry="8.5"/><ellipse cx="39" cy="70" rx="7" ry="8.5"/><ellipse cx="54" cy="70" rx="7" ry="8.5"/><ellipse cx="69" cy="70" rx="7" ry="8.5"/></g><g fill="#f1f6f2"><ellipse cx="96" cy="30" rx="7" ry="8.5"/><ellipse cx="81" cy="50" rx="7" ry="8.5"/><ellipse cx="96" cy="50" rx="7" ry="8.5"/><ellipse cx="96" cy="70" rx="7" ry="8.5"/></g></svg></span><span class="nm"><span class="lz-l">L</span>iczydło</span> <span class="sub">kalkulator szczepień drobiu</span></h1>
       <div class="headtools">
         <span class="chip" id="chip-mode"><span class="dot"></span><span>Łączenie z pamięcią…</span></span>
         <a class="btn small ghost" href="#info" id="info-link">O aplikacji / Sugestie</a>
@@ -1695,7 +1696,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.18.6';
+const APP_VERSION = '1.18.7';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};

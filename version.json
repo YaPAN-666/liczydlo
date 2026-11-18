@@ -1,11 +1,12 @@
 {
- "wersja": "1.19.0",
+ "wersja": "1.19.1",
  "data": "2026-11-17",
  "zmiany": [
-  "Wentylacja jedna na cały kurnik: limit liczony dla całego oprysku (technicy pracują jednocześnie, każdy w swoim sektorze), a nie dla jednego sektora.",
-  "Nowe pole „Pora roku”: limit oprysku latem ok. 20 min, wiosną i jesienią ok. 30, zimą ok. 40 min (zimą temperatura rośnie wolniej). Domyślnie wg miesiąca.",
-  "Nowe pole „Wentylacja wyłączona po oprysku”: najmniej 10 min (Aviagen), domyślnie 15 albo tyle, ile podaje ChPLW szczepionki (np. Poulvac IB Primer – 20 min). Wynik pokazuje łączny czas wyłączonej wentylacji.",
-  "Zasada przerwania: wzrost temperatury w kurniku o 2–3 °C albo dyszenie ptaków – od razu włącz wentylację. W raporcie i w podsumowaniu zabiegu.",
+  "Bezpieczeństwo szczepiącego (AviGate ND QV4, Primun Bronchitis H120, Poulvac E. coli): zamiast „ostrożnie ze ściółką” – wyjaśnienie, że zaszczepione ptaki wydalają z odchodami wirus (przy E. coli – bakterie) szczepionkowy, więc ściółkę rusza się w rękawicach, bez wzbijania kurzu, a potem myje ręce.",
+  "(1.19.0) Wentylacja jedna na cały kurnik: limit liczony dla całego oprysku (technicy pracują jednocześnie, każdy w swoim sektorze), a nie dla jednego sektora.",
+  "(1.19.0) Nowe pole „Pora roku”: limit oprysku latem ok. 20 min, wiosną i jesienią ok. 30, zimą ok. 40 min (zimą temperatura rośnie wolniej). Domyślnie wg miesiąca.",
+  "(1.19.0) Nowe pole „Wentylacja wyłączona po oprysku”: najmniej 10 min (Aviagen), domyślnie 15 albo tyle, ile podaje ChPLW szczepionki (np. Poulvac IB Primer – 20 min). Wynik pokazuje łączny czas wyłączonej wentylacji.",
+  "(1.19.0) Zasada przerwania: wzrost temperatury w kurniku o 2–3 °C albo dyszenie ptaków – od razu włącz wentylację. W raporcie i w podsumowaniu zabiegu.",
   "(1.18.7) Jedno logo liczydła w całej aplikacji: w nagłówku to samo liczydło co na stronie tytułowej i na ikonie telefonu (3 pręty, 13 paciorków, pomarańczowe po lewej).",
   "(1.18.6) Strona tytułowa: napis z paciorków ustawia się dokładnie w miejscu zwykłego napisu „Liczydło” (wcześniej był odrobinę wyżej).",
   "(1.18.6) Litera „L” w nazwie Liczydło jest pomarańczowa – na stronie tytułowej, w nagłówku, na ekranie instalacji, w „O aplikacji” i w stopce raportu.",

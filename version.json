@@ -1,9 +1,11 @@
 {
- "wersja": "1.18.4",
+ "wersja": "1.18.5",
  "data": "2026-11-17",
  "zmiany": [
-  "Ekran „Zainstaluj Liczydło” z instrukcją (Android i iPhone) i przyciskiem „Zainstaluj teraz”; na stronie tytułowej odnośnik „Jak zainstalować na telefonie?”.",
-  "Link otwarty w Messengerze (i innych komunikatorach): aplikacja proponuje „Otwórz w Chrome” – z wbudowanej przeglądarki komunikatora nie da się zainstalować.",
+  "Zablokowana aplikacja bez internetu sprawdza się sama co kilka sekund – odblokowanie dociera także wtedy, gdy telefon nie zgłosi powrotu sieci.",
+  "Strona tytułowa: paciorki liczydła wjeżdżają po prętach z lewej i prawej strony i układają się w napis „Liczydło” (przy włączonym ograniczeniu animacji w telefonie – sam napis).",
+  "(1.18.4) Ekran „Zainstaluj Liczydło” z instrukcją (Android i iPhone) i przyciskiem „Zainstaluj teraz”; na stronie tytułowej odnośnik „Jak zainstalować na telefonie?”.",
+  "(1.18.4) Link otwarty w Messengerze (i innych komunikatorach): aplikacja proponuje „Otwórz w Chrome” – z wbudowanej przeglądarki komunikatora nie da się zainstalować.",
   "(1.18.3) Link do aplikacji wysłany w WhatsAppie, Messengerze czy SMS-ie pokazuje teraz grafikę Liczydła z opisem – stuknięcie w nią otwiera aplikację.",
   "(1.18.2) Strona tytułowa: logo Studio Pracy Umysłowej (znak i napis) w kolorach ekranu tytułowego; usunięty dopisek „kill-switch enabled app”.",
   "(1.18.1) Instrukcje Birchmeier (AS 1200 GR1 2026, REX 15, REC 15, tabela dysz): dmuchawa AS 1200 pasuje także do REB 15; pełna tabela poziomów AS 1200 (prędkość powietrza i czas pracy), ochronniki słuchu od poziomu max, AS 1200 nie do środków dezynfekcyjnych.",

@@ -175,6 +175,12 @@ dl.kv dd{margin:0;min-width:0}
 .splash .center{display:grid;place-content:center;justify-items:center;text-align:center;gap:4px}
 .splash .abacus{width:min(32vw,140px);height:auto;color:#f1f6f2;margin-bottom:22px}
 .splash .name{font-family:var(--f-head);font-weight:700;font-size:clamp(56px,17vw,108px);line-height:1;letter-spacing:.005em;color:#f1f6f2}
+.splash .name{position:relative}
+.splash .name.anim .txt{opacity:0}
+.splash .name .beads{position:absolute;left:50%;top:50%;width:104%;transform:translate(-50%,-58%);overflow:visible;pointer-events:none}
+.splash .name .rail{stroke:#cfe0d6;stroke-opacity:.22;stroke-width:1.2}
+.splash .name .bead{fill:#f1f6f2}
+.splash .name .bead.acc{fill:#e8a964}
 .splash .app{font-family:var(--f-head);font-weight:600;font-size:clamp(18px,5.4vw,30px);letter-spacing:.65em;padding-left:.65em;color:#e8a964}
 .splash .brand{justify-self:center;display:flex;align-items:center;gap:14px;text-align:left;color:#f1f6f2;padding-bottom:calc(26px + env(safe-area-inset-bottom,0px))}
 .splash .brand .mark{width:46px;height:46px;flex:none}
@@ -182,7 +188,7 @@ dl.kv dd{margin:0;min-width:0}
 .splash .brand .studio{font-family:"Space Grotesk",var(--f-head);font-weight:600;font-size:17px;line-height:1.05;letter-spacing:-.01em;color:#f1f6f2}
 .splash .brand .author{display:flex;align-items:center;gap:9px;font-family:var(--f-body);font-weight:500;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#cfe0d6}
 .splash .brand .author i{display:block;width:22px;height:2px;border-radius:2px;background:#e8a964}
-.splash .tap{margin-top:30px;font-size:13px;letter-spacing:.12em;color:#f1f6f2;opacity:0;animation:tapIn .6s ease 1s forwards,tapPulse 2.4s ease-in-out 1.6s infinite}
+.splash .tap{margin-top:30px;font-size:13px;letter-spacing:.12em;color:#f1f6f2;opacity:0;animation:tapIn .6s ease 2.4s forwards,tapPulse 2.4s ease-in-out 3s infinite}
 @keyframes tapIn{to{opacity:.8}}
 @keyframes tapPulse{0%,100%{opacity:.8}50%{opacity:.4}}
 @media (prefers-reduced-motion:reduce){.splash .tap{animation:none;opacity:.8}}
@@ -325,7 +331,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
       <g fill="#e8a964"><ellipse cx="24" cy="30" rx="6.5" ry="8"/><ellipse cx="38" cy="30" rx="6.5" ry="8"/><ellipse cx="52" cy="30" rx="6.5" ry="8"/><ellipse cx="24" cy="50" rx="6.5" ry="8"/><ellipse cx="38" cy="50" rx="6.5" ry="8"/><ellipse cx="24" cy="70" rx="6.5" ry="8"/><ellipse cx="38" cy="70" rx="6.5" ry="8"/><ellipse cx="52" cy="70" rx="6.5" ry="8"/><ellipse cx="66" cy="70" rx="6.5" ry="8"/></g>
       <g fill="currentColor"><ellipse cx="96" cy="30" rx="6.5" ry="8"/><ellipse cx="82" cy="50" rx="6.5" ry="8"/><ellipse cx="96" cy="50" rx="6.5" ry="8"/><ellipse cx="96" cy="70" rx="6.5" ry="8"/></g>
     </svg>
-    <div class="name">Liczydło</div>
+    <div class="name"><span class="txt">Liczydło</span></div>
     <div class="app">APP</div>
     <div class="tap" aria-hidden="true">dotknij ekranu, aby rozpocząć</div>
     <button class="inst-link" type="button" id="splash-inst" hidden>Jak zainstalować na telefonie?</button>
@@ -1687,7 +1693,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.18.4';
+const APP_VERSION = '1.18.5';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -3546,6 +3552,8 @@ function gateInit(){
   document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') gateCheck(); });
   // Po odzyskaniu internetu sprawdź od nowa – także gdy trwa jeszcze sprawdzanie rozpoczęte bez sieci
   window.addEventListener('online', () => { const b = G.busy; if(b) b.finally(() => gateCheck()); else gateCheck(); });
+  // Zablokowana bez internetu: ponawiaj co 4 s – zdarzenie „online” nie zawsze przychodzi (np. przełączenie Wi-Fi ↔ dane)
+  setInterval(() => { if(!G.net && !document.hidden && $('gate') && !$('gate').hidden && navigator.onLine !== false) gateCheck(); }, 4000);
   setInterval(() => gateCheck(), 30 * 60 * 1000);
 }
 
@@ -4081,9 +4089,53 @@ async function importBackup(file){
 }
 
 /* ---------- Strona tytułowa – znika po dotknięciu ekranu ---------- */
+// Strona tytułowa: paciorki liczydła wjeżdżają po prętach z lewej i prawej i układają się w napis „Liczydło”,
+// potem przechodzą w zwykły napis. Litery 4–5 × 9 pól (wiersz 6 = linia bazowa, 7–8 – ogonek „y”).
+// (funkcja, nie stała – init() startuje, zanim stałe niżej w pliku zostaną utworzone)
+function beadFont(){ return {
+  L:['#...','#...','#...','#...','#...','#...','####','....','....'],
+  i:['#','.','#','#','#','#','#','.','.'],
+  c:['....','....','.###','#...','#...','#...','.###','....','....'],
+  z:['....','....','####','..#.','.#..','#...','####','....','....'],
+  y:['....','....','#..#','#..#','#..#','#..#','.###','...#','###.'],
+  d:['...#','...#','.###','#..#','#..#','#..#','.###','....','....'],
+  'ł':['.#..','.#..','.#.#','.##.','##..','.#..','.#..','....','....'],
+  o:['....','....','.##.','#..#','#..#','#..#','.##.','....','....']
+}; }
+function splashBeads(sp){
+  const name = sp.querySelector('.name'); if(!name || name.querySelector('svg')) return null;
+  const word = 'Liczydło', beads = [], F = beadFont(); let x = 0;
+  for(const ch of word){ const g = F[ch]; g.forEach((row, r) => [...row].forEach((c, k) => { if(c === '#') beads.push({x:x + k, y:r, ch}); })); x += g[0].length + 1; }
+  const W = x - 1, H = 9, U = 10, NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', `-6 -6 ${W * U + 12} ${H * U + 12}`); svg.setAttribute('class', 'beads'); svg.setAttribute('aria-hidden', 'true');
+  const rows = [...new Set(beads.map(b => b.y))];
+  const rails = rows.map(r => { const l = document.createElementNS(NS, 'line');
+    l.setAttribute('x1', -6); l.setAttribute('x2', W * U + 6); l.setAttribute('y1', r * U + U / 2); l.setAttribute('y2', r * U + U / 2); l.setAttribute('class', 'rail'); svg.appendChild(l); return l; });
+  const dots = beads.map(b => { const c = document.createElementNS(NS, 'circle');
+    c.setAttribute('cx', b.x * U + U / 2); c.setAttribute('cy', b.y * U + U / 2); c.setAttribute('r', U * 0.42);
+    c.setAttribute('class', b.ch === 'L' ? 'bead acc' : 'bead'); svg.appendChild(c); return {c, b}; });
+  name.appendChild(svg); name.classList.add('anim');
+  const run = () => {
+    const off = W * U * 0.75;
+    rails.forEach((l, i) => l.animate([{opacity:0}, {opacity:1}], {duration:300, delay:i * 25, fill:'both'}));
+    dots.forEach(({c, b}, i) => {
+      const fromLeft = b.y % 2 === 0, dx = fromLeft ? -(off + b.x * U * 0.4) : (off + (W - b.x) * U * 0.4);
+      const delay = 120 + (fromLeft ? b.x : W - b.x) * 22 + (b.y * 13) % 60;
+      c.animate([{transform:`translateX(${dx}px)`, opacity:0}, {opacity:1, offset:0.2}, {transform:`translateX(${fromLeft ? 2.5 : -2.5}px)`, offset:0.82}, {transform:'translateX(0)', opacity:1}],
+        {duration:780, delay, easing:'cubic-bezier(.22,.7,.3,1)', fill:'both'});
+    });
+    const end = 120 + W * 22 + 60 + 780;
+    setTimeout(() => { svg.animate([{opacity:1}, {opacity:0}], {duration:520, delay:380, fill:'both', easing:'ease'});
+      name.querySelector('.txt').animate([{opacity:0, filter:'blur(6px)'}, {opacity:1, filter:'blur(0)'}], {duration:520, delay:380, fill:'both', easing:'ease'}); }, end);
+    return end + 900;
+  };
+  return run;
+}
 function initSplash(){
   const sp = $('splash'); if(!sp) return;
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce && typeof Element.prototype.animate === 'function'){ try { const run = splashBeads(sp); if(run) run(); } catch(e){ sp.querySelector('.name').classList.remove('anim'); } }
   let done = false;
   const hide = () => { if(done) return; done = true; document.removeEventListener('keydown', onKey); sp.classList.add('out'); setTimeout(() => { sp.hidden = true; }, reduce ? 0 : 550); };
   const onKey = ev => { if(ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Escape'){ ev.preventDefault(); hide(); } };

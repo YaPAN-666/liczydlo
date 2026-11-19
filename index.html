@@ -999,7 +999,7 @@ const VACCINES = [
  lay:'Bezpieczeństwo w okresie nieśności nie zostało określone.', mix:'Nie mieszać z innymi produktami; inne szczepionki przed lub po – decyzja indywidualna.',
  sch:'Jedna dawka na ptaka; program szczepień ustala lekarz weterynarii.',
  safe:'Przy oprysku: okulary ochronne oraz maska na nos i usta albo hełm z filtrowanym obiegiem powietrza.', store:'2–8°C, chronić przed światłem, nie zamrażać.',
- r:{spray:{d:[120,150], opts:[{l:'atomizer (kropla ok. 50 µm) – ściółka',ml:[400,400]},{l:'atomizer (kropla ok. 50 µm) – klatki',ml:[200,200]},{l:'wytwornica grubokroplista w wylęgarni – automat',ml:[150,150]}], note:'Dwa rodzaje urządzeń w ChPLW. 1) Ręczna lub automatyczna wytwornica aerozolu grubocząsteczkowego (opryskiwacz, np. Birchmeier z TX-VK6): kropla 0,12–0,15 mm (120–150 µm), rozpylać równomiernie ok. 50 cm nad głowami, tak by szczepionka trafiła bezpośrednio na każdego ptaka; ilość wody podana tylko dla automatu w wylęgarni – 0,15 l na 1000 dawek, w kurniku zależy od aparatu i sposobu utrzymania ptaków. 2) Atomizer: kropla ok. 0,05 mm (pozycja 5 regulatora), nie opryskiwać ptaków bezpośrednio, tylko wypełnić aerozolem całe pomieszczenie; 0,4 l (ściółka) lub 0,2 l (klatki) na 1000 dawek. W kurniku: uszczelnić pomieszczenie, wentylacja wyłączona w trakcie i 20 min po zakończeniu szczepienia. W upały – w najchłodniejszej porze dnia.'},
+ r:{spray:{d:[120,150], opts:[{l:'atomizer (kropla ok. 50 µm) – ściółka',ml:[400,400],fine:true},{l:'atomizer (kropla ok. 50 µm) – klatki',ml:[200,200],fine:true},{l:'wytwornica grubokroplista w wylęgarni – automat',ml:[150,150]}], note:'Dwa rodzaje urządzeń w ChPLW. 1) Ręczna lub automatyczna wytwornica aerozolu grubocząsteczkowego (opryskiwacz, np. Birchmeier z TX-VK6): kropla 0,12–0,15 mm (120–150 µm), rozpylać równomiernie ok. 50 cm nad głowami, tak by szczepionka trafiła bezpośrednio na każdego ptaka; ilość wody podana tylko dla automatu w wylęgarni – 0,15 l na 1000 dawek, w kurniku zależy od aparatu i sposobu utrzymania ptaków. 2) Atomizer: kropla ok. 0,05 mm (pozycja 5 regulatora), nie opryskiwać ptaków bezpośrednio, tylko wypełnić aerozolem całe pomieszczenie; 0,4 l (ściółka) lub 0,2 l (klatki) na 1000 dawek. W kurniku: uszczelnić pomieszczenie, wentylacja wyłączona w trakcie i 20 min po zakończeniu szczepienia. W upały – w najchłodniejszej porze dnia.'},
     woda:{rule:'perDay', f:1, max:40, x2:{b:'kury-brojlery', from:18, l:'brojlery od 2,5 tyg.'}, win:'2 h', thirst:'2–4 h (poza upałami)', note:'Litry = wiek kurcząt w dniach, maks. 40 l na 1000; u brojlerów od 2,5. tygodnia objętość podwaja się. Bez leków i środków dezynfekcyjnych w wodzie 24 h przed szczepieniem.'},
     oko:{ml:50, bird:'1 kropla do oka lub nosa'}}},
 {id:'avigate-nd-qv4', n:'AviGate ND QV4', m:'Huvepharma', t:'żywa', dz:['ND'], s:'QV4', sp:['kury'], st:'v', src:[RPL(53532)],
@@ -1103,7 +1103,7 @@ const VACCINES = [
  lay:'Może być stosowana u kur niosek od 1. dnia życia.', mix:'Nie mieszać. Tego samego dnia, bez mieszania, można podać żywe szczepionki przeciw ND. Inne – decyzja indywidualna.',
  sch:'Od 1. dnia życia; odporność po 21 dniach, trwa 42 dni. Brojlery w 1. i 14. dniu – ochrona do uboju (7.–8. tydz.). Nioski i stada reprodukcyjne doszczepiać wg programu. Gruba kropla – pisklęta jednodniowe (wylęgarnia lub kurnik, zwykły opryskiwacz); aerozol – powtórne szczepienie starszych ptaków. Szczep szerzy się na podatne gatunki.',
  safe:'Rękawice, okulary i maska ochronna. Po połknięciu lub rozlaniu na skórę – do lekarza z ulotką.', ae:'Brak.', od:'Dawka 10 razy większa (do oka, pisklęta SPF) – bezpieczna.', store:'2–8°C, chronić przed światłem. Tabletek z przebitej części blistra nie używać; niezużytej szczepionki nie zostawiać na inny dzień.',
- r:{spray:{opts:[{l:'gruba kropla (≥100 µm)', ml:[50,300]},{l:'aerozol (40–100 µm) – powtórne, starsze ptaki', ml:[100,150]}], d:[100,null], dRep:[40,100], dist:'60–70 cm nad ptakami', water:'czysta woda przegotowana, zimna – bez dezynfekcji i detergentów', note:'ChPLW PL: ml wody na 1000 dawek – gruba kropla 50–300, aerozol 100–150 (dokładnie wg wydajności urządzenia; 5000 dawek: 250–1500 / 500–750). Tabletka rozpuszcza się 1–2 min. Światło przyciemnić, wentylację i ogrzewanie wyłączyć; urządzenie myć gorącą przegotowaną wodą.'}}},
+ r:{spray:{opts:[{l:'gruba kropla (≥100 µm)', ml:[50,300]},{l:'aerozol (40–100 µm) – powtórne, starsze ptaki', ml:[100,150], fine:true}], d:[100,null], dRep:[40,100], dist:'60–70 cm nad ptakami', water:'czysta woda przegotowana, zimna – bez dezynfekcji i detergentów', note:'ChPLW PL: ml wody na 1000 dawek – gruba kropla 50–300, aerozol 100–150 (dokładnie wg wydajności urządzenia; 5000 dawek: 250–1500 / 500–750). Tabletka rozpuszcza się 1–2 min. Światło przyciemnić, wentylację i ogrzewanie wyłączyć; urządzenie myć gorącą przegotowaną wodą.'}}},
 {id:'poulvac-ib-qx', n:'Poulvac IB QX', m:'Zoetis', t:'żywa (atenuowana)', pf:'liofilizat do sporządzania zawiesiny (podanie w aerozolu)', dz:['IB'], s:'IBV L1148 (QX), 10^3,0–10^5,0 EID50', sp:['kury'], st:'v', ma:'2300/13',
  src:[{t:'ChPLW PL – Poulvac IB QX, pozwolenie 2300/13 (Rejestr Produktów Leczniczych – wyszukaj nazwę)', u:'https://rejestry.ezdrowie.gov.pl/rpl/search/public'}, SRC_UPD('600000043490')],
  min:{kury:1}, minB:{'kury-odchow':7}, minT:'brojlery od 1. dnia; przyszłe nioski i ptaki zarodowe od 7. dnia (od 1. dnia, gdy mają przeciwciała matczyne IB)', pk:[2000,5000,10000], use:'2 h po rozpuszczeniu', wd:'0 dni',
@@ -1147,7 +1147,7 @@ const VACCINES = [
  lay:'Nie w okresie nieśności ani 4 tyg. przed jej rozpoczęciem.', mix:'Nie mieszać z innymi produktami. Indyków nie szczepić jednocześnie z innymi szczepieniami ani zabiegami stresującymi. Nie szczepić przy innych wrażliwych gatunkach (perliczki, bażanty).',
  sch:'Indyki: 1. dzień życia, przypominające w 3. tygodniu i w 7.–9. tygodniu; odporność po 15 dniach, do 12 tyg. po ostatnim szczepieniu. Kury: jedno szczepienie od 10. tygodnia, potem przypominające szczepionką inaktywowaną z adiuwantem olejowym – odporność przez cały okres nieśności.',
  safe:'Sprzęt czysty, bez środków antyseptycznych i dezynfekcyjnych.', ae:'Nie stwierdzono.', od:'Dawka 10 razy większa – bez objawów niepożądanych.', store:'W lodówce, chronić przed światłem, nie zamrażać.',
- r:{spray:{ml:[250,250], water:'woda jałowa (destylowana lub dejonizowana)', note:'Ulotka PL: 1000 dawek rozpuścić w 1 ml, uzupełnić jałową wodą do 250 ml; rozpylacz wytwarzający mikrokrople (wielkości w µm nie podaje). Pisklęta w zwartej grupie w trakcie i 15 min po.'},
+ r:{spray:{mikro:true, ml:[250,250], water:'woda jałowa (destylowana lub dejonizowana)', note:'Ulotka PL: 1000 dawek rozpuścić w 1 ml, uzupełnić jałową wodą do 250 ml; rozpylacz wytwarzający mikrokrople (wielkości w µm nie podaje). Pisklęta w zwartej grupie w trakcie i 15 min po.'},
     oko:{ml:50, bird:'1 kropla 0,05 ml na gałkę oczną', note:'Ulotka PL: 1000 dawek w 1 ml, uzupełnić jałową wodą do 50 ml (więcej przy 2000 i 5000 dawek).'},
     woda:{rule:'measured', h:2, min:7, win:'1–2 h', thirst:'2 h', note:'Ulotka PL: od 7. dnia; tyle wody, ile ptaki wypiją w 1–2 h. Woda czysta, bez dezynfekcji; 2 h bez wody przed szczepieniem; podać tuż przed piciem.'}}},
 {id:'nobilis-rhino-cv', n:'Nobilis Rhino CV', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa', pf:'liofilizat do sporządzania zawiesiny do podawania na oczy i nozdrza', dz:['aMPV'], s:'aMPV 11/94, 10^1,5–10^3,7 TCID50', sp:['kury'], st:'v', src:[RPL(18783, '10/2025')], ma:'1623/05',
@@ -1751,7 +1751,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.21.3';
+const APP_VERSION = '1.21.4';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2146,7 +2146,8 @@ function refreshGuides(){ fillDz(); fillVac({keep:true, notify:true}); buildRout
 function sprayDefault(v, age){
   const sp = v && v.r ? v.r.spray : null;
   if(!sp || !(sp.ml || sp.opts || sp.byAge)) return {ml:250, hint: v ? 'ChPLW (w bazie) nie podaje objętości – wpisz wg ulotki' : 'wpisz wg ulotki szczepionki'};
-  if(sp.opts){ const o = sp.opts.find(x => /ściółka/.test(x.l)) || sp.opts[0]; return {ml:o.ml[0], hint:'ChPLW: ' + sp.opts.map(x => `${x.l} ${fmtRange(x.ml)} ml`).join('; ')}; }
+  // domyślnie ilość dla grubej kropli (opryskiwacz), nie dla atomizera / aerozolu
+  if(sp.opts){ const co = sp.opts.filter(x => !x.fine), o = co.find(x => /ściółka/.test(x.l)) || co[0] || sp.opts[0]; return {ml:o.ml[0], hint:'ChPLW: ' + sp.opts.map(x => `${x.l} ${fmtRange(x.ml)} ml`).join('; ')}; }
   if(sp.byAge){ const o = sp.byAge.find(x => isNum(x.to) && age <= x.to) || sp.byAge[sp.byAge.length-1]; return {ml:o.ml[0], hint:'ChPLW: ' + sp.byAge.map(x => `${x.l} ${fmtRange(x.ml)} ml`).join('; ')}; }
   return {ml:(sp.ml[0] === sp.ml[1] || age <= 3) ? sp.ml[0] : sp.ml[1], hint:`ChPLW: ${fmtRange(sp.ml)} ml na 1000 dawek`};
 }
@@ -2318,11 +2319,14 @@ function calc(){
     if(mode !== 'lanca' && noz === 'vk6' && src !== 'reczne') msgs.push(['warn', `Tabela dysz Birchmeiera do AS 1200 podaje dla TXVK-6 ${fmt(flowTab(TXVK6_BIRCH_AS, p > 0 ? p : 2),2)} l/min przy ${fmtT(p > 0 ? p : 2)} bar – ok. 2 razy więcej niż katalog TeeJet dla jednej dyszy (${fmt(flowTab(TXVK6_TEEJET, p > 0 ? p : 2),2)} l/min). Przed szczepieniem zmierz wydatek dyszy w dmuchawie cylindrem (60 s) i wpisz go jako „pomiar własny”.`]);
     if(mode !== 'lanca') msgs.push(['info','Z dmuchawą: ptaki ok. 1–3 m od wylotu, strumień skośnie w dół nad stado. Dmuchawa AS 1200 pracuje w temperaturze 5–30°C (instrukcja AS 1200) – w cieplejszym kurniku sprawdź jej działanie.']);
     const allowed = sp.ml ? [sp.ml] : (sp.opts || sp.byAge || []).map(o => o.ml);
-    // Ilości „atomizer” z ChPLW dotyczą innego urządzenia (bardzo drobna kropla wypełniająca pomieszczenie) – nie opryskiwacza grubokroplistego
-    if(sp.opts && sp.opts.some(o => /atomizer/i.test(o.l))){
-      const at = sp.opts.filter(o => /atomizer/i.test(o.l)), co = sp.opts.filter(o => !/atomizer/i.test(o.l));
-      msgs.push(['warn', `ChPLW podaje ${at.map(o => fmtRange(o.ml) + ' ml').join(' / ')} na 1000 dawek dla atomizera (kropla ok. 50 µm). Opryskiwacz Birchmeier z dyszą TX-VK${noz === 'vk18' ? '18' : '6'} to opryskiwacz grubokroplisty – dla niego ChPLW ${co.length ? `podaje tylko ${co.map(o => `${o.l.replace(/^wytwornica grubokroplista /, '')}: ${fmtRange(o.ml)} ml`).join('; ')}, a w kurniku ` : ''}nie podaje ilości wody (zależy od aparatu i utrzymania ptaków). Ilość ustal z lekarzem weterynarii.`]);
+    const vmd0 = src === 'reczne' && isNum(q1) ? vmdEst(p, q1, noz) : vmdAt(p > 0 ? p : 2.5, noz);
+    // Ilości dla drobnej kropli (atomizer, aerozol do szczepienia powtórnego) dotyczą innego urządzenia niż opryskiwacz grubokroplisty
+    if(sp.opts && sp.opts.some(o => o.fine)){
+      const fi = sp.opts.filter(o => o.fine), co = sp.opts.filter(o => !o.fine);
+      msgs.push(['warn', `ChPLW podaje ${fi.map(o => `${fmtRange(o.ml)} ml (${o.l})`).join('; ')} na 1000 dawek dla drobnej kropli – to inne urządzenie. Opryskiwacz Birchmeier z dyszą ${NZ.n} daje grubą kroplę (ok. ${fmt0(vmd0)} µm)${co.length ? ` – do niego pasuje: ${co.map(o => `${o.l} ${fmtRange(o.ml)} ml`).join('; ')}` : ''}.${co.length && co.every(o => /wylęgarn/.test(o.l)) ? ' Dla opryskiwacza w kurniku ChPLW nie podaje ilości wody (zależy od aparatu i utrzymania ptaków) – ilość ustal z lekarzem weterynarii.' : ''}`]);
     }
+    if(sp.dRep && isNum(vmd0) && !inWin(sp.dRep, vmd0)) msgs.push(['warn', `ChPLW: szczepienie powtórne – drobna kropla ${fmtRange(sp.dRep)} µm. ${NZ.n} daje ok. ${fmt0(vmd0)} µm, więc nadaje się tylko do szczepienia pierwotnego (${fmtRange(sp.d)} µm). Do powtórnego potrzebny rozpylacz drobnokroplisty.`]);
+    if(sp.mikro && !sp.d) msgs.push(['warn', `ChPLW wymaga rozpylacza wytwarzającego mikrokrople (wielkości w µm nie podaje). ${NZ.n} daje kroplę ok. ${fmt0(vmd0)} µm – grubszą niż mikrokrople. Sposób podania ustal z lekarzem weterynarii.`]);
     if(allowed.length){ const lo = Math.min(...allowed.map(a => a[0])), hi = Math.max(...allowed.map(a => a[1])); if(ml < lo || ml > hi) msgs.push(['warn', `${fmtT(ml)} ml na 1000 dawek – poza zakresem z ChPLW (${fmtT(lo)}–${fmtT(hi)} ml).`]); }
     const vmd = src === 'reczne' && isNum(q1) ? vmdEst(p, q1, noz) : vmdAt(p, noz);   // kropla zależy od jednej dyszy
     if(sp.d && vmd){
@@ -2722,7 +2726,7 @@ function seasonOf(id, date){ return SEASONS[id] ? id : seasonByDate(date); }
 function tLim(id, date){ const s = SEASONS[seasonOf(id, date)]; return {max:s.max, goal:s.goal, l:s.l}; }
 // Czas wyłączonej wentylacji po oprysku z ChPLW (np. „wentylacja wyłączona 20 min po”), inaczej 15 min
 function ventChplw(v){
-  const t = JSON.stringify((v && v.r && v.r.spray) || {}), m = t.match(/wentylac[^."]*?(\d+)(?:\s*[–-]\s*(\d+))?\s*min/i);
+  const t = JSON.stringify((v && v.r && v.r.spray) || {}), m = t.match(/wentylac[^"]{0,60}?(\d+)(?:\s*[–-]\s*(\d+))?\s*min/i);
   return m ? Math.max(VENT_MIN, +m[1]) : null;
 }
 function ventMin(v){ const x = pf($('s-vent').value); if(isNum(x) && x > 0) return Math.max(VENT_MIN, Math.round(x)); return ventChplw(v) || VENT_DEF; }

@@ -1,8 +1,13 @@
 {
- "wersja": "1.21.3",
+ "wersja": "1.21.4",
  "data": "2026-11-17",
  "zmiany": [
-  "Poulvac NDW (ChPLW 07/2015): dodana wielkość kropli dla opryskiwacza grubokroplistego 120–150 µm – aplikacja sprawdza ją z dyszą TX-VK6; rozdzielone opisy opryskiwacza (gruba kropla, na ptaki) i atomizera (kropla ok. 50 µm, wypełnia pomieszczenie); wentylacja wyłączona 20 min po szczepieniu.",
+  "Przegląd szczepionek sprayowych pod kątem urządzenia i kropli:",
+  "– Primun Newcastle HB1, Primun Newcastle C30, Primun IB+ND Duo, Primun IB H120, TAbic IB VAR: ChPLW wymaga przy szczepieniu powtórnym drobnej kropli (50–80 µm, TAbic 40–100 µm) – aplikacja ostrzega, że TX-VK6 nadaje się tylko do szczepienia pierwotnego.",
+  "– TAbic IB VAR i Poulvac NDW: ilości wody dla drobnej kropli (aerozol, atomizer) oznaczone jako inne urządzenie; domyślnie aplikacja bierze ilość dla grubej kropli.",
+  "– Aviffa-RTI: ChPLW wymaga rozpylacza mikrokroplowego – aplikacja ostrzega, że TX-VK6 daje grubszą kroplę.",
+  "– Primun IB H120: czas wyłączonej wentylacji po oprysku z ChPLW (20–30 min) – wcześniej aplikacja go nie odczytywała i przyjmowała 15 min.",
+  "(1.21.3) Poulvac NDW (ChPLW 07/2015): dodana wielkość kropli dla opryskiwacza grubokroplistego 120–150 µm – aplikacja sprawdza ją z dyszą TX-VK6; rozdzielone opisy opryskiwacza (gruba kropla, na ptaki) i atomizera (kropla ok. 50 µm, wypełnia pomieszczenie); wentylacja wyłączona 20 min po szczepieniu.",
   "(1.21.2) Logo Studio Pracy Umysłowej bez własnego tła – przyjmuje kolor napisu i pasuje do każdego tła (strona tytułowa i podpis na dole ekranów).",
   "(1.21.1) Nowe logo Studio Pracy Umysłowej – drzewo-umysł z iskrą pomysłu – na stronie tytułowej i nad podpisem „Studio Pracy Umysłowej / Paweł Czarnocki” na dole ekranów.",
   "(1.21.0) Fiolki: zamiast wpisywania – lista z wielkościami z ChPLW („wszystkie” – aplikacja dobiera najmniej fiolek, albo jedna wielkość); „inna wielkość” pozwala wpisać ręcznie.",

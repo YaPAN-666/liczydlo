@@ -223,6 +223,8 @@ dl.kv dd{margin:0;min-width:0}
 #crew{margin-top:10px}
 #s-org-wrap{grid-column:1/-1}
 .row > label.wide{grid-column:1/-1}
+/* Pola obok siebie w jednej linii: nazwa, pole i podpowiedź w osobnych wierszach wspólnych dla rzędu */
+@supports (grid-template-rows:subgrid){ .row > label:not(.check){grid-row:span 3;grid-template-rows:subgrid;row-gap:4px;align-content:normal} .row > label:not(.check) > :is(input,select,textarea){align-self:start} .row > label:not(.check) > .hint{align-self:start} }
 .seg button small{font-size:.72em;margin-left:4px;opacity:.85}
 #dz-hint:empty,#route-hint:empty,#bird-hint:empty{display:none}
 .steps{margin:0;padding-left:20px;display:grid;gap:4px;font-size:.88rem;line-height:1.45}
@@ -613,12 +615,12 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
             <span class="hint" id="s-org-hint"></span></label>
           <label>Pora roku
             <select id="s-season">
-              <option value="lato">Lato / upał – na zewnątrz ponad ok. 25 °C</option>
+              <option value="lato">Lato / upał</option>
               <option value="umiark">Wiosna / jesień</option>
               <option value="zima">Zima / chłodno</option>
             </select>
             <span class="hint" id="s-season-hint"></span></label>
-          <label>Wentylacja wyłączona po oprysku (min)
+          <label>Wentylacja po oprysku (min)
             <input id="s-vent" type="number" min="10" max="60" step="1" inputmode="numeric" autocomplete="off">
             <span class="hint" id="s-vent-hint"></span></label>
         </div>
@@ -1724,7 +1726,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.20.1';
+const APP_VERSION = '1.20.2';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2242,7 +2244,7 @@ function calc(){
     const sea = seasonOf($('s-season').value), LIM = tLim(sea), vent = ventMin(v), vc = ventChplw(v), toff = isNum(tw) ? tw + vent : NaN;
     $('s-season-hint').textContent = SEASONS[sea].h;
     $('s-vent').placeholder = String(vc || VENT_DEF);
-    $('s-vent-hint').textContent = `${vc ? `ChPLW tej szczepionki: ${vc} min` : `domyślnie ${VENT_DEF} min`} · najmniej ${VENT_MIN} min (Aviagen), dłużej jest lepiej`;
+    $('s-vent-hint').textContent = `wentylacja wyłączona po oprysku · ${vc ? `ChPLW tej szczepionki: ${vc} min` : `domyślnie ${VENT_DEF} min`} · najmniej ${VENT_MIN} min (Aviagen), dłużej jest lepiej`;
     if(isNum(toff)) tiles.push({k:'Wentylacja wyłączona', v:fmtMin(toff), s:`oprysk ${fmtMin(tw)} + ${vent} min po oprysku`});
     Object.assign(R, {ml1000:ml, water_l:V, pressure:p, flow:Q, flowPer:q1, nozzles:nn, nnLance:nozN('lanca', $('s-nn').value), flowSrc:qsrc, flowKey:src, flowQ:src === 'reczne' && measured ? qm : null, flowQbar:src === 'reczne' && measured ? qp : null,
       nozzle:noz, sprayer:SP.id, sprayerName:sprayerName(SP), tank:tankL || null, pMax:SP.pMax || null, mode:$('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, season:sea, ventAfter:vent, minutes:tw, sprayMin:t1, sectorMin:ts,
@@ -2675,7 +2677,7 @@ async function reportAction(ev){
 // szybko, zimą wolniej, ale rośnie CO2, amoniak i wilgotność. Wartości to założenie aplikacji; o przerwaniu
 // zawsze decyduje temperatura w kurniku i zachowanie ptaków.
 const SEASONS = {
-  lato:   {l:'lato / upał', max:20, goal:15, h:'Kurnik nagrzewa się szybko – szczep wcześnie rano (Aviagen). Oprysk do ok. 20 min.'},
+  lato:   {l:'lato / upał', max:20, goal:15, h:'Na zewnątrz ponad ok. 25 °C: kurnik nagrzewa się szybko – szczep wcześnie rano (Aviagen). Oprysk do ok. 20 min.'},
   umiark: {l:'wiosna / jesień', max:30, goal:20, h:'Oprysk do ok. 30 min.'},
   zima:   {l:'zima / chłodno', max:40, goal:30, h:'Temperatura rośnie wolniej, ale szybciej rośnie CO2, amoniak i wilgotność. Oprysk do ok. 40 min.'}
 };

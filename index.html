@@ -549,8 +549,10 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
           <div class="seg" role="group" aria-label="Droga podania" id="route"></div>
           <span class="hint" id="route-hint"></span>
         </div>
-        <label>Fiolki po (dawek) – z ChPLW, można zmienić
-          <input id="packs" type="text" autocomplete="off" inputmode="numeric"></label>
+        <label>Fiolki po (dawek) – z ChPLW
+          <select id="packs-sel" aria-label="Wielkość fiolek"></select>
+          <input id="packs" type="text" autocomplete="off" inputmode="numeric" placeholder="np. 1000, 2500" hidden>
+          <span class="hint" id="packs-hint"></span></label>
       </div>
 
       <div class="card" id="in-spray">
@@ -575,7 +577,8 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
             <input id="s-ml" type="number" min="10" step="10" placeholder="z ChPLW" inputmode="decimal">
             <span class="hint" id="s-ml-hint"></span></label>
           <label>Ciśnienie (bar)
-            <input id="s-p" type="number" min="1" max="6" step="0.1" placeholder="np. 2,5" inputmode="decimal"></label>
+            <select id="s-p"></select>
+            <span class="hint" id="s-p-hint"></span></label>
           <label>Tryb pracy
             <select id="s-mode">
               <option value="lanca">Bez dmuchawy (lanca)</option>
@@ -599,7 +602,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
             <input id="s-q" type="text" autocomplete="off" placeholder="np. 0,33" inputmode="decimal">
             <span class="hint">test cylindrem z jednej dyszy: ml zebrane w 60 s ÷ 1000</span></label>
           <label id="s-qp-wrap" hidden>Pomiar przy ciśnieniu (bar)
-            <input id="s-qp" type="text" autocomplete="off" placeholder="jak ustawione" inputmode="decimal">
+            <select id="s-qp"></select>
             <span class="hint">przy innym ciśnieniu roboczym wydatek zostanie przeliczony</span></label>
           <label>Liczba sektorów
             <input id="s-sec" type="number" min="1" max="6" step="1" placeholder="1" inputmode="numeric">
@@ -1648,6 +1651,34 @@ function num(id, def=0){ const v = parseFloat(String($(id)?.value ?? '').replace
 function clone(o){ return JSON.parse(JSON.stringify(o ?? null)); }
 function linkSrc(s){ return s.u ? `<a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)}</a>` : esc(s.t); }
 function fillSelect(sel, opts){ const prev = sel.value; sel.innerHTML = opts.map(o => `<option value="${esc(o.v)}">${esc(o.l)}</option>`).join(''); if(opts.some(o => o.v === prev)) sel.value = prev; return sel.value !== prev; }
+// Listy ciśnienia: od minimum do maksimum opryskiwacza co 0,5 bar. Wartość spoza siatki (np. 2,3 bar ze starszego
+// raportu albo z odczytu manometru) zostaje dopisana do listy, żeby jej nie zgubić.
+function pGrid(lo, hi){ const a = []; for(let x = Math.ceil(lo * 2 - 1e-9) / 2; x <= hi + 1e-9; x += 0.5) a.push(Math.round(x * 10) / 10); return a; }
+function pOptions(sel, lo, hi, val, empty){
+  const v = isNum(pf(val)) ? Math.round(pf(val) * 10) / 10 : null, g = pGrid(lo, hi);
+  if(v != null && !g.some(x => Math.abs(x - v) < 1e-9)) { g.push(v); g.sort((a, b) => a - b); }
+  sel.innerHTML = (empty != null ? `<option value="">${esc(empty)}</option>` : '') + g.map(x => `<option value="${x}">${fmtT(x)} bar</option>`).join('');
+  sel.value = v != null ? String(v) : '';
+}
+function setP(id, val){ const el = $(id), v = pf(val); if(!el) return; if(isNum(v) && ![...el.options].some(o => o.value === String(Math.round(v * 10) / 10))) pOptions(el, pf(el.dataset.lo) || 0.5, pf(el.dataset.hi) || 6, v, el.id === 's-qp' ? 'jak ustawione' : '— wybierz —'); else el.value = isNum(v) ? String(Math.round(v * 10) / 10) : ''; }
+// Fiolki: lista wielkości z ChPLW – „wszystkie” (aplikacja dobiera najmniej fiolek) albo jedna wielkość; „inna” – wpisanie ręczne
+function setPacks(str){ $('packs').value = str; S.packsBase = parsePacks(str); packsUI(); }
+function packsUI(){
+  const base = S.packsBase || [], sel = $('packs-sel'), inp = $('packs'), cur = parsePacks(inp.value).join(', ');
+  if(!base.length){ sel.hidden = true; inp.hidden = false; $('packs-hint').textContent = 'wpisz wielkość opakowania z etykiety (np. 500 albo 500, 1000)'; return; }
+  const o = []; if(base.length > 1) o.push({v:base.join(', '), l:`wszystkie: ${base.map(n => n.toLocaleString('pl-PL')).join(', ')}`});
+  base.forEach(n => o.push({v:String(n), l:`tylko ${n.toLocaleString('pl-PL')} dawek`}));
+  o.push({v:'inne', l:'inna wielkość – wpiszę'});
+  sel.innerHTML = o.map(x => `<option value="${esc(x.v)}">${esc(x.l)}</option>`).join('');
+  const hit = o.find(x => x.v === cur); sel.hidden = false;
+  if(hit){ sel.value = hit.v; inp.hidden = true; } else { sel.value = 'inne'; inp.hidden = false; }
+  $('packs-hint').textContent = sel.value === 'inne' ? 'wpisz wielkość (np. 1000 albo 1000, 2500)' : base.length > 1 && hit === o[0] ? 'aplikacja dobierze najmniej fiolek' : '';
+}
+function packsPick(){
+  const sel = $('packs-sel'), inp = $('packs');
+  if(sel.value === 'inne'){ inp.hidden = false; $('packs-hint').textContent = 'wpisz wielkość (np. 1000 albo 1000, 2500)'; inp.focus(); inp.select && inp.select(); return; }
+  inp.value = sel.value; packsUI(); calc();
+}
 let toastTimer = null;
 function toast(msg, ms = 3000){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, ms); }
 function armConfirm(btn){
@@ -1726,7 +1757,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.20.2';
+const APP_VERSION = '1.21.0';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -1784,14 +1815,19 @@ function sprayerName(s){ return s && s.n || SPRAYERS.rec15.n; }
 // nie więcej niż maks. wydatek oprysku z ulotki. Przybliżenie z dwóch punktów danych producenta.
 function pumpCap(s, p){ if(!s || !s.q0 || !isNum(p)) return Infinity; return Math.min(s.out, s.q0 + (s.qMax - s.q0) * Math.min(Math.max(p, 0), s.pMax) / s.pMax); }
 // Najwyższe ciśnienie (krok 0,1 bar), przy którym pompa nadąża za dyszą
-function pMaxPump(s, flowFn){ let best = null; for(let pi = Math.round(s.pMin * 10); pi <= Math.round(s.pMax * 10); pi++){ const p = pi / 10, q = flowFn(p); if(isNum(q) && q <= pumpCap(s, p) + 1e-9) best = p; } return best; }
+function pMaxPump(s, flowFn){ let best = null; for(const p of pGrid(s.pMin, s.pMax)){ q = flowFn(p); if(isNum(q) && q <= pumpCap(s, p) + 1e-9) best = p; } return best; }
 // Wybór opryskiwacza ustawia granice ciśnienia i blokuje dmuchawę tam, gdzie nie pasuje.
 // Zwraca true, gdy trzeba było przełączyć z dmuchawy na lancę.
 function sprayerUI(){
   const s = sprayer(), mode = $('s-mode'); let forced = false;
   [...mode.options].forEach(o => { if(o.value !== 'lanca') o.disabled = !s.as; });
   if(!s.as && mode.value !== 'lanca'){ mode.value = 'lanca'; forced = true; }
-  $('s-p').max = s.pMax; $('s-p').min = s.pMin;
+  const sp = $('s-p'); if(sp.dataset.lo !== String(s.pMin) || sp.dataset.hi !== String(s.pMax)){
+    let cur = pf(sp.value); if(isNum(cur)) cur = Math.min(s.pMax, Math.max(s.pMin, cur));
+    sp.dataset.lo = $('s-qp').dataset.lo = s.pMin; sp.dataset.hi = $('s-qp').dataset.hi = s.pMax;
+    pOptions(sp, s.pMin, s.pMax, cur, '— wybierz —'); pOptions($('s-qp'), s.pMin, s.pMax, $('s-qp').value, 'jak ustawione');
+  }
+  $('s-p-hint').textContent = `${fmtT(s.pMin)}–${fmtT(s.pMax)} bar co 0,5 · ${$('s-mode').value === 'lanca' ? 'zalecane 2–3 bar' : 'z dmuchawą 2–2,5 bar, maks. 3'}`;
   $('s-spr-hint').textContent = s.h;
   const a = AS1200[mode.value];
   $('s-mode-hint').textContent = a ? `AS 1200: ${a.v} m/s, 1 dysza, akumulator dmuchawy ok. ${a.t} · poziomy 3–5 i max (34–65 m/s, zasięg do 13 m) to nawiew do ochrony roślin – za silny do szczepienia, aplikacja ich nie liczy` : 'lanca 30–50 cm nad ptakami';
@@ -2145,7 +2181,7 @@ function applyInjDefaults(force){
   if(!force && key === S.injKey) return false;
   S.injKey = key;
   if(isNum(ri.ml)) $('i-ml').value = ri.ml;
-  if(ri.btl && isNum(ri.ml) && ri.ml > 0) $('packs').value = ri.btl.map(b => Math.round(b / ri.ml)).join(', ');   // butelki w ml → dawek przy tej dawce
+  if(ri.btl && isNum(ri.ml) && ri.ml > 0) setPacks(ri.btl.map(b => Math.round(b / ri.ml)).join(', '));   // butelki w ml → dawek przy tej dawce
   const so = siteOpts(ri.site); fillSelect($('i-site'), so); if(!S.siteTouched) $('i-site').value = so[0].v;
   return true;
 }
@@ -2156,7 +2192,7 @@ function onVacChange(){
   else fillDz();
   buildRoutes();
   $('packs').closest('label').hidden = noVac();
-  $('packs').value = noVac() || (v && v.auto) ? '' : v && v.pk && v.pk.length ? v.pk.join(', ') : (S.route === 'inj' ? '500, 1000' : '1000, 2500, 5000, 10000');
+  setPacks(noVac() || (v && v.auto) ? '' : v && v.pk && v.pk.length ? v.pk.join(', ') : (S.route === 'inj' ? '500, 1000' : '1000, 2500, 5000, 10000'));
   applyDefaults(); calc();
   applyFarmSettings(true);   // ustawienia stałe fermy – po zmianie szczepionki sprawdzone wobec jej ChPLW
 }
@@ -2164,7 +2200,7 @@ function setRoute(r){
   S.route = r;
   document.querySelectorAll('#route [data-route]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.route === r)));
   RT.forEach(k => { $('in-' + k).hidden = k !== r; });
-  const v = curVac(); if(!(v && v.pk && v.pk.length) && !(v && v.auto) && r === 'inj') $('packs').value = '500, 1000';
+  const v = curVac(); if(!(v && v.pk && v.pk.length) && !(v && v.auto) && r === 'inj') setPacks('500, 1000');
   calc();
 }
 
@@ -2822,8 +2858,8 @@ function bestSettings(cur, m, v, birds, limit, opt = {}){
   const nnL = cur.nnL === 1 ? 1 : 2;
   for(const [noz, mm, ncost] of nozs) for(const mode of modes) for(const nn of mode === 'lanca' ? (nnL === 1 ? [1, 2] : [2]) : [1]){
     const pmax = Math.min(mode === 'lanca' && win ? 6 : 3, SPc.pMax), mcost = (mode !== cur.mode ? 30 : 0) + ncost + (mode === 'lanca' && nn !== nnL ? 10 : 0);
-    for(let pi = Math.max(20, Math.round(SPc.pMin * 10)); pi <= Math.round(pmax * 10); pi++){
-      const p = pi / 10, q1 = flowAt(mm, p), Q = q1 * nn, vmd = mm.src === 'reczne' ? vmdEst(p, q1, noz) : vmdAt(p, noz);
+    for(const p of pGrid(Math.max(2, SPc.pMin), pmax)){   // ciśnienie co 0,5 bar – tak jak na liście wyboru
+      const q1 = flowAt(mm, p), Q = q1 * nn, vmd = mm.src === 'reczne' ? vmdEst(p, q1, noz) : vmdAt(p, noz);
       if(!(Q > 0) || !inWin(win, vmd) || Q > pumpCap(SPc, p) + 1e-9) continue;   // pompa musi nadążyć za dyszą
       const pcost = Math.abs(p - cur.p) * 10 + mcost;
       for(const ml of mls){
@@ -2895,7 +2931,7 @@ function sumPanel(r){
       <label>Czas – minuty<input id="sum-min" type="text" inputmode="numeric" autocomplete="off" value="${esc(String(isNum(s.min) ? s.min : ''))}" placeholder="np. 24"><span class="hint">plan ${fmtMin(r.minutes)}</span></label>
       <label>Czas – sekundy<input id="sum-sec" type="text" inputmode="numeric" autocomplete="off" value="${esc(String(isNum(s.sec) ? s.sec : ''))}" placeholder="0"><span class="hint">0–59</span></label>
       <label>Zużyta woda (l)<input id="sum-v" type="text" inputmode="decimal" autocomplete="off" value="${esc(String(isNum(s.used) ? fmt(s.used,2) : fmt(r.water_l,2)))}"><span class="hint">plan ${fmt(r.water_l,2)} l</span></label>
-      <label>Ciśnienie (bar)<input id="sum-p" type="text" inputmode="decimal" autocomplete="off" value="${esc(String(isNum(s.bar) ? fmtT(s.bar) : fmtT(r.pressure)))}"><span class="hint">plan ${fmtT(r.pressure)} bar</span></label>
+      <label>Ciśnienie (bar)<select id="sum-p">${(() => { const sp = SPRAYERS[sprOf(r.sprayer)], v = isNum(s.bar) ? s.bar : r.pressure, g = pGrid(Math.min(sp.pMin, isNum(v) ? v : 9), Math.max(sp.pMax, isNum(v) ? v : 0)); if(isNum(v) && !g.some(x => Math.abs(x - v) < 1e-9)){ g.push(Math.round(v * 10) / 10); g.sort((a, b) => a - b); } return g.map(x => `<option value="${x}"${isNum(v) && Math.abs(x - v) < 1e-9 ? ' selected' : ''}>${fmtT(x)} bar</option>`).join(''); })()}</select><span class="hint">plan ${fmtT(r.pressure)} bar</span></label>
     </div>
     <span class="note">${k > 1 ? 'Czas: cały zabieg – od startu do końca, wszystkie osoby.' : 'Czas: łączny czas natrysku.'} Ciśnienie – odczyt z manometru. Popraw tylko to, co w kurniku wyszło inaczej niż w planie – wynik liczy się na bieżąco.</span>
     <div id="sum-out"></div>
@@ -3201,7 +3237,7 @@ function setFlow(x){
   if(x && x.key === 'birch') x = {key:'teejet'};   // dawny katalog Birchmeiera – teraz TeeJet × liczba dysz
   if(!x || !FLOW_SRC[x.key]) return;
   $('s-src').value = x.key;
-  if(x.key === 'reczne'){ $('s-q').value = fmtT(x.q, 3); $('s-qp').value = fmtT(x.bar); }
+  if(x.key === 'reczne'){ $('s-q').value = fmtT(x.q, 3); setP('s-qp', x.bar); }
   flowSrcUI();
 }
 function applyChanges(chs){
@@ -3209,7 +3245,7 @@ function applyChanges(chs){
   for(const c of list){
     if(c.k === 'nozzle') setNozzle(c.to, true);
     if(c.k === 'nozzles' && (c.to === 1 || c.to === 2)){ $('s-nn').value = String(c.to); saveEquipment(); }
-    if(c.k === 'pressure') $('s-p').value = c.to;
+    if(c.k === 'pressure') setP('s-p', c.to);
     if(c.k === 'ml1000'){ $('s-ml').value = c.to; S.mlTouched = true; }
     if(c.k === 'sectors') $('s-sec').value = c.to;
     if(c.k === 'persons') $('s-os').value = c.to;
@@ -3239,7 +3275,7 @@ function applyFarmSettings(quiet){
   if(isNum(P.pressure)){
     const vm = P.flow && P.flow.key === 'reczne' ? vmdEst(P.pressure, P.flow.q * Math.sqrt(P.pressure / P.flow.bar), P.nozzle) : vmdAt(P.pressure, P.nozzle);
     if(P.pressure > SPc.pMax + 1e-9) skipped.push(`ciśnienie ${fmtT(P.pressure)} bar – ${SPc.n} pracuje do ${fmtT(SPc.pMax)} bar`);
-    else if(!v || v.id === P.vacId || !win || inWin(win, vm)) $('s-p').value = P.pressure;
+    else if(!v || v.id === P.vacId || !win || inWin(win, vm)) setP('s-p', P.pressure);
     else skipped.push(`ciśnienie ${fmtT(P.pressure)} bar – kropla poza oknem ChPLW tej szczepionki`);
   }
   if(isNum(P.ml1000)){
@@ -4054,6 +4090,7 @@ function bind(){
   ['a-doc-cert', 'a-doc-instr', 'a-doc-order'].forEach(id => $(id).addEventListener('change', () => scheduleCalc()));
   $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(!b || b.disabled) return; if(b.dataset.alt) pickRoute(b.dataset.route); else { S.rPref = b.dataset.route; setRoute(b.dataset.route); } });
   $('s-ml').addEventListener('input', () => { S.mlTouched = true; });
+  $('packs-sel').addEventListener('change', packsPick);
   $('s-src').addEventListener('change', flowSrcUI);
   $('s-noz').addEventListener('change', ev => { setNozzle(ev.target.value); saveEquipment(); calc(); });
   $('s-spr').addEventListener('change', () => { saveEquipment(); calc(); });
@@ -4093,7 +4130,7 @@ function flowSrcUI(){
   if(!FLOW_SRC[$('s-src').value]) $('s-src').value = 'teejet';
   const src = $('s-src').value, fs = FLOW_SRC[src] || FLOW_SRC.teejet;
   $('s-q-wrap').hidden = $('s-qp-wrap').hidden = src !== 'reczne';
-  if(src === 'reczne' && !$('s-qp').value) $('s-qp').value = $('s-p').value;
+  if(src === 'reczne' && !$('s-qp').value) setP('s-qp', $('s-p').value);
   $('s-src-hint').textContent = fs.h[noz] || '';
   $('s-noz-hint').textContent = NOZ[noz].h;
 }
@@ -4102,7 +4139,7 @@ function setNozzle(noz, quiet){
   noz = nozOf(noz); const was = nozOf($('s-noz').dataset.cur || $('s-noz').value);
   $('s-noz').value = noz; $('s-noz').dataset.cur = noz;
   if(was !== noz && $('s-src').value === 'reczne' && $('s-q').value){
-    $('s-q').value = ''; $('s-qp').value = '';
+    $('s-q').value = ''; setP('s-qp', '');
     if(!quiet) toast('Zmieniono dyszę – wpisz pomiar wydatku nowej końcówki.');
   }
   flowSrcUI();

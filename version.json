@@ -1,8 +1,9 @@
 {
- "wersja": "1.21.2",
- "data": "2026-11-19",
+ "wersja": "1.21.3",
+ "data": "2026-11-17",
  "zmiany": [
-  "Logo Studio Pracy Umysłowej bez własnego tła – przyjmuje kolor napisu i pasuje do każdego tła (strona tytułowa i podpis na dole ekranów).",
+  "Poulvac NDW (ChPLW 07/2015): dodana wielkość kropli dla opryskiwacza grubokroplistego 120–150 µm – aplikacja sprawdza ją z dyszą TX-VK6; rozdzielone opisy opryskiwacza (gruba kropla, na ptaki) i atomizera (kropla ok. 50 µm, wypełnia pomieszczenie); wentylacja wyłączona 20 min po szczepieniu.",
+  "(1.21.2) Logo Studio Pracy Umysłowej bez własnego tła – przyjmuje kolor napisu i pasuje do każdego tła (strona tytułowa i podpis na dole ekranów).",
   "(1.21.1) Nowe logo Studio Pracy Umysłowej – drzewo-umysł z iskrą pomysłu – na stronie tytułowej i nad podpisem „Studio Pracy Umysłowej / Paweł Czarnocki” na dole ekranów.",
   "(1.21.0) Fiolki: zamiast wpisywania – lista z wielkościami z ChPLW („wszystkie” – aplikacja dobiera najmniej fiolek, albo jedna wielkość); „inna wielkość” pozwala wpisać ręcznie.",
   "(1.21.0) Ciśnienie: lista od minimum do maksimum wybranego opryskiwacza co 0,5 bar – w planie, przy pomiarze wydatku i w podsumowaniu zabiegu. Zalecenia na następny raz też podają ciśnienie co 0,5 bar.",

@@ -999,7 +999,7 @@ const VACCINES = [
  lay:'Bezpieczeństwo w okresie nieśności nie zostało określone.', mix:'Nie mieszać z innymi produktami; inne szczepionki przed lub po – decyzja indywidualna.',
  sch:'Jedna dawka na ptaka; program szczepień ustala lekarz weterynarii.',
  safe:'Przy oprysku: okulary ochronne oraz maska na nos i usta albo hełm z filtrowanym obiegiem powietrza.', store:'2–8°C, chronić przed światłem, nie zamrażać.',
- r:{spray:{opts:[{l:'atomizer – ściółka',ml:[400,400]},{l:'atomizer – klatki',ml:[200,200]},{l:'wylęgarnia – automat',ml:[150,150]}], note:'Aerozol: atomizer 0,4 l (ściółka) lub 0,2 l (klatki), automatyczna wytwornica w wylęgarni 0,15 l na 1000 dawek.'},
+ r:{spray:{d:[120,150], opts:[{l:'atomizer (kropla ok. 50 µm) – ściółka',ml:[400,400]},{l:'atomizer (kropla ok. 50 µm) – klatki',ml:[200,200]},{l:'wytwornica grubokroplista w wylęgarni – automat',ml:[150,150]}], note:'Dwa rodzaje urządzeń w ChPLW. 1) Ręczna lub automatyczna wytwornica aerozolu grubocząsteczkowego (opryskiwacz, np. Birchmeier z TX-VK6): kropla 0,12–0,15 mm (120–150 µm), rozpylać równomiernie ok. 50 cm nad głowami, tak by szczepionka trafiła bezpośrednio na każdego ptaka; ilość wody podana tylko dla automatu w wylęgarni – 0,15 l na 1000 dawek, w kurniku zależy od aparatu i sposobu utrzymania ptaków. 2) Atomizer: kropla ok. 0,05 mm (pozycja 5 regulatora), nie opryskiwać ptaków bezpośrednio, tylko wypełnić aerozolem całe pomieszczenie; 0,4 l (ściółka) lub 0,2 l (klatki) na 1000 dawek. W kurniku: uszczelnić pomieszczenie, wentylacja wyłączona w trakcie i 20 min po zakończeniu szczepienia. W upały – w najchłodniejszej porze dnia.'},
     woda:{rule:'perDay', f:1, max:40, x2:{b:'kury-brojlery', from:18, l:'brojlery od 2,5 tyg.'}, win:'2 h', thirst:'2–4 h (poza upałami)', note:'Litry = wiek kurcząt w dniach, maks. 40 l na 1000; u brojlerów od 2,5. tygodnia objętość podwaja się. Bez leków i środków dezynfekcyjnych w wodzie 24 h przed szczepieniem.'},
     oko:{ml:50, bird:'1 kropla do oka lub nosa'}}},
 {id:'avigate-nd-qv4', n:'AviGate ND QV4', m:'Huvepharma', t:'żywa', dz:['ND'], s:'QV4', sp:['kury'], st:'v', src:[RPL(53532)],
@@ -1751,7 +1751,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.21.2';
+const APP_VERSION = '1.21.3';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -1817,7 +1817,7 @@ function sprayerUI(){
   [...mode.options].forEach(o => { if(o.value !== 'lanca') o.disabled = !s.as; });
   if(!s.as && mode.value !== 'lanca'){ mode.value = 'lanca'; forced = true; }
   const sp = $('s-p'); if(sp.dataset.lo !== String(s.pMin) || sp.dataset.hi !== String(s.pMax)){
-    let cur = pf(sp.value); if(isNum(cur)) cur = Math.min(s.pMax, Math.max(s.pMin, cur));
+    let cur = pf(sp.value); if(isNum(cur)) cur = Math.min(s.pMax, Math.max(s.pMin, cur));   // czysty start – ciśnienie niewybrane
     sp.dataset.lo = $('s-qp').dataset.lo = s.pMin; sp.dataset.hi = $('s-qp').dataset.hi = s.pMax;
     pOptions(sp, s.pMin, s.pMax, cur, '— wybierz —'); pOptions($('s-qp'), s.pMin, s.pMax, $('s-qp').value, 'jak ustawione');
   }
@@ -2318,6 +2318,11 @@ function calc(){
     if(mode !== 'lanca' && noz === 'vk6' && src !== 'reczne') msgs.push(['warn', `Tabela dysz Birchmeiera do AS 1200 podaje dla TXVK-6 ${fmt(flowTab(TXVK6_BIRCH_AS, p > 0 ? p : 2),2)} l/min przy ${fmtT(p > 0 ? p : 2)} bar – ok. 2 razy więcej niż katalog TeeJet dla jednej dyszy (${fmt(flowTab(TXVK6_TEEJET, p > 0 ? p : 2),2)} l/min). Przed szczepieniem zmierz wydatek dyszy w dmuchawie cylindrem (60 s) i wpisz go jako „pomiar własny”.`]);
     if(mode !== 'lanca') msgs.push(['info','Z dmuchawą: ptaki ok. 1–3 m od wylotu, strumień skośnie w dół nad stado. Dmuchawa AS 1200 pracuje w temperaturze 5–30°C (instrukcja AS 1200) – w cieplejszym kurniku sprawdź jej działanie.']);
     const allowed = sp.ml ? [sp.ml] : (sp.opts || sp.byAge || []).map(o => o.ml);
+    // Ilości „atomizer” z ChPLW dotyczą innego urządzenia (bardzo drobna kropla wypełniająca pomieszczenie) – nie opryskiwacza grubokroplistego
+    if(sp.opts && sp.opts.some(o => /atomizer/i.test(o.l))){
+      const at = sp.opts.filter(o => /atomizer/i.test(o.l)), co = sp.opts.filter(o => !/atomizer/i.test(o.l));
+      msgs.push(['warn', `ChPLW podaje ${at.map(o => fmtRange(o.ml) + ' ml').join(' / ')} na 1000 dawek dla atomizera (kropla ok. 50 µm). Opryskiwacz Birchmeier z dyszą TX-VK${noz === 'vk18' ? '18' : '6'} to opryskiwacz grubokroplisty – dla niego ChPLW ${co.length ? `podaje tylko ${co.map(o => `${o.l.replace(/^wytwornica grubokroplista /, '')}: ${fmtRange(o.ml)} ml`).join('; ')}, a w kurniku ` : ''}nie podaje ilości wody (zależy od aparatu i utrzymania ptaków). Ilość ustal z lekarzem weterynarii.`]);
+    }
     if(allowed.length){ const lo = Math.min(...allowed.map(a => a[0])), hi = Math.max(...allowed.map(a => a[1])); if(ml < lo || ml > hi) msgs.push(['warn', `${fmtT(ml)} ml na 1000 dawek – poza zakresem z ChPLW (${fmtT(lo)}–${fmtT(hi)} ml).`]); }
     const vmd = src === 'reczne' && isNum(q1) ? vmdEst(p, q1, noz) : vmdAt(p, noz);   // kropla zależy od jednej dyszy
     if(sp.d && vmd){

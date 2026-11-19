@@ -248,7 +248,7 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 #priv ul{margin:0;padding-left:20px;display:grid;gap:4px;font-size:.88rem}
 
 /* Pasek „Dostępna nowa wersja” */
-.updbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--brand);color:var(--brand-ink);display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.92rem}
+.updbar{position:fixed;left:0;right:0;bottom:0;background:var(--brand);color:var(--brand-ink);display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:.92rem}
 .updbar .btn{background:var(--brand-ink);color:var(--brand);border-color:var(--brand-ink)}
 
 /* Nagłówek z nazwą programu */
@@ -480,7 +480,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
         <h2>1. Ferma i ptaki</h2>
         <div class="row">
           <label>Ferma (kurnik)
-            <input id="farm" type="text" list="farm-list" autocomplete="off" placeholder="np. Ferma Nowak, kurnik 2"></label>
+            <input id="farm" type="text" list="farm-list" autocomplete="off" placeholder="np. Nowak, kurnik 2"></label>
           <datalist id="farm-list"></datalist>
           <label>Data zabiegu
             <input id="date" type="date"></label>
@@ -531,10 +531,10 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
       <div class="card">
         <h2>2. Szczepienie</h2>
         <div class="row">
-          <label>Na co szczepimy
+          <label class="wide">Na co szczepimy
             <select id="dz"></select>
             <span class="hint" id="dz-hint"></span></label>
-          <label>Czym (szczepionka)
+          <label class="wide">Czym (szczepionka)
             <select id="vac"></select>
             <span class="hint" id="vac-hint"></span></label>
         </div>
@@ -575,9 +575,9 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
             <span class="hint" id="s-p-hint"></span></label>
           <label>Tryb pracy
             <select id="s-mode">
-              <option value="lanca">Bez dmuchawy (lanca)</option>
-              <option value="dm1">Dmuchawa – poziom 1</option>
-              <option value="dm2">Dmuchawa – poziom 2</option>
+              <option value="lanca">Lanca</option>
+              <option value="dm1">Dmuchawa – 1</option>
+              <option value="dm2">Dmuchawa – 2</option>
             </select>
             <span class="hint" id="s-mode-hint"></span></label>
           <label id="s-nn-wrap">Dysze na lancy
@@ -628,8 +628,8 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
         <div class="row">
           <label>Podawanie
             <select id="w-mode">
-              <option value="doz">Dozownik proporcjonalny (%)</option>
-              <option value="zb">Zbiornik / beczka – cała woda naraz</option>
+              <option value="doz">Dozownik (%)</option>
+              <option value="zb">Zbiornik / beczka</option>
             </select></label>
           <label id="w-pct-wrap">Ustawienie dozownika (%)
             <input id="w-pct" type="text" inputmode="decimal" autocomplete="off" placeholder="np. 1">
@@ -682,7 +682,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
           <label class="wide">Aparat (strzykawka automatyczna)
             <select id="i-app">
               <option value="1">Pojedynczy – jedna szczepionka</option>
-              <option value="2">Podwójny – dwie szczepionki jednym ruchem</option>
+              <option value="2">Podwójny – dwie szczepionki</option>
             </select></label>
           <label class="wide" id="i-vac2-wrap" hidden>Druga szczepionka (druga strona aparatu)
             <select id="i-vac2"></select></label>
@@ -1751,7 +1751,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.21.5';
+const APP_VERSION = '1.22.0';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2093,7 +2093,7 @@ function fillVac(opt = {}){
     : !S.picked ? (ok.length === 1 && $('dz').value && $('dz').value !== DZ_ALL ? ok[0].v.id : '-')
     : prev === '' && opt.keep ? '' : (list[0] ? list[0].v.id : '');
   if(next && next !== '-') S.picked = true;
-  $('vac').innerHTML = (next === '-' ? '<option value="-">— wybierz szczepionkę —</option>' : '') + ok.map(o).join('') + (bad.length ? `<optgroup label="Nie pasują do tych ptaków lub wieku">${bad.map(o).join('')}</optgroup>` : '') + '<option value="">— inna szczepionka (wartości wpisuję ręcznie) —</option>';
+  $('vac').innerHTML = (next === '-' ? '<option value="-">— wybierz szczepionkę —</option>' : '') + ok.map(o).join('') + (bad.length ? `<optgroup label="Nie pasują do tych ptaków lub wieku">${bad.map(o).join('')}</optgroup>` : '') + '<option value="">— inna szczepionka (wpiszę ręcznie) —</option>';
   $('vac').value = next;
   const nv = next ? VACCINES.find(x => x.id === next) : null;
   if(next !== prev && opt.notify){
@@ -2278,7 +2278,7 @@ function calc(){
     $('s-vent-hint').textContent = `wentylacja wyłączona po oprysku · ${vc ? `ChPLW tej szczepionki: ${vc} min` : `domyślnie ${VENT_DEF} min`} · najmniej ${VENT_MIN} min (Aviagen), dłużej jest lepiej`;
     if(isNum(toff)) tiles.push({k:'Wentylacja wyłączona', v:fmtMin(toff), s:`oprysk ${fmtMin(tw)} + ${vent} min po oprysku`});
     Object.assign(R, {ml1000:ml, water_l:V, pressure:p, flow:Q, flowPer:q1, nozzles:nn, nnLance:nozN('lanca', $('s-nn').value), flowSrc:qsrc, flowKey:src, flowQ:src === 'reczne' && measured ? qm : null, flowQbar:src === 'reczne' && measured ? qp : null,
-      nozzle:noz, sprayer:SP.id, sprayerName:sprayerName(SP), tank:tankL || null, pMax:SP.pMax || null, mode:$('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, season:sea, ventAfter:vent, minutes:tw, sprayMin:t1, sectorMin:ts,
+      nozzle:noz, sprayer:SP.id, sprayerName:sprayerName(SP), tank:tankL || null, pMax:SP.pMax || null, mode:MODE_L[mode] || $('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, season:sea, ventAfter:vent, minutes:tw, sprayMin:t1, sectorMin:ts,
       crew:k > 1 && isNum(t1) ? C.persons.map(o => ({no:o.no, sec:o.sec, l:V * o.share, min:t1 * o.work})) : null});
     if(src === 'reczne' && !measured) msgs.push(['warn','Wpisz zmierzony przepływ jednej dyszy, inaczej nie policzę czasu oprysku.']);
     if(noz === 'vk18'){
@@ -2721,7 +2721,8 @@ const SEASONS = {
   zima:   {l:'zima / chłodno', max:40, goal:30, h:'Temperatura rośnie wolniej, ale szybciej rośnie CO2, amoniak i wilgotność. Oprysk do ok. 40 min.'}
 };
 const VENT_MIN = 10, VENT_DEF = 15;
-function seasonByDate(d){ const m = (d ? new Date(d) : new Date()).getMonth() + 1; return m >= 6 && m <= 8 ? 'lato' : (m === 12 || m <= 2) ? 'zima' : 'umiark'; }
+// Pora roku wg miesiąca (Polska): czerwiec–sierpień lato, listopad–marzec chłodno, reszta wiosna/jesień
+function seasonByDate(d){ const t = d ? new Date(d) : new Date(), m = (isNaN(t) ? new Date() : t).getMonth() + 1; return m >= 6 && m <= 8 ? 'lato' : (m >= 11 || m <= 3) ? 'zima' : 'umiark'; }
 function seasonOf(id, date){ return SEASONS[id] ? id : seasonByDate(date); }
 function tLim(id, date){ const s = SEASONS[seasonOf(id, date)]; return {max:s.max, goal:s.goal, l:s.l}; }
 // Czas wyłączonej wentylacji po oprysku z ChPLW (np. „wentylacja wyłączona 20 min po”), inaczej 15 min
@@ -3049,7 +3050,7 @@ function sumDiag(r, inp){
       }
     }
   }
-  const tp = r.minutes, perSec = Math.abs(ts - t) > 1e-6, LIM = tLim(r.season, r.date || r.created), vA = isNum(r.ventAfter) ? r.ventAfter : VENT_DEF;
+  const tp = r.minutes, perSec = Math.abs(ts - t) > 1e-6, LIM = tLim(r.season || 'umiark'), vA = isNum(r.ventAfter) ? r.ventAfter : VENT_DEF;
   let tline = isNum(tp) && tp > 0 && Math.abs(t - tp) / tp > 0.1 ? `czas ${fmtMin(t)} zamiast planowanych ${fmtMin(tp)}` : null;
   if(t > LIM.max){
     msgs.push(['bad', `Oprysk trwał ${fmtMin(t)} – ponad ${LIM.max} min (${LIM.l}). Wentylacja w całym kurniku była wyłączona ok. ${fmtMin(t + vA)} (z ${vA} min po oprysku).`]);
@@ -3147,7 +3148,7 @@ function sumHTML(d, r){
   if(d.alt) h += `<p class="note" style="margin:0">Inna możliwość – bez zmniejszania wody: ${esc(changesText(d.alt.changes))}; ${esc(predText(d.alt.pred))}.</p>`;
   if(d.alt2) h += `<p class="note" style="margin:0">Z dodatkową osobą: ${esc(changesText(d.alt2.changes))}; ${esc(predText(d.alt2.pred))}.</p>`;
   if(d.actions.length) h += `<ul class="list">${d.actions.map(a => `<li>${esc(a)}</li>`).join('')}</ul>`;
-  if(d.pred) h += `<p class="note" style="margin:0">Przewidywany czas przy następnym zabiegu${d.changes.length ? ' z tymi zmianami' : ''}: <b>${esc(predText(d.pred))}</b>, limit ${tLim(r.season, r.date || r.created).max} min oprysku${d.pred.vmd ? ` · kropla ok. ${fmt0(d.pred.vmd)} µm${win ? ` (ChPLW ${fmtRange(win)} µm)` : ''}` : ''}.</p>`;
+  if(d.pred) h += `<p class="note" style="margin:0">Przewidywany czas przy następnym zabiegu${d.changes.length ? ' z tymi zmianami' : ''}: <b>${esc(predText(d.pred))}</b>, limit ${tLim(r.season || 'umiark').max} min oprysku${d.pred.vmd ? ` · kropla ok. ${fmt0(d.pred.vmd)} µm${win ? ` (ChPLW ${fmtRange(win)} µm)` : ''}` : ''}.</p>`;
   h += `<p class="note" style="margin:0">${farmKey(r.farm) ? `Po zapisaniu aplikacja zapamięta to zalecenie i przypomni o nim przy kolejnym szczepieniu na fermie „${esc(r.farm)}”.` : 'Raport nie ma nazwy fermy – zalecenie zostanie zapisane, ale aplikacja nie będzie wiedziała, przy której fermie o nim przypomnieć.'}</p></div>`;
   return h;
 }
@@ -4156,7 +4157,9 @@ async function init(){
   gateInit();
   opInit();
   loadFonts();
-  bind(); $('s-noz').dataset.cur = $('s-noz').value; loadEquipment(); $('s-season').value = seasonByDate(); flowSrcUI(); fillDz(); fillVac(); onVacChange();   // czysty start – nic nie wybrane
+  bind(); $('s-noz').dataset.cur = $('s-noz').value; loadEquipment(); $('s-season').value = seasonByDate();
+  $('s-season').addEventListener('change', () => { S.seasonTouched = true; });
+  $('date').addEventListener('change', () => { if(!S.seasonTouched && $('date').value){ $('s-season').value = seasonByDate($('date').value + 'T12:00:00'); calc(); } }); flowSrcUI(); fillDz(); fillVac(); onVacChange();   // czysty start – nic nie wybrane
   showTab(location.hash.slice(1) || 'obliczenia');
   let db = null, dl = null;
   try { if(window.claude && typeof window.claude.use === 'function'){ [db, dl] = await Promise.all([window.claude.use('db').catch(() => null), window.claude.use('downloads').catch(() => null)]); } } catch(e){}

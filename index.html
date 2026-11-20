@@ -1764,7 +1764,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.23.0';
+const APP_VERSION = '1.23.1';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -1959,11 +1959,12 @@ function spraySteps(o){
     `Przyciemnij światło i zgrupuj ptaki; wyłącz albo ogranicz wentylację i ogrzewanie.${o.chicks ? ' Skrzynki z pisklętami ustaw w rzędzie, z dala od nagrzewnic i wentylatorów.' : ''}`,
     `Szczepionkę rozpuść tuż przed opryskiem${o.use ? ` (ChPLW: zużyć w ${o.use})` : ''}: fiolki przepłucz wodą, wymieszaj${isNum(o.V) && o.V > 0 ? ` – razem ${fmt(o.V, 2)} l roztworu` : ''}.`,
     o.mode === 'lanca' ? `Pryskaj równym tempem ${distTxt(o.dist || '30–40 cm', 'nad głowami')} – szczepionka ma trafić w oczy, nozdrza i dziób każdego ptaka, nie w ściółkę i puste miejsca.` : 'Prowadź strumień dmuchawy skośnie w dół nad stadem, ptaki 1–3 m od wylotu, równym tempem – szczepionka ma trafić w każdego ptaka, nie w ściółkę i puste miejsca.',
+    o.resp ? 'Zaszczep całe stado w jednym zabiegu, bez pomijania ptaków – pominięte zakażą się później od zaszczepionych, a szczep krążący z ptaka na ptaka może odzyskiwać zjadliwość (Ceva).' : null,
     `Wentylacja wyłączona jeszcze ${o.vent} min po oprysku. Przerwij i włącz ją, gdy temperatura wzrośnie o 2–3 °C albo ptaki zaczną dyszeć.`];
   const after = [
     'Umyj opryskiwacz ciepłą wodą bez detergentów i dezynfekcji, rozkręć i wyczyść dyszę i filtry, wysusz; przechowuj otwarty w suchym miejscu.',
     o.resp ? 'Kontrola szczepienia (Ceva): 2–5 dni po oprysku (jednodniówki do 5. dnia, po szczepieniu powtórnym nieco krócej) kilkanaście wymazów z tchawicy lub szczeliny podniebiennej do PCR pokaże, czy szczep szczepionkowy dotarł do ptaków. Pobranie i badanie – z lekarzem weterynarii.' : null];
-  const n1 = before.length, n2 = day.length;
+  const n1 = before.filter(Boolean).length, n2 = day.filter(Boolean).length;
   return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – oprysk</summary>
     <h4 class="steps-h">Przed szczepieniem</h4><ol class="steps">${L(before)}</ol>
     <h4 class="steps-h">W kurniku</h4><ol class="steps" start="${n1 + 1}">${L(day)}</ol>

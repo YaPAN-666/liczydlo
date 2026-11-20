@@ -546,6 +546,12 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
           <select id="packs-sel" aria-label="Wielkość fiolek"></select>
           <input id="packs" type="text" autocomplete="off" inputmode="numeric" placeholder="np. 1000, 2500" hidden>
           <span class="hint" id="packs-hint"></span></label>
+        <div class="row" id="lot-wrap" hidden>
+          <label>Nr serii
+            <input id="v-lot" autocomplete="off" placeholder="z etykiety fiolki"></label>
+          <label>Ważna do
+            <input id="v-exp" type="date"></label>
+        </div>
       </div>
 
       <div class="card" id="in-spray">
@@ -642,6 +648,8 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
             <select id="w-stab">
               <option value="vacsafe">Vac-Safe (MSD) – 1 tabletka na 100 l</option>
               <option value="aviblue">AviBlue (Elanco) – 1 nakrętka na 200 l</option>
+              <option value="avistab">AVI Stabilizator – 27 g na 1000 l</option>
+              <option value="cevamune">Cevamune (Ceva) – 1 tabletka na 100 l</option>
               <option value="inny">Inny gotowy stabilizator – dawka z etykiety</option>
               <option value="mleko">Mleko w proszku – gdy wymaga go ChPLW</option>
               <option value="brak">Bez stabilizatora</option>
@@ -1614,13 +1622,19 @@ const VACCINES = [
 // Tabela Birchmeiera „TXVK-6” (0,66 l/min przy 2 bar) to wydatek lancy z dwiema dyszami TX-VK6 – dlatego 2 × TeeJet.
 // TeeJet TX-VK6 (0,100 gpm przy 40 psi) [bar, l/min] – jedna dysza; klasa kropli VF
 const TXVK6_TEEJET = [[2,0.327],[3,0.393],[4,0.448],[5,0.496],[6,0.539]];
-// Orientacyjny VMD kropli TX-VK6 wg danych TeeJet [bar, µm] – Birchmeier podaje tylko klasę VF
-const VMD_TEEJET = [[2,153],[4,132],[6,122]];
+// VMD kropli TX-VK6 [bar, µm]: TeeJet (ConeJet TXA8001VK: 151 µm przy 30 psi, 131 przy 60, 122 przy 90) i karta dysz
+// MSD/Birchmeier (TXVK-6 czerwona, art. 50142057: 2 bar 153 µm 0,33 l/min; 3 bar 144 µm 0,39 l/min)
+const VMD_TEEJET = [[2,153],[3,144],[4,132],[6,122]];
 // TeeJet TX-VK18 (0,300 gpm przy 40 psi) [bar, l/min] – trzy razy więcej niż TX-VK6; zgodne z tabelą
 // Birchmeier dla dyszy tej samej klasy wydatku (AITXA 8003: 0,96 / 1,18 / 1,36 / 1,53 / 1,67 l/min przy 2–6 bar)
 const TXVK18_TEEJET = [[2,0.968],[3,1.18],[4,1.37],[5,1.53],[6,1.67]];
-// VMD kropli TX-VK18 wg danych TeeJet [bar, µm] (Dv0,1 / Dv0,9 przy 2 bar: 115 / 331 µm)
-const VMD_VK18 = [[2,235],[4,203],[6,188]];
+// VMD kropli TX-VK18 [bar, µm] wg TeeJet (Dv0,1 / Dv0,9 przy 2 bar: 115 / 331 µm) i karty dysz MSD/Birchmeier
+// (TXVK-18 pomarańczowa, art. 11957701: 2 bar 235 µm 0,97 l/min; 3 bar 216 µm 1,18 l/min)
+const VMD_VK18 = [[2,235],[3,216],[4,203],[6,188]];
+// TX-VS2 (biała, art. 12116601) z tej samej karty dysz: 2 bar 114 µm 0,11 l/min; 3 bar 106 µm 0,13 l/min (Ceva: TXSS2 115 µm
+// do szczepień powtórnych). Nie ma jej w liczydle – wciąż za gruba na okna ≤100 µm (Avinew, MG, MS, aerozol powtórny).
+const VS2_D = [106,114];
+const VS2_TXT = 'dysza TX-VS2 (biała) do opryskiwacza Birchmeier daje ok. 106–114 µm przy 2–3 bar – też za grubo';
 const DISEASES = {'ND':'Rzekomy pomór drobiu (ND)','IB':'Zakaźne zapalenie oskrzeli (IB)','IBD':'Choroba Gumboro (IBD)','aMPV':'Metapneumowirus – TRT/SHS','Marek':'Choroba Mareka','ILT':'Zakaźne zapalenie krtani i tchawicy (ILT)','AE':'Zakaźne zapalenie mózgu i rdzenia (AE)','CAV':'Zakaźna anemia kurcząt (CAV)','EDS':'Zespół spadku nieśności (EDS)','Reo':'Reowirusy','Salmonella':'Salmonelloza','E. coli':'Kolibakterioza (E. coli)','Pasteurella':'Cholera drobiu (pasterelloza)','ORT':'ORT (Ornithobacterium)','MG':'Mykoplazmoza (MG)','MS':'Mykoplazmoza – M. synoviae (MS)','HE':'Krwotoczne zapalenie jelit indyków (HE)','Derzsy':'Choroba Derzsy’ego – parwowiroza gęsi (GPV)','MDPV':'Parwowiroza kaczek piżmowych (MDPV)','Kokcydioza':'Kokcydioza','inne':'Inne'};
 const ROUTES = {spray:'Oprysk',woda:'Woda do picia',oko:'Oko / nos',inj:'Iniekcja',inovo:'In ovo'};
 
@@ -1750,7 +1764,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.22.1';
+const APP_VERSION = '1.23.0';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -1823,7 +1837,7 @@ function sprayerUI(){
   $('s-p-hint').textContent = `${fmtT(s.pMin)}–${fmtT(s.pMax)} bar co 0,5 · ${$('s-mode').value === 'lanca' ? 'zalecane 2–3 bar' : 'z dmuchawą 2–2,5 bar, maks. 3'}`;
   $('s-spr-hint').textContent = s.h;
   const a = AS1200[mode.value];
-  $('s-mode-hint').textContent = a ? `AS 1200: ${a.v} m/s, 1 dysza, akumulator dmuchawy ok. ${a.t} · poziomy 3–5 i max (34–65 m/s, zasięg do 13 m) to nawiew do ochrony roślin – za silny do szczepienia, aplikacja ich nie liczy` : 'lanca 30–50 cm nad ptakami';
+  $('s-mode-hint').textContent = a ? `AS 1200: ${a.v} m/s, 1 dysza, akumulator dmuchawy ok. ${a.t} · poziomy 3–5 i max (34–65 m/s, zasięg do 13 m) to nawiew do ochrony roślin – za silny do szczepienia, aplikacja ich nie liczy` : 'lanca 30–40 cm nad ptakami';
   $('s-nn-wrap').hidden = mode.value !== 'lanca';
   $('s-nn-hint').textContent = 'wydatek lancy = liczba dysz × wydatek jednej dyszy';
   return forced;
@@ -1879,9 +1893,13 @@ function bestPacks(need, packs){
 // pochodzenia zwierzęcego, wg MSD może zastąpić mleko w proszku, 10 min przed szczepionką; AviBlue (Elanco) –
 // granulat musujący, 1 płaska nakrętka na 200 l (butelka 375 g na 3000 l), neutralizuje chlor, metale ciężkie,
 // zakwaszacze i środki dezynfekcyjne; przy dozowniku ilość na całą wodę (Elanco: 1000 l przy 2% = 5 nakrętek w 20 l).
-// Mleko w proszku – tylko gdy wymaga go ChPLW albo nie ma stabilizatora.
+// AVI Stabilizator (etykieta) – saszetka 27 g na 1000 l: tiosiarczan sodu + barwnik, 10–15 min przed szczepionką;
+// Cevamune (Ceva, lista kontrolna szczepienia w wodzie) – 1 tabletka na 100 l, 15 min przed szczepionką.
+// Mleko w proszku – tylko gdy wymaga go ChPLW albo nie ma stabilizatora (Ceva 2,5 g/l).
 const STAB = {
   vacsafe:{n:'Vac-Safe', per:100, u:['tabletka','tabletki','tabletek'], ru:'tabletka', wait:'10 min', dye:1, h:'tabletka musująca: neutralizuje chlor (do 5 ppm), niebieski barwnik; wg MSD może zastąpić mleko w proszku'},
+  avistab:{n:'AVI Stabilizator', per:1000, g:27, wait:'10–15 min', dye:1, h:'saszetka 27 g na 1000 l: tiosiarczan sodu neutralizuje chlor i zasadowe pH, niebieski barwnik zostaje na języku 1–4 h. Etykieta podaje wodę 20–22 °C – MSD i Ceva zalecają chłodniejszą (w linii 8–15 °C, w zbiorniku 14–20 °C).'},
+  cevamune:{n:'Cevamune', per:100, u:['tabletka','tabletki','tabletek'], ru:'tabletka', wait:'15 min', dye:2, h:'tabletka (Ceva): 1 na 100 l, neutralizuje chlor; wg listy kontrolnej Ceva wrzuć do wody 15 min przed szczepionką'},
   aviblue:{n:'AviBlue', per:200, u:['nakrętka','nakrętki','nakrętek'], ru:'płaska nakrętka', wait:'', dye:1, h:'granulat musujący: neutralizuje chlor, metale ciężkie, zakwaszacze i środki dezynfekcyjne; butelka 375 g na 3000 l'},
   inny:{n:'stabilizator', dye:2, h:'wpisz dawkę na 100 l z etykiety preparatu'},
   mleko:{n:'mleko w proszku', wait:'10–20 min', h:'odtłuszczone; dziś stosowane rzadko – gdy wymaga go ChPLW'},
@@ -1892,7 +1910,9 @@ function stabUI(){ const sid = stabId(); $('w-milk-wrap').hidden = sid !== 'mlek
 // Ilość stabilizatora na V litrów wody (przy dozowniku – cała ilość do wiadra)
 function stabAmount(id, V, milkGl){
   const s = STAB[id] || STAB.vacsafe;
-  if(id === 'vacsafe' || id === 'aviblue'){ const n = Math.ceil(V / s.per - 1e-9); return {id, n:s.n, qty:n, txt:`${n} ${pl(n, ...s.u)} ${s.n}`, rule:`1 ${s.ru} na ${s.per} l`, wait:s.wait}; }
+  if(id === 'avistab'){ const g = V * s.g / s.per, n = Math.round(V / s.per * 10) / 10, whole = Number.isInteger(n);
+    return {id, n:s.n, qty:g, txt:`${fmt(g, g < 10 ? 1 : 0)} g preparatu ${s.n}`, rule:`saszetka ${s.g} g na ${s.per} l – tu ok. ${fmt(n, whole ? 0 : 1)} ${whole ? pl(n, 'saszetka', 'saszetki', 'saszetek') : 'saszetki'}`, wait:s.wait}; }
+  if(id === 'vacsafe' || id === 'aviblue' || id === 'cevamune'){ const n = Math.ceil(V / s.per - 1e-9); return {id, n:s.n, qty:n, txt:`${n} ${pl(n, ...s.u)} ${s.n}`, rule:`1 ${s.ru} na ${s.per} l`, wait:s.wait}; }
   if(id === 'inny'){ const a = pf($('w-stab-amt').value), u = $('w-stab-unit').value; if(!(a > 0)) return {id, n:s.n, txt:'stabilizator wg etykiety', rule:'dawka z etykiety', wait:'wg etykiety'}; const q = a * V / 100; return {id, n:s.n, qty:q, txt:`${u === 'szt.' ? Math.ceil(q - 1e-9) : fmt(q, q < 10 ? 1 : 0)} ${u} stabilizatora`, rule:`${fmtT(a)} ${u} na 100 l`, wait:'wg etykiety'}; }
   if(id === 'mleko'){ if(!(milkGl > 0)) return {id, n:s.n, txt:'mleko w proszku wg ChPLW', rule:'wpisz g/l', wait:s.wait}; const kg = V * milkGl / 1000; return {id, n:s.n, qty:kg, kg, txt:`${fmt(kg, 2)} kg mleka w proszku`, rule:`${fmtT(milkGl)} g/l`, wait:s.wait}; }
   return {id:'brak', n:s.n, txt:'', rule:'', wait:''};
@@ -1911,6 +1931,7 @@ function waterSteps(o){
   const day = [
     `Rano zakręć wodę i podnieś linie poideł – wstrzymanie ${o.thirst || '1–2 h wg ChPLW (krócej w upale)'}. Spuść z linii wodę z chlorem.`,
     o.doz ? `Do wiadra: ${st} l wody${mk}${wt}.` : `Do zbiornika: ${fmt0(o.V)} l wody${mk}${wt}.`,
+    'Woda chłodna: MSD – w linii 8–15 °C (ciepło osłabia szczepionkę), Ceva – w zbiorniku 14–20 °C. Wiadro plastikowe, mieszadło plastikowe albo drewniane – metale inaktywują szczepionkę.',
     `Fiolki${o.packs && o.packs !== '–' ? ` (${o.packs} dawek)` : ''} otwieraj pod wodą, przepłucz kilka razy, wlej ${o.doz ? 'do wiadra' : 'do zbiornika'} i wymieszaj.`,
     o.doz ? `Ustaw dozownik na ${o.pct > 0 ? fmtT(o.pct) : '…'}% i włóż wąż ssący do wiadra.` : null,
     `Napełnij linie: otwórz końce linii i spuszczaj, aż ${dye === 1 ? 'pojawi się zabarwiony roztwór' : dye === 2 ? 'pojawi się roztwór ze stabilizatorem (zabarwiony, jeśli preparat ma barwnik)' : sb.id === 'mleko' ? 'pojawi się mleczny roztwór' : 'spłynie woda stojąca w liniach'} (Aviagen: ok. 1 l na każde 3 m linii smoczkowej). Zamknij końce. Najlepiej przy przyciemnionym świetle.`,
@@ -1922,6 +1943,30 @@ function waterSteps(o){
   return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – ${o.doz ? 'dozownik' : 'zbiornik'}</summary>
     <h4 class="steps-h">Dzień wcześniej</h4><ol class="steps">${L(before)}</ol>
     <h4 class="steps-h">Dzień szczepienia</h4><ol class="steps" start="${n1 + 1}">${L(day)}</ol>
+    <h4 class="steps-h">Po szczepieniu</h4><ol class="steps" start="${n1 + n2 + 1}">${L(after)}</ol></details>`;
+}
+// Odległość lancy z ChPLW: „30–40 cm” → „30–40 cm nad ptakami”; bez dopisku, gdy ChPLW już mówi „nad …” / „od głów …”
+function distTxt(d, w){ if(/nad |od głów/.test(d)) return d; const m = d.match(/^(.*?)(\s*\(.*\))$/); return m ? `${m[1]} ${w}${m[2]}` : `${d} ${w}`; }
+// Oprysk krok po kroku – ChPLW (odległość, woda) + dobre praktyki MSD i Ceva (materiały szkoleniowe 2025)
+function spraySteps(o){
+  const L = a => a.filter(Boolean).map(x => `<li>${esc(x)}</li>`).join('');
+  const before = [
+    'Opryskiwacz tylko do szczepień: umyty ciepłą wodą, bez detergentów i środków dezynfekcyjnych – ich resztki niszczą szczepionkę.',
+    `Załóż ${o.nn > 1 ? `${o.nn} dysze ${o.nz}` : `dyszę ${o.nz}`} i ustaw ${isNum(o.p) && o.p > 0 ? fmtT(o.p) + ' bar' : 'ciśnienie'}. Najpewniej zmierzyć wydatek: woda z jednej dyszy przez 60 s do menzurki – wynik wpisz przy „Pomiar własny”.`,
+    o.water ? `Woda wg ChPLW: ${o.water}${/temperatur|°C|chłodn|zimn|pokojow/i.test(o.water) ? '' : ` – najlepiej chłodna (Ceva: 6–8 °C, MSD: 8–20 °C)`}. Naczynia i mieszadło plastikowe.` : 'Woda do roztworu destylowana lub demineralizowana, chłodna (Ceva: 6–8 °C, MSD: 8–20 °C). Naczynia i mieszadło plastikowe.',
+    'Raz na jakiś czas sprawdź rozkład kropli: papier wodoczuły rozłożony na wysokości głów ptaków pokazuje, czy krople są równe i gęste (MSD).'];
+  const day = [
+    `Przyciemnij światło i zgrupuj ptaki; wyłącz albo ogranicz wentylację i ogrzewanie.${o.chicks ? ' Skrzynki z pisklętami ustaw w rzędzie, z dala od nagrzewnic i wentylatorów.' : ''}`,
+    `Szczepionkę rozpuść tuż przed opryskiem${o.use ? ` (ChPLW: zużyć w ${o.use})` : ''}: fiolki przepłucz wodą, wymieszaj${isNum(o.V) && o.V > 0 ? ` – razem ${fmt(o.V, 2)} l roztworu` : ''}.`,
+    o.mode === 'lanca' ? `Pryskaj równym tempem ${distTxt(o.dist || '30–40 cm', 'nad głowami')} – szczepionka ma trafić w oczy, nozdrza i dziób każdego ptaka, nie w ściółkę i puste miejsca.` : 'Prowadź strumień dmuchawy skośnie w dół nad stadem, ptaki 1–3 m od wylotu, równym tempem – szczepionka ma trafić w każdego ptaka, nie w ściółkę i puste miejsca.',
+    `Wentylacja wyłączona jeszcze ${o.vent} min po oprysku. Przerwij i włącz ją, gdy temperatura wzrośnie o 2–3 °C albo ptaki zaczną dyszeć.`];
+  const after = [
+    'Umyj opryskiwacz ciepłą wodą bez detergentów i dezynfekcji, rozkręć i wyczyść dyszę i filtry, wysusz; przechowuj otwarty w suchym miejscu.',
+    o.resp ? 'Kontrola szczepienia (Ceva): 2–5 dni po oprysku (jednodniówki do 5. dnia, po szczepieniu powtórnym nieco krócej) kilkanaście wymazów z tchawicy lub szczeliny podniebiennej do PCR pokaże, czy szczep szczepionkowy dotarł do ptaków. Pobranie i badanie – z lekarzem weterynarii.' : null];
+  const n1 = before.length, n2 = day.length;
+  return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – oprysk</summary>
+    <h4 class="steps-h">Przed szczepieniem</h4><ol class="steps">${L(before)}</ol>
+    <h4 class="steps-h">W kurniku</h4><ol class="steps" start="${n1 + 1}">${L(day)}</ol>
     <h4 class="steps-h">Po szczepieniu</h4><ol class="steps" start="${n1 + n2 + 1}">${L(after)}</ol></details>`;
 }
 // Druga szczepionka do aparatu podwójnego: iniekcyjne dla tych ptaków, bez pierwszej; dawka z ChPLW przy zmianie
@@ -2160,9 +2205,9 @@ function applyDefaults(){
   if(w && w.rule === 'choice') fillSelect($('w-dose'), w.opts.map((o,i) => ({v:String(i), l:o.l})));
   const milk = w ? parseMilk(w.milk) : null;
   $('w-milk').value = milk != null ? milk : 0;
-  $('w-milk-hint').textContent = w && w.milk ? 'ChPLW: ' + w.milk : (v ? 'ChPLW (w bazie) nie podaje ilości mleka' : 'zwykle 2–4 g/l');
+  $('w-milk-hint').textContent = w && w.milk ? 'ChPLW: ' + w.milk : (v ? 'ChPLW (w bazie) nie podaje ilości mleka – zwykle 2–2,5 g/l odtłuszczonego (Ceva 2,5 g/l)' : 'zwykle 2–4 g/l');
   if(r.oko && isNum(r.oko.ml)) $('o-ml').value = r.oko.ml;
-  $('auto-wrap').hidden = !(v && v.auto);   // autogenna: dane z etykiety serii
+  $('auto-wrap').hidden = !(v && v.auto);
   if(v && v.auto && !(v.r && v.r.inj && isNum(v.r.inj.ml))) $('i-ml').value = '';
   applyInjDefaults(true);
 }
@@ -2186,6 +2231,7 @@ function onVacChange(){
   else fillDz();
   buildRoutes();
   $('packs').closest('label').hidden = noVac();
+  if(S.lotVac !== (v ? v.id : '')){ S.lotVac = v ? v.id : ''; $('v-lot').value = ''; $('v-exp').value = ''; }   // seria i ważność – z etykiety nowej szczepionki
   setPacks(noVac() || (v && v.auto) ? '' : v && v.pk && v.pk.length ? v.pk.join(', ') : (S.route === 'inj' ? '500, 1000' : '1000, 2500, 5000, 10000'));
   applyDefaults(); calc();
   applyFarmSettings(true);   // ustawienia stałe fermy – po zmianie szczepionki sprawdzone wobec jej ChPLW
@@ -2203,6 +2249,7 @@ function calc(){
   opStatSoon();
   renderBirdPick();   // przyciski „Drób” zawsze zgodne z wyborem (także po „Licz z tą szczepionką”)
   const v = curVac(); const bird = BIRDS[$('bird').value]; const route = S.route;
+  $('lot-wrap').hidden = noVac() || !!(v && v.auto);   // autogenna ma własne pola serii i ważności
   const age = Math.max(0, Math.round(num('age',0))); const dol = age + 1;
   const birds = Math.max(0, Math.round(num('birds',0)));
   $('bird-hint').textContent = (bird && bird.h) || '';
@@ -2225,6 +2272,10 @@ function calc(){
   const need = Math.ceil(birds * (1 + loss/100));
   const bp = bestPacks(need, parsePacks($('packs').value));
   const tiles = [], msgs = [], R = {route, age, birds, need, vials:bp ? bp.vials : null, doses:bp ? bp.total : null, packs:packsText(bp)};
+  // Seria i termin ważności z etykiety (szczepionka autogenna – w jej własnych polach)
+  const expV = v && v.auto ? $('a-exp').value : $('v-exp').value, dayV = $('date').value || todayISO();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(expV || '') && expV < dayV) msgs.push(['bad', `Szczepionka po terminie ważności (${fmtDate(expV)}) – nie używaj jej.`]);
+  if(!(v && v.auto)){ R.lot = $('v-lot').value.trim(); R.exp = $('v-exp').value; }
   if(bp) tiles.push({k:'Szczepionka', v:packsText(bp), s:`${bp.vials} ${plFiolka(bp.vials)} · ${fmt0(bp.total)} dawek`, main:true});
   else msgs.push(['warn','Wpisz wielkość fiolek (np. 1000, 2500, 5000).']);
 
@@ -2283,6 +2334,7 @@ function calc(){
     if(noz === 'vk18'){
       // Dysza TX-VK18: ostrzeżenia, gdy parametry nie pasują do szczepienia
       msgs.push(['warn', 'TX-VK18: do szczepienia drobiu Birchmeier zaleca dyszę TXVK-6 (tabela dysz do AS 1200). TX-VK18 ma ok. 3 razy większy wydatek i grubszą kroplę (ok. 190–235 µm przy 2–6 bar).']);
+      msgs.push(['info', 'Ceva (tabela dysz opryskiwacza Desvac) podaje TXVK18 – 235 µm, 0,97 l/min przy 2 bar – do szczepienia pierwotnego IB/ND w gorących, suchych warunkach: gruba kropla wolniej paruje. Wielkość kropli i tak rozstrzyga ChPLW.']);
       if(mode !== 'lanca') msgs.push(['warn', 'TX-VK18 z dmuchawą AS 1200: tej dyszy nie ma w tabeli dysz Birchmeiera do AS 1200, a na poziomach 1–2 dmuchawa nie rozbija grubych kropli. Szczep lancą albo załóż TX-VK6.']);
       const q6 = flowTab(TXVK6_TEEJET, p) * nn;
       if(isNum(t1) && q6 > 0 && src !== 'reczne') msgs.push(['info', `Ta sama objętość ${nn > 1 ? nn + ' dyszami' : 'dyszą'} TX-VK6 (katalog TeeJet): ok. ${fmtMin(V / q6 * C.wall)}. Przy TX-VK18 trzeba iść ok. 3 razy szybciej, równym tempem – inaczej początek kurnika dostanie za dużo roztworu, a koniec za mało.`]);
@@ -2313,7 +2365,7 @@ function calc(){
     if(mode !== 'lanca' && p > 3) msgs.push(['bad','Z dmuchawą pracuj przy 2,0–2,5 bar, maksymalnie 3 bar.']);
     else if(!(p > 0)) msgs.push(['warn', 'Wpisz ciśnienie robocze (zalecane 2,0–3,0 bar).']);
     else if(p < 2 || p > (mode === 'lanca' && dropWin(v) ? 6 : 3)) msgs.push(['warn', mode === 'lanca' && dropWin(v) ? `Zalecane ciśnienie dla ${NZ.n}: 2,0–3,0 bar; z lancą do 6 bar, jeśli kropla mieści się w oknie z ChPLW.` : `Zalecane ciśnienie dla ${NZ.n}: 2,0–2,5 bar (maks. 3).`]);
-    if(mode !== 'lanca' && dol <= 7) msgs.push(['warn','Pisklęta w 1. tygodniu szczep bez dmuchawy (lanca 30–50 cm nad ptakami).']);
+    if(mode !== 'lanca' && dol <= 7) msgs.push(['warn','Pisklęta w 1. tygodniu szczep bez dmuchawy (lanca 30–40 cm nad ptakami).']);
     if(mode === 'dm2') msgs.push(['warn','Poziom 2 tylko, gdy zasięg poziomu 1 nie wystarcza.']);
     if(mode !== 'lanca' && noz === 'vk6' && src !== 'reczne') msgs.push(['warn', `Tabela dysz Birchmeiera do AS 1200 podaje dla TXVK-6 ${fmt(flowTab(TXVK6_BIRCH_AS, p > 0 ? p : 2),2)} l/min przy ${fmtT(p > 0 ? p : 2)} bar – ok. 2 razy więcej niż katalog TeeJet dla jednej dyszy (${fmt(flowTab(TXVK6_TEEJET, p > 0 ? p : 2),2)} l/min). Przed szczepieniem zmierz wydatek dyszy w dmuchawie cylindrem (60 s) i wpisz go jako „pomiar własny”.`]);
     if(mode !== 'lanca') msgs.push(['info','Z dmuchawą: ptaki ok. 1–3 m od wylotu, strumień skośnie w dół nad stado. Dmuchawa AS 1200 pracuje w temperaturze 5–30°C (instrukcja AS 1200) – w cieplejszym kurniku sprawdź jej działanie.']);
@@ -2324,23 +2376,34 @@ function calc(){
       const fi = sp.opts.filter(o => o.fine), co = sp.opts.filter(o => !o.fine);
       msgs.push(['warn', `ChPLW podaje ${fi.map(o => `${fmtRange(o.ml)} ml (${o.l})`).join('; ')} na 1000 dawek dla drobnej kropli – to inne urządzenie. Opryskiwacz Birchmeier z dyszą ${NZ.n} daje grubą kroplę (ok. ${fmt0(vmd0)} µm)${co.length ? ` – do niego pasuje: ${co.map(o => `${o.l} ${fmtRange(o.ml)} ml`).join('; ')}` : ''}.${co.length && co.every(o => /wylęgarn/.test(o.l)) ? ' Dla opryskiwacza w kurniku ChPLW nie podaje ilości wody (zależy od aparatu i utrzymania ptaków) – ilość ustal z lekarzem weterynarii.' : ''}`]);
     }
-    if(sp.dRep && isNum(vmd0) && !inWin(sp.dRep, vmd0)) msgs.push(['warn', `ChPLW: szczepienie powtórne – drobna kropla ${fmtRange(sp.dRep)} µm. ${NZ.n} daje ok. ${fmt0(vmd0)} µm, więc nadaje się tylko do szczepienia pierwotnego (${fmtRange(sp.d)} µm). Do powtórnego potrzebny rozpylacz drobnokroplisty.`]);
+    if(sp.dRep && isNum(vmd0) && !inWin(sp.dRep, vmd0)) msgs.push(['warn', `ChPLW: szczepienie powtórne – drobna kropla ${fmtRange(sp.dRep)} µm. ${NZ.n} daje ok. ${fmt0(vmd0)} µm, więc nadaje się tylko do szczepienia pierwotnego (${fmtRange(sp.d)} µm). Do powtórnego potrzebny rozpylacz drobnokroplisty${sp.dRep[1] < VS2_D[0] ? ` – ${VS2_TXT}` : ''}.`]);
     if(sp.mikro && !sp.d) msgs.push(['warn', `ChPLW wymaga rozpylacza wytwarzającego mikrokrople (wielkości w µm nie podaje). ${NZ.n} daje kroplę ok. ${fmt0(vmd0)} µm – grubszą niż mikrokrople. Sposób podania ustal z lekarzem weterynarii.`]);
     if(allowed.length){ const lo = Math.min(...allowed.map(a => a[0])), hi = Math.max(...allowed.map(a => a[1])); if(ml < lo || ml > hi) msgs.push(['warn', `${fmtT(ml)} ml na 1000 dawek – poza zakresem z ChPLW (${fmtT(lo)}–${fmtT(hi)} ml).`]); }
     const vmd = src === 'reczne' && isNum(q1) ? vmdEst(p, q1, noz) : vmdAt(p, noz);   // kropla zależy od jednej dyszy
     if(sp.d && vmd){
       const [lo, hi] = sp.d;
-      if(isNum(lo) && vmd < lo) msgs.push(['warn', `Kropla ok. ${fmt0(vmd)} µm – drobniejsza niż w ChPLW (${fmtRange(sp.d)} µm). Obniż ciśnienie do 2 bar.`]);
+      // Ciśnienia do sprawdzenia: z lancą do 6 bar (i do maks. opryskiwacza), z dmuchawą do 3 bar
+      const PS = [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6].filter(pp => pp <= (mode === 'lanca' ? Math.min(6, SP.pMax || 6) : 3) + 1e-9);
+      const vAt = pp => src === 'reczne' && isNum(q1) ? vmdEst(pp, q1 * Math.sqrt(pp / p), noz) : vmdAt(pp, noz);
+      if(isNum(lo) && vmd < lo){
+        const pDown = PS.filter(pp => pp < p - 1e-9 && inWin(sp.d, vAt(pp))).pop();   // najmniejsza zmiana ciśnienia
+        const p18 = noz === 'vk6' ? PS.find(pp => inWin(sp.d, vmdAt(pp, 'vk18'))) : null;
+        msgs.push(['warn', `Kropla ok. ${fmt0(vmd)} µm – drobniejsza niż w ChPLW (${fmtRange(sp.d)} µm).${pDown ? ` Obniż ciśnienie do ${fmtT(pDown)} bar – kropla ok. ${fmt0(vAt(pDown))} µm.`
+          : p18 ? ` ${NZ.n} nawet przy 2 bar daje ok. ${fmt0(vmdAt(2, noz))} µm – grubszą kroplę da TX-VK18${mode !== 'lanca' ? ' na lancy' : ''} (ok. ${fmt0(vmdAt(p18, 'vk18'))} µm przy ${fmtT(p18)} bar).`
+          : ` Opryskiwacz Birchmeier z TX-VK6 albo TX-VK18 daje najwyżej ok. ${fmt0(vmdAt(2, 'vk18'))} µm (TX-VK18 przy 2 bar) – sposób podania ustal z lekarzem weterynarii.`}`]);
+      }
       else if(isNum(hi) && vmd > hi){
         // TX-VK18 nawet przy 6 bar daje ok. 188 µm – ciśnieniem nie da się zejść do okna
         const fix = noz === 'vk18' && vmdAt(6, 'vk18') > hi && [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6].some(pp => inWin(sp.d, vmdAt(pp, 'vk6')));
-        msgs.push([noz === 'vk18' ? 'bad' : 'warn', `ChPLW wymaga kropli ${fmtRange(sp.d)} µm – ${NZ.n} daje grubszą (ok. ${fmt0(vmd)} µm).${fix ? ' Z tą szczepionką użyj dyszy TX-VK6 – TX-VK18 nawet przy 6 bar daje ok. 188 µm.' : ' Decyzja lekarza.'}`]);
+        const pUp = fix ? null : PS.find(pp => pp > p + 1e-9 && inWin(sp.d, vAt(pp)));
+        msgs.push([noz === 'vk18' ? 'bad' : 'warn', `ChPLW wymaga kropli ${fmtRange(sp.d)} µm – ${NZ.n} daje grubszą (ok. ${fmt0(vmd)} µm).${fix ? ' Z tą szczepionką użyj dyszy TX-VK6 – TX-VK18 nawet przy 6 bar daje ok. 188 µm.' : pUp ? ` Podnieś ciśnienie do ${fmtT(pUp)} bar – kropla ok. ${fmt0(vAt(pUp))} µm.` : ` Decyzja lekarza.${hi < VS2_D[0] ? ` Uwaga: ${VS2_TXT}.` : ''}`}`]);
       }
       else msgs.push(['ok', `Kropla ok. ${fmt0(vmd)} µm – zgodna z ChPLW (${fmtRange(sp.d)} µm).${sp.dAssumed ? ` Uwaga: ${sp.dAssumed}.` : sp.dSrc ? ` Źródło: ${sp.dSrc}.` : ''}`]);
     }
     if(sp.water) msgs.push(['info', 'Woda wg ChPLW: ' + sp.water + '.']);
-    if(sp.dist) msgs.push(['info', `Bez dmuchawy: ${sp.dist} nad ptakami.`]);
+    if(sp.dist) msgs.push(['info', `Bez dmuchawy: ${distTxt(sp.dist, 'nad ptakami')}.`]);
     if(!/mask|okular|gogl|ochron\w* oczu|hełm/i.test((v && v.safe) || '')) msgs.push(['info', 'Ochrona szczepiącego przy oprysku: maska na nos i usta oraz okulary ochronne (gogle) – wymagają ich ChPLW m.in. Poulvac TRT, Poulvac NDW, Nobilis ND Clone 30 i Primun Bronchitis H120. Po zabiegu umyj ręce i twarz.']);
+    crewH += spraySteps({nz:NZ.n, nn, p, mode, V, vent, dist:sp.dist, water:sp.water, use:useMinutes(v) ? v.use : null, chicks:age <= 2, resp:!!(v && /żyw/.test(v.t || '') && v.dz.some(d => ['ND','IB','aMPV','ILT','MG','MS'].includes(d)))});
   }
   if(route === 'woda'){
     const w = (v && v.r && v.r.woda) || null; const meas = parseFloat(String($('w-meas').value).replace(',','.'));
@@ -2375,7 +2438,7 @@ function calc(){
       else {
         if(pct < 0.2 || pct > 2) msgs.push(['warn', `Ustawienie ${fmtT(pct)}% – sprawdź zakres swojego dozownika (np. Dosatron D25RE2: 0,2–2%).`]);
         msgs.push(['info', `Dozownik ${fmtT(pct)}%: ${fmt(stock, 1)} l roztworu zejdzie razem z ${fmt0(V)} l wody. Wszystkie fiolki i stabilizator idą do wiadra – szczepionka trafia do linii tylko przez dozownik.`]);
-        if(stab.txt && isNum(stab.qty)) msgs.push(['info', `Stabilizator liczy się na całą wodę, która przejdzie przez dozownik (${stab.rule}), więc w wiadrze jest go ${fmt0(100 / pct)} razy więcej niż w poidłach${STAB[sid].per ? ` – przy ${fmtT(pct)}% to 1 ${STAB[sid].u[0]} na ${fmtT(STAB[sid].per * pct / 100)} l roztworu${sid === 'vacsafe' ? ' (jak w broszurze MSD)' : ''}` : ''}${sid === 'mleko' ? '. Mieszaj roztwór w trakcie podawania – mleko opada' : ''}.`]);
+        if(stab.txt && isNum(stab.qty)) msgs.push(['info', `Stabilizator liczy się na całą wodę, która przejdzie przez dozownik (${stab.rule}), więc w wiadrze jest go ${fmt0(100 / pct)} razy więcej niż w poidłach${STAB[sid].per && (STAB[sid].g || STAB[sid].u) ? ` – przy ${fmtT(pct)}% to ${STAB[sid].g ? `saszetka ${STAB[sid].g} g` : `1 ${STAB[sid].u[0]}`} na ${fmtT(STAB[sid].per * pct / 100)} l roztworu${sid === 'vacsafe' ? ' (jak w broszurze MSD)' : ''}` : ''}${sid === 'mleko' ? '. Mieszaj roztwór w trakcie podawania – mleko opada' : ''}.`]);
         const um = useMinutes(v), wm = String(win).match(/(\d+(?:[.,]\d+)?)\s*h/g), winMax = wm ? Math.max(...wm.map(x => parseFloat(x.replace(',', '.')))) : 2;
         if(um && winMax * 60 + 20 > um) msgs.push(['warn', `Roztwór ze szczepionką trzeba zużyć w ${v.use} od rozpuszczenia, a picie z napełnianiem linii potrwa ok. ${fmtT(winMax)} h. Przygotuj roztwór w dwóch porcjach – fiolki rozpuszczone osobno dla każdej.`]);
       }
@@ -2565,7 +2628,7 @@ function reportText(){
   const sec = (title, rows) => { rows = rows.filter(Boolean); if(rows.length) out.push('', title, ...rows); };
   sec('STADO', [rkv('Drób', L.bird.l), rkv('Wiek', `${R.age} ${R.age === 1 ? 'dzień' : 'dni'}${R.age >= 14 ? ` (${ageWeeks(R.age)})` : ''}`), rkv('Liczba ptaków', fmt0(R.birds) + ' szt.')]);
   sec('SZCZEPIENIE', [rkv('Choroba', dzT), rkv('Szczepionka', v ? v.n : 'spoza bazy'), rkv('Droga podania', ROUTES[R.route].toLowerCase()),
-    R.doses ? rkv('Fiolki', `${R.packs} = ${fmt0(R.doses)} dawek`) : null, v ? rkv('Karencja', v.auto ? ($('a-wd').value.trim() ? `${$('a-wd').value.trim()} (instrukcja serii)` : 'wg instrukcji serii – nie wpisano') : v.wd) : null]);
+    R.doses ? rkv('Fiolki', `${R.packs} = ${fmt0(R.doses)} dawek`) : null, R.lot || R.exp ? rkv('Seria', `${R.lot || 'nie wpisano'}${R.exp ? `, ważna do ${fmtDate(R.exp)}` : ''}`) : null, v ? rkv('Karencja', v.auto ? ($('a-wd').value.trim() ? `${$('a-wd').value.trim()} (instrukcja serii)` : 'wg instrukcji serii – nie wpisano') : v.wd) : null]);
   if(R.route === 'spray'){
     const k = R.persons || 1, n = R.sectors || 1, m = R.modId && S.mods[R.modId];
     const rows = [rkv('Woda', `${fmt(R.water_l,2)} l (${fmtT(R.ml1000)} ml na 1000)`), rkv('Opryskiwacz', R.sprayerName || 'Birchmeier REC 15 AC1'),
@@ -3459,7 +3522,7 @@ function renderRules(){
     <li>Dmuchawa AS 1200: 2 akumulatory 18 V 10 Ah (ładowanie ok. 70 min), 3,5 kg, 0,5–10 bar, 5–30 °C, zasięg do 13 m. Poziomy (prędkość powietrza / czas pracy): 1 – 21 m/s / 5 h 40 min, 2 – 26 m/s / 3 h 20 min, 3 – 34 m/s / 1 h 50 min, 4 – 44 m/s / 50 min, 5 – 56 m/s / 25 min, max – 65 m/s / 15 min (od „max” ochronniki słuchu). Do szczepienia tylko poziom 1 (wyjątkowo 2).</li>
     <li>AS 1200 nie jest przeznaczona do kwasów, ługów i środków dezynfekcyjnych (instrukcja) – po szczepieniu przepłucz ją czystą wodą (min. 1 l w opryskiwaczu) i wyczyść dyszę i filtr; nie przedmuchuj dyszy ustami.</li>
     <li>Po zabiegu opróżnij zbiornik, wlej czystą wodę i przepompuj ją przez lancę (instrukcja REC 15). Regularnie czyść filtr w zaworze spustowym, wąż zasysający i dyszę.</li>
-    <li>Pisklęta – bez dmuchawy, 30–50 cm nad ptakami. Szczepienia przypominające – dmuchawa AS 1200 poziom 1 (wyjątkowo 2). Wentylacja (jedna na cały kurnik) wyłączona przez cały oprysk i co najmniej 10–15 min po nim, aż krople opadną; dłużej jest lepiej, jeśli temperatura i ptaki na to pozwalają. Limit samego oprysku zależy od pory roku: lato ok. 20 min, wiosna/jesień ok. 30, zima ok. 40.</li>
+    <li>Pisklęta – bez dmuchawy, 30–40 cm nad ptakami. Szczepienia przypominające – dmuchawa AS 1200 poziom 1 (wyjątkowo 2). Wentylacja (jedna na cały kurnik) wyłączona przez cały oprysk i co najmniej 10–15 min po nim, aż krople opadną; dłużej jest lepiej, jeśli temperatura i ptaki na to pozwalają. Limit samego oprysku zależy od pory roku: lato ok. 20 min, wiosna/jesień ok. 30, zima ok. 40.</li>
     <li>Cały zabieg – od rozpuszczenia fiolek do końca oprysku – musi zmieścić się w czasie zużycia z ChPLW (pole „Zużyć w”, zwykle 1–3 h). Aplikacja porównuje go z planem.</li>
     <li>Kilka osób: każda z własnym opryskiwaczem ustawionym tak samo. Wszystkie fiolki rozpuść w całej wodzie, wymieszaj i dopiero wtedy rozlej do opryskiwaczy wg tabeli w wyniku. Osoby w osobnych sektorach skracają cały zabieg; praca razem, sektor po sektorze, skraca też czas w każdym sektorze.</li>
     <li>Zbiornik REC 15 mieści 15 l. Większą objętość na osobę przygotuj w czystym pojemniku i dolewaj w trakcie.</li></ul></div>
@@ -4089,7 +4152,7 @@ function bind(){
   $('sp-seg').addEventListener('click', ev => { const b = ev.target.closest('[data-sp]'); if(b) pickSpecies(b.dataset.sp); });
   $('grp').addEventListener('click', ev => { const b = ev.target.closest('[data-bird]'); if(b) setBird(b.dataset.bird); });
   $('i-site').addEventListener('change', () => { S.siteTouched = true; });
-  ['a-adj', 'a-strain', 'a-lab', 'a-lot', 'a-exp', 'a-farm', 'a-wd'].forEach(id => $(id).addEventListener('input', () => scheduleCalc()));
+  ['a-adj', 'a-strain', 'a-lab', 'a-lot', 'a-exp', 'a-farm', 'a-wd', 'v-lot', 'v-exp'].forEach(id => $(id).addEventListener('input', () => scheduleCalc()));
   ['a-doc-cert', 'a-doc-instr', 'a-doc-order'].forEach(id => $(id).addEventListener('change', () => scheduleCalc()));
   $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(!b || b.disabled) return; if(b.dataset.alt) pickRoute(b.dataset.route); else { S.rPref = b.dataset.route; setRoute(b.dataset.route); } });
   $('s-ml').addEventListener('input', () => { S.mlTouched = true; });

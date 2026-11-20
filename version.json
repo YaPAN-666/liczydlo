@@ -1,8 +1,16 @@
 {
- "wersja": "1.22.1",
+ "wersja": "1.23.0",
  "data": "2026-11-17",
  "zmiany": [
-  "Usunięty napis „kill-switch enabled app” – w stopce „O aplikacji” i na ekranie blokady.",
+  "Oprysk krok po kroku, nr serii i termin ważności szczepionki oraz nowe stabilizatory wody (AVI Stabilizator, Cevamune) – na podstawie materiałów szkoleniowych MSD i Ceva.",
+  "– Oprysk: lista „Krok po kroku – oprysk” (przed, w kurniku, po): czysty opryskiwacz bez detergentów, chłodna woda destylowana, przyciemnione światło, 30–40 cm nad głowami, wentylacja, mycie dysz i filtrów, kontrola PCR 2–5 dni po szczepieniu.",
+  "– Nr serii i „Ważna do” z etykiety fiolki trafiają do raportu; szczepionka po terminie ważności daje czerwone ostrzeżenie. Po zmianie szczepionki pola się czyszczą.",
+  "– Stabilizatory wody: AVI Stabilizator (saszetka 27 g na 1000 l, 10–15 min przed szczepionką) i Cevamune (1 tabletka na 100 l, 15 min przed) – ilość liczona na całą wodę.",
+  "– Kropla TX-VK6 i TX-VK18 przy 3 bar z karty dysz MSD/Birchmeier (144 i 216 µm). Gdy kropla nie mieści się w oknie z ChPLW, aplikacja podaje konkretne ciśnienie (np. Gallivac IB88: TX-VK6 od 2,5 bar), a gdy żadne nie pasuje – mówi to wprost.",
+  "– Szczepienie w wodzie: woda chłodna (MSD: w linii 8–15 °C, Ceva: w zbiorniku 14–20 °C), naczynia plastikowe, mieszadło plastikowe lub drewniane.",
+  "– TX-VK18: Ceva podaje ją do szczepienia pierwotnego IB/ND w upale i suchym powietrzu (gruba kropla wolniej paruje). TX-VS2 (106–114 µm) nie wystarczy do okien ≤100 µm – aplikacja o tym mówi.",
+  "– Pisklęta: lanca 30–40 cm nad głowami (MSD i większość ChPLW), wcześniej 30–50 cm.",
+  "(1.22.1) Usunięty napis „kill-switch enabled app” – w stopce „O aplikacji” i na ekranie blokady.",
   "(1.22.0) Czytelniejsze pola na telefonie i pora roku dobierana do daty zabiegu.",
   "(1.22.0) Pola „Na co szczepimy” i „Czym (szczepionka)” na całą szerokość – pełne nazwy chorób i szczepionek, bez ucinania.",
   "(1.22.0) Krótsze opisy na listach: „Lanca”, „Dmuchawa – 1”, „Dmuchawa – 2”, „Dozownik (%)”, „Zbiornik / beczka” – mieszczą się na ekranie telefonu (szczegóły w podpowiedzi pod polem).",

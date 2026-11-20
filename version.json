@@ -1,8 +1,10 @@
 {
- "wersja": "1.23.1",
+ "wersja": "1.23.2",
  "data": "2026-11-20",
  "zmiany": [
-  "Oprysk krok po kroku: nowy krok „całe stado w jednym zabiegu” (Ceva) i ciągła numeracja kroków.",
+  "Primun Newcastle HB1 – dane z nowej ChPLW i ulotki (02/2026): wentylacja wyłączona lub zmniejszona na 20–30 min, oprysk z 30–40 cm, woda czysta i zimna.",
+  "– Primun Newcastle HB1: odporność po 3 tyg. (brojlery do 4. tyg., przyszłe nioski do 10. tyg.), odczyny oddechowe 7–10 dni po szczepieniu, wydalanie szczepu do 10 dni, higiena przy świeżo szczepionych kurczętach.",
+  "(1.23.1) Oprysk krok po kroku: nowy krok „całe stado w jednym zabiegu” (Ceva) i ciągła numeracja kroków.",
   "(1.23.0) Oprysk krok po kroku, nr serii i termin ważności szczepionki oraz nowe stabilizatory wody (AVI Stabilizator, Cevamune) – na podstawie materiałów szkoleniowych MSD i Ceva.",
   "(1.23.0) – Oprysk: lista „Krok po kroku – oprysk” (przed, w kurniku, po): czysty opryskiwacz bez detergentów, chłodna woda destylowana, przyciemnione światło, 30–40 cm nad głowami, całe stado w jednym zabiegu, wentylacja, mycie dysz i filtrów, kontrola PCR 2–5 dni po szczepieniu.",
   "(1.23.0) – Nr serii i „Ważna do” z etykiety fiolki trafiają do raportu; szczepionka po terminie ważności daje czerwone ostrzeżenie. Po zmianie szczepionki pola się czyszczą.",

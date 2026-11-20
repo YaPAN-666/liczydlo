@@ -970,13 +970,17 @@ const VACCINES = [
  sch:'Oko od 4. dnia; powtórnie po 3–4 tyg. (oko lub woda); nioski 3. dawka w 10.–12. tyg.',
  r:{oko:{ml:30, bird:'1 kropla = 1 dawka', water:'woda do wstrzykiwań'},
     woda:{rule:'ageTable', rows:[{a:21,b:28,l:[25,30]},{a:70,b:999,l:[40,40]}], thirst:'średnio 1,5 h', milk:'2,5 g/l (lub tiosiarczan sodu 15 mg/l)', note:'Bez dezynfekcji wody 48 h przed i 24 h po; tylko naczynia plastikowe. ChPLW nie podaje ilości dla 5.–9. tygodnia – wtedy zmierz zużycie.'}}},
-{id:'primun-nd-hb1', n:'Primun Newcastle HB1', m:'Laboratorios Calier', t:'żywa', dz:['ND'], s:'B1 Hitchner', sp:['kury'], st:'v', src:[RPL(39735)],
- min:{kury:1}, minT:'od 1. dnia życia', pk:[1000,5000], use:'2 h', wd:'0 dni',
- lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać z innymi produktami.',
- sch:'Brojlery: jedno szczepienie od 1. dnia. Przyszłe nioski: 1. dzień + 3 tyg. później.',
- r:{spray:{byAge:[{to:1,l:'jednodniowe',ml:[250,250]},{l:'starsze',ml:[500,500]}], d:[100,null], dRep:[50,80], note:'Szczepienie pierwotne: gruba kropla ≥100 µm; powtórne: drobna kropla 50–80 µm.'},
-    woda:{rule:'measured', h:2, thirst:'2–4 h', milk:'2–4 g/l (lub 20–40 ml/l mleka)', note:'Objętość wg wcześniejszego zużycia wody.'},
-    oko:{ml:50, bird:'50 µl (ptaki >14 d) lub 2 × 25 µl (1–14 d)', water:'sól fizjologiczna lub jałowa woda destylowana'}}},
+{id:'primun-nd-hb1', n:'Primun Newcastle HB1', m:'Laboratorios Calier', t:'żywa', pf:'liofilizat do sporządzania zawiesiny', dz:['ND'], s:'ND Hitchner B1, 10^6,0–10^7,0 EID50', sp:['kury'], st:'v', src:[RPL(39735, '02/2026'), RPLC(39735)], ma:'2723/17',
+ min:{kury:1}, minT:'od 1. dnia życia (brojlery i przyszłe nioski)', pk:[1000,5000], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Nie w okresie nieśności ani 4 tyg. przed.', mix:'Nie mieszać z innymi produktami; inne szczepionki przed lub po – decyzja indywidualna.',
+ sch:'Brojlery: jedno szczepienie od 1. dnia (odporność do 4. tyg.). Przyszłe nioski: 1. dzień i 3 tyg. później (odporność do 10. tyg.). Odporność po 3 tyg. od każdej dawki.',
+ safe:'Przy świeżo szczepionych kurczętach higiena: zmiana odzieży, rękawice, czyszczenie i dezynfekcja butów; odchody i ściółkę usuwać ostrożnie – szczep szczepionkowy utrzymuje się w środowisku do 10 dni. Po dostaniu się do oka – do lekarza z ulotką.',
+ ae:'Bardzo często objawy oddechowe 7–10 dni po szczepieniu, trwają do 5 dni. Szczep szczepionkowy wydalany do 10 dni – ograniczyć kontakt z kurczętami nieszczepionymi i o obniżonej odporności.',
+ od:'Dawka 10 razy większa – tylko objawy jak po szczepieniu.',
+ store:'2–8°C (także transport), chronić przed światłem, nie zamrażać; roztwór chronić przed słońcem i temperaturą >25°C. Otwartą fiolkę zużyć od razu i w całości.',
+ r:{spray:{byAge:[{to:1,l:'pisklęta jednodniowe',ml:[250,250]},{l:'ptaki starsze',ml:[500,500]}], d:[100,null], dRep:[50,80], dist:'30–40 cm', water:'czysta, zimna; sprzęt bez detergentów, środków dezynfekcyjnych i jonów metali', note:'Ulotka PL (02/2026): 250 ml na 1000 piskląt jednodniowych, 500 ml na 1000 starszych (dysza na grubą kroplę); szczepienie pierwotne gruba kropla ≥100 µm, powtórne drobna 50–80 µm; ptaki razem przy słabym świetle; wentylację (klimatyzację) wyłączyć lub zmniejszyć na ok. 20–30 min.'},
+    woda:{rule:'measured', h:2, thirst:'2–4 h (wg wieku i temperatury)', milk:'2–4 g/l odtłuszczonego mleka (lub 20–40 ml/l chudego mleka)', note:'Objętość wg wcześniejszego zużycia wody; więcej poideł na czas szczepienia.'},
+    oko:{ml:50, bird:'1–14 dni i mniejsze rasy: 2 krople po 25 µl (oko + nozdrze); >14 dni: 1 kropla 50 µl', water:'sól fizjologiczna lub jałowa woda destylowana', note:'Ulotka PL: 1000 dawek w 50 ml; kalibrowany kroplomierz.'}}},
 {id:'nobilis-nd-clone30', n:'Nobilis ND Clone 30', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa', pf:'liofilizat i rozpuszczalnik do sporządzania zawiesiny na oczy i nozdrza lub do podania w wodzie do picia', dz:['ND'], s:'Clone 30', sp:['kury'], st:'v', src:[RPL(18357, '06/2026')], ma:'851/99',
  min:{kury:1}, minT:'od 1. dnia życia (oprysk piskląt jednodniowych); ulotka PL – tylko kury', pk:[1000,2500,5000,10000], use:'2 h po rozpuszczeniu', wd:'0 dni',
  lay:'Ulotka: nie dotyczy.', mix:'Nie mieszać (poza rozpuszczalnikiem). Tego samego dnia, bez mieszania: Innovax-ILT, Innovax-ND-IBD i Innovax-ND-ILT (pisklęta jednodniowe) oraz Nobilis IB Ma5 (wg ulotki IB Ma5). Inne – decyzja indywidualna.',
@@ -1764,7 +1768,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.23.1';
+const APP_VERSION = '1.23.2';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};

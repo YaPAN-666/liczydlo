@@ -1,4 +1,4 @@
-LICZYDŁO APP – wersja 1.23.1
+LICZYDŁO APP – wersja 1.23.2
 =====================================
 
 Zawartość folderu „liczydlo”:

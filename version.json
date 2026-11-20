@@ -1,9 +1,14 @@
 {
- "wersja": "1.23.2",
+ "wersja": "1.24.0",
  "data": "2026-11-20",
  "zmiany": [
-  "Primun Newcastle HB1 – dane z nowej ChPLW i ulotki (02/2026): wentylacja wyłączona lub zmniejszona na 20–30 min, oprysk z 30–40 cm, woda czysta i zimna.",
-  "– Primun Newcastle HB1: odporność po 3 tyg. (brojlery do 4. tyg., przyszłe nioski do 10. tyg.), odczyny oddechowe 7–10 dni po szczepieniu, wydalanie szczepu do 10 dni, higiena przy świeżo szczepionych kurczętach.",
+  "Podgląd wielkości kropli w karcie oprysku: widełki z ChPLW i kropla przy wybranej dyszy i ciśnieniu – od razu widać, czy ustawienie jest poprawne.",
+  "– Skala 0–300 µm: zielone widełki z ChPLW (szczepienie pierwotne), niebieskie – szczepienie powtórne, kreskowane – poniżej 50 µm (krople parują).",
+  "– Pas dyszy z punktami ciśnień (2, 3, 4, 6 bar) i drugi pas dla porównania (TX-VK6 / TX-VK18); kropla przesuwa się płynnie po zmianie ciśnienia lub dyszy.",
+  "– Ocena na pierwszy rzut oka: „✓ w widełkach ChPLW” albo „✗ za gruba / za drobna o … µm” z podpowiedzią, jakie ciśnienie lub dyszę ustawić; działa już przed wpisaniem liczby ptaków.",
+  "– Nowy kafelek „Kropla” w wyniku (zielony / czerwony) i wiersz „Kropla” w raporcie.",
+  "(1.23.2) Primun Newcastle HB1 – dane z nowej ChPLW i ulotki (02/2026): wentylacja wyłączona lub zmniejszona na 20–30 min, oprysk z 30–40 cm, woda czysta i zimna.",
+  "(1.23.2) – Primun Newcastle HB1: odporność po 3 tyg. (brojlery do 4. tyg., przyszłe nioski do 10. tyg.), odczyny oddechowe 7–10 dni po szczepieniu, wydalanie szczepu do 10 dni, higiena przy świeżo szczepionych kurczętach.",
   "(1.23.1) Oprysk krok po kroku: nowy krok „całe stado w jednym zabiegu” (Ceva) i ciągła numeracja kroków.",
   "(1.23.0) Oprysk krok po kroku, nr serii i termin ważności szczepionki oraz nowe stabilizatory wody (AVI Stabilizator, Cevamune) – na podstawie materiałów szkoleniowych MSD i Ceva.",
   "(1.23.0) – Oprysk: lista „Krok po kroku – oprysk” (przed, w kurniku, po): czysty opryskiwacz bez detergentów, chłodna woda destylowana, przyciemnione światło, 30–40 cm nad głowami, całe stado w jednym zabiegu, wentylacja, mycie dysz i filtrów, kontrola PCR 2–5 dni po szczepieniu.",

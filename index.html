@@ -328,6 +328,70 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6px 0}details.chlog .list{margin-top:6px}
 
 .adocs{border:1px solid var(--line,#d7ddd8);border-radius:10px;padding:8px 12px;margin:10px 0 0;display:grid;gap:6px}.adocs legend{font-weight:600;font-size:.9rem;padding:0 4px}.adocs .chk{display:flex;gap:8px;align-items:flex-start;font-size:.9rem}
+
+/* Podgląd kropli (oprysk): skala 0–300 µm, widełki ChPLW, pas dyszy z ciśnieniami, kropla przy bieżącym ustawieniu */
+.row > .dropviz{grid-column:1/-1}
+.dropviz{--dvc:var(--muted);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px 10px;background:var(--surface);display:grid;gap:6px;transition:border-color .3s,background-color .3s}
+.dropviz.dv-ok{--dvc:var(--ok);border-color:var(--ok)}
+.dropviz.dv-bad{--dvc:var(--bad);border-color:var(--bad)}
+.dropviz.dv-warn{--dvc:var(--warn);border-color:var(--warn)}
+.dv-head{display:flex;align-items:center;justify-content:space-between;gap:6px 10px;flex-wrap:wrap}
+.dv-t{font-size:.84rem;font-weight:600;color:var(--ink)}
+.dv-st{font-size:.82rem;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--surface-2);color:var(--muted);transition:background-color .3s,color .3s}
+.dv-ok .dv-st{background:var(--ok-soft);color:var(--ok)}
+.dv-bad .dv-st{background:var(--bad-soft);color:var(--bad)}
+.dv-warn .dv-st{background:var(--warn-soft);color:var(--warn)}
+.dv-plot{position:relative;height:120px;margin:0 14px 0 8px}
+.dv-track{position:absolute;left:0;right:0;top:38px;height:24px;border-radius:5px;overflow:hidden;background-color:var(--surface-2);
+  background-image:repeating-linear-gradient(90deg,transparent 0,transparent calc(16.6667% - 1px),var(--line) calc(16.6667% - 1px),var(--line) 16.6667%)}
+.dv-track > i{position:absolute;top:0;bottom:0}
+.dv-mist{left:0;width:16.6667%;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--bad) 22%,transparent) 0 4px,transparent 4px 8px)}
+.dv-win{background:var(--ok-soft);background:color-mix(in srgb,var(--ok) 30%,transparent);transition:left .45s ease,width .45s ease}
+.dv-win.open-r{background:linear-gradient(90deg,color-mix(in srgb,var(--ok) 30%,transparent) 65%,transparent)}
+.dv-win.open-l{background:linear-gradient(270deg,color-mix(in srgb,var(--ok) 30%,transparent) 65%,transparent)}
+.dv-rep{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--info) 45%,transparent) 0 3px,color-mix(in srgb,var(--info) 15%,transparent) 3px 6px);transition:left .45s ease,width .45s ease}
+.dv-brk{position:absolute;top:33px;height:34px;pointer-events:none;transition:left .45s ease,width .45s ease}
+.dv-brk::before,.dv-brk::after{content:"";position:absolute;top:0;bottom:0;width:7px;border:3px solid var(--ok)}
+.dv-brk::before{left:-1.5px;border-right:0;border-radius:3px 0 0 3px}
+.dv-brk::after{right:-1.5px;border-left:0;border-radius:0 3px 3px 0}
+.dv-brk.open-l::before,.dv-brk.open-r::after{display:none}
+.dv-brk.assumed::before,.dv-brk.assumed::after{border-style:dashed}
+.dv-axis{position:absolute;left:0;right:0;top:68px;height:14px}
+.dv-axis span{position:absolute;top:0;transform:translateX(-50%);font:500 .68rem/1 var(--f-mono);color:var(--muted);white-space:nowrap}
+.dv-axis span.first{transform:none}
+.dv-axis span.last{transform:translateX(-100%)}
+.dv-axis span.w{color:var(--ok);font-weight:700}
+.dv-axis span.r{color:var(--info);font-weight:700}
+.dv-lane{position:absolute;border-radius:4px;transition:left .45s ease,width .45s ease}
+.dv-lane.sel{top:88px;height:6px;background:var(--muted)}
+.dv-lane.alt{top:111px;height:3px;background:var(--line)}
+.dv-dot{position:absolute;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:var(--surface);border:1.5px solid var(--muted);transition:left .45s ease}
+.dv-lane.alt .dv-dot{width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-color:var(--line)}
+.dv-dot b{position:absolute;top:8px;left:50%;transform:translateX(-50%);font:500 .66rem/1 var(--f-mono);color:var(--muted)}
+.dv-dot.on{width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border:2.5px solid var(--surface);background:var(--dvc);box-shadow:0 0 0 1.5px var(--dvc)}
+.dv-dot.on b{top:10px;color:var(--ink);font-weight:700}
+.dv-nm{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);font-size:.7rem;font-weight:600;color:var(--muted);white-space:nowrap}
+.dv-lane.alt .dv-nm{font-weight:400;font-size:.66rem}
+.dv-mk{position:absolute;top:0;left:0;width:0;height:62px;color:var(--dvc);z-index:2;transition:left .45s cubic-bezier(.3,.8,.3,1)}
+.dv-v{position:absolute;top:0;left:0;transform:translateX(-50%);padding:2px 8px;border-radius:999px;background:var(--dvc);color:var(--surface);font:600 .8rem/1.2 var(--f-mono);white-space:nowrap;transition:background-color .3s}
+.dv-mk svg{position:absolute;top:20px;left:-6px;width:12px;height:16px;fill:currentColor;transform-origin:50% 100%}
+.dv-line{position:absolute;top:37px;left:-1px;width:2px;height:25px;background:currentColor;border-radius:1px}
+.dv-bad .dv-mk svg{animation:dvPulse 1.3s ease-in-out infinite}
+@keyframes dvPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.dv-tip{margin:0;font-size:.84rem;line-height:1.4;color:var(--ink)}
+.dv-tip:empty{display:none}
+.dv-bad .dv-tip{color:var(--bad);font-weight:600}
+.dv-leg{display:flex;flex-wrap:wrap;gap:3px 12px;font-size:.72rem;color:var(--muted)}
+.dv-leg span{display:inline-flex;align-items:center;gap:5px}
+.dv-leg .sw{display:inline-block;width:16px;height:9px;border-radius:2px}
+.dv-leg .sw.w{background:color-mix(in srgb,var(--ok) 30%,transparent);border:2px solid var(--ok);border-top:0;border-bottom:0}
+.dv-leg .sw.w.a{border-style:dashed}
+.dv-leg .sw.r{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--info) 45%,transparent) 0 3px,color-mix(in srgb,var(--info) 15%,transparent) 3px 6px)}
+.dv-leg .sw.m{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--bad) 30%,transparent) 0 3px,transparent 3px 6px)}
+.tile.t-ok{border-color:var(--ok);background:var(--ok-soft)}
+.tile.t-bad{border-color:var(--bad);background:var(--bad-soft)}
+.tile.t-bad b{color:var(--bad)}
+@media (prefers-reduced-motion:reduce){.dv-mk,.dv-win,.dv-rep,.dv-brk,.dv-lane,.dv-dot{transition:none}.dv-bad .dv-mk svg{animation:none}}
 </style>
 </head>
 <body>
@@ -603,6 +667,19 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
           <label id="s-qp-wrap" hidden>Pomiar przy ciśnieniu (bar)
             <select id="s-qp"></select>
             <span class="hint">przy innym ciśnieniu roboczym wydatek zostanie przeliczony</span></label>
+          <div class="dropviz dv-none" id="s-drop">
+            <div class="dv-head"><span class="dv-t">Wielkość kropli (µm)</span><span class="dv-st" id="dv-st" aria-live="polite"></span></div>
+            <div class="dv-plot" id="dv-plot" role="img" aria-label="Wielkość kropli">
+              <div class="dv-track"><i class="dv-mist"></i><i class="dv-rep" id="dv-rep" hidden></i><i class="dv-win" id="dv-win" hidden></i></div>
+              <i class="dv-brk" id="dv-brk" hidden></i>
+              <div class="dv-axis" id="dv-axis"></div>
+              <div class="dv-lane sel" id="dv-l1" hidden></div>
+              <div class="dv-lane alt" id="dv-l2" hidden></div>
+              <div class="dv-mk" id="dv-mk" hidden><b class="dv-v" id="dv-v"></b><svg viewBox="0 0 14 18" aria-hidden="true"><path d="M7 0C7 0 0 8.4 0 11.4a7 7 0 0 0 14 0C14 8.4 7 0 7 0Z"/></svg><i class="dv-line"></i></div>
+            </div>
+            <p class="dv-tip" id="dv-tip"></p>
+            <div class="dv-leg" id="dv-leg"></div>
+          </div>
           <label>Liczba sektorów
             <input id="s-sec" type="number" min="1" max="6" step="1" placeholder="1" inputmode="numeric">
             <span class="hint">sektor = część kurnika jednego technika; wentylacja jedna na cały kurnik</span></label>
@@ -754,7 +831,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
       <div class="card">
         <h2>Zapisz raport</h2>
         <label>Uwagi (opcjonalnie)
-          <textarea id="notes" rows="2" placeholder="seria szczepionki, warunki, odczyny"></textarea></label>
+          <textarea id="notes" rows="2" placeholder="warunki w kurniku, odczyny, uwagi"></textarea></label>
         <div class="tools">
           <button class="btn" type="button" id="save">Zapisz raport</button>
           <button class="btn ghost" type="button" id="copy">Kopiuj</button>
@@ -1768,7 +1845,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.23.2';
+const APP_VERSION = '1.24.0';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -1973,6 +2050,94 @@ function spraySteps(o){
     <h4 class="steps-h">Przed szczepieniem</h4><ol class="steps">${L(before)}</ol>
     <h4 class="steps-h">W kurniku</h4><ol class="steps" start="${n1 + 1}">${L(day)}</ol>
     <h4 class="steps-h">Po szczepieniu</h4><ol class="steps" start="${n1 + n2 + 1}">${L(after)}</ol></details>`;
+}
+// Kropla przy bieżących ustawieniach oprysku (z formularza): VMD jednej dyszy, okno z ChPLW, ocena i podpowiedź
+// ciśnienia albo dyszy. Wspólne dla podglądu, komunikatów, kafelka i raportu.
+function dropState(v){
+  const sp = (v && v.r && v.r.spray) || {}, SP = sprayer(), mode = $('s-mode').value, p = num('s-p', 0);
+  const noz = nozOf($('s-noz').value), NZ = NOZ[noz], src = FLOW_SRC[$('s-src').value] ? $('s-src').value : 'teejet';
+  const qm = pf($('s-q').value), qp0 = pf($('s-qp').value), qp = isNum(qp0) && qp0 > 0 ? qp0 : p;
+  const est = src === 'reczne' && isNum(qm) && qm > 0 && p > 0, q1 = est ? qm * Math.sqrt(p / qp) : NaN;   // pomiar własny – kropla szacowana z wydatku
+  const vAt = pp => est ? vmdEst(pp, q1 * Math.sqrt(pp / p), noz) : vmdAt(pp, noz);
+  // Ciśnienia do sprawdzenia: z lancą do 6 bar (i do maks. opryskiwacza), z dmuchawą do 3 bar
+  const PS = [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6].filter(pp => pp <= (mode === 'lanca' ? Math.min(6, SP.pMax || 6) : 3) + 1e-9);
+  const D = {sp, noz, NZ, p, mode, est, PS, vAt, vmd:p > 0 ? vAt(p) : null, win:sp.d || null, state:null, lvl:null, tip:''};
+  if(D.win && D.vmd){
+    const [lo, hi] = D.win, vmd = D.vmd;
+    if(isNum(lo) && vmd < lo){
+      const pDown = PS.filter(pp => pp < p - 1e-9 && inWin(D.win, vAt(pp))).pop();   // najmniejsza zmiana ciśnienia
+      const p18 = noz === 'vk6' ? PS.find(pp => inWin(D.win, vmdAt(pp, 'vk18'))) : null;
+      Object.assign(D, {state:'fine', lvl:'warn', tip:pDown ? `Obniż ciśnienie do ${fmtT(pDown)} bar – kropla ok. ${fmt0(vAt(pDown))} µm.`
+        : p18 ? `${NZ.n} nawet przy 2 bar daje ok. ${fmt0(vmdAt(2, noz))} µm – grubszą kroplę da TX-VK18${mode !== 'lanca' ? ' na lancy' : ''} (ok. ${fmt0(vmdAt(p18, 'vk18'))} µm przy ${fmtT(p18)} bar).`
+        : `Opryskiwacz Birchmeier z TX-VK6 albo TX-VK18 daje najwyżej ok. ${fmt0(vmdAt(2, 'vk18'))} µm (TX-VK18 przy 2 bar) – sposób podania ustal z lekarzem weterynarii.`});
+    }
+    else if(isNum(hi) && vmd > hi){
+      // TX-VK18 nawet przy 6 bar daje ok. 188 µm – ciśnieniem nie da się zejść do okna
+      const fix = noz === 'vk18' && vmdAt(6, 'vk18') > hi && [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6].some(pp => inWin(D.win, vmdAt(pp, 'vk6')));
+      const pUp = fix ? null : PS.find(pp => pp > p + 1e-9 && inWin(D.win, vAt(pp)));
+      Object.assign(D, {state:'coarse', lvl:noz === 'vk18' ? 'bad' : 'warn', tip:fix ? 'Z tą szczepionką użyj dyszy TX-VK6 – TX-VK18 nawet przy 6 bar daje ok. 188 µm.'
+        : pUp ? `Podnieś ciśnienie do ${fmtT(pUp)} bar – kropla ok. ${fmt0(vAt(pUp))} µm.` : `Decyzja lekarza.${hi < VS2_D[0] ? ` Uwaga: ${VS2_TXT}.` : ''}`});
+    }
+    else D.state = 'ok';
+  }
+  return D;
+}
+// Podgląd kropli: skala 0–300 µm, widełki z ChPLW (zielone), szczepienie powtórne (niebieskie), poniżej 50 µm
+// krople parują (Ceva), pas wybranej dyszy z punktami ciśnień i kropla przy bieżącym ustawieniu.
+// Elementy są stałe (body.html), zmieniają się tylko położenia – przesunięcia animuje CSS (transition).
+const DV_MAX = 300;
+function dvX(um){ return Math.max(0, Math.min(100, um / DV_MAX * 100)); }
+function dvBand(el, w){   // w = [od, do] – null: otwarte z tej strony
+  if(!w || (!isNum(w[0]) && !isNum(w[1]))){ el.hidden = true; return; }
+  const lo = isNum(w[0]) ? w[0] : 0, hi = isNum(w[1]) ? w[1] : DV_MAX;
+  el.hidden = false; el.style.left = dvX(lo) + '%'; el.style.width = (dvX(hi) - dvX(lo)) + '%';
+  el.classList.toggle('open-l', !isNum(w[0])); el.classList.toggle('open-r', !isNum(w[1]));
+}
+function dvLane(el, pts, cur, name, labels){   // pts: [[bar, µm]]
+  const ok = pts.filter(x => isNum(x[1]));
+  if(!ok.length){ el.hidden = true; return; }
+  const lo = Math.min(...ok.map(x => x[1])), hi = Math.max(...ok.map(x => x[1]));
+  el.hidden = false; el.style.left = dvX(lo) + '%'; el.style.width = Math.max(0.8, dvX(hi) - dvX(lo)) + '%';
+  const rel = um => hi > lo ? (um - lo) / (hi - lo) * 100 : 50;
+  el.innerHTML = ok.map(([pp, um]) => `<i class="dv-dot${isNum(cur) && Math.abs(pp - cur) < 1e-9 ? ' on' : ''}" style="left:${rel(um)}%">${labels && [2, 3, 4, 6].includes(pp) ? `<b>${pp}</b>` : ''}</i>`).join('')
+    + `<span class="dv-nm">${esc(name)}</span>`;
+}
+function dvRange(ps){   // [2,5; 3; 3,5] → „2,5–3,5”
+  const out = []; ps.forEach(x => { const l = out[out.length - 1]; if(l && Math.abs(x - l[1] - 0.5) < 1e-9) l[1] = x; else out.push([x, x]); });
+  return out.map(([a, b]) => a === b ? fmtT(a) : `${fmtT(a)}–${fmtT(b)}`).join(', ');
+}
+function dropViz(v, D){
+  if(!$('s-drop')) return;
+  const win = D.win, rep = D.sp.dRep || null, mikro = !!D.sp.mikro && !win, vmd = isNum(D.vmd) ? D.vmd : null;
+  const cls = !v ? 'none' : D.state === 'ok' ? 'ok' : D.state ? 'bad' : mikro && vmd ? 'warn' : 'none';
+  $('s-drop').className = 'dropviz dv-' + cls;
+  dvBand($('dv-win'), win); dvBand($('dv-brk'), win); dvBand($('dv-rep'), rep);
+  $('dv-brk').classList.toggle('assumed', !!D.sp.dAssumed);
+  const other = D.noz === 'vk6' ? 'vk18' : 'vk6';
+  dvLane($('dv-l1'), D.PS.map(pp => [pp, D.vAt(pp)]), D.p, D.NZ.n + (D.est ? ' (pomiar)' : ''), true);
+  dvLane($('dv-l2'), D.PS.map(pp => [pp, vmdAt(pp, other)]), null, NOZ[other].n, false);
+  // Oś co 50 µm; krawędzie widełek opisane kolorem pasa (wąskie widełki – jeden opis „150–170”)
+  const marks = [];
+  [[win, 'w'], [rep, 'r']].forEach(([w, c]) => {
+    const e = (w || []).filter(isNum).filter(x => !marks.some(m => m.x === x));
+    if(e.length === 2 && e[1] - e[0] < 26) marks.push({x:(e[0] + e[1]) / 2, t:`${e[0]}–${e[1]}`, c, near:e});
+    else e.forEach(x => marks.push({x, t:String(x), c, near:[x]}));
+  });
+  const base = [0, 50, 100, 150, 200, 250, 300].filter(x => !marks.some(m => m.near.some(y => Math.abs(y - x) < 16) || Math.abs(m.x - x) < 16))
+    .map(x => ({x, t:String(x), c:x === 0 ? 'first' : x === 300 ? 'last' : ''}));
+  $('dv-axis').innerHTML = [...base, ...marks].map(m => `<span class="${m.c}" style="left:${dvX(m.x)}%">${m.t}</span>`).join('');
+  $('dv-mk').hidden = !vmd;
+  if(vmd){ $('dv-mk').style.left = dvX(vmd) + '%'; $('dv-v').textContent = `${D.est ? 'ok. ' : ''}${fmt0(vmd)} µm`; }
+  const okP = win ? D.PS.filter(pp => inWin(win, D.vAt(pp))) : [];
+  const st = !v ? (noVac() ? 'wybierz szczepionkę' : 'spoza bazy – bez widełek') : !(D.p > 0) ? 'wybierz ciśnienie' : !vmd ? `brak danych kropli przy ${fmtT(D.p)} bar`
+    : D.state === 'ok' ? '✓ w widełkach ChPLW' : D.state === 'coarse' ? `✗ za gruba o ${fmt0(vmd - win[1])} µm` : D.state === 'fine' ? `✗ za drobna o ${fmt0(win[0] - vmd)} µm` : mikro ? '! ChPLW: mikrokrople' : 'ChPLW nie podaje µm';
+  $('dv-st').textContent = st;
+  $('dv-tip').textContent = !v ? 'Po wyborze szczepionki pokażę widełki kropli z jej ChPLW.' : !vmd ? (D.p > 0 ? 'Tabele kropli TeeJet obejmują 2–6 bar.' : '')
+    : D.state === 'ok' ? (okP.length === D.PS.length ? `${D.NZ.n} mieści się w widełkach w całym zakresie ${dvRange(D.PS)} bar.` : `${D.NZ.n} mieści się w widełkach przy ${dvRange(okP)} bar.`)
+    : D.state ? D.tip : mikro ? `${D.NZ.n} daje ok. ${fmt0(vmd)} µm – grubszą niż mikrokrople. Sposób podania ustal z lekarzem weterynarii.` : 'ChPLW nie podaje wielkości kropli – kropla tylko dla orientacji.';
+  $('dv-leg').innerHTML = [win ? `<span><i class="sw w${D.sp.dAssumed ? ' a' : ''}"></i>widełki ChPLW ${esc(fmtRange(win))} µm${rep ? ' – pierwotne' : ''}${D.sp.dAssumed ? ' (przyjęte)' : ''}</span>` : '',
+    rep ? `<span><i class="sw r"></i>powtórne ${esc(fmtRange(rep))} µm</span>` : '', '<span><i class="sw m"></i>poniżej 50 µm – parują</span>', '<span>liczby pod pasem dyszy – ciśnienie (bar)</span>'].filter(Boolean).join('');
+  $('dv-plot').setAttribute('aria-label', `Kropla ${vmd ? fmt0(vmd) + ' µm' : 'nieznana'}${win ? `, widełki ChPLW ${fmtRange(win)} µm` : ''} – ${st}`);
 }
 // Druga szczepionka do aparatu podwójnego: iniekcyjne dla tych ptaków, bez pierwszej; dawka z ChPLW przy zmianie
 function fillVac2(v, bird, dol){
@@ -2262,6 +2427,7 @@ function calc(){
   const kk = (v ? v.id : '') + '|' + route; if(S.knowKey !== kk){ S.knowKey = kk; renderKnow(v); }   // opis z ChPLW tylko po zmianie
   $('s-org-wrap').hidden = !(Math.round(num('s-os',1)) > 1 && Math.round(num('s-sec',1)) > 1);
   sprayerUI(); stabUI();   // granice ciśnienia, dmuchawa, podpowiedzi opryskiwacza i stabilizatora – także przed wpisaniem liczby ptaków
+  const DROP = route === 'spray' ? dropState(v) : null; if(DROP) dropViz(v, DROP);   // podgląd kropli – od razu po zmianie dyszy i ciśnienia
   const miss = [!bird && ['bird', S.spPick ? 'grupę ptaków' : 'rodzaj drobiu'], !ageKnown() && ['age', 'wiek'], noVac() && ['vac', 'szczepionkę'], !(birds > 0) && ['birds', 'liczbę ptaków']].filter(Boolean);
   if(miss.length){
     const R0 = {route, age, birds:0};
@@ -2321,6 +2487,8 @@ function calc(){
     if(k > 1) tiles.push({k:'Czas zabiegu', v:fmtMin(tw), s:`${k} ${plOsoba(k)} jednocześnie · ${C.n > 1 ? fmtMin(ts) + ' na sektor' : 'razem w jednym sektorze'}`});
     else tiles.push({k:'Czas oprysku', v:fmtMin(tw), s:nsec > 1 ? `${nsec} ${plSektor(nsec)} po ${fmtMin(ts)}` : 'czysty czas natrysku'});
     tiles.push({k:'Przepływ – ' + nzT, v:isNum(Q) ? fmt(Q,3) + ' l/min' : '–', s:(nn > 1 && isNum(q1) ? `${nn} × ${fmt(q1,3)} l/min · ` : '') + qsrc + (k > 1 ? ' · każdy opryskiwacz' : '')});
+    if(DROP && v){ const W = DROP.win; tiles.push({k:'Kropla', v:isNum(DROP.vmd) ? `${DROP.est ? 'ok. ' : ''}${fmt0(DROP.vmd)} µm` : '–', cls:DROP.state === 'ok' ? 't-ok' : DROP.state ? 't-bad' : '',
+      s:W ? `widełki ChPLW ${fmtRange(W)} µm${DROP.state === 'ok' ? ' · w widełkach' : DROP.state === 'coarse' ? ' · za gruba' : DROP.state === 'fine' ? ' · za drobna' : ''}` : 'ChPLW nie podaje wielkości kropli'}); }
     if(k > 1){
       const L = C.persons.map(o => V * o.share), same = L.every(x => Math.abs(x - L[0]) < 0.005);
       tiles.push({k:'Roztwór na osobę', v:same ? fmt(L[0],2) + ' l' : L.map(x => fmt(x,2)).join(' / ') + ' l', s:'całość rozpuść razem, potem rozlej'});
@@ -2384,27 +2552,12 @@ function calc(){
     if(sp.dRep && isNum(vmd0) && !inWin(sp.dRep, vmd0)) msgs.push(['warn', `ChPLW: szczepienie powtórne – drobna kropla ${fmtRange(sp.dRep)} µm. ${NZ.n} daje ok. ${fmt0(vmd0)} µm, więc nadaje się tylko do szczepienia pierwotnego (${fmtRange(sp.d)} µm). Do powtórnego potrzebny rozpylacz drobnokroplisty${sp.dRep[1] < VS2_D[0] ? ` – ${VS2_TXT}` : ''}.`]);
     if(sp.mikro && !sp.d) msgs.push(['warn', `ChPLW wymaga rozpylacza wytwarzającego mikrokrople (wielkości w µm nie podaje). ${NZ.n} daje kroplę ok. ${fmt0(vmd0)} µm – grubszą niż mikrokrople. Sposób podania ustal z lekarzem weterynarii.`]);
     if(allowed.length){ const lo = Math.min(...allowed.map(a => a[0])), hi = Math.max(...allowed.map(a => a[1])); if(ml < lo || ml > hi) msgs.push(['warn', `${fmtT(ml)} ml na 1000 dawek – poza zakresem z ChPLW (${fmtT(lo)}–${fmtT(hi)} ml).`]); }
-    const vmd = src === 'reczne' && isNum(q1) ? vmdEst(p, q1, noz) : vmdAt(p, noz);   // kropla zależy od jednej dyszy
-    if(sp.d && vmd){
-      const [lo, hi] = sp.d;
-      // Ciśnienia do sprawdzenia: z lancą do 6 bar (i do maks. opryskiwacza), z dmuchawą do 3 bar
-      const PS = [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6].filter(pp => pp <= (mode === 'lanca' ? Math.min(6, SP.pMax || 6) : 3) + 1e-9);
-      const vAt = pp => src === 'reczne' && isNum(q1) ? vmdEst(pp, q1 * Math.sqrt(pp / p), noz) : vmdAt(pp, noz);
-      if(isNum(lo) && vmd < lo){
-        const pDown = PS.filter(pp => pp < p - 1e-9 && inWin(sp.d, vAt(pp))).pop();   // najmniejsza zmiana ciśnienia
-        const p18 = noz === 'vk6' ? PS.find(pp => inWin(sp.d, vmdAt(pp, 'vk18'))) : null;
-        msgs.push(['warn', `Kropla ok. ${fmt0(vmd)} µm – drobniejsza niż w ChPLW (${fmtRange(sp.d)} µm).${pDown ? ` Obniż ciśnienie do ${fmtT(pDown)} bar – kropla ok. ${fmt0(vAt(pDown))} µm.`
-          : p18 ? ` ${NZ.n} nawet przy 2 bar daje ok. ${fmt0(vmdAt(2, noz))} µm – grubszą kroplę da TX-VK18${mode !== 'lanca' ? ' na lancy' : ''} (ok. ${fmt0(vmdAt(p18, 'vk18'))} µm przy ${fmtT(p18)} bar).`
-          : ` Opryskiwacz Birchmeier z TX-VK6 albo TX-VK18 daje najwyżej ok. ${fmt0(vmdAt(2, 'vk18'))} µm (TX-VK18 przy 2 bar) – sposób podania ustal z lekarzem weterynarii.`}`]);
-      }
-      else if(isNum(hi) && vmd > hi){
-        // TX-VK18 nawet przy 6 bar daje ok. 188 µm – ciśnieniem nie da się zejść do okna
-        const fix = noz === 'vk18' && vmdAt(6, 'vk18') > hi && [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6].some(pp => inWin(sp.d, vmdAt(pp, 'vk6')));
-        const pUp = fix ? null : PS.find(pp => pp > p + 1e-9 && inWin(sp.d, vAt(pp)));
-        msgs.push([noz === 'vk18' ? 'bad' : 'warn', `ChPLW wymaga kropli ${fmtRange(sp.d)} µm – ${NZ.n} daje grubszą (ok. ${fmt0(vmd)} µm).${fix ? ' Z tą szczepionką użyj dyszy TX-VK6 – TX-VK18 nawet przy 6 bar daje ok. 188 µm.' : pUp ? ` Podnieś ciśnienie do ${fmtT(pUp)} bar – kropla ok. ${fmt0(vAt(pUp))} µm.` : ` Decyzja lekarza.${hi < VS2_D[0] ? ` Uwaga: ${VS2_TXT}.` : ''}`}`]);
-      }
-      else msgs.push(['ok', `Kropla ok. ${fmt0(vmd)} µm – zgodna z ChPLW (${fmtRange(sp.d)} µm).${sp.dAssumed ? ` Uwaga: ${sp.dAssumed}.` : sp.dSrc ? ` Źródło: ${sp.dSrc}.` : ''}`]);
-    }
+    // Kropla: ta sama ocena co w podglądzie (dropState) – okno z ChPLW, podpowiedź ciśnienia albo dyszy
+    const D = DROP || dropState(v);
+    if(D.state === 'fine') msgs.push(['warn', `Kropla ok. ${fmt0(D.vmd)} µm – drobniejsza niż w ChPLW (${fmtRange(sp.d)} µm). ${D.tip}`]);
+    else if(D.state === 'coarse') msgs.push([D.lvl, `ChPLW wymaga kropli ${fmtRange(sp.d)} µm – ${NZ.n} daje grubszą (ok. ${fmt0(D.vmd)} µm). ${D.tip}`]);
+    else if(D.state === 'ok') msgs.push(['ok', `Kropla ok. ${fmt0(D.vmd)} µm – zgodna z ChPLW (${fmtRange(sp.d)} µm).${sp.dAssumed ? ` Uwaga: ${sp.dAssumed}.` : sp.dSrc ? ` Źródło: ${sp.dSrc}.` : ''}`]);
+    Object.assign(R, {vmd:isNum(D.vmd) ? D.vmd : null, dWin:sp.d || null, dState:D.state});
     if(sp.water) msgs.push(['info', 'Woda wg ChPLW: ' + sp.water + '.']);
     if(sp.dist) msgs.push(['info', `Bez dmuchawy: ${distTxt(sp.dist, 'nad ptakami')}.`]);
     if(!/mask|okular|gogl|ochron\w* oczu|hełm/i.test((v && v.safe) || '')) msgs.push(['info', 'Ochrona szczepiącego przy oprysku: maska na nos i usta oraz okulary ochronne (gogle) – wymagają ich ChPLW m.in. Poulvac TRT, Poulvac NDW, Nobilis ND Clone 30 i Primun Bronchitis H120. Po zabiegu umyj ręce i twarz.']);
@@ -2531,7 +2684,7 @@ function calc(){
 
   $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R) : '';
   const ord = {bad:0, warn:1, ok:2, info:3}; msgs.sort((a,b) => ord[a[0]] - ord[b[0]]);
-  $('tiles').innerHTML = tiles.map(t => `<div class="tile${t.main ? ' main' : ''}"><span>${esc(t.k)}</span><b>${esc(t.v)}</b><small>${esc(t.s || '')}</small></div>`).join('');
+  $('tiles').innerHTML = tiles.map(t => `<div class="tile${t.main ? ' main' : ''}${t.cls ? ' ' + t.cls : ''}"><span>${esc(t.k)}</span><b>${esc(t.v)}</b><small>${esc(t.s || '')}</small></div>`).join('');
   $('crew').innerHTML = crewH;
   $('msgs').innerHTML = msgs.map(([c,t]) => `<div class="msg ${c}">${esc(t)}</div>`).join('');
   $('res-sub').textContent = `${ROUTES[route]} · ${fmt0(birds)} ptaków`;
@@ -2638,6 +2791,7 @@ function reportText(){
     const k = R.persons || 1, n = R.sectors || 1, m = R.modId && S.mods[R.modId];
     const rows = [rkv('Woda', `${fmt(R.water_l,2)} l (${fmtT(R.ml1000)} ml na 1000)`), rkv('Opryskiwacz', R.sprayerName || 'Birchmeier REC 15 AC1'),
       rkv('Dysza', nnTxt(R.nozzles || 1, NOZ[nozOf(R.nozzle)].n)), rkv('Ciśnienie', fmtT(R.pressure) + ' bar'), rkv('Wydatek', `${fmt(R.flow,3)} l/min (${R.flowKey === 'reczne' ? 'pomiar' : 'TeeJet'})`),
+      isNum(R.vmd) ? rkv('Kropla', `ok. ${fmt0(R.vmd)} µm${R.dWin ? ` – ${R.dState === 'ok' ? 'w widełkach' : 'poza widełkami'} ChPLW (${fmtRange(R.dWin)} µm)` : ''}`) : null,
       rkv('Tryb pracy', String(R.mode || '').toLowerCase())];
     if(k > 1){
       rows.push(rkv('Czas zabiegu', fmtMin(R.minutes)), rkv('Osoby', `${k} – ${orgText(R.org, n)}`), n > 1 ? rkv('Sektory', `${n}, po ${fmtMin(R.sectorMin)}`) : null);

@@ -344,6 +344,16 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .dv-zoom svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .dv-zoom[aria-pressed="true"] .v{display:none}
 .dv-t{font-size:.84rem;font-weight:600;color:var(--ink)}
+.dv-ctl{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dv-seg,.dv-pst{display:inline-flex;align-items:stretch;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface-2)}
+.dv-ctl button{min-height:36px;min-width:36px;padding:0 8px;border:0;background:transparent;color:var(--muted);font:600 .74rem/1 var(--f-mono);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color .25s,color .25s}
+.dv-ctl button:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+.dv-seg button[aria-pressed="true"]{background:var(--dvc);color:var(--surface)}
+.dv-none .dv-seg button[aria-pressed="true"]{background:var(--ink)}
+.dv-pst button{font-size:1.1rem;color:var(--ink)}
+.dv-pst button:active,.dv-seg button:active{background:var(--line)}
+.dv-pst button:disabled{color:var(--line);cursor:default}
+.dv-pst output{display:inline-flex;align-items:center;justify-content:center;min-width:54px;padding:0 4px;font:700 .8rem/1 var(--f-mono);color:var(--ink);border-left:1px solid var(--line);border-right:1px solid var(--line)}
 .dv-st{font-size:.82rem;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--surface-2);color:var(--muted);transition:background-color .3s,color .3s}
 .dv-ok .dv-st{background:var(--ok-soft);color:var(--ok)}
 .dv-bad .dv-st{background:var(--bad-soft);color:var(--bad)}
@@ -704,6 +714,10 @@ label.need > :is(input,select){border-color:var(--warn);box-shadow:0 0 0 2px col
             <span class="hint">przy innym ciśnieniu roboczym wydatek zostanie przeliczony</span></label>
           <div class="dropviz dv-none" id="s-drop">
             <div class="dv-head"><span class="dv-t">Wielkość kropli (µm)</span><button type="button" class="dv-zoom" id="dv-zoom" aria-pressed="false" title="Przybliż zakres wokół widełek i pasa dyszy"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.7 12.7 17.5 17.5M6 8.5h5"/><path class="v" d="M8.5 6v5"/></svg><span>Przybliż</span></button><span class="dv-st" id="dv-st" aria-live="polite"></span></div>
+            <div class="dv-ctl" id="dv-ctl">
+              <div class="dv-seg" role="group" aria-label="Dysza"><button type="button" data-noz="vk6" aria-pressed="false">TX-VK6</button><button type="button" data-noz="vk18" aria-pressed="false">TX-VK18</button></div>
+              <div class="dv-pst" role="group" aria-label="Ciśnienie"><button type="button" data-dp="-1" aria-label="Niższe ciśnienie">−</button><output id="dv-p" aria-live="polite">– bar</output><button type="button" data-dp="1" aria-label="Wyższe ciśnienie">+</button></div>
+            </div>
             <div class="dv-plot" id="dv-plot" role="img" aria-label="Wielkość kropli">
               <div class="dv-track"><span class="dv-grid" id="dv-grid"></span><i class="dv-mist" id="dv-mist"></i><i class="dv-rep" id="dv-rep" hidden></i><i class="dv-win" id="dv-win" hidden></i></div>
               <i class="dv-brk" id="dv-brk" hidden></i>
@@ -1913,7 +1927,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.25.0';
+const APP_VERSION = '1.25.1';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2231,6 +2245,28 @@ function dvLane(el, pts, cur, name, sel, W){   // pts: [[bar, µm]]
   const nw = name.length * 6.6 + 10, right = (100 - b) / 100 * W >= nw || (100 - b) >= a;
   nm.style.left = right ? `calc(${b}% + 8px)` : 'auto'; nm.style.right = right ? 'auto' : `calc(${100 - a}% + 8px)`;
 }
+// Szybkie przełączniki nad wykresem: dysza i ciśnienie zmieniają te same pola co formularz (wynik liczy się od
+// nowa), a wykres płynnie przesuwa kroplę i pas dyszy. Ciśnienia – te, które dopuszcza wybrany opryskiwacz.
+function dvPList(){ return [...$('s-p').options].map(o => pf(o.value)).filter(x => isNum(x) && x > 0).sort((a, b) => a - b); }
+function dvCtlSync(D){
+  $('dv-ctl').querySelectorAll('[data-noz]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.noz === D.noz)));
+  const ps = dvPList(), p = D.p > 0 ? D.p : null;
+  $('dv-p').textContent = p ? `${fmtT(p)} bar` : '– bar';
+  $('dv-ctl').querySelector('[data-dp="-1"]').disabled = !ps.length || (p !== null && p <= ps[0] + 1e-9);
+  $('dv-ctl').querySelector('[data-dp="1"]').disabled = !ps.length || (p !== null && p >= ps[ps.length - 1] - 1e-9);
+}
+function dvCtlInit(){
+  $('dv-ctl').addEventListener('click', ev => {
+    const b = ev.target.closest('button'); if(!b || b.disabled) return;
+    if(b.dataset.noz){ if(nozOf($('s-noz').value) === b.dataset.noz) return; setNozzle(b.dataset.noz); saveEquipment(); calc(); return; }
+    const ps = dvPList(); if(!ps.length) return;
+    const p = num('s-p', 0), up = b.dataset.dp === '1';
+    // bez wybranego ciśnienia: start od 2 bar (początek zalecanego zakresu) albo najbliższego dostępnego
+    const nx = !(p > 0) ? (ps.find(x => x >= 2) ?? ps[0]) : up ? ps.find(x => x > p + 1e-9) : [...ps].reverse().find(x => x < p - 1e-9);
+    if(!isNum(nx)) return;
+    setP('s-p', nx); calc();
+  });
+}
 function dvRange(ps){   // [2,5; 3; 3,5] → „2,5–3,5”
   const out = []; ps.forEach(x => { const l = out[out.length - 1]; if(l && Math.abs(x - l[1] - 0.5) < 1e-9) l[1] = x; else out.push([x, x]); });
   return out.map(([a, b]) => a === b ? fmtT(a) : `${fmtT(a)}–${fmtT(b)}`).join(', ');
@@ -2246,6 +2282,7 @@ function dropViz(v, D){
   if(!keep) S.dvPan = null; else P.vmd = vmd;
   DV_R = keep ? P.r : auto;
   $('s-drop').className = 'dropviz dv-' + cls + (zoom ? ' dv-z' : '') + (zoom && DV_R[0] > 0.5 ? ' more-l' : '') + (zoom && DV_R[1] < DV_MAX - 0.5 ? ' more-r' : '') + ($('s-drop').classList.contains('dv-drag') ? ' dv-drag' : '');
+  dvCtlSync(D);
   const zb = $('dv-zoom'); zb.setAttribute('aria-pressed', String(zoom)); zb.lastChild.textContent = zoom ? 'Cała skala' : 'Przybliż';
   zb.title = zoom ? `Pokaż całą skalę 0–300 µm (teraz ${DV_R[0]}–${DV_R[1]} µm)` : 'Przybliż zakres wokół widełek i pasa dyszy';
   dvBand($('dv-mist'), [0, 50]); dvBand($('dv-win'), win); dvBand($('dv-brk'), win); dvBand($('dv-rep'), rep);
@@ -2279,7 +2316,7 @@ function dropViz(v, D){
   $('dv-tip').textContent = !v ? 'Po wyborze szczepionki pokażę widełki kropli z jej ChPLW.' : !vmd ? (D.p > 0 ? 'Tabele kropli TeeJet obejmują 2–6 bar.' : '')
     : D.state === 'ok' ? (okP.length === D.PS.length ? `${D.NZ.n} mieści się w widełkach w całym zakresie ${dvRange(D.PS)} bar.` : `${D.NZ.n} mieści się w widełkach przy ${dvRange(okP)} bar.`)
     : D.state ? D.tip : mikro ? `${D.NZ.n} daje ok. ${fmt0(vmd)} µm – grubszą niż mikrokrople. Sposób podania ustal z lekarzem weterynarii.` : 'ChPLW nie podaje wielkości kropli – kropla tylko dla orientacji.';
-  $('dv-leg').innerHTML = [win ? `<span><i class="sw w${D.sp.dAssumed ? ' a' : ''}"></i>widełki ChPLW ${esc(fmtRange(win))} µm${rep ? ' – pierwotne' : ''}${D.sp.dAssumed ? ' (przyjęte)' : ''}</span>` : '',
+  $('dv-leg').innerHTML = [win ? `<span><i class="sw w${D.sp.dAssumed ? ' a' : ''}"></i>widełki ChPLW ${esc(fmtRange(win))} µm${rep ? ' – pierwotne' : ''}${D.sp.dAssumed ? ' (przyjęte)' : ''}${!isNum(win[1]) ? ' – bez górnej granicy w ChPLW' : !isNum(win[0]) ? ' – bez dolnej granicy w ChPLW' : ''}</span>` : '',
     rep ? `<span><i class="sw r"></i>powtórne ${esc(fmtRange(rep))} µm</span>` : '', '<span><i class="sw m"></i>poniżej 50 µm – parują</span>', '<span>liczby pod pasem dyszy – ciśnienie (bar)</span>',
     `<span class="dv-hint">${zoom ? 'przesuń wykres palcem ← →, stuknij – cała skala' : 'stuknij wykres – przybliżenie'}</span>`].filter(Boolean).join('');
   $('dv-plot').setAttribute('aria-label', `Kropla ${vmd ? fmt0(vmd) + ' µm' : 'nieznana'}${win ? `, widełki ChPLW ${fmtRange(win)} µm` : ''} – ${st}`);
@@ -4477,7 +4514,7 @@ function bind(){
   $('i-site').addEventListener('change', () => { S.siteTouched = true; });
   ['a-adj', 'a-strain', 'a-lab', 'a-lot', 'a-exp', 'a-farm', 'a-wd', 'v-lot', 'v-exp'].forEach(id => $(id).addEventListener('input', () => scheduleCalc()));
   // Podgląd kropli: przybliżenie przyciskiem albo stuknięciem w wykres; po obrocie ekranu – opisy od nowa
-  $('dv-zoom').addEventListener('click', dvZoomToggle); $('dv-plot').addEventListener('click', () => { if(Date.now() - (S.dvDragged || 0) > 250) dvZoomToggle(); }); dvPanInit();
+  $('dv-zoom').addEventListener('click', dvZoomToggle); $('dv-plot').addEventListener('click', () => { if(Date.now() - (S.dvDragged || 0) > 250) dvZoomToggle(); }); dvPanInit(); dvCtlInit();
   document.addEventListener('click', e => { const b = e.target.closest('.need-go'); if(b) goField(b.dataset.f); });
   addEventListener('resize', () => { clearTimeout(S.dvRz); S.dvRz = setTimeout(() => { if(S.route === 'spray'){ const v = curVac(); dropViz(v, dropState(v)); } }, 200); });
   ['a-doc-cert', 'a-doc-instr', 'a-doc-order'].forEach(id => $(id).addEventListener('change', () => scheduleCalc()));

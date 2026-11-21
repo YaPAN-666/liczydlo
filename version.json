@@ -1,9 +1,12 @@
 {
- "wersja": "1.25.1",
+ "wersja": "1.26.0",
  "data": "2026-11-21",
  "zmiany": [
-  "Podgląd kropli: nad wykresem przełącznik dyszy (TX-VK6 / TX-VK18) i ciśnienie − / + – jednym stuknięciem widać, jak zmienia się kropla. Zmiana ustawia też dyszę i ciśnienie w formularzu, wynik liczy się od nowa.",
-  "– Widełki bez górnej granicy (ChPLW podaje tylko „gruba kropla” albo „≥ … µm”) są opisane w legendzie wprost.",
+  "Nowa dysza do wyboru: TX-VS2 (biała) – kropla 114 µm przy 2 bar i 106 µm przy 3 bar, wydatek 0,11–0,13 l/min na dyszę (karta dysz MSD/Birchmeier).",
+  "– TX-VS2 ma swój pas na wykresie kropli i przycisk w szybkim przełączniku dysz; gdy TX-VK6 daje za grubą kroplę, a TX-VS2 mieści się w widełkach z ChPLW, aplikacja to podpowiada.",
+  "– Ostrzeżenia dla TX-VS2: dane tylko dla 2–3 bar, trzy razy dłuższy oprysk niż TX-VK6, brak w tabeli dysz do dmuchawy AS 1200.",
+  "(1.25.1) Podgląd kropli: nad wykresem przełącznik dyszy i ciśnienie − / + – jednym stuknięciem widać, jak zmienia się kropla. Zmiana ustawia też dyszę i ciśnienie w formularzu.",
+  "(1.25.1) – Widełki bez górnej granicy (ChPLW podaje tylko „gruba kropla” albo „≥ … µm”) są opisane w legendzie wprost.",
   "(1.25.0) Aplikacja mówi, czego brakuje do obliczeń: puste pola konieczne mają pomarańczową ramkę, a w wyniku jest lista „Uzupełnij” z przyciskami do tych pól – zamiast zer w wodzie i czasie.",
   "(1.25.0) – Woda na 1000 dawek tylko dla opryskiwacza Birchmeier w kurniku: bez atomizerów i automatów z wylęgarni. Gdy ChPLW nie podaje ilości dla takiego sprzętu – pisklęta jednodniowe 250 ml, starsze 500 ml (jak w ChPLW Primun i Poulvac TRT), w granicach zakresu z ChPLW.",
   "(1.25.0) – Podgląd kropli: przybliżoną skalę przesuwasz palcem w lewo i w prawo; strzałki przy krawędziach pokazują, że skala ciągnie się dalej.",

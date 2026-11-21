@@ -348,8 +348,17 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .dv-ok .dv-st{background:var(--ok-soft);color:var(--ok)}
 .dv-bad .dv-st{background:var(--bad-soft);color:var(--bad)}
 .dv-warn .dv-st{background:var(--warn-soft);color:var(--warn)}
-.dv-plot{position:relative;height:120px;margin:0 14px 0 8px;cursor:zoom-in;-webkit-tap-highlight-color:transparent}
-.dv-z .dv-plot{cursor:zoom-out}
+.dv-plot{position:relative;height:120px;margin:0 14px 0 8px;cursor:zoom-in;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;
+  --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.5 1.5 6.5 7l-5 5.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.dv-z .dv-plot{cursor:grab;touch-action:pan-y}
+.dv-drag .dv-plot{cursor:grabbing}
+.dv-plot::before,.dv-plot::after{content:"";position:absolute;top:43px;width:8px;height:14px;background:var(--muted);opacity:0;transition:opacity .3s;pointer-events:none;-webkit-mask:var(--chev) center/contain no-repeat;mask:var(--chev) center/contain no-repeat}
+.dv-plot::before{left:-11px;transform:scaleX(-1)}
+.dv-plot::after{right:-12px}
+.more-l .dv-plot::before,.more-r .dv-plot::after{opacity:1}
+.dv-drag :is(.dv-mk,.dv-win,.dv-rep,.dv-brk,.dv-bar,.dv-mist,.dv-dot){transition:none}
+.dv-drag :is(.dv-axis span,.dv-grid i){animation:none}
+.dv-leg .dv-hint{font-style:italic}
 .dv-track{position:absolute;left:0;right:0;top:38px;height:24px;border-radius:5px;overflow:hidden;background-color:var(--surface-2)}
 .dv-grid i{position:absolute;top:0;bottom:0;width:1px;margin-left:-.5px;background:var(--line);animation:dvFade .35s ease}
 .dv-track > i{position:absolute;top:0;bottom:0}
@@ -404,6 +413,20 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .tile.t-bad{border-color:var(--bad);background:var(--bad-soft)}
 .tile.t-bad b{color:var(--bad)}
 @media (prefers-reduced-motion:reduce){.dv-mk,.dv-win,.dv-rep,.dv-brk,.dv-bar,.dv-mist,.dv-dot{transition:none}.dv-axis span,.dv-grid i{animation:none}.dv-bad .dv-mk svg{animation:none}}
+/* Dane konieczne do obliczeń: puste pole – pomarańczowa ramka; w wyniku lista „Uzupełnij” z przyciskami do pól */
+label.need{color:var(--warn);font-weight:600}
+label.need .hint{color:var(--muted);font-weight:400}
+#need:empty{display:none}
+#need{margin-bottom:10px}
+.tile.t-need{border-color:var(--warn);background:var(--warn-soft)}
+.tile.t-need b{color:var(--warn)}
+label.need > :is(input,select){border-color:var(--warn);box-shadow:0 0 0 2px color-mix(in srgb,var(--warn) 25%,transparent)}
+.birdpick.need #bird-h{color:var(--warn);font-weight:600}
+.birdpick.need :is(#sp-seg,#grp){outline:2px solid color-mix(in srgb,var(--warn) 45%,transparent);outline-offset:3px;border-radius:var(--r)}
+.msg.need{background:var(--warn-soft);border-left-color:var(--warn);color:var(--ink);line-height:2}
+.need-go{display:inline;margin:0 1px;padding:2px 9px;border:1px solid var(--warn);border-radius:999px;background:var(--surface);color:var(--ink);font:600 .86rem/1.4 var(--f-body);cursor:pointer}
+.need-go:hover{background:var(--warn);color:var(--surface)}
+.need-go:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 </style>
 </head>
 <body>
@@ -835,6 +858,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
       <div class="card" aria-live="polite">
         <div class="card-h"><h2>Wynik</h2><span class="note" id="res-sub"></span></div>
         <div id="farm-alert"></div>
+        <div class="msgs" id="need"></div>
         <div class="tiles" id="tiles"></div>
         <div id="crew"></div>
         <div class="msgs" id="msgs"></div>
@@ -1843,6 +1867,38 @@ function pickSpecies(sp){
   if(bk) setBird(''); else calc();   // inny gatunek – grupę wybiera się od nowa; wynik od razu prosi o grupę
 }
 // Brakujące pole: przy drobiu – pierwszy przycisk grupy (albo gatunku)
+// Dane konieczne do obliczeń w wybranej drodze podania. Bez nich nie ma wody, czasu ani dawki – zamiast zer wynik
+// pokazuje „–”, listę „Uzupełnij” z przyciskami do pól, a puste pola mają pomarańczową ramkę.
+const REQ_IDS = ['bird', 'age', 'vac', 'birds', 's-ml', 's-p', 's-q', 'w-pct', 'w-milk', 'o-ml', 'i-ml', 'i-vac2', 'i-ml2'];
+const REQ_WHAT = {spray:'wtedy policzę wodę i czas oprysku', woda:'wtedy policzę roztwór i stabilizator', oko:'wtedy policzę rozpuszczalnik', inj:'wtedy policzę objętość szczepionki'};
+function reqMissing(route, v){
+  const m = [];
+  if(route === 'spray'){
+    if(!(num('s-ml', 0) > 0)) m.push(['s-ml', 'wodę na 1000 dawek (ml)']);
+    if(!(num('s-p', 0) > 0)) m.push(['s-p', 'ciśnienie (bar)']);
+    if($('s-src').value === 'reczne' && !(pf($('s-q').value) > 0)) m.push(['s-q', 'zmierzony wydatek jednej dyszy (l/min)']);
+  }
+  if(route === 'woda'){
+    if($('w-mode').value === 'doz' && !(pf($('w-pct').value) > 0)) m.push(['w-pct', 'ustawienie dozownika (%)']);
+    if(stabId() === 'mleko' && !(num('w-milk', 0) > 0)) m.push(['w-milk', 'ilość mleka w proszku (g/l)']);
+  }
+  if(route === 'oko' && !(num('o-ml', 0) > 0)) m.push(['o-ml', 'rozpuszczalnik na 1000 dawek (ml)']);
+  if(route === 'inj'){
+    if(!(num('i-ml', 0) > 0)) m.push(['i-ml', `dawkę na ptaka (ml)${v && v.auto ? ' z etykiety serii' : ''}`]);
+    if($('i-app').value === '2'){ if(!$('i-vac2').value) m.push(['i-vac2', 'drugą szczepionkę']); else if(!(num('i-ml2', 0) > 0)) m.push(['i-ml2', 'dawkę drugiej szczepionki (ml)']); }
+  }
+  return m;
+}
+function reqBox(id){ return id === 'bird' ? document.querySelector('.birdpick') : ($(id) && $(id).closest('label')); }
+function markReq(miss){ const ids = new Set(miss.map(m => m[0])); REQ_IDS.forEach(id => { const b = reqBox(id); if(b) b.classList.toggle('need', ids.has(id)); }); }
+function needHTML(miss, what){
+  return `<div class="msg need">Uzupełnij: ${miss.map(m => `<button type="button" class="need-go" data-f="${esc(m[0])}">${esc(m[1])}</button>`).join(', ')} – ${esc(what)}.</div>`;
+}
+function goField(id){
+  const b = reqBox(id), el = id === 'bird' ? (document.querySelector('#grp [data-bird]') || document.querySelector('#sp-seg [data-sp]')) : $(id);
+  if(b) b.scrollIntoView({block:'center', behavior:'smooth'});
+  if(el) setTimeout(() => { try { el.focus({preventScroll:true}); } catch(e){ el.focus(); } }, 250);
+}
 function focusField(id){ const el = id === 'bird' ? (document.querySelector('#grp [data-bird]') || document.querySelector('#sp-seg [data-sp]')) : $(id); if(el) el.focus(); }
 // Iniekcja wg ChPLW dla tych ptaków i wieku: dawka i miejsce z r.inj, zmieniane po kolei przez reguły r.inj.by
 // (g – gatunek, b – rodzaje ptaków, from/to – wiek w dniach). Wynik: ml, site, l (opis reguły), warn.
@@ -1857,7 +1913,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.24.1';
+const APP_VERSION = '1.25.0';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2102,8 +2158,25 @@ const DV_MAX = 300, DV_ZKEY = 'liczydlo.kropla.zoom.v1';
 let DV_R = [0, DV_MAX], DV_AXIS = '';
 function dvZoomGet(){ if(typeof S.dvZoom !== 'boolean'){ try { S.dvZoom = localStorage.getItem(DV_ZKEY) === '1'; } catch(e){ S.dvZoom = false; } } return S.dvZoom; }
 function dvZoomToggle(){
-  S.dvZoom = !dvZoomGet(); try { localStorage.setItem(DV_ZKEY, S.dvZoom ? '1' : '0'); } catch(e){}
+  S.dvZoom = !dvZoomGet(); S.dvPan = null; try { localStorage.setItem(DV_ZKEY, S.dvZoom ? '1' : '0'); } catch(e){}
   const v = curVac(); dropViz(v, dropState(v));
+}
+// Przesuwanie przybliżonej skali palcem (albo myszą) w lewo i w prawo – w granicach 0–300 µm. Przesunięcie zostaje,
+// dopóki po zmianie ustawień kropla mieści się w widoku; inaczej skala wraca do kropli.
+function dvPanInit(){
+  const plot = $('dv-plot'); let st = null;
+  plot.addEventListener('pointerdown', e => { if(!dvZoomGet() || (e.pointerType === 'mouse' && e.button !== 0)) return; st = {x:e.clientX, r:DV_R.slice(), id:e.pointerId, on:false}; });
+  plot.addEventListener('pointermove', e => {
+    if(!st || e.pointerId !== st.id) return;
+    const dx = e.clientX - st.x;
+    if(!st.on){ if(Math.abs(dx) < 6) return; st.on = true; try { plot.setPointerCapture(e.pointerId); } catch(_){} $('s-drop').classList.add('dv-drag'); }
+    const W = plot.clientWidth || 300, span = st.r[1] - st.r[0], a = Math.max(0, Math.min(DV_MAX - span, st.r[0] - dx / W * span));
+    S.dvPan = {key:S.dvAuto, r:[a, a + span], vmd:S.dvLast && S.dvLast.D.vmd};
+    if(S.dvLast) dropViz(S.dvLast.v, S.dvLast.D);
+    if(e.cancelable) e.preventDefault();
+  });
+  const end = e => { if(!st || e.pointerId !== st.id) return; if(st.on){ S.dvDragged = Date.now(); $('s-drop').classList.remove('dv-drag'); } st = null; };
+  plot.addEventListener('pointerup', end); plot.addEventListener('pointercancel', end);
 }
 // Wycinek skali: pas wybranej dyszy, bieżąca kropla i krawędzie widełek z ChPLW, z zapasem; co najmniej 40 µm
 function dvZoomRange(D){
@@ -2130,6 +2203,7 @@ function dvFit(items, W, cw){   // podziałka (pri 1) trzyma się dalej od opis�
   const kept = [];
   [...items].sort((a, b) => b.pri - a.pri || a.x - b.x).forEach(it => {
     const w = it.t.length * cw, cx = it.al === 'l' ? it.x / 100 * W + w / 2 : it.al === 'r' ? it.x / 100 * W - w / 2 : it.x / 100 * W;
+    if(it.tick && (cx - w / 2 < -6 || cx + w / 2 > W + 10)) return;
     if(kept.every(k => Math.abs(k.cx - cx) >= (k.w + w) / 2 + (it.tick && !k.tick ? 10 : 3))) kept.push(Object.assign({}, it, {w, cx}));
   });
   return kept;
@@ -2165,9 +2239,13 @@ function dropViz(v, D){
   if(!$('s-drop')) return;
   const win = D.win, rep = D.sp.dRep || null, mikro = !!D.sp.mikro && !win, vmd = isNum(D.vmd) ? D.vmd : null;
   const cls = !v ? 'none' : D.state === 'ok' ? 'ok' : D.state ? 'bad' : mikro && vmd ? 'warn' : 'none';
-  const zoom = dvZoomGet(), W = $('dv-plot').clientWidth || 300;
-  DV_R = zoom ? dvZoomRange(D) : [0, DV_MAX];
-  $('s-drop').className = 'dropviz dv-' + cls + (zoom ? ' dv-z' : '');
+  const zoom = dvZoomGet(), W = $('dv-plot').clientWidth || 300, auto = zoom ? dvZoomRange(D) : [0, DV_MAX];
+  S.dvLast = {v, D}; S.dvAuto = auto.join('-');
+  // przesunięta skala zostaje, jeśli zakres się nie zmienił, a kropla po zmianie ustawień jest w widoku
+  const P = S.dvPan, keep = zoom && P && P.key === S.dvAuto && (!vmd || P.vmd === vmd || (vmd >= P.r[0] && vmd <= P.r[1]));
+  if(!keep) S.dvPan = null; else P.vmd = vmd;
+  DV_R = keep ? P.r : auto;
+  $('s-drop').className = 'dropviz dv-' + cls + (zoom ? ' dv-z' : '') + (zoom && DV_R[0] > 0.5 ? ' more-l' : '') + (zoom && DV_R[1] < DV_MAX - 0.5 ? ' more-r' : '') + ($('s-drop').classList.contains('dv-drag') ? ' dv-drag' : '');
   const zb = $('dv-zoom'); zb.setAttribute('aria-pressed', String(zoom)); zb.lastChild.textContent = zoom ? 'Cała skala' : 'Przybliż';
   zb.title = zoom ? `Pokaż całą skalę 0–300 µm (teraz ${DV_R[0]}–${DV_R[1]} µm)` : 'Przybliż zakres wokół widełek i pasa dyszy';
   dvBand($('dv-mist'), [0, 50]); dvBand($('dv-win'), win); dvBand($('dv-brk'), win); dvBand($('dv-rep'), rep);
@@ -2202,7 +2280,8 @@ function dropViz(v, D){
     : D.state === 'ok' ? (okP.length === D.PS.length ? `${D.NZ.n} mieści się w widełkach w całym zakresie ${dvRange(D.PS)} bar.` : `${D.NZ.n} mieści się w widełkach przy ${dvRange(okP)} bar.`)
     : D.state ? D.tip : mikro ? `${D.NZ.n} daje ok. ${fmt0(vmd)} µm – grubszą niż mikrokrople. Sposób podania ustal z lekarzem weterynarii.` : 'ChPLW nie podaje wielkości kropli – kropla tylko dla orientacji.';
   $('dv-leg').innerHTML = [win ? `<span><i class="sw w${D.sp.dAssumed ? ' a' : ''}"></i>widełki ChPLW ${esc(fmtRange(win))} µm${rep ? ' – pierwotne' : ''}${D.sp.dAssumed ? ' (przyjęte)' : ''}</span>` : '',
-    rep ? `<span><i class="sw r"></i>powtórne ${esc(fmtRange(rep))} µm</span>` : '', '<span><i class="sw m"></i>poniżej 50 µm – parują</span>', '<span>liczby pod pasem dyszy – ciśnienie (bar)</span>'].filter(Boolean).join('');
+    rep ? `<span><i class="sw r"></i>powtórne ${esc(fmtRange(rep))} µm</span>` : '', '<span><i class="sw m"></i>poniżej 50 µm – parują</span>', '<span>liczby pod pasem dyszy – ciśnienie (bar)</span>',
+    `<span class="dv-hint">${zoom ? 'przesuń wykres palcem ← →, stuknij – cała skala' : 'stuknij wykres – przybliżenie'}</span>`].filter(Boolean).join('');
   $('dv-plot').setAttribute('aria-label', `Kropla ${vmd ? fmt0(vmd) + ' µm' : 'nieznana'}${win ? `, widełki ChPLW ${fmtRange(win)} µm` : ''} – ${st}`);
 }
 // Druga szczepionka do aparatu podwójnego: iniekcyjne dla tych ptaków, bez pierwszej; dawka z ChPLW przy zmianie
@@ -2423,13 +2502,37 @@ function pickRoute(r){
 }
 // Zmiana wieku: lista chorób i szczepionek dla nowego wieku, dostępne drogi podania
 function refreshGuides(){ fillDz(); fillVac({keep:true, notify:true}); buildRoutes(); }
+// Woda na 1000 dawek dla opryskiwacza Birchmeier w kurniku (lanca albo dmuchawa AS 1200). Z ChPLW bierzemy tylko to, co
+// dotyczy takiego sprzętu – bez atomizerów, zamgławiaczy i automatów w wylęgarni. Gdy ChPLW podaje zakres, wybieramy
+// w jego granicach wartość najbliższą praktyce dla opryskiwacza plecakowego: pisklęta jednodniowe 250 ml, starsze
+// 500 ml (ChPLW Primun – Calier; Poulvac TRT i Poulvac IB Primer – Zoetis: opryskiwacz plecakowy, ściółka 500 ml).
+// Gdy ChPLW nie podaje ilości dla tego sprzętu – te same 250 / 500 ml, z adnotacją „przyjęto”.
+function bmMl(age){ return age <= 1 ? 250 : 500; }
+function sprayFarmOpt(x){ return !x.fine && !/wylęgarn|automat|atomizer|zamgław/i.test(x.l); }
+function sprayFarm(sp){   // zakresy ml z ChPLW, które dotyczą opryskiwacza w kurniku (bez atomizerów i wylęgarni)
+  if(!sp) return [];
+  if(sp.ml) return [sp.ml];
+  if(sp.opts) return sp.opts.filter(sprayFarmOpt).map(x => x.ml);
+  if(sp.byAge){ const by = sp.byAge.filter(x => !/wylęgarn/i.test(x.l)); return (by.length ? by : sp.byAge).map(x => x.ml); }
+  return [];
+}
 function sprayDefault(v, age){
-  const sp = v && v.r ? v.r.spray : null;
-  if(!sp || !(sp.ml || sp.opts || sp.byAge)) return {ml:250, hint: v ? 'ChPLW (w bazie) nie podaje objętości – wpisz wg ulotki' : 'wpisz wg ulotki szczepionki'};
-  // domyślnie ilość dla grubej kropli (opryskiwacz), nie dla atomizera / aerozolu
-  if(sp.opts){ const co = sp.opts.filter(x => !x.fine), o = co.find(x => /ściółka/.test(x.l)) || co[0] || sp.opts[0]; return {ml:o.ml[0], hint:'ChPLW: ' + sp.opts.map(x => `${x.l} ${fmtRange(x.ml)} ml`).join('; ')}; }
-  if(sp.byAge){ const o = sp.byAge.find(x => isNum(x.to) && age <= x.to) || sp.byAge[sp.byAge.length-1]; return {ml:o.ml[0], hint:'ChPLW: ' + sp.byAge.map(x => `${x.l} ${fmtRange(x.ml)} ml`).join('; ')}; }
-  return {ml:(sp.ml[0] === sp.ml[1] || age <= 3) ? sp.ml[0] : sp.ml[1], hint:`ChPLW: ${fmtRange(sp.ml)} ml na 1000 dawek`};
+  const sp = v && v.r ? v.r.spray : null, bm = bmMl(age), who = age <= 1 ? 'pisklęta jednodniowe' : 'ptaki starsze';
+  const fit = r => Math.min(r[1], Math.max(r[0], bm)), rng = (r, ml) => r[0] === r[1] ? `${r[0]} ml` : `${fmtRange(r)} ml – dla Birchmeiera ${ml} ml (${who})`;
+  const assumed = `Birchmeier w kurniku: ${bm} ml (${who}; ${age <= 1 ? 'starsze 500 ml' : 'pisklęta jednodniowe 250 ml'}). ChPLW nie podaje ilości wody dla opryskiwacza w kurniku – przyjęto jak w ChPLW Primun (Calier) i Poulvac TRT (Zoetis).`;
+  if(sp && sp.opts){
+    const co = sp.opts.filter(sprayFarmOpt);
+    const o = co.find(x => /plecak/i.test(x.l) && /ściółk/i.test(x.l)) || co.find(x => /ściółk|kurnik/i.test(x.l)) || co.find(x => /plecak|opryskiwacz|gruba/i.test(x.l)) || co[0];
+    if(!o) return {ml:bm, hint:assumed};
+    const ml = fit(o.ml); return {ml, hint:`ChPLW – ${o.l}: ${rng(o.ml, ml)}`};
+  }
+  if(sp && sp.byAge){
+    const by = sp.byAge.filter(x => !/wylęgarn/i.test(x.l)), list = by.length ? by : sp.byAge;
+    const o = list.find(x => isNum(x.to) && age <= x.to) || list[list.length - 1], ml = fit(o.ml);
+    return {ml, hint:`ChPLW – ${o.l}: ${rng(o.ml, ml)}`};
+  }
+  if(sp && sp.ml){ const ml = fit(sp.ml); return {ml, hint:`ChPLW: ${rng(sp.ml, ml)}`}; }
+  return {ml:bm, hint:v ? assumed : 'wpisz wg ulotki szczepionki'};
 }
 function applyDefaults(){
   const v = curVac(); const r = (v && v.r) || {}; const age = Math.max(0, Math.round(num('age',0)));
@@ -2440,7 +2543,7 @@ function applyDefaults(){
   $('w-dose-wrap').hidden = !(w && w.rule === 'choice');
   if(w && w.rule === 'choice') fillSelect($('w-dose'), w.opts.map((o,i) => ({v:String(i), l:o.l})));
   const milk = w ? parseMilk(w.milk) : null;
-  $('w-milk').value = milk != null ? milk : 0;
+  $('w-milk').value = milk != null ? milk : '';
   $('w-milk-hint').textContent = w && w.milk ? 'ChPLW: ' + w.milk : (v ? 'ChPLW (w bazie) nie podaje ilości mleka – zwykle 2–2,5 g/l odtłuszczonego (Ceva 2,5 g/l)' : 'zwykle 2–4 g/l');
   if(r.oko && isNum(r.oko.ml)) $('o-ml').value = r.oko.ml;
   $('auto-wrap').hidden = !(v && v.auto);
@@ -2499,12 +2602,13 @@ function calc(){
     const R0 = {route, age, birds:0};
     $('farm-alert').innerHTML = route === 'spray' && !noVac() && bird ? farmAlert(R0) : '';
     $('tiles').innerHTML = ''; $('crew').innerHTML = '';
-    $('msgs').innerHTML = `<div class="msg info">Uzupełnij: ${esc(miss.map(m => m[1]).join(', '))} – wtedy policzę fiolki, wodę i czas.</div>`;
+    $('msgs').innerHTML = needHTML(miss, 'wtedy policzę fiolki, wodę i czas'); markReq(miss); $('need').innerHTML = '';
     $('res-sub').textContent = noVac() ? '' : ROUTES[route];
     S.last = {v, bird:bird || {l:''}, R:R0, msgs:[], empty:true, miss};
     return;
   }
   let crewH = '';
+  const reqM = reqMissing(route, v); markReq(reqM);   // dane konieczne dla tej drogi podania
   const loss = route === 'inj' ? Math.max(0, num('i-loss',0)) : 0;
   const need = Math.ceil(birds * (1 + loss/100));
   const bp = bestPacks(need, parsePacks($('packs').value));
@@ -2548,16 +2652,17 @@ function calc(){
     const q1 = src === 'reczne' ? (measured && p > 0 ? qm * Math.sqrt(p / qp) : NaN) : tab ? flowTab(tab, p) : NaN, Q = q1 * nn;
     const qsrc = src === 'reczne' ? (measured ? `pomiar własny jednej dyszy ${fmt(qm,3)} l/min przy ${fmtT(qp)} bar` : 'pomiar własny') : `${fs.n}, ${fmtT(p)} bar`;
     // t1 – jeden opryskiwacz na całą objętość; tw – cały zabieg (od startu do końca); ts – najdłuższy sektor
-    const V = birds / 1000 * ml / 1000, t1 = Q > 0 ? V / Q : NaN, tw = t1 * C.wall, ts = t1 * C.sec;
-    tiles.push({k:'Woda', v:fmt(V,2) + ' l', s:`${fmtT(ml)} ml na 1000 ptaków`, main:true});
-    if(k > 1) tiles.push({k:'Czas zabiegu', v:fmtMin(tw), s:`${k} ${plOsoba(k)} jednocześnie · ${C.n > 1 ? fmtMin(ts) + ' na sektor' : 'razem w jednym sektorze'}`});
-    else tiles.push({k:'Czas oprysku', v:fmtMin(tw), s:nsec > 1 ? `${nsec} ${plSektor(nsec)} po ${fmtMin(ts)}` : 'czysty czas natrysku'});
-    tiles.push({k:'Przepływ – ' + nzT, v:isNum(Q) ? fmt(Q,3) + ' l/min' : '–', s:(nn > 1 && isNum(q1) ? `${nn} × ${fmt(q1,3)} l/min · ` : '') + qsrc + (k > 1 ? ' · każdy opryskiwacz' : '')});
+    const V = ml > 0 ? birds / 1000 * ml / 1000 : NaN, t1 = Q > 0 ? V / Q : NaN, tw = t1 * C.wall, ts = t1 * C.sec;
+    const nTxt = reqM.length ? 'uzupełnij: ' + reqM.map(m => m[1]).join(', ') : '';
+    tiles.push({k:'Woda', v:isNum(V) ? fmt(V,2) + ' l' : '–', s:isNum(V) ? `${fmtT(ml)} ml na 1000 ptaków` : 'wpisz wodę na 1000 dawek', main:true, cls:isNum(V) ? '' : 't-need'});
+    if(k > 1) tiles.push({k:'Czas zabiegu', v:fmtMin(tw), s:isNum(tw) ? `${k} ${plOsoba(k)} jednocześnie · ${C.n > 1 ? fmtMin(ts) + ' na sektor' : 'razem w jednym sektorze'}` : nTxt, cls:isNum(tw) ? '' : 't-need'});
+    else tiles.push({k:'Czas oprysku', v:fmtMin(tw), s:!isNum(tw) ? nTxt : nsec > 1 ? `${nsec} ${plSektor(nsec)} po ${fmtMin(ts)}` : 'czysty czas natrysku', cls:isNum(tw) ? '' : 't-need'});
+    tiles.push({k:'Przepływ – ' + nzT, v:isNum(Q) ? fmt(Q,3) + ' l/min' : '–', s:!(p > 0) ? 'wybierz ciśnienie' : (nn > 1 && isNum(q1) ? `${nn} × ${fmt(q1,3)} l/min · ` : '') + qsrc + (k > 1 ? ' · każdy opryskiwacz' : ''), cls:isNum(Q) ? '' : 't-need'});
     if(DROP && v){ const W = DROP.win; tiles.push({k:'Kropla', v:isNum(DROP.vmd) ? `${DROP.est ? 'ok. ' : ''}${fmt0(DROP.vmd)} µm` : '–', cls:DROP.state === 'ok' ? 't-ok' : DROP.state ? 't-bad' : '',
       s:W ? `widełki ChPLW ${fmtRange(W)} µm${DROP.state === 'ok' ? ' · w widełkach' : DROP.state === 'coarse' ? ' · za gruba' : DROP.state === 'fine' ? ' · za drobna' : ''}` : 'ChPLW nie podaje wielkości kropli'}); }
     if(k > 1){
       const L = C.persons.map(o => V * o.share), same = L.every(x => Math.abs(x - L[0]) < 0.005);
-      tiles.push({k:'Roztwór na osobę', v:same ? fmt(L[0],2) + ' l' : L.map(x => fmt(x,2)).join(' / ') + ' l', s:'całość rozpuść razem, potem rozlej'});
+      if(isNum(V)) tiles.push({k:'Roztwór na osobę', v:same ? fmt(L[0],2) + ' l' : L.map(x => fmt(x,2)).join(' / ') + ' l', s:'całość rozpuść razem, potem rozlej'});
       if(isNum(t1)) crewH = crewHTML(C, V, t1);
     }
     $('s-org-hint').textContent = C.razem ? 'wszyscy razem, sektor po sektorze' : 'każdy technik w swoim sektorze, jednocześnie';
@@ -2569,7 +2674,6 @@ function calc(){
     Object.assign(R, {ml1000:ml, water_l:V, pressure:p, flow:Q, flowPer:q1, nozzles:nn, nnLance:nozN('lanca', $('s-nn').value), flowSrc:qsrc, flowKey:src, flowQ:src === 'reczne' && measured ? qm : null, flowQbar:src === 'reczne' && measured ? qp : null,
       nozzle:noz, sprayer:SP.id, sprayerName:sprayerName(SP), tank:tankL || null, pMax:SP.pMax || null, mode:MODE_L[mode] || $('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, season:sea, ventAfter:vent, minutes:tw, sprayMin:t1, sectorMin:ts,
       crew:k > 1 && isNum(t1) ? C.persons.map(o => ({no:o.no, sec:o.sec, l:V * o.share, min:t1 * o.work})) : null});
-    if(src === 'reczne' && !measured) msgs.push(['warn','Wpisz zmierzony przepływ jednej dyszy, inaczej nie policzę czasu oprysku.']);
     if(noz === 'vk18'){
       // Dysza TX-VK18: ostrzeżenia, gdy parametry nie pasują do szczepienia
       msgs.push(['warn', 'TX-VK18: do szczepienia drobiu Birchmeier zaleca dyszę TXVK-6 (tabela dysz do AS 1200). TX-VK18 ma ok. 3 razy większy wydatek i grubszą kroplę (ok. 190–235 µm przy 2–6 bar).']);
@@ -2602,22 +2706,16 @@ function calc(){
     if(k > 1 && C.uneven) msgs.push(['warn', `Nierówny podział: ${C.persons.map(o => `osoba ${o.no} – ${secText(o.sec)}`).join(', ')}. Osoby skończą w różnym czasie – lepiej liczba sektorów podzielna przez liczbę osób albo praca razem, sektor po sektorze.`]);
     if(k > 1) msgs.push(['info', `${k} ${plOsoba(k)}: rozpuść wszystkie fiolki w całej objętości wody, wymieszaj i dopiero wtedy rozlej do opryskiwaczy wg tabeli. Opryskiwacze ustaw tak samo – ta sama dysza i ciśnienie.`]);
     if(mode !== 'lanca' && p > 3) msgs.push(['bad','Z dmuchawą pracuj przy 2,0–2,5 bar, maksymalnie 3 bar.']);
-    else if(!(p > 0)) msgs.push(['warn', 'Wpisz ciśnienie robocze (zalecane 2,0–3,0 bar).']);
-    else if(p < 2 || p > (mode === 'lanca' && dropWin(v) ? 6 : 3)) msgs.push(['warn', mode === 'lanca' && dropWin(v) ? `Zalecane ciśnienie dla ${NZ.n}: 2,0–3,0 bar; z lancą do 6 bar, jeśli kropla mieści się w oknie z ChPLW.` : `Zalecane ciśnienie dla ${NZ.n}: 2,0–2,5 bar (maks. 3).`]);
+    else if(p > 0 && (p < 2 || p > (mode === 'lanca' && dropWin(v) ? 6 : 3))) msgs.push(['warn', mode === 'lanca' && dropWin(v) ? `Zalecane ciśnienie dla ${NZ.n}: 2,0–3,0 bar; z lancą do 6 bar, jeśli kropla mieści się w oknie z ChPLW.` : `Zalecane ciśnienie dla ${NZ.n}: 2,0–2,5 bar (maks. 3).`]);
     if(mode !== 'lanca' && dol <= 7) msgs.push(['warn','Pisklęta w 1. tygodniu szczep bez dmuchawy (lanca 30–40 cm nad ptakami).']);
     if(mode === 'dm2') msgs.push(['warn','Poziom 2 tylko, gdy zasięg poziomu 1 nie wystarcza.']);
     if(mode !== 'lanca' && noz === 'vk6' && src !== 'reczne') msgs.push(['warn', `Tabela dysz Birchmeiera do AS 1200 podaje dla TXVK-6 ${fmt(flowTab(TXVK6_BIRCH_AS, p > 0 ? p : 2),2)} l/min przy ${fmtT(p > 0 ? p : 2)} bar – ok. 2 razy więcej niż katalog TeeJet dla jednej dyszy (${fmt(flowTab(TXVK6_TEEJET, p > 0 ? p : 2),2)} l/min). Przed szczepieniem zmierz wydatek dyszy w dmuchawie cylindrem (60 s) i wpisz go jako „pomiar własny”.`]);
     if(mode !== 'lanca') msgs.push(['info','Z dmuchawą: ptaki ok. 1–3 m od wylotu, strumień skośnie w dół nad stado. Dmuchawa AS 1200 pracuje w temperaturze 5–30°C (instrukcja AS 1200) – w cieplejszym kurniku sprawdź jej działanie.']);
-    const allowed = sp.ml ? [sp.ml] : (sp.opts || sp.byAge || []).map(o => o.ml);
+    const allowed = sprayFarm(sp);
     const vmd0 = src === 'reczne' && isNum(q1) ? vmdEst(p, q1, noz) : vmdAt(p > 0 ? p : 2.5, noz);
-    // Ilości dla drobnej kropli (atomizer, aerozol do szczepienia powtórnego) dotyczą innego urządzenia niż opryskiwacz grubokroplisty
-    if(sp.opts && sp.opts.some(o => o.fine)){
-      const fi = sp.opts.filter(o => o.fine), co = sp.opts.filter(o => !o.fine);
-      msgs.push(['warn', `ChPLW podaje ${fi.map(o => `${fmtRange(o.ml)} ml (${o.l})`).join('; ')} na 1000 dawek dla drobnej kropli – to inne urządzenie. Opryskiwacz Birchmeier z dyszą ${NZ.n} daje grubą kroplę (ok. ${fmt0(vmd0)} µm)${co.length ? ` – do niego pasuje: ${co.map(o => `${o.l} ${fmtRange(o.ml)} ml`).join('; ')}` : ''}.${co.length && co.every(o => /wylęgarn/.test(o.l)) ? ' Dla opryskiwacza w kurniku ChPLW nie podaje ilości wody (zależy od aparatu i utrzymania ptaków) – ilość ustal z lekarzem weterynarii.' : ''}`]);
-    }
     if(sp.dRep && isNum(vmd0) && !inWin(sp.dRep, vmd0)) msgs.push(['warn', `ChPLW: szczepienie powtórne – drobna kropla ${fmtRange(sp.dRep)} µm. ${NZ.n} daje ok. ${fmt0(vmd0)} µm, więc nadaje się tylko do szczepienia pierwotnego (${fmtRange(sp.d)} µm). Do powtórnego potrzebny rozpylacz drobnokroplisty${sp.dRep[1] < VS2_D[0] ? ` – ${VS2_TXT}` : ''}.`]);
     if(sp.mikro && !sp.d) msgs.push(['warn', `ChPLW wymaga rozpylacza wytwarzającego mikrokrople (wielkości w µm nie podaje). ${NZ.n} daje kroplę ok. ${fmt0(vmd0)} µm – grubszą niż mikrokrople. Sposób podania ustal z lekarzem weterynarii.`]);
-    if(allowed.length){ const lo = Math.min(...allowed.map(a => a[0])), hi = Math.max(...allowed.map(a => a[1])); if(ml < lo || ml > hi) msgs.push(['warn', `${fmtT(ml)} ml na 1000 dawek – poza zakresem z ChPLW (${fmtT(lo)}–${fmtT(hi)} ml).`]); }
+    if(allowed.length && ml > 0){ const lo = Math.min(...allowed.map(a => a[0])), hi = Math.max(...allowed.map(a => a[1])); if(ml < lo || ml > hi) msgs.push(['warn', `${fmtT(ml)} ml na 1000 dawek – poza zakresem z ChPLW (${fmtT(lo)}–${fmtT(hi)} ml).`]); }
     // Kropla: ta sama ocena co w podglądzie (dropState) – okno z ChPLW, podpowiedź ciśnienia albo dyszy
     const D = DROP || dropState(v);
     if(D.state === 'fine') msgs.push(['warn', `Kropla ok. ${fmt0(D.vmd)} µm – drobniejsza niż w ChPLW (${fmtRange(sp.d)} µm). ${D.tip}`]);
@@ -2658,8 +2756,7 @@ function calc(){
     if(doz){
       // Dozownik proporcjonalny: w wiadrze cała szczepionka; dozownik dodaje pct% roztworu do każdego litra wody,
       // więc roztworu ma być tyle, ile wody ptaki wypiją w czasie szczepienia × pct%.
-      if(!(pct > 0)) msgs.push(['warn', 'Wpisz ustawienie dozownika w %.']);
-      else {
+      if(pct > 0){
         if(pct < 0.2 || pct > 2) msgs.push(['warn', `Ustawienie ${fmtT(pct)}% – sprawdź zakres swojego dozownika (np. Dosatron D25RE2: 0,2–2%).`]);
         msgs.push(['info', `Dozownik ${fmtT(pct)}%: ${fmt(stock, 1)} l roztworu zejdzie razem z ${fmt0(V)} l wody. Wszystkie fiolki i stabilizator idą do wiadra – szczepionka trafia do linii tylko przez dozownik.`]);
         if(stab.txt && isNum(stab.qty)) msgs.push(['info', `Stabilizator liczy się na całą wodę, która przejdzie przez dozownik (${stab.rule}), więc w wiadrze jest go ${fmt0(100 / pct)} razy więcej niż w poidłach${STAB[sid].per && (STAB[sid].g || STAB[sid].u) ? ` – przy ${fmtT(pct)}% to ${STAB[sid].g ? `saszetka ${STAB[sid].g} g` : `1 ${STAB[sid].u[0]}`} na ${fmtT(STAB[sid].per * pct / 100)} l roztworu${sid === 'vacsafe' ? ' (jak w broszurze MSD)' : ''}` : ''}${sid === 'mleko' ? '. Mieszaj roztwór w trakcie podawania – mleko opada' : ''}.`]);
@@ -2673,16 +2770,16 @@ function calc(){
     Object.assign(R, {water_l:V, l1000:L, waterBasis:basis, milk_kg:sid === 'mleko' ? V * milk / 1000 : 0, stab:stab.txt ? {id:sid, txt:stab.txt, rule:stab.rule} : null, waterMode:wmode, doser:doz && pct > 0 ? {pct, stock_l:stock} : null});
   }
   if(route === 'oko'){
-    const ml = Math.max(0, num('o-ml',0)); const total = (bp ? bp.total : birds) / 1000 * ml;
-    tiles.push({k:'Rozpuszczalnik', v:fmt(total,0) + ' ml', s:`${fmtT(ml,1)} ml na 1000 dawek`, main:true});
-    tiles.push({k:'Na ptaka', v:fmt(ml,0) + ' µl', s:(v && v.r && v.r.oko && v.r.oko.bird) || '1 dawka'});
-    if(bp) tiles.push({k:'Na fiolkę', v:Object.keys(bp.use).map(Number).sort((a,b) => b-a).map(d => `${fmtT(d/1000*ml,1)} ml`).join(' / '), s:Object.keys(bp.use).map(Number).sort((a,b) => b-a).map(d => `fiolka ${d} d`).join(' / ')});
+    const ml = Math.max(0, num('o-ml',0)); const total = ml > 0 ? (bp ? bp.total : birds) / 1000 * ml : NaN;
+    tiles.push({k:'Rozpuszczalnik', v:isNum(total) ? fmt(total,0) + ' ml' : '–', s:ml > 0 ? `${fmtT(ml,1)} ml na 1000 dawek` : 'wpisz rozpuszczalnik na 1000 dawek', main:true, cls:isNum(total) ? '' : 't-need'});
+    tiles.push({k:'Na ptaka', v:ml > 0 ? fmt(ml,0) + ' µl' : '–', s:(v && v.r && v.r.oko && v.r.oko.bird) || '1 dawka'});
+    if(bp && ml > 0) tiles.push({k:'Na fiolkę', v:Object.keys(bp.use).map(Number).sort((a,b) => b-a).map(d => `${fmtT(d/1000*ml,1)} ml`).join(' / '), s:Object.keys(bp.use).map(Number).sort((a,b) => b-a).map(d => `fiolka ${d} d`).join(' / ')});
     Object.assign(R, {diluent_ml:total, ml1000:ml});
   }
   if(route === 'inj'){
-    const r = injFor(v, $('bird').value, age); const ml = Math.max(0, num('i-ml',0)); const Vml = birds * ml * (1 + loss/100);
-    tiles.push({k:'Objętość szczepionki', v:fmt(Vml/1000,2) + ' l', s:`${fmt0(Vml)} ml z zapasem ${fmtT(loss)}%`, main:true});
-    tiles.push({k:'Dawka', v:fmtT(ml,2) + ' ml', s:[r.l, r.site].filter(Boolean).join(' · ')});
+    const r = injFor(v, $('bird').value, age); const ml = Math.max(0, num('i-ml',0)); const Vml = ml > 0 ? birds * ml * (1 + loss/100) : NaN;
+    tiles.push({k:'Objętość szczepionki', v:isNum(Vml) ? fmt(Vml/1000,2) + ' l' : '–', s:isNum(Vml) ? `${fmt0(Vml)} ml z zapasem ${fmtT(loss)}%` : 'wpisz dawkę na ptaka', main:true, cls:isNum(Vml) ? '' : 't-need'});
+    tiles.push({k:'Dawka', v:ml > 0 ? fmtT(ml,2) + ' ml' : '–', s:[r.l, r.site].filter(Boolean).join(' · ')});
     if(isNum(r.ml) && Math.abs(r.ml - ml) > 1e-9) msgs.push(['warn', `Dawka różni się od ChPLW (${fmtT(r.ml,2)} ml${r.l ? ' – ' + r.l : ''}).`]);
     if(v && r.warn) msgs.push(['warn', `${v.n}: ${r.warn}`]);
     if(bp && r.bags){ const parts = Object.entries(bp.use).map(([d,n]) => { const nd = Number(d) * ml; const bag = r.bags.find(b => b >= nd - 1e-9); return `${n} × ${d} d → ${bag ? bag + ' ml' : fmt0(nd) + ' ml'}`; }); msgs.push(['info', 'Rozpuszczalnik: ' + parts.join('; ') + '.']); }
@@ -2708,7 +2805,7 @@ function calc(){
     // Autogenna: adiuwant z etykiety serii decyduje o temperaturze, odczynie i ostrzeżeniach; drobnoustroje – o endotoksynach
     const auto = !!(v && v.auto), adj = auto ? $('a-adj').value : '', strain = auto ? $('a-strain').value.trim() : '';
     const inact = v && /inaktyw/i.test(v.t || ''), oil = inact && (auto ? adj === 'oil' : v.adj !== 'al'), temp = String(r.note || '').match(/\d+\s*[–-]\s*\d+\s*°C/);
-    if(!(ml > 0)) msgs.push(['warn', `Wpisz dawkę na ptaka (ml)${auto ? ' z etykiety serii' : ''}.`]);
+    if(!(ml > 0) && auto) msgs.push(['warn', 'Wpisz dawkę na ptaka (ml) z etykiety serii.']);
     if(auto){
       $('a-adj-hint').textContent = ADJ[adj] ? ADJ[adj].h : 'od adiuwantu zależy temperatura, odczyn i ostrzeżenia';
       if(!adj) msgs.push(['warn', 'Wybierz adiuwant z etykiety serii – od niego zależą przygotowanie, odczyn w miejscu wkłucia i ostrzeżenia.']);
@@ -2752,9 +2849,10 @@ function calc(){
   const ord = {bad:0, warn:1, ok:2, info:3}; msgs.sort((a,b) => ord[a[0]] - ord[b[0]]);
   $('tiles').innerHTML = tiles.map(t => `<div class="tile${t.main ? ' main' : ''}${t.cls ? ' ' + t.cls : ''}"><span>${esc(t.k)}</span><b>${esc(t.v)}</b><small>${esc(t.s || '')}</small></div>`).join('');
   $('crew').innerHTML = crewH;
+  $('need').innerHTML = reqM.length ? needHTML(reqM, REQ_WHAT[route] || 'wtedy dokończę obliczenia') : '';
   $('msgs').innerHTML = msgs.map(([c,t]) => `<div class="msg ${c}">${esc(t)}</div>`).join('');
   $('res-sub').textContent = `${ROUTES[route]} · ${fmt0(birds)} ptaków`;
-  S.last = {v, bird, R, msgs};
+  S.last = reqM.length ? {v, bird, R, msgs, empty:true, miss:reqM} : {v, bird, R, msgs};
 }
 // Dodatkowe dane z ulotki: bezpieczeństwo szczepiącego, odczyny po szczepieniu, przechowywanie
 function extraKV(v){ return [['Dokumentacja', v.docs], ['Postać', v.pf], ['Adiuwant', v.adjT], ['Dla szczepiącego', v.safe], ['Po szczepieniu', v.ae], ['Przedawkowanie', v.od], ['Przechowywanie', v.store], ['Pozwolenie', v.ma]].filter(x => x[1]).map(([k, t]) => `<dt>${k}</dt><dd>${esc(t)}</dd>`).join(''); }
@@ -3738,7 +3836,7 @@ function renderRules(){
     <li>Linie napełnij roztworem przed opuszczeniem: spuszczaj z końców, aż pojawi się barwnik (Aviagen: ok. 1 l na 3 m linii smoczkowej).</li>
     <li>Kontrola (Aviagen): po szczepieniu obejrzyj 100 ptaków z co najmniej 3 miejsc kurnika – co najmniej 90% z zabarwionym językiem lub wolem. Serologia ok. 3 tyg. po szczepieniu (20 próbek) pokazuje, czy stado zareagowało równo.</li></ul></div>
   <div><h3>Oprysk</h3><ul class="list">
-    <li>Woda na 1000 dawek wg ChPLW: zwykle 150–500 ml; Poulvac IB Primer i Poulvac TRT dla opryskiwacza plecakowego: 250 ml (klatki), 500 ml (ściółka); Poulvac NDW – atomizer 200/400 ml. Wodę liczę na liczbę ptaków (1 dawka = 1 ptak); nadwyżkę dawek z otwartych fiolek rozpuść w tej samej wodzie.</li>
+    <li>Woda na 1000 dawek dla opryskiwacza Birchmeier w kurniku: z ChPLW, gdy podaje ilość dla takiego sprzętu (np. Poulvac IB Primer i Poulvac TRT – opryskiwacz plecakowy: ściółka 500 ml, klatki 250 ml). Gdy ChPLW podaje ją tylko dla atomizera albo automatu w wylęgarni, albo wcale – pisklęta jednodniowe 250 ml, starsze 500 ml (jak w ChPLW Primun), w granicach zakresu z ChPLW. Wodę liczę na liczbę ptaków (1 dawka = 1 ptak); nadwyżkę dawek z otwartych fiolek rozpuść w tej samej wodzie.</li>
     <li>Kropla wg ChPLW: szczepienie pierwotne i pisklęta – gruba (≥100 µm, np. Primun, Poulvac TRT 120–150 µm, TAbic IB VAR206 100–200 µm); przypominające – drobniejsza (50–80 µm), gdy ChPLW na to pozwala. Drobny aerozol poniżej 100 µm (Nobilis MG 6/85, Nobilis MS Live) wymaga zamgławiacza – TX-VK6 daje ok. 120–150 µm.</li>
     <li>Ochrona szczepiącego: maska na nos i usta oraz okulary ochronne albo hełm z obiegiem powietrza – wymagają ich ChPLW m.in. Poulvac TRT, Poulvac NDW, Nobilis ND Clone 30, Primun Bronchitis H120, Nobilis IB Primo QX i Nobilis MS Live. Po zabiegu umyj ręce i twarz.</li>
     <li>Birchmeier zaleca do szczepienia drobiu dyszę TX-VK6 – to końcówka TeeJet (Birchmeier nie produkuje własnych dysz). Lanca: 1 albo 2 dysze, dmuchawa AS 1200: 1 dysza. Ciśnienie 2,0–2,5 bar (z dmuchawą maks. 3). Przepływ: katalog TeeJet × liczba dysz albo test cylindrem jednej dyszy. Tabela dysz Birchmeiera do AS 1200 podaje dla TXVK-6 0,66 l/min przy 2 bar (0,48–1,08 l/min przy 1–6 bar, kropla VF) – dwa razy więcej niż katalog TeeJet dla jednej dyszy. Aplikacja liczy wg TeeJet; z dmuchawą zmierz wydatek cylindrem.</li>
@@ -4379,7 +4477,8 @@ function bind(){
   $('i-site').addEventListener('change', () => { S.siteTouched = true; });
   ['a-adj', 'a-strain', 'a-lab', 'a-lot', 'a-exp', 'a-farm', 'a-wd', 'v-lot', 'v-exp'].forEach(id => $(id).addEventListener('input', () => scheduleCalc()));
   // Podgląd kropli: przybliżenie przyciskiem albo stuknięciem w wykres; po obrocie ekranu – opisy od nowa
-  $('dv-zoom').addEventListener('click', dvZoomToggle); $('dv-plot').addEventListener('click', dvZoomToggle);
+  $('dv-zoom').addEventListener('click', dvZoomToggle); $('dv-plot').addEventListener('click', () => { if(Date.now() - (S.dvDragged || 0) > 250) dvZoomToggle(); }); dvPanInit();
+  document.addEventListener('click', e => { const b = e.target.closest('.need-go'); if(b) goField(b.dataset.f); });
   addEventListener('resize', () => { clearTimeout(S.dvRz); S.dvRz = setTimeout(() => { if(S.route === 'spray'){ const v = curVac(); dropViz(v, dropState(v)); } }, 200); });
   ['a-doc-cert', 'a-doc-instr', 'a-doc-order'].forEach(id => $(id).addEventListener('change', () => scheduleCalc()));
   $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(!b || b.disabled) return; if(b.dataset.alt) pickRoute(b.dataset.route); else { S.rPref = b.dataset.route; setRoute(b.dataset.route); } });

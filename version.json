@@ -1,10 +1,14 @@
 {
- "wersja": "1.24.1",
+ "wersja": "1.25.0",
  "data": "2026-11-20",
  "zmiany": [
-  "Podgląd kropli: przybliżenie zakresu – przycisk „Przybliż” albo stuknięcie w wykres. Skala dopasowuje się do widełek z ChPLW i pasa dyszy, a zmiana płynnie się animuje.",
-  "– W przybliżeniu gęstsza podziałka (co 10 lub 20 µm) i opisy kolejnych ciśnień na pasie dyszy; „Cała skala” wraca do 0–300 µm. Wybór zapamiętuje telefon.",
-  "– Ocena kropli („✓ w widełkach ChPLW” / „✗ za gruba…”) w osobnym wierszu pod tytułem – czytelnie także na wąskim ekranie.",
+  "Aplikacja mówi, czego brakuje do obliczeń: puste pola konieczne mają pomarańczową ramkę, a w wyniku jest lista „Uzupełnij” z przyciskami do tych pól – zamiast zer w wodzie i czasie.",
+  "– Woda na 1000 dawek tylko dla opryskiwacza Birchmeier w kurniku: bez atomizerów i automatów z wylęgarni. Gdy ChPLW nie podaje ilości dla takiego sprzętu – pisklęta jednodniowe 250 ml, starsze 500 ml (jak w ChPLW Primun i Poulvac TRT), w granicach zakresu z ChPLW.",
+  "– Podgląd kropli: przybliżoną skalę przesuwasz palcem w lewo i w prawo; strzałki przy krawędziach pokazują, że skala ciągnie się dalej.",
+  "– Bez danych koniecznych nie zapiszesz ani nie skopiujesz raportu – aplikacja wskaże brakujące pole.",
+  "(1.24.1) Podgląd kropli: przybliżenie zakresu – przycisk „Przybliż” albo stuknięcie w wykres. Skala dopasowuje się do widełek z ChPLW i pasa dyszy, a zmiana płynnie się animuje.",
+  "(1.24.1) – W przybliżeniu gęstsza podziałka (co 10 lub 20 µm) i opisy kolejnych ciśnień na pasie dyszy; „Cała skala” wraca do 0–300 µm. Wybór zapamiętuje telefon.",
+  "(1.24.1) – Ocena kropli („✓ w widełkach ChPLW” / „✗ za gruba…”) w osobnym wierszu pod tytułem – czytelnie także na wąskim ekranie.",
   "(1.24.0) Podgląd wielkości kropli w karcie oprysku: widełki z ChPLW i kropla przy wybranej dyszy i ciśnieniu – od razu widać, czy ustawienie jest poprawne.",
   "(1.24.0) – Skala 0–300 µm: zielone widełki z ChPLW (szczepienie pierwotne), niebieskie – szczepienie powtórne, kreskowane – poniżej 50 µm (krople parują).",
   "(1.24.0) – Pas dyszy z punktami ciśnień (2, 3, 4, 6 bar) i drugi pas dla porównania (TX-VK6 / TX-VK18); kropla przesuwa się płynnie po zmianie ciśnienia lub dyszy.",

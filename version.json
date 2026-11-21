@@ -1,10 +1,12 @@
 {
- "wersja": "1.26.0",
+ "wersja": "1.26.1",
  "data": "2026-11-21",
  "zmiany": [
-  "Nowa dysza do wyboru: TX-VS2 (biała) – kropla 114 µm przy 2 bar i 106 µm przy 3 bar, wydatek 0,11–0,13 l/min na dyszę (karta dysz MSD/Birchmeier).",
-  "– TX-VS2 ma swój pas na wykresie kropli i przycisk w szybkim przełączniku dysz; gdy TX-VK6 daje za grubą kroplę, a TX-VS2 mieści się w widełkach z ChPLW, aplikacja to podpowiada.",
-  "– Ostrzeżenia dla TX-VS2: dane tylko dla 2–3 bar, trzy razy dłuższy oprysk niż TX-VK6, brak w tabeli dysz do dmuchawy AS 1200.",
+  "W zasadach oprysku wyjaśnione, co w ChPLW znaczy „gruba kropla” (co najmniej 100 µm, zwykle 100–200 µm), „drobna kropla” (poniżej 100 µm) i „aerozol” (ok. 20–50 µm) – z przykładami szczepionek.",
+  "– Przy szczepionkach, których ChPLW mówi tylko „gruba kropla”, aplikacja podaje, skąd wzięte jest przyjęte „co najmniej 100 µm”.",
+  "(1.26.0) Nowa dysza do wyboru: TX-VS2 (biała) – kropla 114 µm przy 2 bar i 106 µm przy 3 bar, wydatek 0,11–0,13 l/min na dyszę (karta dysz MSD/Birchmeier).",
+  "(1.26.0) – TX-VS2 ma swój pas na wykresie kropli i przycisk w szybkim przełączniku dysz; gdy TX-VK6 daje za grubą kroplę, a TX-VS2 mieści się w widełkach z ChPLW, aplikacja to podpowiada.",
+  "(1.26.0) – Ostrzeżenia dla TX-VS2: dane tylko dla 2–3 bar, trzy razy dłuższy oprysk niż TX-VK6, brak w tabeli dysz do dmuchawy AS 1200.",
   "(1.25.1) Podgląd kropli: nad wykresem przełącznik dyszy i ciśnienie − / + – jednym stuknięciem widać, jak zmienia się kropla. Zmiana ustawia też dyszę i ciśnienie w formularzu.",
   "(1.25.1) – Widełki bez górnej granicy (ChPLW podaje tylko „gruba kropla” albo „≥ … µm”) są opisane w legendzie wprost.",
   "(1.25.0) Aplikacja mówi, czego brakuje do obliczeń: puste pola konieczne mają pomarańczową ramkę, a w wyniku jest lista „Uzupełnij” z przyciskami do tych pól – zamiast zer w wodzie i czasie.",

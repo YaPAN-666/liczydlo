@@ -1,9 +1,12 @@
 {
- "wersja": "1.26.1",
+ "wersja": "1.26.2",
  "data": "2026-11-21",
  "zmiany": [
-  "W zasadach oprysku wyjaśnione, co w ChPLW znaczy „gruba kropla” (co najmniej 100 µm, zwykle 100–200 µm), „drobna kropla” (poniżej 100 µm) i „aerozol” (ok. 20–50 µm) – z przykładami szczepionek.",
-  "– Przy szczepionkach, których ChPLW mówi tylko „gruba kropla”, aplikacja podaje, skąd wzięte jest przyjęte „co najmniej 100 µm”.",
+  "Dmuchawa AS 1200: aktualna karta dysz Birchmeiera podaje dla TXVK-6 ten sam wydatek co katalog TeeJet (0,33 l/min przy 2 bar) – zniknęło ostrzeżenie o „2 razy większym” wydatku.",
+  "– TX-VS2: wydatek z katalogu TeeJet dla 2–6 bar (0,110–0,177 l/min); wielkość kropli nadal tylko dla 2–3 bar.",
+  "– Karta Birchmeiera wskazuje TXVK-6 jako jedyną dyszę zalecaną do szczepienia drobiu z AS 1200.",
+  "(1.26.1) W zasadach oprysku wyjaśnione, co w ChPLW znaczy „gruba kropla” (co najmniej 100 µm, zwykle 100–200 µm), „drobna kropla” (poniżej 100 µm) i „aerozol” (ok. 20–50 µm) – z przykładami szczepionek.",
+  "(1.26.1) – Przy szczepionkach, których ChPLW mówi tylko „gruba kropla”, aplikacja podaje, skąd wzięte jest przyjęte „co najmniej 100 µm”.",
   "(1.26.0) Nowa dysza do wyboru: TX-VS2 (biała) – kropla 114 µm przy 2 bar i 106 µm przy 3 bar, wydatek 0,11–0,13 l/min na dyszę (karta dysz MSD/Birchmeier).",
   "(1.26.0) – TX-VS2 ma swój pas na wykresie kropli i przycisk w szybkim przełączniku dysz; gdy TX-VK6 daje za grubą kroplę, a TX-VS2 mieści się w widełkach z ChPLW, aplikacja to podpowiada.",
   "(1.26.0) – Ostrzeżenia dla TX-VS2: dane tylko dla 2–3 bar, trzy razy dłuższy oprysk niż TX-VK6, brak w tabeli dysz do dmuchawy AS 1200.",

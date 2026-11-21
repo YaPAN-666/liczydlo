@@ -335,17 +335,25 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .dropviz.dv-ok{--dvc:var(--ok);border-color:var(--ok)}
 .dropviz.dv-bad{--dvc:var(--bad);border-color:var(--bad)}
 .dropviz.dv-warn{--dvc:var(--warn);border-color:var(--warn)}
-.dv-head{display:flex;align-items:center;justify-content:space-between;gap:6px 10px;flex-wrap:wrap}
+.dv-head{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 8px}
+.dv-head .dv-st{grid-column:1/-1;grid-row:2;justify-self:start}
+.dv-zoom{display:inline-flex;align-items:center;gap:5px;min-height:30px;padding:2px 10px 2px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font:600 .76rem/1 var(--f-body, inherit);cursor:pointer}
+.dv-zoom:hover{border-color:var(--muted)}
+.dv-zoom:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.dv-zoom[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.dv-zoom svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.dv-zoom[aria-pressed="true"] .v{display:none}
 .dv-t{font-size:.84rem;font-weight:600;color:var(--ink)}
 .dv-st{font-size:.82rem;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--surface-2);color:var(--muted);transition:background-color .3s,color .3s}
 .dv-ok .dv-st{background:var(--ok-soft);color:var(--ok)}
 .dv-bad .dv-st{background:var(--bad-soft);color:var(--bad)}
 .dv-warn .dv-st{background:var(--warn-soft);color:var(--warn)}
-.dv-plot{position:relative;height:120px;margin:0 14px 0 8px}
-.dv-track{position:absolute;left:0;right:0;top:38px;height:24px;border-radius:5px;overflow:hidden;background-color:var(--surface-2);
-  background-image:repeating-linear-gradient(90deg,transparent 0,transparent calc(16.6667% - 1px),var(--line) calc(16.6667% - 1px),var(--line) 16.6667%)}
+.dv-plot{position:relative;height:120px;margin:0 14px 0 8px;cursor:zoom-in;-webkit-tap-highlight-color:transparent}
+.dv-z .dv-plot{cursor:zoom-out}
+.dv-track{position:absolute;left:0;right:0;top:38px;height:24px;border-radius:5px;overflow:hidden;background-color:var(--surface-2)}
+.dv-grid i{position:absolute;top:0;bottom:0;width:1px;margin-left:-.5px;background:var(--line);animation:dvFade .35s ease}
 .dv-track > i{position:absolute;top:0;bottom:0}
-.dv-mist{left:0;width:16.6667%;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--bad) 22%,transparent) 0 4px,transparent 4px 8px)}
+.dv-mist{transition:left .45s ease,width .45s ease;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--bad) 22%,transparent) 0 4px,transparent 4px 8px)}
 .dv-win{background:var(--ok-soft);background:color-mix(in srgb,var(--ok) 30%,transparent);transition:left .45s ease,width .45s ease}
 .dv-win.open-r{background:linear-gradient(90deg,color-mix(in srgb,var(--ok) 30%,transparent) 65%,transparent)}
 .dv-win.open-l{background:linear-gradient(270deg,color-mix(in srgb,var(--ok) 30%,transparent) 65%,transparent)}
@@ -357,20 +365,24 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .dv-brk.open-l::before,.dv-brk.open-r::after{display:none}
 .dv-brk.assumed::before,.dv-brk.assumed::after{border-style:dashed}
 .dv-axis{position:absolute;left:0;right:0;top:68px;height:14px}
-.dv-axis span{position:absolute;top:0;transform:translateX(-50%);font:500 .68rem/1 var(--f-mono);color:var(--muted);white-space:nowrap}
+.dv-axis span{position:absolute;top:0;transform:translateX(-50%);font:500 .68rem/1 var(--f-mono);color:var(--muted);white-space:nowrap;animation:dvFade .35s ease}
+@keyframes dvFade{from{opacity:0}to{opacity:1}}
 .dv-axis span.first{transform:none}
 .dv-axis span.last{transform:translateX(-100%)}
 .dv-axis span.w{color:var(--ok);font-weight:700}
 .dv-axis span.r{color:var(--info);font-weight:700}
-.dv-lane{position:absolute;border-radius:4px;transition:left .45s ease,width .45s ease}
-.dv-lane.sel{top:88px;height:6px;background:var(--muted)}
-.dv-lane.alt{top:111px;height:3px;background:var(--line)}
-.dv-dot{position:absolute;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:var(--surface);border:1.5px solid var(--muted);transition:left .45s ease}
+.dv-lane{position:absolute;left:0;right:0;height:12px}
+.dv-lane.sel{top:85px}
+.dv-lane.alt{top:106px}
+.dv-bar{position:absolute;top:50%;height:6px;margin-top:-3px;border-radius:4px;background:var(--muted);transition:left .45s ease,width .45s ease}
+.dv-lane.alt .dv-bar{height:3px;margin-top:-1.5px;background:var(--line)}
+.dv-dot.out{opacity:0}
+.dv-dot{position:absolute;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:var(--surface);border:1.5px solid var(--muted);transition:left .45s ease,opacity .3s}
 .dv-lane.alt .dv-dot{width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-color:var(--line)}
 .dv-dot b{position:absolute;top:8px;left:50%;transform:translateX(-50%);font:500 .66rem/1 var(--f-mono);color:var(--muted)}
 .dv-dot.on{width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border:2.5px solid var(--surface);background:var(--dvc);box-shadow:0 0 0 1.5px var(--dvc)}
 .dv-dot.on b{top:10px;color:var(--ink);font-weight:700}
-.dv-nm{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);font-size:.7rem;font-weight:600;color:var(--muted);white-space:nowrap}
+.dv-nm{position:absolute;top:50%;transform:translateY(-50%);font-size:.7rem;font-weight:600;color:var(--muted);white-space:nowrap}
 .dv-lane.alt .dv-nm{font-weight:400;font-size:.66rem}
 .dv-mk{position:absolute;top:0;left:0;width:0;height:62px;color:var(--dvc);z-index:2;transition:left .45s cubic-bezier(.3,.8,.3,1)}
 .dv-v{position:absolute;top:0;left:0;transform:translateX(-50%);padding:2px 8px;border-radius:999px;background:var(--dvc);color:var(--surface);font:600 .8rem/1.2 var(--f-mono);white-space:nowrap;transition:background-color .3s}
@@ -391,7 +403,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .tile.t-ok{border-color:var(--ok);background:var(--ok-soft)}
 .tile.t-bad{border-color:var(--bad);background:var(--bad-soft)}
 .tile.t-bad b{color:var(--bad)}
-@media (prefers-reduced-motion:reduce){.dv-mk,.dv-win,.dv-rep,.dv-brk,.dv-lane,.dv-dot{transition:none}.dv-bad .dv-mk svg{animation:none}}
+@media (prefers-reduced-motion:reduce){.dv-mk,.dv-win,.dv-rep,.dv-brk,.dv-bar,.dv-mist,.dv-dot{transition:none}.dv-axis span,.dv-grid i{animation:none}.dv-bad .dv-mk svg{animation:none}}
 </style>
 </head>
 <body>
@@ -668,9 +680,9 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
             <select id="s-qp"></select>
             <span class="hint">przy innym ciśnieniu roboczym wydatek zostanie przeliczony</span></label>
           <div class="dropviz dv-none" id="s-drop">
-            <div class="dv-head"><span class="dv-t">Wielkość kropli (µm)</span><span class="dv-st" id="dv-st" aria-live="polite"></span></div>
+            <div class="dv-head"><span class="dv-t">Wielkość kropli (µm)</span><button type="button" class="dv-zoom" id="dv-zoom" aria-pressed="false" title="Przybliż zakres wokół widełek i pasa dyszy"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.7 12.7 17.5 17.5M6 8.5h5"/><path class="v" d="M8.5 6v5"/></svg><span>Przybliż</span></button><span class="dv-st" id="dv-st" aria-live="polite"></span></div>
             <div class="dv-plot" id="dv-plot" role="img" aria-label="Wielkość kropli">
-              <div class="dv-track"><i class="dv-mist"></i><i class="dv-rep" id="dv-rep" hidden></i><i class="dv-win" id="dv-win" hidden></i></div>
+              <div class="dv-track"><span class="dv-grid" id="dv-grid"></span><i class="dv-mist" id="dv-mist"></i><i class="dv-rep" id="dv-rep" hidden></i><i class="dv-win" id="dv-win" hidden></i></div>
               <i class="dv-brk" id="dv-brk" hidden></i>
               <div class="dv-axis" id="dv-axis"></div>
               <div class="dv-lane sel" id="dv-l1" hidden></div>
@@ -1845,7 +1857,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.24.0';
+const APP_VERSION = '1.24.1';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -2082,25 +2094,68 @@ function dropState(v){
   }
   return D;
 }
-// Podgląd kropli: skala 0–300 µm, widełki z ChPLW (zielone), szczepienie powtórne (niebieskie), poniżej 50 µm
-// krople parują (Ceva), pas wybranej dyszy z punktami ciśnień i kropla przy bieżącym ustawieniu.
-// Elementy są stałe (body.html), zmieniają się tylko położenia – przesunięcia animuje CSS (transition).
-const DV_MAX = 300;
-function dvX(um){ return Math.max(0, Math.min(100, um / DV_MAX * 100)); }
-function dvBand(el, w){   // w = [od, do] – null: otwarte z tej strony
-  if(!w || (!isNum(w[0]) && !isNum(w[1]))){ el.hidden = true; return; }
-  const lo = isNum(w[0]) ? w[0] : 0, hi = isNum(w[1]) ? w[1] : DV_MAX;
-  el.hidden = false; el.style.left = dvX(lo) + '%'; el.style.width = (dvX(hi) - dvX(lo)) + '%';
-  el.classList.toggle('open-l', !isNum(w[0])); el.classList.toggle('open-r', !isNum(w[1]));
+// Podgląd kropli: skala w µm – cała (0–300) albo przybliżona – z widełkami z ChPLW (zielone), szczepieniem powtórnym
+// (niebieskie), polem poniżej 50 µm (krople parują – Ceva), pasem wybranej dyszy z punktami ciśnień i kroplą przy
+// bieżącym ustawieniu. Elementy są stałe (body.html), zmieniają się tylko położenia – przesunięcia i przybliżenie
+// animuje CSS (transition). Przybliżenie: przycisk w nagłówku albo stuknięcie w wykres; wybór zapamiętany w telefonie.
+const DV_MAX = 300, DV_ZKEY = 'liczydlo.kropla.zoom.v1';
+let DV_R = [0, DV_MAX], DV_AXIS = '';
+function dvZoomGet(){ if(typeof S.dvZoom !== 'boolean'){ try { S.dvZoom = localStorage.getItem(DV_ZKEY) === '1'; } catch(e){ S.dvZoom = false; } } return S.dvZoom; }
+function dvZoomToggle(){
+  S.dvZoom = !dvZoomGet(); try { localStorage.setItem(DV_ZKEY, S.dvZoom ? '1' : '0'); } catch(e){}
+  const v = curVac(); dropViz(v, dropState(v));
 }
-function dvLane(el, pts, cur, name, labels){   // pts: [[bar, µm]]
+// Wycinek skali: pas wybranej dyszy, bieżąca kropla i krawędzie widełek z ChPLW, z zapasem; co najmniej 40 µm
+function dvZoomRange(D){
+  const xs = D.PS.map(pp => D.vAt(pp)).filter(isNum);
+  if(isNum(D.vmd)) xs.push(D.vmd);
+  (D.win || []).filter(isNum).forEach(x => xs.push(x));
+  if(!xs.length) return [0, DV_MAX];
+  let lo = Math.min(...xs), hi = Math.max(...xs);
+  const pad = Math.max(8, (hi - lo) * 0.15); lo -= pad; hi += pad;
+  if(hi - lo < 40){ const c = (lo + hi) / 2; lo = c - 20; hi = c + 20; }
+  return [Math.max(0, Math.floor(lo / 10) * 10), Math.min(DV_MAX, Math.ceil(hi / 10) * 10)];
+}
+function dvX(um){ return Math.max(0, Math.min(100, (um - DV_R[0]) / (DV_R[1] - DV_R[0]) * 100)); }
+function dvBand(el, w){   // w = [od, do] – null: otwarte z tej strony; poza przybliżeniem – ukryte albo ucięte (bez nawiasu)
+  if(!w || (!isNum(w[0]) && !isNum(w[1]))){ el.hidden = true; return; }
+  const lo = isNum(w[0]) ? w[0] : -Infinity, hi = isNum(w[1]) ? w[1] : Infinity;
+  if(hi <= DV_R[0] || lo >= DV_R[1]){ el.hidden = true; return; }
+  const a = dvX(lo), b = dvX(hi);
+  el.hidden = false; el.style.left = a + '%'; el.style.width = (b - a) + '%';
+  el.classList.toggle('open-l', lo < DV_R[0]); el.classList.toggle('open-r', hi > DV_R[1]);
+}
+// Opisy bez nachodzenia: najpierw ważniejsze (pri), szerokość z liczby znaków (czcionka o stałej szerokości)
+function dvFit(items, W, cw){   // podziałka (pri 1) trzyma się dalej od opisów widełek, żeby ich nie zagłuszać
+  const kept = [];
+  [...items].sort((a, b) => b.pri - a.pri || a.x - b.x).forEach(it => {
+    const w = it.t.length * cw, cx = it.al === 'l' ? it.x / 100 * W + w / 2 : it.al === 'r' ? it.x / 100 * W - w / 2 : it.x / 100 * W;
+    if(kept.every(k => Math.abs(k.cx - cx) >= (k.w + w) / 2 + (it.tick && !k.tick ? 10 : 3))) kept.push(Object.assign({}, it, {w, cx}));
+  });
+  return kept;
+}
+// Pas dyszy: kreska od najdrobniejszej do najgrubszej kropli, punkt na każde ciśnienie (bieżące wyróżnione).
+// Liczba punktów stała – przy zmianie ciśnienia, dyszy czy przybliżenia punkty przesuwają się płynnie.
+function dvLane(el, pts, cur, name, sel, W){   // pts: [[bar, µm]]
   const ok = pts.filter(x => isNum(x[1]));
-  if(!ok.length){ el.hidden = true; return; }
-  const lo = Math.min(...ok.map(x => x[1])), hi = Math.max(...ok.map(x => x[1]));
-  el.hidden = false; el.style.left = dvX(lo) + '%'; el.style.width = Math.max(0.8, dvX(hi) - dvX(lo)) + '%';
-  const rel = um => hi > lo ? (um - lo) / (hi - lo) * 100 : 50;
-  el.innerHTML = ok.map(([pp, um]) => `<i class="dv-dot${isNum(cur) && Math.abs(pp - cur) < 1e-9 ? ' on' : ''}" style="left:${rel(um)}%">${labels && [2, 3, 4, 6].includes(pp) ? `<b>${pp}</b>` : ''}</i>`).join('')
-    + `<span class="dv-nm">${esc(name)}</span>`;
+  const lo = ok.length ? Math.min(...ok.map(x => x[1])) : 0, hi = ok.length ? Math.max(...ok.map(x => x[1])) : 0;
+  if(!ok.length || hi < DV_R[0] || lo > DV_R[1]){ el.hidden = true; return; }
+  el.hidden = false;
+  if(+el.dataset.n !== ok.length){ el.dataset.n = ok.length; el.innerHTML = '<i class="dv-bar"></i>' + '<i class="dv-dot"><b></b></i>'.repeat(ok.length) + '<span class="dv-nm"></span>'; }
+  const a = dvX(lo), b = dvX(hi), bar = el.querySelector('.dv-bar'), dots = el.querySelectorAll('.dv-dot'), nm = el.querySelector('.dv-nm');
+  bar.style.left = a + '%'; bar.style.width = Math.max(0.8, b - a) + '%';
+  const isCur = pp => isNum(cur) && Math.abs(pp - cur) < 1e-9, inR = um => um >= DV_R[0] - 1e-9 && um <= DV_R[1] + 1e-9;
+  // opisy ciśnień: bieżące, potem punkty z tabeli (2, 3, 4, 6 bar), inne pełne bary, połówki – jeśli się mieszczą
+  const fit = sel ? dvFit(ok.map(([pp, um], i) => ({i, x:dvX(um), t:fmtT(pp), pri:isCur(pp) ? 4 : [2, 3, 4, 6].includes(pp) ? 3 : Number.isInteger(pp) ? 2 : 1})).filter(it => inR(ok[it.i][1])), W, 6.4) : [];
+  ok.forEach(([pp, um], i) => {
+    const d = dots[i], lb = d.firstChild, f = fit.find(it => it.i === i);
+    d.style.left = dvX(um) + '%'; d.classList.toggle('on', isCur(pp)); d.classList.toggle('out', !inR(um));
+    lb.hidden = !f; if(f) lb.textContent = f.t;
+  });
+  // nazwa dyszy po tej stronie pasa, gdzie jest miejsce
+  nm.textContent = name;
+  const nw = name.length * 6.6 + 10, right = (100 - b) / 100 * W >= nw || (100 - b) >= a;
+  nm.style.left = right ? `calc(${b}% + 8px)` : 'auto'; nm.style.right = right ? 'auto' : `calc(${100 - a}% + 8px)`;
 }
 function dvRange(ps){   // [2,5; 3; 3,5] → „2,5–3,5”
   const out = []; ps.forEach(x => { const l = out[out.length - 1]; if(l && Math.abs(x - l[1] - 0.5) < 1e-9) l[1] = x; else out.push([x, x]); });
@@ -2110,22 +2165,33 @@ function dropViz(v, D){
   if(!$('s-drop')) return;
   const win = D.win, rep = D.sp.dRep || null, mikro = !!D.sp.mikro && !win, vmd = isNum(D.vmd) ? D.vmd : null;
   const cls = !v ? 'none' : D.state === 'ok' ? 'ok' : D.state ? 'bad' : mikro && vmd ? 'warn' : 'none';
-  $('s-drop').className = 'dropviz dv-' + cls;
-  dvBand($('dv-win'), win); dvBand($('dv-brk'), win); dvBand($('dv-rep'), rep);
+  const zoom = dvZoomGet(), W = $('dv-plot').clientWidth || 300;
+  DV_R = zoom ? dvZoomRange(D) : [0, DV_MAX];
+  $('s-drop').className = 'dropviz dv-' + cls + (zoom ? ' dv-z' : '');
+  const zb = $('dv-zoom'); zb.setAttribute('aria-pressed', String(zoom)); zb.lastChild.textContent = zoom ? 'Cała skala' : 'Przybliż';
+  zb.title = zoom ? `Pokaż całą skalę 0–300 µm (teraz ${DV_R[0]}–${DV_R[1]} µm)` : 'Przybliż zakres wokół widełek i pasa dyszy';
+  dvBand($('dv-mist'), [0, 50]); dvBand($('dv-win'), win); dvBand($('dv-brk'), win); dvBand($('dv-rep'), rep);
   $('dv-brk').classList.toggle('assumed', !!D.sp.dAssumed);
   const other = D.noz === 'vk6' ? 'vk18' : 'vk6';
-  dvLane($('dv-l1'), D.PS.map(pp => [pp, D.vAt(pp)]), D.p, D.NZ.n + (D.est ? ' (pomiar)' : ''), true);
-  dvLane($('dv-l2'), D.PS.map(pp => [pp, vmdAt(pp, other)]), null, NOZ[other].n, false);
-  // Oś co 50 µm; krawędzie widełek opisane kolorem pasa (wąskie widełki – jeden opis „150–170”)
-  const marks = [];
-  [[win, 'w'], [rep, 'r']].forEach(([w, c]) => {
-    const e = (w || []).filter(isNum).filter(x => !marks.some(m => m.x === x));
-    if(e.length === 2 && e[1] - e[0] < 26) marks.push({x:(e[0] + e[1]) / 2, t:`${e[0]}–${e[1]}`, c, near:e});
-    else e.forEach(x => marks.push({x, t:String(x), c, near:[x]}));
-  });
-  const base = [0, 50, 100, 150, 200, 250, 300].filter(x => !marks.some(m => m.near.some(y => Math.abs(y - x) < 16) || Math.abs(m.x - x) < 16))
-    .map(x => ({x, t:String(x), c:x === 0 ? 'first' : x === 300 ? 'last' : ''}));
-  $('dv-axis').innerHTML = [...base, ...marks].map(m => `<span class="${m.c}" style="left:${dvX(m.x)}%">${m.t}</span>`).join('');
+  dvLane($('dv-l1'), D.PS.map(pp => [pp, D.vAt(pp)]), D.p, D.NZ.n + (D.est ? ' (pomiar)' : ''), true, W);
+  dvLane($('dv-l2'), D.PS.map(pp => [pp, vmdAt(pp, other)]), null, NOZ[other].n, false, W);
+  // Oś: podziałka dobrana do zakresu (co 50 µm na całej skali, gęściej w przybliżeniu); krawędzie widełek
+  // opisane kolorem pasa (wąskie widełki – jeden opis „150–170”); opisy nie nachodzą na siebie
+  const span = DV_R[1] - DV_R[0], step = span <= 50 ? 5 : span <= 100 ? 10 : span <= 200 ? 20 : 50;
+  const ticks = []; for(let x = Math.ceil(DV_R[0] / step) * step; x <= DV_R[1] + 1e-9; x += step) ticks.push(x);
+  const akey = JSON.stringify([DV_R, win, rep, Math.round(W)]);
+  if(akey !== DV_AXIS){
+    DV_AXIS = akey;
+    const inR = x => x >= DV_R[0] && x <= DV_R[1], marks = [];
+    [[win, 'w', 3], [rep, 'r', 2]].forEach(([w, c, pri]) => {
+      const e = (w || []).filter(isNum).filter(inR).filter(x => !marks.some(m => m.v === x));
+      if(e.length === 2 && (e[1] - e[0]) / span * W < 34) marks.push({x:dvX((e[0] + e[1]) / 2), t:`${e[0]}–${e[1]}`, c, pri, v:e[0]});
+      else e.forEach(x => marks.push({x:dvX(x), t:String(x), c, pri, v:x}));
+    });
+    const base = ticks.map(x => ({x:dvX(x), t:String(x), c:x === DV_R[0] ? 'first' : x === DV_R[1] ? 'last' : '', al:x === DV_R[0] ? 'l' : x === DV_R[1] ? 'r' : '', pri:1, tick:true}));
+    $('dv-axis').innerHTML = dvFit([...marks, ...base], W, 6.6).map(m => `<span class="${m.c}" style="left:${m.x}%">${m.t}</span>`).join('');
+    $('dv-grid').innerHTML = ticks.filter(x => x > DV_R[0] && x < DV_R[1]).map(x => `<i style="left:${dvX(x)}%"></i>`).join('');
+  }
   $('dv-mk').hidden = !vmd;
   if(vmd){ $('dv-mk').style.left = dvX(vmd) + '%'; $('dv-v').textContent = `${D.est ? 'ok. ' : ''}${fmt0(vmd)} µm`; }
   const okP = win ? D.PS.filter(pp => inWin(win, D.vAt(pp))) : [];
@@ -4312,6 +4378,9 @@ function bind(){
   $('grp').addEventListener('click', ev => { const b = ev.target.closest('[data-bird]'); if(b) setBird(b.dataset.bird); });
   $('i-site').addEventListener('change', () => { S.siteTouched = true; });
   ['a-adj', 'a-strain', 'a-lab', 'a-lot', 'a-exp', 'a-farm', 'a-wd', 'v-lot', 'v-exp'].forEach(id => $(id).addEventListener('input', () => scheduleCalc()));
+  // Podgląd kropli: przybliżenie przyciskiem albo stuknięciem w wykres; po obrocie ekranu – opisy od nowa
+  $('dv-zoom').addEventListener('click', dvZoomToggle); $('dv-plot').addEventListener('click', dvZoomToggle);
+  addEventListener('resize', () => { clearTimeout(S.dvRz); S.dvRz = setTimeout(() => { if(S.route === 'spray'){ const v = curVac(); dropViz(v, dropState(v)); } }, 200); });
   ['a-doc-cert', 'a-doc-instr', 'a-doc-order'].forEach(id => $(id).addEventListener('change', () => scheduleCalc()));
   $('route').addEventListener('click', ev => { const b = ev.target.closest('[data-route]'); if(!b || b.disabled) return; if(b.dataset.alt) pickRoute(b.dataset.route); else { S.rPref = b.dataset.route; setRoute(b.dataset.route); } });
   $('s-ml').addEventListener('input', () => { S.mlTouched = true; });

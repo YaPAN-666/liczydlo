@@ -358,7 +358,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .dv-ok .dv-st{background:var(--ok-soft);color:var(--ok)}
 .dv-bad .dv-st{background:var(--bad-soft);color:var(--bad)}
 .dv-warn .dv-st{background:var(--warn-soft);color:var(--warn)}
-.dv-plot{position:relative;height:134px;margin:0 14px 0 8px;cursor:zoom-in;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;
+.dv-plot{position:relative;height:144px;margin:0 14px 0 8px;cursor:zoom-in;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;
   --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.5 1.5 6.5 7l-5 5.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
 .dv-z .dv-plot{cursor:grab;touch-action:pan-y}
 .dv-drag .dv-plot{cursor:grabbing}
@@ -392,8 +392,8 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .dv-axis span.r{color:var(--info);font-weight:700}
 .dv-lane{position:absolute;left:0;right:0;height:12px}
 .dv-lane.sel{top:85px}
-.dv-lane.alt{top:106px}
-.dv-lane.alt2{top:120px}
+.dv-lane.alt{top:114px}
+.dv-lane.alt2{top:129px}
 .dv-bar{position:absolute;top:50%;height:6px;margin-top:-3px;border-radius:4px;background:var(--muted);transition:left .45s ease,width .45s ease}
 .dv-lane.alt .dv-bar{height:3px;margin-top:-1.5px;background:var(--line)}
 .dv-dot.out{opacity:0}
@@ -1609,10 +1609,12 @@ const VACCINES = [
  sch:'Kury nioski i repro: 3.–4. tydz. + 16.–18. tydz. Indyki rzeźne: 5.–6. + 10.–12. tydz. Indyki repro: 5.–6., 10.–12., 24.–26. tydz.',
  safe:SAFE_OIL, ae:'Przejściowe odczyny w miejscu wstrzyknięcia (adiuwant), zwykle ustępują w 2 tyg.; czasem apatia i brak apetytu przez 12–24 h.', od:'Dawka podwójna – bez innych działań niepożądanych.', store:'2–8°C, chronić przed światłem, nie zamrażać.',
  r:{inj:{ml:0.5, site:'s.c. (grzbietowa nasada szyi) lub i.m. (mięśnie piersiowe)', bottles:[{d:1000,ml:500}], note:'Energicznie wstrząsnąć, ogrzać do temperatury pokojowej; aseptyka – igły i strzykawki wyjałowione termicznie, bez środków dezynfekcyjnych. Nie podawać dożylnie ani w okolice ścięgien, stawów, nerwów.'}}},
-{id:'nobilis-or-inac', n:'Nobilis OR inac', m:'MSD Animal Health', t:'inaktywowana', dz:['ORT'], s:'O. rhinotracheale serotyp A', sp:['kury','indyki'], st:'u', off:'Wycofana z obrotu – pozwolenie unijne (procedura centralna) wycofane na wniosek podmiotu odpowiedzialnego (EMA). Tylko do wglądu – nie ma jej na listach do obliczeń.',
- src:[{t:'EMA – Nobilis OR Inac (pozwolenie wycofane)', u:'https://www.ema.europa.eu/pl/medicines/veterinary/EPAR/nobilis-or-inac'}, {t:'UPD – karta „Nobilis OR inac WD” (status: wycofany)', u:'https://medicines.health.europa.eu/veterinary/en/node/191201/printable/pdf'}],
- min:{}, minT:'—', pk:null, use:'—', wd:'—', lay:'—', mix:'—', sch:'Przy ORT – szczepionka autogenna (szablon w bazie) albo decyzja lekarza weterynarii.',
- r:{inj:{ml:0.5, site:'s.c. lub i.m.', note:'Produkt wycofany.'}}},
+{id:'nobilis-or-inac', n:'Nobilis OR inac', m:'MSD Animal Health', t:'inaktywowana – emulsja olejowa', dz:['ORT'], s:'O. rhinotracheale serotyp A', sp:['kury'], st:'v', off:'Wycofana z obrotu – pozwolenie unijne (procedura centralna, EU/2/02/036) wycofane na wniosek podmiotu odpowiedzialnego (EMA). Tylko do wglądu – nie ma jej na listach do obliczeń.',
+ src:[{t:'EMA – Nobilis OR Inac (pozwolenie wycofane; ChPLW i ulotka PL)', u:'https://www.ema.europa.eu/pl/medicines/veterinary/EPAR/nobilis-or-inac'}, {t:'UPD – karta „Nobilis OR inac WD” (status: wycofany)', u:'https://medicines.health.europa.eu/veterinary/en/node/191201/printable/pdf'}],
+ min:{kury:36}, minT:'stada rodzicielskie: 1. dawka w 6.–12. tyg., 2. dawka co najmniej 6 tyg. później, w 14.–18. tyg.', pk:[1000,2000], use:'zużyć niezwłocznie po otwarciu', wd:'0 dni', lay:'Nie stosować w okresie nieśności.', mix:'Brak danych o stosowaniu z innymi szczepionkami.',
+ sch:'Dane archiwalne z ChPLW: dwie dawki po 0,25 ml kurom stada rodzicielskiego – odporność bierna brojlerów co najmniej 14 dni od wyklucia, przekazywana przez 43 tyg. nieśności. Dziś przy ORT – szczepionka autogenna (szablon w bazie) albo decyzja lekarza weterynarii.',
+ ae:'Przejściowy miejscowy obrzęk po podaniu podskórnym – do 40% ptaków, co najmniej 14 dni.',
+ r:{inj:{ml:0.25, site:'s.c. – okolica szyi lub i.m. – mięsień piersiowy', bottles:[{d:1000,ml:250},{d:2000,ml:500}], note:'Produkt wycofany – dane archiwalne z ChPLW.'}}},
 
 /* ---------- Inaktywowane wieloskładnikowe (nioski / reprodukcja) ---------- */
 {id:'nobilis-ib-nd-eds', n:'Nobilis IB+ND+EDS', m:'MSD Animal Health', t:'inaktywowana – emulsja olejowa (parafina ciekła)', dz:['IB','ND','EDS'], s:'M41, Clone 30, BC 14', sp:['kury'], st:'v', src:[RPL(19784)], ma:'136/95', adj:'oil', adjT:'parafina ciekła 215 mg na dawkę 0,5 ml (olej mineralny)',
@@ -1942,7 +1944,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.27.0';
+const APP_VERSION = '1.27.1';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -1961,9 +1963,9 @@ function flowTab(tab, p){
 // Birchmeier zaleca do szczepienia drobiu dyszę TXVK-6 (instrukcja AS 1200, tabela „Użycie dysz”);
 // katalog Birchmeiera nie podaje TX-VK18.
 const NOZ = {
-  vk6:  {n:'TX-VK6',  teejet:TXVK6_TEEJET,  vmd:VMD_TEEJET, h:'zalecana przez Birchmeiera do szczepienia drobiu'},
-  vk18: {n:'TX-VK18', teejet:TXVK18_TEEJET, vmd:VMD_VK18,   h:'ok. 3 razy większy wydatek i grubsza kropla niż TX-VK6'},
-  vs2:  {n:'TX-VS2',  teejet:TXVS2_TEEJET,  vmd:VMD_VS2,    h:'biała: drobniejsza kropla (106–114 µm przy 2–3 bar) i 3 razy mniejszy wydatek niż TX-VK6'}
+  vk6:  {mesh:50, n:'TX-VK6',  teejet:TXVK6_TEEJET,  vmd:VMD_TEEJET, h:'zalecana przez Birchmeiera do szczepienia drobiu'},
+  vk18: {mesh:50, n:'TX-VK18', teejet:TXVK18_TEEJET, vmd:VMD_VK18,   h:'ok. 3 razy większy wydatek i grubsza kropla niż TX-VK6'},
+  vs2:  {mesh:100, n:'TX-VS2',  teejet:TXVS2_TEEJET,  vmd:VMD_VS2,    h:'biała: drobniejsza kropla (106–114 µm przy 2–3 bar) i 3 razy mniejszy wydatek niż TX-VK6'}
 };
 const NOZ_ORDER = ['vs2', 'vk6', 'vk18'];   // od najdrobniejszej kropli
 const FLOW_SRC = {
@@ -2018,7 +2020,7 @@ function sprayerUI(){
   $('s-p-hint').textContent = `${fmtT(s.pMin)}–${fmtT(s.pMax)} bar co 0,5 · ${$('s-mode').value === 'lanca' ? 'zalecane 2–3 bar' : 'z dmuchawą 2–2,5 bar, maks. 3'}`;
   $('s-spr-hint').textContent = s.h;
   const a = AS1200[mode.value];
-  $('s-mode-hint').textContent = a ? `AS 1200: ${a.v} m/s, 1 dysza, akumulator dmuchawy ok. ${a.t} · poziomy 3–5 i max (34–65 m/s, zasięg do 13 m) to nawiew do ochrony roślin – za silny do szczepienia, aplikacja ich nie liczy` : 'lanca 30–40 cm nad ptakami';
+  $('s-mode-hint').textContent = a ? `AS 1200: ${a.v} m/s, 1 dysza, akumulator dmuchawy ok. ${a.t} · poziomy 3–5 i max (34–65 m/s, zasięg do 13 m) to nawiew do ochrony roślin – za silny do szczepienia, aplikacja ich nie liczy` : (() => { const v = curVac(), d = v && v.r && v.r.spray && v.r.spray.dist; return d ? `lanca ${distTxt(d, 'nad ptakami')} (ChPLW)` : 'lanca 30–40 cm nad ptakami'; })();
   $('s-nn-wrap').hidden = mode.value !== 'lanca';
   $('s-nn-hint').textContent = 'wydatek lancy = liczba dysz × wydatek jednej dyszy';
   return forced;
@@ -3488,7 +3490,7 @@ function sumDiag(r, inp){
     if(nn > 1) chk.push('Obie dysze lancy pracowały – strumień z każdej sprawdzony przed zabiegiem');
     probs.push(`wydatek dyszy ${pct(rr - 1)} – przydławiony przepływ`);
     // Instrukcja REC 15 (Usuwanie usterek): przy niewystarczającym ciśnieniu lub wydajności – filtr w zaworze spustowym i wąż zasysający
-    chk.push('Sitko 50 mesh w dyszy wyjęte i przepłukane', 'Kryza drożna – sprawdzona pod światło', 'Filtr w zaworze spustowym (rękojeść lancy) wyczyszczony', 'Wąż zasysający w zbiorniku drożny', 'Wąż bez zagięć i przygnieceń', 'Akumulator naładowany przed zabiegiem', 'Ciśnienie na sterowniku zgodne z ustawionym', 'Wydatek zmierzony cylindrem po czyszczeniu (60 s)');
+    chk.push(`Sitko ${NZ.mesh || 50} mesh w dyszy wyjęte i przepłukane`, 'Kryza drożna – sprawdzona pod światło', 'Filtr w zaworze spustowym (rękojeść lancy) wyczyszczony', 'Wąż zasysający w zbiorniku drożny', 'Wąż bez zagięć i przygnieceń', 'Akumulator naładowany przed zabiegiem', 'Ciśnienie na sterowniku zgodne z ustawionym', 'Wydatek zmierzony cylindrem po czyszczeniu (60 s)');
     act.push('Przed kolejnym zabiegiem wyczyść sitko i kryzę dyszy, filtr w zaworze spustowym i wąż zasysający, naładuj akumulator, potem zmierz wydatek cylindrem.');
   }
   if(vr != null){
@@ -3906,9 +3908,11 @@ function renderRules(){
   <div><h3>Oprysk</h3><ul class="list">
     <li>Co znaczą określenia kropli w ChPLW: <b>gruba kropla</b> (coarse spray) – co najmniej 100 µm, zwykle 100–200 µm; osiada w oczach, nozdrzach i górnych drogach oddechowych, używana do pierwszego szczepienia (ChPLW: Nobilis Ma5 + Clone 30, Primun, HatchPak IB H120 – ≥100 µm; Cevac Mass L, TAbic IB VAR206 – 100–200 µm; Avishield – 150–170 µm; wyjątek: Nobilis IB Primo QX – ≥250 µm). <b>Drobna kropla / mikrokrople</b> – poniżej 100 µm (Primun powtórne 50–80 µm, Avinew 80–100 µm, Nobilis MG 6/85 i MS Live – poniżej 100 µm). <b>Aerozol</b> z atomizera – ok. 20–50 µm; krople poniżej ok. 70 µm docierają do dolnych dróg oddechowych i dają silniejszy odczyn, dlatego stosuje się je dopiero przy szczepieniu powtórnym. ChPLW nie używają określenia „średnia kropla”.
     <li>Woda na 1000 dawek dla opryskiwacza Birchmeier w kurniku: z ChPLW, gdy podaje ilość dla takiego sprzętu (np. Poulvac IB Primer i Poulvac TRT – opryskiwacz plecakowy: ściółka 500 ml, klatki 250 ml). Gdy ChPLW podaje ją tylko dla atomizera albo automatu w wylęgarni, albo wcale – pisklęta jednodniowe 250 ml, starsze 500 ml (jak w ChPLW Primun), w granicach zakresu z ChPLW. Wodę liczę na liczbę ptaków (1 dawka = 1 ptak); nadwyżkę dawek z otwartych fiolek rozpuść w tej samej wodzie.</li>
-    <li>Kropla wg ChPLW: szczepienie pierwotne i pisklęta – gruba (≥100 µm, np. Primun, Poulvac TRT 120–150 µm, TAbic IB VAR206 100–200 µm); przypominające – drobniejsza (50–80 µm), gdy ChPLW na to pozwala. Drobny aerozol poniżej 100 µm (Nobilis MG 6/85, Nobilis MS Live) wymaga zamgławiacza – TX-VK6 daje ok. 120–150 µm.</li>
+    <li>Kropla wg ChPLW: szczepienie pierwotne i pisklęta – gruba (≥100 µm, np. Primun, Poulvac TRT 120–150 µm, TAbic IB VAR206 100–200 µm); przypominające – drobniejsza (50–80 µm), gdy ChPLW na to pozwala. Drobny aerozol poniżej 100 µm (Nobilis MG 6/85, Nobilis MS Live) wymaga zamgławiacza – TX-VK6 daje ok. 120–150 µm, a TX-VS2 ok. 106–114 µm.</li>
     <li>Ochrona szczepiącego: maska na nos i usta oraz okulary ochronne albo hełm z obiegiem powietrza – wymagają ich ChPLW m.in. Poulvac TRT, Poulvac NDW, Nobilis ND Clone 30, Primun Bronchitis H120, Nobilis IB Primo QX i Nobilis MS Live. Po zabiegu umyj ręce i twarz.</li>
     <li>Birchmeier zaleca do szczepienia drobiu dyszę TX-VK6 – to końcówka TeeJet (Birchmeier nie produkuje własnych dysz). Lanca: 1 albo 2 dysze, dmuchawa AS 1200: 1 dysza. Ciśnienie 2,0–2,5 bar (z dmuchawą maks. 3). Przepływ: katalog TeeJet × liczba dysz albo test cylindrem jednej dyszy. Karta dysz Birchmeiera do AS 1200 (wyd. 2026) podaje dla TXVK-6 0,33 l/min przy 2 bar (0,24–0,54 l/min przy 1–6 bar, kropla VF) – tyle samo co katalog TeeJet – i wskazuje ją jako jedyną dyszę zalecaną do szczepienia drobiu.</li>
+    <li>Dysze TX (TeeJet ConeJet, pusty stożek 80°) – wspólne dla lancy i dmuchawy, na nakrętkę TeeJet: <b>TX-VS2</b> biała, stal nierdzewna, sitko 100 mesh, 0,11–0,18 l/min przy 2–6 bar, kropla 114–106 µm przy 2–3 bar; <b>TX-VK6</b> czerwona, ceramika, sitko 50 mesh, 0,33–0,54 l/min i 153–122 µm przy 2–6 bar; <b>TX-VK18</b> pomarańczowa, ceramika, sitko 50 mesh, 0,97–1,67 l/min i 235–188 µm przy 2–6 bar. TeeJet dopuszcza dla nich 2–20 bar, ale wielkość kropli jest znana tylko do 6 bar (TX-VS2 do 3 bar), dlatego aplikacja ocenia kroplę w tym zakresie. Poniżej 2 bar stożek się nie rozwija i krople są nierówne.</li>
+    <li>Inne dysze z karty AS 1200 nie nadają się do szczepienia: przeciwznoszeniowe AITXA i AIXR dają krople grube do skrajnie grubych (klasy C–XC, setki µm), MV 425 i MV 850 – średnie, a NF 125 i ULV 015 – mgłę (klasa XF). Birchmeier zaleca do szczepienia drobiu tylko TXVK-6.</li>
     <li>TX-VK18 daje ok. 3 razy większy wydatek i kroplę ok. 190–235 µm – pasuje tylko do szczepionek, których ChPLW dopuszcza grubą kroplę. Pompa REC 15 daje najwyżej ok. 1,4 l/min (1,0 l/min przy 6 bar), więc TX-VK18 na REC 15 tylko do ok. 3,9 bar.</li>
     <li>Opryskiwacze: REC 15 i REC 15 PC1 0,5–6 bar, REX 15 1–10 bar, REB 15 0,5–3 bar (plecakowe, zbiornik 15 l); C 50 1–6 bar (wózek, zbiornik 50 l, wąż 10 m). Dmuchawa AS 1200 współpracuje z REB 15, REC 15, REX 15 i C 50 (instrukcja AS 1200, 2026). REC 15 PC1 (wersja z dyszą płaską) daje najwyżej ok. 1,1 l/min.</li>
     <li>Dmuchawa AS 1200: 2 akumulatory 18 V 10 Ah (ładowanie ok. 70 min), 3,5 kg, 0,5–10 bar, 5–30 °C, zasięg do 13 m. Poziomy (prędkość powietrza / czas pracy): 1 – 21 m/s / 5 h 40 min, 2 – 26 m/s / 3 h 20 min, 3 – 34 m/s / 1 h 50 min, 4 – 44 m/s / 50 min, 5 – 56 m/s / 25 min, max – 65 m/s / 15 min (od „max” ochronniki słuchu). Do szczepienia tylko poziom 1 (wyjątkowo 2).</li>

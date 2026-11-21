@@ -1,9 +1,12 @@
 {
- "wersja": "1.27.0",
+ "wersja": "1.27.1",
  "data": "2026-11-21",
  "zmiany": [
-  "Raport: nowe pola „Godzina szczepienia”, „Temperatura w kurniku” i „Szczepiący” – trafiają do raportu w sekcji ZABIEG (lista kontrolna szczepienia wg Ceva).",
-  "– „Szczepiący” podpowiada nazwę użytkownika aplikacji; godzina i temperatura czyszczą się po zapisaniu raportu.",
+  "Przegląd z dokumentami EMA i rejestru: poprawiona karta wycofanej Nobilis OR inac (dawka 0,25 ml, tylko kury) – pozostałe szczepionki zgodne. Nowe zasady o dyszach TX i dyszach z karty AS 1200.",
+  "– Odległość lancy pod polem „Tryb pracy” bierze się teraz z ChPLW wybranej szczepionki (np. Poulvac TRT – ok. 50 cm).",
+  "– Wykres kropli: pasy pozostałych dysz niżej, żeby nie nachodziły na opisy ciśnień. Lista kontrolna po zabiegu podaje sitko właściwe dla dyszy (TX-VS2 – 100 mesh).",
+  "(1.27.0) Raport: nowe pola „Godzina szczepienia”, „Temperatura w kurniku” i „Szczepiący” – trafiają do raportu w sekcji ZABIEG (lista kontrolna szczepienia wg Ceva).",
+  "(1.27.0) – „Szczepiący” podpowiada nazwę użytkownika aplikacji; godzina i temperatura czyszczą się po zapisaniu raportu.",
   "(1.26.2) Dmuchawa AS 1200: aktualna karta dysz Birchmeiera podaje dla TXVK-6 ten sam wydatek co katalog TeeJet (0,33 l/min przy 2 bar) – zniknęło ostrzeżenie o „2 razy większym” wydatku.",
   "(1.26.2) – TX-VS2: wydatek z katalogu TeeJet dla 2–6 bar (0,110–0,177 l/min); wielkość kropli nadal tylko dla 2–3 bar.",
   "(1.26.2) – Karta Birchmeiera wskazuje TXVK-6 jako jedyną dyszę zalecaną do szczepienia drobiu z AS 1200.",

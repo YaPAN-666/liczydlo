@@ -395,10 +395,10 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .dv-lane.alt{top:114px}
 .dv-lane.alt2{top:129px}
 .dv-bar{position:absolute;top:50%;height:6px;margin-top:-3px;border-radius:4px;background:var(--muted);transition:left .45s ease,width .45s ease}
-.dv-lane.alt .dv-bar{height:3px;margin-top:-1.5px;background:var(--line)}
+.dv-lane.alt .dv-bar{height:3px;margin-top:-1.5px;background:color-mix(in srgb,var(--muted) 45%,var(--surface))}
 .dv-dot.out{opacity:0}
 .dv-dot{position:absolute;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:var(--surface);border:1.5px solid var(--muted);transition:left .45s ease,opacity .3s}
-.dv-lane.alt .dv-dot{width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-color:var(--line)}
+.dv-lane.alt .dv-dot{width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-color:color-mix(in srgb,var(--muted) 45%,var(--surface))}
 .dv-dot b{position:absolute;top:8px;left:50%;transform:translateX(-50%);font:500 .66rem/1 var(--f-mono);color:var(--muted)}
 .dv-dot.on{width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border:2.5px solid var(--surface);background:var(--dvc);box-shadow:0 0 0 1.5px var(--dvc)}
 .dv-dot.on b{top:10px;color:var(--ink);font-weight:700}
@@ -933,7 +933,7 @@ label.need > :is(input,select){border-color:var(--warn);box-shadow:0 0 0 2px col
 <section class="view" id="v-szczepionki" hidden>
   <div class="card">
     <div class="row tight">
-      <label>Szukaj<input id="k-q" type="search" placeholder="nazwa, choroba, szczep"></label>
+      <label>Szukaj<input id="k-q" type="search" placeholder="nazwa, choroba"></label>
       <label>Drób<select id="k-sp"><option value="">wszystkie gatunki</option><option value="kury">kury</option><option value="indyki">indyki</option><option value="kaczki">kaczki (pekin, mulard)</option><option value="kaczki-p">kaczki piżmowe</option><option value="gesi">gęsi</option></select></label>
       <label>Choroba<select id="k-dz"></select></label>
       <label>Droga podania<select id="k-rt"><option value="">wszystkie</option><option value="spray">oprysk</option><option value="woda">woda do picia</option><option value="oko">oko / nos</option><option value="inj">iniekcja</option></select></label>
@@ -1944,7 +1944,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.27.1';
+const APP_VERSION = '1.27.2';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};

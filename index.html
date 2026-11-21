@@ -883,6 +883,14 @@ label.need > :is(input,select){border-color:var(--warn);box-shadow:0 0 0 2px col
       </div>
       <div class="card">
         <h2>Zapisz raport</h2>
+        <div class="row">
+          <label>Godzina szczepienia
+            <input id="r-time" type="time"></label>
+          <label>Temp. w kurniku (°C)
+            <input id="r-temp" type="number" min="0" max="45" step="0.5" inputmode="decimal" placeholder="np. 24"></label>
+          <label class="wide">Szczepiący
+            <input id="r-who" type="text" autocomplete="off" maxlength="80" placeholder="imię i nazwisko"></label>
+        </div>
         <label>Uwagi (opcjonalnie)
           <textarea id="notes" rows="2" placeholder="warunki w kurniku, odczyny, uwagi"></textarea></label>
         <div class="tools">
@@ -1934,7 +1942,7 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.26.2';
+const APP_VERSION = '1.27.0';
 const DATA_DATE = '17.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
@@ -3037,6 +3045,9 @@ function reportText(){
   }
   const w = L.msgs.filter(m => m[0] === 'bad' || m[0] === 'warn').map(m => m[1]);
   if(w.length) out.push('', 'UWAGI Z OBLICZEŃ', ...rbul(w));
+  // Przebieg zabiegu – pola z listy kontrolnej szczepienia (Ceva): godzina, temperatura w kurniku, szczepiący
+  const rT = $('r-time').value, rTemp = pf($('r-temp').value), rWho = $('r-who').value.trim();
+  sec('ZABIEG', [rT ? rkv('Godzina', rT) : null, isNum(rTemp) ? rkv('Temp. w kurniku', fmtT(rTemp, 1) + ' °C') : null, rWho ? rkv('Szczepiący', rWho) : null]);
   const notes = $('notes').value.trim();
   if(notes) out.push('', 'UWAGI', ...notes.split('\n').map(x => x.trim()).filter(Boolean).map(x => rwrap('  ', x, 4)));
   out.push(...repFooter());
@@ -3094,14 +3105,14 @@ async function saveReport(btn){
   if(!S.store){ toast('Pamięć aplikacji jeszcze się łączy – spróbuj za chwilę.'); return; }
   const L = S.last; if(!L) return;
   if(L.empty){ const m = (L.miss || [['birds', 'liczbę ptaków']])[0]; toast(`Uzupełnij: ${(L.miss || [m]).map(x => x[1]).join(', ')}.`); focusField(m[0]); return; }
-  const doc = Object.assign({}, L.R, {date:$('date').value || todayISO(), farm:$('farm').value.trim(), bird:$('bird').value, birdLabel:L.bird.l, dz:$('dz').value === DZ_ALL ? (L.v ? L.v.dz[0] : '') : $('dz').value, vacId:L.v ? L.v.id : '', vacName:L.v ? L.v.n : 'spoza bazy', notes:$('notes').value.trim(), text:reportText(), createdAt:new Date().toISOString()});
+  const doc = Object.assign({}, L.R, {date:$('date').value || todayISO(), farm:$('farm').value.trim(), bird:$('bird').value, birdLabel:L.bird.l, dz:$('dz').value === DZ_ALL ? (L.v ? L.v.dz[0] : '') : $('dz').value, vacId:L.v ? L.v.id : '', vacName:L.v ? L.v.n : 'spoza bazy', notes:$('notes').value.trim(), time:$('r-time').value || null, houseTemp:isNum(pf($('r-temp').value)) ? pf($('r-temp').value) : null, operator:$('r-who').value.trim() || null, text:reportText(), createdAt:new Date().toISOString()});
   btn.disabled = true;
   if(S.mode === 'local' && !IN_ARTIFACT && !S.persisted && navigator.storage && navigator.storage.persist){ S.persisted = true; navigator.storage.persist().catch(() => {}); }
   try {
     const rid = uid(); await S.store.set(rid, doc);
     const m = doc.modId && S.mods[doc.modId];
     if(m && m.status === 'zalecona') await S.store.set(doc.modId, Object.assign({}, m, {status:'zastosowana', appliedReport:rid, appliedAt:new Date().toISOString()}));
-    $('notes').value = ''; $('save-msg').textContent = 'Zapisano ' + new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) + '.'; toast('Raport zapisany.'); }
+    $('notes').value = ''; $('r-time').value = ''; $('r-temp').value = ''; $('save-msg').textContent = 'Zapisano ' + new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) + '.'; toast('Raport zapisany.'); }
   catch(e){ toast(errText(e)); }
   finally { btn.disabled = false; }
 }
@@ -4560,6 +4571,7 @@ function bind(){
   // Podsumowanie przelicza się samo w trakcie wpisywania
   $('r-list').addEventListener('input', ev => { if(!/^sum-/.test(ev.target.id || '')) return; clearTimeout(sumTimer); sumTimer = setTimeout(() => { const r = S.sum && S.reps[S.sum]; if(r) sumCalc(r); }, 250); });
   $('farm').addEventListener('change', onFarmChange);
+  if(!$('r-who').value) $('r-who').value = userName();   // szczepiący – domyślnie użytkownik aplikacji, można zmienić
   $('farm-alert').addEventListener('click', farmAlertAction);
   $('m-q').addEventListener('input', renderMods);
   $('m-list').addEventListener('click', modAction);

@@ -1,10 +1,12 @@
 {
- "wersja": "1.31.0",
+ "wersja": "1.32.0",
  "data": "2026-11-22",
  "zmiany": [
-  "Nowa zakładka „Program”: stada z datą wylęgu i planem szczepień – daty, „Do zrobienia” (dziś i zaległe, licznik w zakładce), odhaczanie po zapisanym raporcie, przycisk „Licz”, który wypełnia obliczenia.",
-  "– Program sprawdza wiek i gatunek z ChPLW, wycofane szczepionki, uwagę prawną, dwa szczepienia przeciw tej samej chorobie w ciągu 7 dni i żywe szczepionki blisko siebie – z tekstem ChPLW o łączeniu (odstęp ustala lekarz). Program jest też w kopii raportów.",
-  "– Szczepionki: porównanie 2–3 szczepionek obok siebie (przycisk „Dodaj do porównania” w karcie).",
+  "Indyki: cztery nowe szczepionki z Rejestru Produktów Leczniczych – Dindoral (HE, woda, indyki rzeźne w 4. tyg.), Tur-3 (ND + TRT + PMV3, inaktywowana, stada reprodukcyjne), TAbic V.H. (ND, kury i indyki, oprysk i woda) oraz Nobilis AE+POX (AE i ospa, kury i indyki – wing-web, tylko karta, bez obliczeń).",
+  "– Nowe choroby w filtrach: paramyksowiroza typu 3 (PMV3) i ospa drobiu.",
+  "(1.31.0) Nowa zakładka „Program”: stada z datą wylęgu i planem szczepień – daty, „Do zrobienia” (dziś i zaległe, licznik w zakładce), odhaczanie po zapisanym raporcie, przycisk „Licz”, który wypełnia obliczenia.",
+  "(1.31.0) – Program sprawdza wiek i gatunek z ChPLW, wycofane szczepionki, uwagę prawną, dwa szczepienia przeciw tej samej chorobie w ciągu 7 dni i żywe szczepionki blisko siebie – z tekstem ChPLW o łączeniu (odstęp ustala lekarz). Program jest też w kopii raportów.",
+  "(1.31.0) – Szczepionki: porównanie 2–3 szczepionek obok siebie (przycisk „Dodaj do porównania” w karcie).",
   "(1.30.0) Tempo marszu przy oprysku: po wpisaniu długości kurnika i liczby przejść aplikacja podaje m/min i „10 m w … s” – długość zapamiętuje dla fermy.",
   "(1.30.0) – Temperatura i wilgotność w kurniku: ocena parowania kropli (Delta T, wytyczna GRDC 2–8) z ostrzeżeniem przy suchym powietrzu; warunki i tempo trafiają do raportu.",
   "(1.30.0) – Tryb w terenie: przycisk „Rozpuszczona – odliczaj” pokazuje na dole pasek z czasem zużycia szczepionki wg ChPLW (zielony, pomarańczowy, czerwony), a ekran wtedy nie gaśnie. Przycisk A+ (także w „O aplikacji”) włącza duży tekst.",

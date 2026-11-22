@@ -1708,6 +1708,38 @@ const VACCINES = [
  min:{indyki:22}, minT:'od 4. tygodnia życia (jednorazowo)', pk:[1000,1500,2500,5000], use:'1,5 h po rozcieńczeniu', wd:'0 dni',
  lay:'Bezpieczeństwo w nieśności nieokreślone.', mix:'Nie mieszać z innymi produktami.', sch:'Jedno podanie od 4. tygodnia; wcześniej przeciwciała matczyne mogą osłabić odpowiedź.',
  r:{woda:{rule:'measured', h:1.5, win:'1,5 h', thirst:'ok. 2 h', vacc:0.01, note:'Szczepionka płynna 0,01 ml na ptaka (liczba ptaków × 0,01 ml), rozcieńczona w ilości wody wypijanej w 1,5 h. Leki i dezynfekcja w wodzie: przerwa 48 h przed i 24 h po; fiolkę przepłukać wodą do podania.'}}},
+{id:'dindoral', n:'Dindoral', m:'Boehringer Ingelheim Animal Health France', t:'żywa (atenuowana)', pf:'liofilizat do podania w wodzie do picia', dz:['HE'], s:'wirus krwotocznego zapalenia jelit indyków (HEV), szczep Domermuth, ≥9 EU', sp:['indyki'], st:'v', src:[RPL(18392)], ma:'169/95',
+ xb:{'indyki-repro':'ChPLW: nie szczepić stad rodzicielskich ani przyszłych stad reprodukcyjnych'},
+ min:{indyki:22}, minT:'jednorazowo ptakom 4-tygodniowym (brojlery indycze); u bażantów – przeciw chorobie marmurkowatej śledziony', pk:[1000], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Nie szczepić stad rodzicielskich i przyszłych stad reprodukcyjnych. Nie podawać perliczkom.',
+ mix:'Brak danych o podawaniu z innymi produktami – decyzja indywidualna (ten sam dzień lub inny termin).',
+ sch:'Jedno podanie w wodzie do picia 4-tygodniowym indykom rzeźnym. Dzień przed i dzień po szczepieniu – bez stresu (przenoszenie, przycinanie dziobów). Szczep szerzy się na ptaki nieszczepione.',
+ ae:'W badaniach: przejściowe obniżenie odporności humoralnej i liczby limfocytów u indyczych niosek (SPF i standardowych) – znaczenie praktyczne nieustalone.', od:'10-krotna dawka: u bażantów bez objawów; u indyczych niosek SPF – niewielkie obniżenie przyrostu masy.',
+ store:'2–8°C, chronić przed światłem. Po rozpuszczeniu zużyć w 2 h.',
+ r:{woda:{rule:'measured', h:2, win:'1–2 h', thirst:'2 h', note:'ChPLW: liofilizat rozpuścić w wodzie bez środków antyseptycznych i dezynfekcyjnych, rozcieńczyć w ilości wypijanej w 1–2 h; 2 h bez wody przed szczepieniem; naczynia czyste, bez dezynfekcji.'}}},
+{id:'tur-3', n:'Tur-3', m:'Boehringer Ingelheim Animal Health France', t:'inaktywowana – emulsja olejowa (olej parafinowy)', pf:'emulsja do wstrzykiwań', dz:['ND','aMPV','PMV3'], s:'ND Ulster 2C ≥16 HI.Ufr + paramyksowirus ptaków typ 3 (PMV3) ≥40 HAI.U + TRT VCO3 ≥9 E.U (inaktyw.)', sp:['indyki'], st:'v', src:[RPL(18391)], ma:'168/95', adj:'oil', adjT:'adiuwant olejowy (olej parafinowy)', noRubber:true,
+ xb:{'indyki-rzezne':'ChPLW: tylko indyki przeznaczone do stad reprodukcyjnych'},
+ minT:'indyki reprodukcyjne: 1. dawka 8–10 tyg. przed nieśnością, 2. dawka 2–4 tyg. przed nieśnością (odstęp 6 tyg.)', pk:[500,1000], use:'ChPLW nie podaje czasu po otwarciu', wd:'0 dni',
+ lay:'Nie stosować u ptaków w okresie nieśności.',
+ mix:'Nie podawać żadnych innych szczepionek jednocześnie z Tur-3 (brak danych).',
+ sch:'Dawka przypominająca ND i TRT po szczepieniach żywych oraz pierwsze szczepienie przeciw PMV3 u indyków do stad reprodukcyjnych. Dwie dawki 0,3 ml w odstępie 6 tyg.: 8–10 i 2–4 tyg. przed rozpoczęciem nieśności.',
+ safe:SAFE_OIL, ae:'Nie stwierdzono.', od:'Dawka podwójna – bez zdarzeń niepożądanych.', store:'2–8°C, chronić przed światłem, nie zamrażać.',
+ r:{inj:{ml:0.3, site:'i.m. (domięśniowo – ChPLW nie wskazuje mięśnia)', bottles:[{d:500,ml:150},{d:1000,ml:300}], note:'Aseptyka; dobrze wymieszać zawartość butelki przed użyciem. Bez strzykawek z gumowymi uszczelkami tłoka, naturalnym korkiem lub elastomerem butylowym.'}}},
+{id:'tabic-vh', n:'TAbic V.H.', m:'Phibro Animal Health', t:'żywa', pf:'tabletka musująca', dz:['ND'], s:'ND lentogeniczny V.H., ≥10^6,0 EID50', sp:['kury','indyki'], st:'v', src:[RPL(18892)], ma:'1694/06',
+ min:{kury:1, indyki:1}, minT:'kury od 1. dnia (najlepiej 1. i 17. dzień życia); indyki – ChPLW nie podaje schematu', pk:[1000,2000,2500,5000,10000], use:'zużyć natychmiast po rozpuszczeniu', wd:'0 dni',
+ lay:'Może być stosowana w okresie nieśności.', mix:'Nie mieszać z innymi produktami. Inne szczepionki przed lub po – decyzja indywidualna.',
+ sch:'Kury: najlepiej dwukrotnie, w 1. i 17. dniu życia – ochrona brojlerów do końca tuczu (7–8 tyg.) oraz niosek reprodukcyjnych i towarowych w nieśności. Odporność po 5 dniach (pełna po 2 tyg.), trwa 2 miesiące. Gruba kropla – pisklęta jednodniowe; aerozol (40–100 µm) – powtórne szczepienie ptaków powyżej 2 tyg. Za mała dawka groźniejsza niż niewielkie przedawkowanie.',
+ safe:'Może wywołać łagodne zapalenie spojówek u szczepiącego (2–3 dni) – okulary ochronne i maska. Po samoiniekcji, połknięciu lub rozlaniu na skórę – do lekarza z ulotką.', ae:'Nie obserwowano. Szczepić tylko zdrowe ptaki bez stresu (stłoczenie, przegrzanie, zimno, złe żywienie).', od:'10 dawek do oka (pisklęta SPF) – bezpieczne.',
+ store:'2–8°C, chronić przed światłem. Tabletek z uszkodzonej części blistra nie używać; tabletka w pełni rozpuszczona, bez zmian barwy i obrzęku.',
+ r:{spray:{opts:[{l:'gruba kropla – pisklęta jednodniowe', ml:[50,300]},{l:'aerozol (40–100 µm) – powtórne, ptaki > 2 tyg.', ml:[100,150], fine:true}], d:[100,null], dRep:[40,100], dist:'60–70 cm nad ptakami', water:'przegotowana, zimna woda', note:'ChPLW PL: ml wody na 1000 dawek – gruba kropla 50–300, aerozol 100–150 (dokładnie wg wydajności urządzenia). Tabletkę wrzucić do wody, po rozpuszczeniu odczekać 1–2 min i zamieszać. Sprawdzić wydajność urządzenia; wentylacja zatrzymana 20–30 min; światło przyciemnić.'},
+   woda:{rule:'measured', h:2.5, win:'2–3 h', thirst:'2 h', milk:'5 g/l odtłuszczonego mleka w proszku (albo 50 ml/l mleka odtłuszczonego) – odczekać 5 min', note:'ChPLW: zimna woda w ilości 1/5 dziennego zapotrzebowania (wg gatunku, wieku i pogody), do wypicia w 2–3 h; dezynfekcja wody wstrzymana 24 h wcześniej; szczepić rano; 2 h bez wody przed szczepieniem.'}}},
+{id:'nobilis-ae-pox', n:'Nobilis AE+POX', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa (atenuowana)', pf:'liofilizat i rozpuszczalnik do sporządzania zawiesiny – przekłucie błony skrzydłowej (wing-web)', dz:['AE','POX'], s:'AE Calnek 1143 10^1,8–10^4,0 EID50 + ospa drobiu Gibbs 10^1,8–10^4,41 EID50', sp:['kury','indyki'], st:'v', src:[RPL(20463)],
+ docs:'Droga podania: przekłucie błony skrzydłowej (wing-web) podwójną igłą z zestawu – aplikacja tej drogi nie liczy (1 dawka na ptaka, butelka 500 lub 1000 dawek). Igłę zanurzyć tak, by napełniły się oba rowki, przekłuć błonę od dołu, nie trafiając w upierzoną część skrzydła. Po 7–10 dniach sprawdzić odczyn u kilku ptaków: lekki obrzęk i drobne strupki (ustępują po 2–3 tyg.).',
+ min:{kury:57, indyki:127}, minT:'kury 8.–16. tydz. życia; indyki 18.–26. tydz. (nie wcześniej)', pk:[500,1000], use:'2 h po rozpuszczeniu', wd:'0 dni',
+ lay:'Nie w okresie nieśności ani 4 tyg. przed jej rozpoczęciem.', mix:'Nie mieszać z innymi produktami. Inne szczepionki – decyzja indywidualna.',
+ sch:'Jedno szczepienie: kury 8.–16. tydz., indyki 18.–26. tydz. Pełna odporność po 3 tyg., trwa jeden okres nieśny; potomstwo chronione przeciwciałami matczynymi przed AE w pierwszych tygodniach.',
+ safe:'Po szczepieniu umyć i zdezynfekować ręce i sprzęt.', ae:'Nie obserwowano.', od:'Dawki wyższe niż zalecane – bez działań niepożądanych.',
+ store:'2–8°C, chronić przed światłem, nie zamrażać; rozpuszczalnik osobno 15–25°C.', r:{}},
 {id:'nobilis-reo-1133', n:'Nobilis Reo 1133', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa', pf:'liofilizat i rozpuszczalnik do sporządzania zawiesiny do wstrzykiwań (rozpuszczalnik pomarańczowo-czerwony)', dz:['Reo'], s:'reowirus ptaków 1133, żywy', sp:['kury'], st:'v', src:[RPL(17095, '08/2026')], ma:'623/98',
  min:{kury:5}, minT:'od 5. dnia życia; stada reprodukcyjne – priming 6.–9. dzień', pk:[1000], use:'2 h po rozpuszczeniu', wd:'0 dni',
  lay:'Nie w okresie nieśności ani 12 tyg. przed.', mix:'Nie mieszać (poza dołączonym rozpuszczalnikiem). Nie stosować łącznie ze szczepionką przeciw chorobie Mareka ani z żywą szczepionką przeciw chorobie Gumboro. Inne – decyzja indywidualna.',
@@ -1965,7 +1997,7 @@ const TXVS2_TEEJET = [[2,0.110],[3,0.131],[4,0.148],[5,0.164],[6,0.177]];
 const VMD_VS2 = [[2,114],[3,106]];
 const VS2_D = [106,114];
 const VS2_TXT = 'dysza TX-VS2 (biała) do opryskiwacza Birchmeier daje ok. 106–114 µm przy 2–3 bar – też za grubo';
-const DISEASES = {'ND':'Rzekomy pomór drobiu (ND)','IB':'Zakaźne zapalenie oskrzeli (IB)','IBD':'Choroba Gumboro (IBD)','aMPV':'Metapneumowirus – TRT/SHS','Marek':'Choroba Mareka','HPAI':'Grypa ptaków – wysoce zjadliwa, podtyp H5 (HPAI)','ILT':'Zakaźne zapalenie krtani i tchawicy (ILT)','AE':'Zakaźne zapalenie mózgu i rdzenia (AE)','CAV':'Zakaźna anemia kurcząt (CAV)','EDS':'Zespół spadku nieśności (EDS)','Reo':'Reowirusy','Salmonella':'Salmonelloza','E. coli':'Kolibakterioza (E. coli)','Pasteurella':'Cholera drobiu (pasterelloza)','ORT':'ORT (Ornithobacterium)','MG':'Mykoplazmoza (MG)','MS':'Mykoplazmoza – M. synoviae (MS)','HE':'Krwotoczne zapalenie jelit indyków (HE)','Derzsy':'Choroba Derzsy’ego – parwowiroza gęsi (GPV)','MDPV':'Parwowiroza kaczek piżmowych (MDPV)','Kokcydioza':'Kokcydioza','inne':'Inne'};
+const DISEASES = {'ND':'Rzekomy pomór drobiu (ND)','IB':'Zakaźne zapalenie oskrzeli (IB)','IBD':'Choroba Gumboro (IBD)','aMPV':'Metapneumowirus – TRT/SHS','Marek':'Choroba Mareka','HPAI':'Grypa ptaków – wysoce zjadliwa, podtyp H5 (HPAI)','ILT':'Zakaźne zapalenie krtani i tchawicy (ILT)','AE':'Zakaźne zapalenie mózgu i rdzenia (AE)','CAV':'Zakaźna anemia kurcząt (CAV)','EDS':'Zespół spadku nieśności (EDS)','Reo':'Reowirusy','Salmonella':'Salmonelloza','E. coli':'Kolibakterioza (E. coli)','Pasteurella':'Cholera drobiu (pasterelloza)','ORT':'ORT (Ornithobacterium)','MG':'Mykoplazmoza (MG)','MS':'Mykoplazmoza – M. synoviae (MS)','HE':'Krwotoczne zapalenie jelit indyków (HE)','PMV3':'Paramyksowiroza ptaków typu 3 (PMV3)','POX':'Ospa drobiu','Derzsy':'Choroba Derzsy’ego – parwowiroza gęsi (GPV)','MDPV':'Parwowiroza kaczek piżmowych (MDPV)','Kokcydioza':'Kokcydioza','inne':'Inne'};
 const ROUTES = {spray:'Oprysk',woda:'Woda do picia',oko:'Oko / nos',inj:'Iniekcja',inovo:'In ovo'};
 
 </script>
@@ -2137,7 +2169,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.31.0';
+const APP_VERSION = '1.32.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];

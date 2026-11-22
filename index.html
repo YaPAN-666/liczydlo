@@ -2167,9 +2167,9 @@ function applyTheme(m){
   if(b){ b.title = b.ariaLabel = `Motyw: ${THEMES[m]} (zmień)`; b.setAttribute('aria-label', b.title); } if(l) l.textContent = THEMES[m];
   return m;
 }
-function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); toast(`Motyw: ${THEMES[m]}.`); }
+function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.32.0';
+const APP_VERSION = '1.33.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -3374,7 +3374,7 @@ async function saveReport(btn){
   btn.disabled = true;
   if(S.mode === 'local' && !IN_ARTIFACT && !S.persisted && navigator.storage && navigator.storage.persist){ S.persisted = true; navigator.storage.persist().catch(() => {}); }
   try {
-    const rid = uid(); await S.store.set(rid, doc); if(doc.route === 'spray') houseSave();
+    const rid = uid(); await S.store.set(rid, doc); if(doc.route === 'spray') houseSave(); opFeat('raport'); if(/LISTA KONTROLNA/.test(doc.text || '')) opFeat('lista'); if(doc.pace) opFeat('tempo'); if(isNum(doc.deltaT)) opFeat('deltat');
     const m = doc.modId && S.mods[doc.modId];
     if(m && m.status === 'zalecona') await S.store.set(doc.modId, Object.assign({}, m, {status:'zastosowana', appliedReport:rid, appliedAt:new Date().toISOString()}));
     S.chk = {}; chkCount(); document.querySelectorAll('#crew li.tick.done').forEach(li => { li.classList.remove('done'); li.setAttribute('aria-checked', 'false'); }); chkCount(); $('notes').value = ''; $('r-time').value = ''; $('r-temp').value = ''; $('save-msg').textContent = 'Zapisano ' + new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) + '.'; toast('Raport zapisany.'); }
@@ -3416,7 +3416,7 @@ async function reportAction(ev){
   if(btn.dataset.act === 'sum-save'){ ev.stopPropagation(); return sumSave(id, r, false); }
   if(btn.dataset.act === 'sum-perm'){ ev.stopPropagation(); return sumSave(id, r, true); }
   if(btn.dataset.act === 'copy') return copyText(r.text || '');
-  if(btn.dataset.act === 'print') return printReport(r);
+  if(btn.dataset.act === 'print'){ opFeat('druk'); return printReport(r); }
   if(btn.dataset.act === 'dl') return downloadFile(`raport_szczepienia_${r.date}_${(r.farm || 'ferma').replace(/[^\p{L}\p{N}]+/gu,'_')}.txt`, r.text || '', 'text/plain');
   if(btn.dataset.act === 'share'){ try { await navigator.share({title:'Raport szczepienia – Liczydło', text:r.text || ''}); } catch(e){} return; }
   if(btn.dataset.act === 'del'){ if(!armConfirm(btn)) return; try { await S.store.remove(id); S.open = null; toast('Usunięto raport.'); } catch(e){ toast(errText(e)); } }
@@ -3516,7 +3516,7 @@ async function tmWake(on){
 }
 function tmStart(){
   const v = curVac(), min = v ? useMinutes(v) : null;
-  lsSet(TM_KEY, {t0:Date.now(), min, n:v ? v.n : 'szczepionka', use:v ? v.use : ''});
+  opFeat('odliczanie'); lsSet(TM_KEY, {t0:Date.now(), min, n:v ? v.n : 'szczepionka', use:v ? v.use : ''});
   toast(min ? `Odliczam czas zużycia – ChPLW: ${v.use}. Ekran nie zgaśnie.` : 'ChPLW (w bazie) nie podaje czasu zużycia – liczę czas od rozpuszczenia. Ekran nie zgaśnie.', 4500);
   tmPaint();
 }
@@ -3541,7 +3541,7 @@ function tmPaint(){
   draw(); tmTick = setInterval(draw, 15000);
 }
 function bigApply(on){ document.documentElement.classList.toggle('big', !!on); ['tm-big', 'i-big'].forEach(id => { const b = $(id); if(b) b.setAttribute('aria-pressed', String(!!on)); }); }
-function bigToggle(){ const on = !lsGet(BIG_KEY); lsSet(BIG_KEY, on); bigApply(on); toast(on ? 'Duży tekst włączony.' : 'Duży tekst wyłączony.'); }
+function bigToggle(){ opFeat('duzy'); const on = !lsGet(BIG_KEY); lsSet(BIG_KEY, on); bigApply(on); toast(on ? 'Duży tekst włączony.' : 'Duży tekst wyłączony.'); }
 function useMinutes(v){ const m = String(v && v.use || '').match(/(\d+(?:[.,]\d+)?)\s*(?:[–-]\s*\d+(?:[.,]\d+)?\s*)?h\b/); return m ? parseFloat(m[1].replace(',', '.')) * 60 : null; }
 // Cel z zapasem na przygotowanie roztworu: ¾ czasu, ale nie mniej niż czas minus 30 min.
 function useTarget(um){ return Math.max(um * 0.75, um - 30); }
@@ -4323,7 +4323,7 @@ function progAction(ev){
   const btn = ev.target.closest('[data-pg]'); if(!btn) return;
   const p = progGet(), flEl = btn.closest('[data-fl]'), fl = flEl && p.flocks.find(f => f.id === flEl.dataset.fl); if(!fl) return;
   const itEl = btn.closest('[data-it]'), it = itEl && fl.items.find(x => x.id === itEl.dataset.it), a = btn.dataset.pg;
-  if(a === 'use' && it) return progUse(fl, it);
+  if(a === 'use' && it){ opFeat('prog_licz'); return progUse(fl, it); }
   if(a === 'done' && it){ it.done = !it.done; progSet(p); return renderProgram(); }
   if(a === 'del' && it){ if(!armConfirm(btn)) return; fl.items = fl.items.filter(x => x !== it); progSet(p); return renderProgram(); }
   if(a === 'delfl'){ if(!armConfirm(btn)) return; p.flocks = p.flocks.filter(f => f !== fl); progSet(p); toast('Usunięto stado z programu.'); return renderProgram(); }
@@ -4331,7 +4331,7 @@ function progAction(ev){
     const box = btn.closest('.pg-fl'), age = Math.round(pf(box.querySelector('[data-pg-f="age"]').value)), vid = box.querySelector('[data-pg-f="vac"]').value, route = box.querySelector('[data-pg-f="route"]').value;
     if(!isNum(age) || age < 0){ toast('Wpisz wiek w dniach.'); box.querySelector('[data-pg-f="age"]').focus(); return; }
     if(!vid){ toast('Wybierz szczepionkę.'); box.querySelector('[data-pg-f="vac"]').focus(); return; }
-    fl.items.push({id:uid(), age, vacId:vid, route}); progSet(p); renderProgram(); toast('Dodano do programu.');
+    fl.items.push({id:uid(), age, vacId:vid, route}); progSet(p); opFeat('program'); renderProgram(); toast('Dodano do programu.');
   }
 }
 function progField(ev){
@@ -4849,10 +4849,19 @@ function opStatNote(){
   s.n++; add(s.vac, v.n.slice(0, 120)); add(s.route, route); add(s.bird, (BIRDS[bk].l || bk).slice(0, 60));
   lsSet(OP_STAT_KEY, s);
 }
+// Funkcje aplikacji w statystykach (tylko za zgodą; wysyłane razem z obliczeniami)
+function opFeat(k){
+  try {
+    const a = OP.app; if(IN_ARTIFACT || !opOn() || !a || !a.stats || !lsGet(OP_STAT_KEY + '.zgoda')) return;
+    const s = lsGet(OP_STAT_KEY) || {day:opToday(), n:0, vac:{}, route:{}, bird:{}};
+    s.feat = s.feat || {}; if(Object.keys(s.feat).length < 20 || s.feat[k]) s.feat[k] = Math.min(10000, (s.feat[k] || 0) + 1);
+    lsSet(OP_STAT_KEY, s);
+  } catch(e){}
+}
 async function opStatFlush(){
   const s = lsGet(OP_STAT_KEY), a = OP.app;
   if(!s || !s.n || !a || !a.stats || !lsGet(OP_STAT_KEY + '.zgoda')) return;
-  await fsCommit([{update:{name:fsName(fsAppPath('stats/' + opRnd(20))), fields:fsF({day:s.day, ver:APP_VERSION, n:s.n, vac:s.vac, route:s.route, bird:s.bird})}, updateTransforms:[NOW('created')], currentDocument:{exists:false}}]);
+  await fsCommit([{update:{name:fsName(fsAppPath('stats/' + opRnd(20))), fields:fsF(Object.assign({day:s.day, ver:APP_VERSION, n:s.n, vac:s.vac, route:s.route, bird:s.bird}, s.feat && Object.keys(s.feat).length ? {feat:s.feat} : {}))}, updateTransforms:[NOW('created')], currentDocument:{exists:false}}]);
   try { localStorage.removeItem(OP_STAT_KEY); } catch(e){}
 }
 // --- licencje ---
@@ -5051,7 +5060,7 @@ function bind(){
   $('k-list').addEventListener('click', ev => { const b = ev.target.closest('.item'); if(b){ S.selVac = b.dataset.id; S.cmpShow = false; renderKnowledge(); $('k-detail').scrollIntoView({behavior:'smooth', block:'nearest'}); } });
   $('k-detail').addEventListener('click', ev => { if(ev.target.id === 'k-use') useVaccine(S.selVac);
     if(ev.target.id === 'k-cmp'){ const c = S.cmp = S.cmp || [], i = c.indexOf(S.selVac); if(i >= 0) c.splice(i, 1); else { if(c.length >= 3){ toast('Porównasz najwyżej 3 szczepionki – usuń jedną.'); return; } c.push(S.selVac); } renderKnowledge(); } });
-  $('k-cmpbar').addEventListener('click', ev => { const b = ev.target.closest('[data-cmp]'); if(!b) return; if(b.dataset.cmp === 'clear'){ S.cmp = []; S.cmpShow = false; } else S.cmpShow = !S.cmpShow; renderKnowledge(); if(S.cmpShow) $('k-detail').scrollIntoView({behavior:'smooth', block:'nearest'}); });
+  $('k-cmpbar').addEventListener('click', ev => { const b = ev.target.closest('[data-cmp]'); if(!b) return; if(b.dataset.cmp === 'clear'){ S.cmp = []; S.cmpShow = false; } else { S.cmpShow = !S.cmpShow; if(S.cmpShow) opFeat('porownanie'); } renderKnowledge(); if(S.cmpShow) $('k-detail').scrollIntoView({behavior:'smooth', block:'nearest'}); });
   $('b-export').addEventListener('click', exportBackup);
   $('b-csv').addEventListener('click', exportCSV);
   $('pg-add').addEventListener('click', progAdd); $('pg-list').addEventListener('click', progAction); $('pg-today').addEventListener('click', progAction); $('pg-list').addEventListener('input', progField);
@@ -5125,7 +5134,7 @@ function printReport(r){
 // Zestawienie raportów do arkusza (Excel, Arkusze Google): CSV ze średnikami, przecinek dziesiętny, BOM dla polskich znaków
 function exportCSV(){
   const all = Object.values(S.reps).sort((a,b) => String(a.date).localeCompare(String(b.date)));
-  if(!all.length){ toast('Brak raportów do zestawienia.'); return; }
+  if(!all.length){ toast('Brak raportów do zestawienia.'); return; } opFeat('csv');
   const n = (x, d = 2) => isNum(x) ? String(Math.round(x * 10 ** d) / 10 ** d).replace('.', ',') : '';
   const c = x => { const s = x == null ? '' : String(x); return /[;"\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   const H = ['Data','Godzina','Ferma','Drób','Wiek (dni)','Liczba ptaków','Choroba','Szczepionka','Droga podania','Fiolki','Dawki','Seria','Ważna do','Woda / rozpuszczalnik (l)','Dawka iniekcji (ml)','Ciśnienie (bar)','Dysza','Kropla (µm)','Czas (min)','Osoby','Temp. w kurniku (°C)','Szczepiący','Uwagi'];
@@ -5152,7 +5161,7 @@ function bkNag(){
 function exportBackup(){
   const n = Object.keys(S.reps).length + Object.keys(S.mods).length + Object.keys(S.farms).length + progGet().flocks.length;
   if(!n){ toast('Brak danych do zapisania.'); return; }
-  lsSet(BKP_KEY, {t:Date.now()}); setTimeout(bkNag, 50);
+  lsSet(BKP_KEY, {t:Date.now()}); setTimeout(bkNag, 50); opFeat('kopia');
   downloadFile(`liczydlo-kopia-${todayISO()}.json`, JSON.stringify({app:'Liczydło APP', wersja:APP_VERSION, zapisano:new Date().toISOString(), raporty:S.reps, modyfikacje:S.mods, ustawienia:S.farms, program:progGet()}, null, 1), 'application/json');
 }
 async function importBackup(file){

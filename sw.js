@@ -1,10 +1,10 @@
 /* Liczydło APP – service worker (praca bez internetu i aktualizacje)
    Przy każdej nowej wersji zmienia się VERSION – telefon pobiera wtedy nowe pliki
    i pokazuje pasek „Dostępna nowa wersja”. */
-const VERSION = '1.35.2';
+const VERSION = '1.35.3';
 const CACHE = 'liczydlo-app-' + VERSION;
 const FONTS = 'liczydlo-fonts';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png?v=2', './icons/icon-512.png?v=2', './icons/icon-maskable-512.png?v=2', './icons/apple-touch-icon.png?v=2'];
 
 self.addEventListener('install', event => {
   // Pliki nowej wersji pobierane z pominięciem pamięci podręcznej przeglądarki.

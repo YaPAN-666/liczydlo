@@ -520,7 +520,6 @@ html.big .btn{padding:9px 16px} html.big .btn.small{padding:7px 12px} html.big i
 details.pg-inf{margin-top:3px;font-size:.8rem} details.pg-inf summary{cursor:pointer;color:var(--info);font-weight:600}
 /* Bez „pociągnij, aby odświeżyć” – przypadkowe przeciągnięcie w dół nie przeładowuje aplikacji */
 html,body{overscroll-behavior-y:none}
-.spu-l{color:#E39A3B}   /* pierwsze litery Studio Pracy Umysłowej */
 </style>
 </head>
 <body>
@@ -540,7 +539,7 @@ html,body{overscroll-behavior-y:none}
   </div>
   <div class="brand" aria-label="Studio Pracy Umysłowej – Paweł Czarnocki">
     <span class="mark" aria-hidden="true"></span>
-    <span class="words"><span class="studio"><span class="spu-l">S</span>tudio <span class="spu-l">P</span>racy <span class="spu-l">U</span>mysłowej</span><span class="author"><i aria-hidden="true"></i>Paweł Czarnocki</span></span>
+    <span class="words"><span class="studio">Studio Pracy Umysłowej</span><span class="author"><i aria-hidden="true"></i>Paweł Czarnocki</span></span>
   </div>
 </div>
 
@@ -575,7 +574,7 @@ html,body{overscroll-behavior-y:none}
       </ol>
     </div>
     <button class="btn ghost" type="button" id="inst-later">Teraz nie – korzystaj w przeglądarce</button>
-    <p class="credit"><span class="spu-l">S</span>tudio <span class="spu-l">P</span>racy <span class="spu-l">U</span>mysłowej<br><span>Paweł Czarnocki</span></p>
+    <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
   </div>
 </div>
 
@@ -589,7 +588,7 @@ html,body{overscroll-behavior-y:none}
     <span class="note err" id="who-err" role="alert"></span>
     <button class="btn" type="submit" id="who-ok">Zapisz i rozpocznij</button>
     <p class="note">Nazwę później może zmienić tylko administrator aplikacji.</p>
-    <p class="credit"><span class="spu-l">S</span>tudio <span class="spu-l">P</span>racy <span class="spu-l">U</span>mysłowej<br><span>Paweł Czarnocki</span></p>
+    <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
   </form>
 </div>
 
@@ -602,7 +601,7 @@ html,body{overscroll-behavior-y:none}
       <p>Aplikacja rozwija się dzięki Waszym sugestiom, uwagom krytycznym i wskazówkom. Wpisujcie je w zakładce <b>O aplikacji → Sugestie i zgłoszenia</b> – będę za nie bardzo wdzięczny.</p>
       <p class="author-sign">Owocnej pracy!</p>
     </div>
-    <p class="credit"><span class="spu-l">S</span>tudio <span class="spu-l">P</span>racy <span class="spu-l">U</span>mysłowej<br><span>Paweł Czarnocki</span></p>
+    <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
     <div class="tools"><button class="btn" type="button" id="author-ok">Zaczynam pracę</button></div>
   </div>
 </div>
@@ -640,7 +639,7 @@ html,body{overscroll-behavior-y:none}
       <button class="btn ghost" type="button" id="gate-export">Zapisz kopię raportów</button>
     </div>
     <p class="note">Aplikacja jest udostępniana na zasadzie odwołalnej licencji niewyłącznej. Operator zastrzega sobie prawo do zawieszenia lub zakończenia świadczenia usługi w dowolnym momencie bez podania przyczyny.</p>
-    <p class="credit"><span class="spu-l">S</span>tudio <span class="spu-l">P</span>racy <span class="spu-l">U</span>mysłowej<br><span>Paweł Czarnocki</span></p>
+    <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
   </div>
 </div>
 
@@ -1178,7 +1177,7 @@ html,body{overscroll-behavior-y:none}
       <p class="note">Administrator danych: Studio Pracy Umysłowej – Paweł Czarnocki. Identyfikator kopii staje się daną osobową dopiero po przypisaniu go do osoby (np. przy licencji). Podstawa: prawnie uzasadniony interes operatora – zabezpieczenie i rozwój aplikacji (art. 6 ust. 1 lit. f RODO); statystyki – Twoja zgoda (art. 6 ust. 1 lit. a RODO), którą możesz w każdej chwili wycofać. Masz prawo dostępu do danych, ich sprostowania, usunięcia i sprzeciwu – napisz przez „Sugestie i zgłoszenia”, podając identyfikator kopii.</p>
     </div>
   </div>
-  <p class="credit"><span class="spu-l">S</span>tudio <span class="spu-l">P</span>racy <span class="spu-l">U</span>mysłowej<br><span>Paweł Czarnocki</span></p>
+  <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
 </section>
 </main>
 <div class="updbar" id="updbar" role="status" hidden><span id="upd-text">Dostępna nowa wersja aplikacji.</span><button class="btn small" type="button" id="upd-btn">Aktualizuj</button></div>
@@ -2189,7 +2188,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.35.0';
+const APP_VERSION = '1.35.1';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -3251,7 +3250,6 @@ function rwrap(prefix, text, ind){
 }
 function rkv(k, v){ if(v == null || v === '') return null; const pre = `  ${k} ${'.'.repeat(Math.max(2, 15 - k.length))} `; return rwrap(pre, v, pre.length); }
 function rbul(a, ind = '  '){ return (a || []).filter(Boolean).map(x => rwrap(ind + '• ', x, ind.length + 2)); }
-const SPU_HTML = '<span class="spu-l">S</span>tudio <span class="spu-l">P</span>racy <span class="spu-l">U</span>mysłowej';   // pierwsze litery Studia Pracy Umysłowej na pomarańczowo
 function repFooter(){ return ['', R_SEP, `Liczydło APP ${APP_VERSION} · ChPLW ${DATA_DATE}`, 'Studio Pracy Umysłowej', 'Paweł Czarnocki']; }
 // Tekst raportu bez podsumowania i stopki – także raporty zapisane w starszym formacie
 function repBase(text){
@@ -3296,7 +3294,7 @@ function repHTML(text){
     else if(x.t === 'sep') h += '<hr>';
     else if(x.t === 'sub') h += `<div class="rep-sub">${esc(x.x)}</div>`;
     else if(x.t === 'p') h += `<p>${esc(x.x)}</p>`;
-    else if(x.t === 'foot') h += `<div class="rep-f"><span>${esc(x.a[0]).replace(/^Liczydło/, '<span class="lz-l">L</span>iczydło')}</span>${x.a[1] ? `<p class="credit">${esc(x.a[1]).replace(/^Studio Pracy Umysłowej$/, SPU_HTML)}${x.a[2] ? `<br><span>${esc(x.a[2])}</span>` : ''}</p>` : ''}</div>`;
+    else if(x.t === 'foot') h += `<div class="rep-f"><span>${esc(x.a[0]).replace(/^Liczydło/, '<span class="lz-l">L</span>iczydło')}</span>${x.a[1] ? `<p class="credit">${esc(x.a[1])}${x.a[2] ? `<br><span>${esc(x.a[2])}</span>` : ''}</p>` : ''}</div>`;
     i++;
   }
   return h + '</div>';

@@ -1,9 +1,10 @@
 {
- "wersja": "1.34.0",
+ "wersja": "1.34.1",
  "data": "2026-11-22",
  "zmiany": [
-  "Innovax-ND-IBD-ILT (MSD – ND, IBD, ILT i choroba Mareka, 1. dzień lub in ovo): karta z unijnej bazy produktów i opinii CVMP – na razie dane częściowe, bez obliczeń, do czasu pełnej ChPLW.",
-  "– Innovax-ILT sprawdzony z polską ChPLW (EMA): opis rozpuszczalnika i miejsca wstrzyknięcia zgodnie z polskim tekstem.",
+  "Podpis „Studio Pracy Umysłowej” z pomarańczowymi pierwszymi literami S, P, U – na ekranie startowym, w oknach powitalnych, w „O aplikacji” i w stopce raportu.",
+  "(1.34.0) Innovax-ND-IBD-ILT (MSD – ND, IBD, ILT i choroba Mareka, 1. dzień lub in ovo): karta z unijnej bazy produktów i opinii CVMP – na razie dane częściowe, bez obliczeń, do czasu pełnej ChPLW.",
+  "(1.34.0) – Innovax-ILT sprawdzony z polską ChPLW (EMA): opis rozpuszczalnika i miejsca wstrzyknięcia zgodnie z polskim tekstem.",
   "(1.33.2) Nowe logo Studia Pracy Umysłowej (wersja główna): drzewo-umysł w kadrze z narożnikami, z pomarańczową iskrą pomysłu i pomarańczową kropką u podstawy – na ekranie startowym, w oknach powitalnych i w stopce raportu.",
   "(1.33.1) Przeciągnięcie ekranu w dół nie odświeża już aplikacji. Wpisane dane w Obliczeniach są na bieżąco zapamiętywane i wracają po przypadkowym odświeżeniu lub zamknięciu (przez 24 h); czysty formularz – przycisk „Nowe obliczenie”.",
   "(1.33.0) Statystyki dla Operatora (tylko za zgodą użytkownika, anonimowo): oprócz szczepionek, dróg i drobiu także to, z których funkcji korzystacie – raporty, druk, program, odliczanie, porównanie i inne.",

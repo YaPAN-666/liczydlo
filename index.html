@@ -490,6 +490,34 @@ html.big{font-size:18px} html.big body{font-size:17px}
 html.big .btn{padding:9px 16px} html.big .btn.small{padding:7px 12px} html.big input,html.big select{min-height:46px}
 @media print{.tm{display:none !important}}
 .bk-nag{display:grid;gap:8px;margin-bottom:12px} .bk-nag .tools{margin:0}
+/* Program szczepień */
+.pill.today{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.pill.plan{background:var(--surface-2);border-color:var(--line);color:var(--muted)}
+.pg-items{display:grid;gap:2px;margin:8px 0 4px}
+.pg-it{display:grid;grid-template-columns:auto 1fr auto;gap:4px 12px;align-items:start;padding:9px 4px;border-top:1px solid var(--line)}
+.pg-it:first-child{border-top:0}
+.pg-todo .pg-it{grid-template-columns:1fr auto}
+.pg-d{display:grid;justify-items:center;min-width:48px;font-variant-numeric:tabular-nums}
+.pg-d b{font-size:.95rem} .pg-d small{font-size:.72rem;color:var(--muted)}
+.pg-it.done .pg-d,.pg-it.done .pg-v .t{color:var(--muted)}
+.pg-it.late .pg-d b{color:var(--bad)} .pg-it.today .pg-d b{color:var(--warn)}
+.pg-v{display:grid;gap:3px;min-width:0} .pg-v .t{font-weight:600} .pg-v .s{font-size:.82rem;color:var(--muted)}
+.pg-v .msg{font-size:.8rem;padding:6px 9px;margin-top:3px}
+.pg-a{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+@media (max-width:560px){ .pg-it{grid-template-columns:auto 1fr} .pg-a{grid-column:1 / -1;justify-content:flex-start;padding-left:60px} .pg-todo .pg-a{padding-left:0} }
+.pg-new{margin-top:6px}
+#pg-today:empty{display:none}
+/* Porównanie */
+.cmpbar{display:grid;gap:6px} .cmpbar .tools{margin:0}
+.cmp table{font-size:.84rem} .cmp th[scope],.cmp tbody th{text-align:left;white-space:nowrap;color:var(--muted);font-weight:600;vertical-align:top}
+.cmp td{vertical-align:top;min-width:160px}
+.cmpg{display:grid;font-size:.86rem}
+.cmp-h,.cmp-r{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:12px}
+.cmp-h{position:sticky;top:0;background:var(--surface);padding:6px 0 8px;border-bottom:2px solid var(--brand);z-index:1}
+.cmp-h b{font-size:.9rem;line-height:1.25}
+.cmp-k{margin-top:10px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.cmp-r{padding:3px 0 9px;border-bottom:1px solid var(--line);line-height:1.4;overflow-wrap:break-word;hyphens:auto;-webkit-hyphens:auto}
+details.pg-inf{margin-top:3px;font-size:.8rem} details.pg-inf summary{cursor:pointer;color:var(--info);font-weight:600}
 </style>
 </head>
 <body>
@@ -627,6 +655,7 @@ html.big .btn{padding:9px 16px} html.big .btn.small{padding:7px 12px} html.big i
       <a href="#obliczenia" data-tab="obliczenia">Obliczenia</a>
       <a href="#raporty" data-tab="raporty">Raporty <span class="pill" id="rep-count">0</span></a>
       <a href="#zmiany" data-tab="zmiany">Zmiany <span class="pill" id="mod-count">0</span></a>
+      <a href="#program" data-tab="program">Program <span class="pill" id="prog-count" hidden>0</span></a>
       <a href="#szczepionki" data-tab="szczepionki">Szczepionki</a>
     </nav>
   </div>
@@ -969,6 +998,23 @@ html.big .btn{padding:9px 16px} html.big .btn.small{padding:7px 12px} html.big i
   </div>
 </section>
 
+<!-- ============ PROGRAM SZCZEPIEŃ ============ -->
+<section class="view" id="v-program" hidden>
+  <div class="card">
+    <h2>Program szczepień stada</h2>
+    <p class="note">Zaplanuj szczepienia stada od wylęgu. Aplikacja podaje daty, odhacza wykonane (po zapisanym raporcie tej fermy i szczepionki), sprawdza wiek i gatunek z ChPLW oraz pokazuje, co ChPLW mówi o łączeniu szczepionek podanych blisko siebie. Program ustala lekarz weterynarii – aplikacja go tylko pilnuje. Zapis: w tym urządzeniu (i w kopii raportów).</p>
+    <div class="row">
+      <label>Ferma (kurnik)<input id="pg-farm" type="text" list="farm-list" autocomplete="off" placeholder="np. Nowak, kurnik 2"></label>
+      <label>Drób<select id="pg-bird"></select></label>
+      <label>Data wylęgu / wstawienia<input id="pg-hatch" type="date"><span class="hint">tego dnia wiek = 0 dni</span></label>
+      <label>Liczba ptaków<input id="pg-birds" type="number" min="1" step="1" inputmode="numeric" placeholder="np. 30000"></label>
+    </div>
+    <div class="tools"><button class="btn" type="button" id="pg-add">Dodaj stado</button></div>
+  </div>
+  <div id="pg-today"></div>
+  <div id="pg-list" class="stack"></div>
+</section>
+
 <!-- ============ RAPORTY ============ -->
 <section class="view" id="v-raporty" hidden>
   <div class="card-h">
@@ -1026,7 +1072,7 @@ html.big .btn{padding:9px 16px} html.big .btn.small{padding:7px 12px} html.big i
     <span class="note"><span class="pill v">ChPLW PL</span> odczytano z ulotki lub ChPLW w Rejestrze Produktów Leczniczych · <span class="pill p">dane częściowe</span> ChPLW zagraniczna lub niepełny odczyt · <span class="pill u">do weryfikacji</span> sprawdź w ChPLW</span>
   </div>
   <div class="cols side">
-    <div class="stack"><span class="note" id="k-count"></span><div class="items" id="k-list"></div></div>
+    <div class="stack"><div id="k-cmpbar" class="msg info cmpbar" hidden></div><span class="note" id="k-count"></span><div class="items" id="k-list"></div></div>
     <div class="stack"><div class="card" id="k-detail"></div></div>
   </div>
   <details class="card" id="rules"><summary>Zasady podawania i źródła</summary><div id="rules-body" class="stack"></div></details>
@@ -2091,7 +2137,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.30.0';
+const APP_VERSION = '1.31.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -3305,7 +3351,7 @@ async function saveReport(btn){
 }
 function renderReports(){
   const all = Object.entries(S.reps).map(([id,r]) => Object.assign({}, r, {id})).sort((a,b) => String(b.date).localeCompare(String(a.date)) || String(b.createdAt).localeCompare(String(a.createdAt)));
-  $('rep-count').textContent = all.length; bkNag();
+  $('rep-count').textContent = all.length; bkNag(); progBadge(); if(!$('v-program').hidden) renderProgram();
   const farms = [...new Set(all.map(r => r.farm).filter(Boolean))];
   $('farm-list').innerHTML = farms.map(f => `<option value="${esc(f)}"></option>`).join('');
   const q = $('r-q').value.trim().toLowerCase();
@@ -4103,6 +4149,7 @@ function renderKnowledge(){
     && (!mf || mfrOf(v) === mf) && (!st || (st === 'off' ? !!v.off : st === 'law' ? !!v.law : !v.off))).sort((a,b) => a.n.localeCompare(b.n,'pl'));
   $('k-count').textContent = `${rows.length} z ${VACCINES.length} szczepionek`;
   $('k-list').innerHTML = rows.map(v => `<button type="button" class="item${S.selVac === v.id ? ' sel' : ''}" data-id="${esc(v.id)}"><span class="t">${esc(v.n)} ${stPill(v)}</span><span class="s">${esc(v.dz.join(' + '))} · ${esc(spText(v.sp))} · ${esc(Object.keys(v.r || {}).map(k => ROUTES[k].toLowerCase()).join(', ') || 'droga wg ChPLW')}</span></button>`).join('') || '<div class="empty">Brak szczepionek dla wybranych filtrów.</div>';
+  cmpBar(); if(S.cmpShow && (S.cmp || []).length >= 2){ $('k-detail').innerHTML = cmpHTML(); return; }
   const v = S.selVac ? VACCINES.find(x => x.id === S.selVac) : null; const box = $('k-detail');
   if(!v){ box.innerHTML = '<div class="empty"><b>Wybierz szczepionkę z listy.</b><span>Zobaczysz drogi podania, objętości wody, krople, wiek, opakowania, karencję i źródło ChPLW.</span></div>'; return; }
   box.innerHTML = `<div class="card-h"><h2>${esc(v.n)}</h2>${stPill(v)}</div>
@@ -4110,7 +4157,20 @@ function renderKnowledge(){
       ${Object.entries(v.r || {}).map(([k,r]) => describeRoute(k, r)).join('')}
       <dt>Opakowania</dt><dd>${v.pk && v.pk.length ? esc(v.pk.join(', ')) + ' dawek' : 'sprawdź w ChPLW'}</dd><dt>Zużyć w</dt><dd>${esc(v.use)}</dd><dt>Karencja</dt><dd>${esc(v.wd)}</dd><dt>Nieśność</dt><dd>${esc(v.lay)}</dd><dt>Łączenie</dt><dd>${esc(v.mix)}</dd>${extraKV(v)}
       <dt>Źródło</dt><dd>${v.src && v.src.length ? v.src.map(linkSrc).join('<br>') : 'brak odczytu – sprawdź w <a href="https://rejestry.ezdrowie.gov.pl/rpl/search/public" target="_blank" rel="noopener">Rejestrze Produktów Leczniczych</a>'}</dd></dl>
-    ${!v.off && RT.some(r => v.r && v.r[r]) ? '<div class="tools"><button class="btn small" type="button" id="k-use">Licz z tą szczepionką</button></div>' : ''}`;
+    <div class="tools">${!v.off && RT.some(r => v.r && v.r[r]) ? '<button class="btn small" type="button" id="k-use">Licz z tą szczepionką</button>' : ''}<button class="btn small ghost" type="button" id="k-cmp" aria-pressed="${(S.cmp || []).includes(v.id)}">${(S.cmp || []).includes(v.id) ? 'Usuń z porównania' : 'Dodaj do porównania'}</button></div>`;
+}
+// Porównanie 2–3 szczepionek obok siebie (dane z bazy ChPLW)
+function cmpBar(){
+  const c = (S.cmp || []).map(id => VACCINES.find(v => v.id === id)).filter(Boolean);
+  $('k-cmpbar').hidden = !c.length;
+  $('k-cmpbar').innerHTML = c.length ? `<span>Porównanie: ${c.map(v => `<b>${esc(v.n)}</b>`).join(', ')}${c.length < 2 ? ' – dodaj jeszcze jedną' : ''}</span><span class="tools">${c.length >= 2 ? `<button class="btn small" type="button" data-cmp="show">${S.cmpShow ? 'Ukryj porównanie' : 'Porównaj'}</button>` : ''}<button class="btn small ghost" type="button" data-cmp="clear">Wyczyść</button></span>` : '';
+}
+function cmpHTML(){
+  const c = (S.cmp || []).map(id => VACCINES.find(v => v.id === id)).filter(Boolean);
+  const routes = v => Object.keys(v.r || {}).map(k => ROUTES[k] || k).join(', ');
+  const R = [['Status', v => v.off ? 'wycofana' : ST_LABEL[v.st]], ['Uwaga prawna', v => v.law ? 'tak – zob. kartę' : '–'], ['Producent', v => v.m], ['Rodzaj', v => v.t], ['Choroby', v => v.dz.map(d => DISEASES[d] || d).join('; ')], ['Szczep', v => v.s], ['Drób', v => spText(v.sp)],
+    ['Drogi podania', routes], ['Wiek', v => v.minT], ['Schemat i odporność', v => v.sch], ['Opakowania', v => v.pk && v.pk.length ? v.pk.join(', ') + ' dawek' : '–'], ['Zużyć w', v => v.use], ['Karencja', v => v.wd], ['Nieśność', v => v.lay], ['Łączenie', v => v.mix], ['Po szczepieniu', v => v.ae]];
+  return `<div class="card-h"><h2>Porównanie szczepionek</h2></div><div class="cmpg" style="--n:${c.length}"><div class="cmp-h">${c.map(v => `<b>${esc(v.n)}</b>`).join('')}</div>${R.map(([k, f]) => `<div class="cmp-k">${k}</div><div class="cmp-r">${c.map(v => `<div>${esc(f(v) || '–')}</div>`).join('')}</div>`).join('')}</div><p class="note">Dane z kart szczepionek (ChPLW). Szczegóły i źródła – w karcie każdej szczepionki.</p>`;
 }
 function useVaccine(id){
   const v = VACS.find(x => x.id === id); if(!v) return;
@@ -4120,6 +4180,141 @@ function useVaccine(id){
   S.dzAll = true; fillDz(); S.dzAll = false; $('dz').value = v.dz[0];
   S.vacWant = id; S.picked = true; fillVac({keep:true}); $('vac').value = id; onVacChange(); saveWants();
   location.hash = 'obliczenia'; window.scrollTo({top:0});
+}
+/* ---------- Program szczepień stada ----------
+   Stada z datą wylęgu (wiek 0) i listą zaplanowanych szczepień (wiek w dniach, szczepionka, droga).
+   Zapis lokalny (liczydlo.program.v1) i w kopii raportów. Wykonane: raport tej fermy i szczepionki
+   w ciągu ±3 dni od daty z planu albo ręczne odhaczenie. Kontrole: wiek i gatunek z ChPLW, wycofane,
+   uwaga prawna, szczepionki żywe blisko siebie – z tekstem ChPLW o łączeniu (decyzja lekarza). */
+const PROG_KEY = 'liczydlo.program.v1', DAY = 864e5;
+function progGet(){ const p = lsGet(PROG_KEY); return p && Array.isArray(p.flocks) ? p : {flocks:[]}; }
+function progSet(p){ lsSet(PROG_KEY, p); progBadge(); }
+function isoAdd(iso, d){ const t = Date.parse(iso + 'T12:00:00'); return isNum(t) ? new Date(t + d * DAY).toISOString().slice(0, 10) : ''; }
+function isoDiff(a, b){ return Math.round((Date.parse(a + 'T12:00:00') - Date.parse(b + 'T12:00:00')) / DAY); }
+function progDone(fl, it){
+  if(it.done) return {manual:true};
+  const d = isoAdd(fl.hatch, it.age), k = farmKey(fl.farm);
+  const r = Object.entries(S.reps).find(([, x]) => x.vacId === it.vacId && farmKey(x.farm) === k && x.date && Math.abs(isoDiff(x.date, d)) <= 3);
+  return r ? {rep:r[0], date:r[1].date} : null;
+}
+function progStatus(fl, it){
+  const d = isoAdd(fl.hatch, it.age), dd = isoDiff(d, todayISO()), done = progDone(fl, it);
+  if(done) return {c:'done', l:done.manual ? 'wykonane' : `wykonane ${fmtDate(done.date)}`, dd};
+  return dd < 0 ? {c:'late', l:`zaległe ${-dd} ${pl(-dd, 'dzień', 'dni', 'dni')}`, dd} : dd === 0 ? {c:'today', l:'dziś', dd} : {c:'plan', l:dd === 1 ? 'jutro' : `za ${dd} dni`, dd};
+}
+const MIX_GENERIC = new Set(['nobilis','poulvac','cevac','avipro','primun','avishield','gallivac','innovax','vaxxitek','tabic','hatchpak','inac','live','plus']);
+function mixNames(txt, v){
+  const T = String(txt || '').toLowerCase(), tok = v.n.toLowerCase().split(/[\s+\/,()]+/).filter(w => w.length >= 2 && !MIX_GENERIC.has(w));
+  return tok.length > 0 && tok.every(w => T.includes(w));
+}
+function progChecks(fl){
+  const out = {}, add = (id, c, t) => { (out[id] = out[id] || []).push([c, t]); };
+  const its = fl.items.map(it => ({it, v:VACCINES.find(x => x.id === it.vacId)})).filter(x => x.v).sort((a, b) => a.it.age - b.it.age);
+  const live = v => /żyw/i.test(v.t || ''), resp = it => ['spray', 'woda', 'oko'].includes(it.route);
+  its.forEach(({it, v}) => {
+    if(v.off) add(it.id, 'bad', `${v.n}: ${v.off}`);
+    if(v.law) add(it.id, 'bad', `Uwaga prawna – ${v.law}`);
+    const n = vacNote(v, fl.bird, it.age + 1); if(n) add(it.id, 'bad', `ChPLW: ${n} (${v.minT}).`);
+    if(it.route && !rOk(v, it.route, fl.bird)) add(it.id, 'bad', `Droga „${(ROUTES[it.route] || it.route).toLowerCase()}” nie jest w ChPLW dla tych ptaków.`);
+  });
+  for(let i = 0; i < its.length; i++) for(let j = i + 1; j < its.length; j++){
+    const a = its[i], b = its[j], gap = b.it.age - a.it.age, sameDz = a.v.dz.filter(d => b.v.dz.includes(d));
+    if(a.v.id === b.v.id && gap === 0) continue;
+    // ChPLW: „innych szczepionek nie stosować N dni przed i po” (z wyjątkami w nawiasie)
+    const excl = [[a, b, 'po'], [b, a, 'przed']].map(([x, y, w]) => { const m = String(x.v.mix || '').match(/innych szczepionek[^.;]*?(\d+)\s*dni\s*przed\s*(?:i|ani)\s*po/i); return m && gap < +m[1] && !mixNames(x.v.mix, y.v) ? {x, y, n:+m[1], w} : null; }).find(Boolean);
+    if(excl){ add(b.it.id, 'bad', `${excl.x.v.n} – ChPLW: innych szczepionek nie stosować ${excl.n} dni przed ani po. ${gap ? `${excl.y.v.n} wypada ${gap} ${pl(gap, 'dzień', 'dni', 'dni')} ${excl.w} niej.` : `${excl.y.v.n} jest tego samego dnia.`} Pełny tekst ChPLW: „${excl.x.v.mix}”`); continue; }
+    if(gap === 0 && a.v.id !== b.v.id){
+      const named = mixNames(a.v.mix, b.v) || mixNames(b.v.mix, a.v);
+      add(b.it.id, named ? 'info' : 'warn', `Ten sam dzień co ${a.v.n}. ${named ? 'ChPLW wymienia to łączenie' : 'ChPLW nie wymienia tego łączenia'} – ${a.v.n}: „${a.v.mix || 'brak danych'}” · ${b.v.n}: „${b.v.mix || 'brak danych'}”`);
+    } else if(gap > 0 && gap < 7 && sameDz.length) add(b.it.id, 'warn', `${gap} ${pl(gap, 'dzień', 'dni', 'dni')} po ${a.v.n} – znowu przeciw ${sameDz.join(', ')}. Sprawdź program z lekarzem weterynarii.`);
+    else if(gap > 0 && gap < 14 && live(a.v) && live(b.v) && (sameDz.length || (resp(a.it) && resp(b.it)))) add(b.it.id, 'info', `${gap} ${pl(gap, 'dzień', 'dni', 'dni')} po żywej ${a.v.n}${sameDz.length ? '' : ' (obie przez drogi oddechowe)'} – odstęp ustala lekarz. ChPLW ${b.v.n} o innych szczepionkach: „${b.v.mix || 'brak danych'}”`);
+  }
+  return out;
+}
+function progBadge(){
+  const p = progGet(); let n = 0;
+  p.flocks.forEach(fl => fl.items.forEach(it => { const s = progStatus(fl, it); if(s.c === 'late' || s.c === 'today') n++; }));
+  const b = $('prog-count'); if(b){ b.textContent = n; b.hidden = !n; b.classList.toggle('late', n > 0); }
+}
+function progVacOpts(fl, age){
+  const g = BIRDS[fl.bird] ? BIRDS[fl.bird].g : null;
+  const list = VACS.filter(v => (!g || v.sp.includes(g)) && RT.some(r => rOk(v, r, fl.bird))).map(v => ({v, n:isNum(age) ? vacNote(v, fl.bird, age + 1) : ''}));
+  list.sort((a, b) => (!!a.n - !!b.n) || a.v.n.localeCompare(b.v.n, 'pl'));
+  return '<option value="">— szczepionka —</option>' + list.map(({v, n}) => `<option value="${esc(v.id)}">${esc(v.n)} · ${esc(v.dz.join('+'))}${n ? ' – ' + esc(n) : ''}</option>`).join('');
+}
+function progRouteOpts(v, bk){ return v ? RT.filter(r => rOk(v, r, bk)).map(r => `<option value="${r}">${esc(ROUTES[r])}</option>`).join('') : '<option value="">—</option>'; }
+function renderProgram(){
+  if(!$('pg-bird').options.length) fillSelect($('pg-bird'), Object.entries(BIRDS).map(([k, b]) => ({v:k, l:b.l})));
+  if(!$('pg-hatch').value) $('pg-hatch').value = todayISO();
+  const p = progGet(), today = todayISO(), todo = [];
+  $('pg-list').innerHTML = p.flocks.map(fl => {
+    const ck = progChecks(fl), age = isoDiff(today, fl.hatch), its = [...fl.items].sort((a, b) => a.age - b.age);
+    const rows = its.map(it => {
+      const v = VACCINES.find(x => x.id === it.vacId), s = progStatus(fl, it), d = isoAdd(fl.hatch, it.age);
+      if(s.c === 'late' || s.c === 'today') todo.push({fl, it, v, s});
+      const ms = ck[it.id] || [], inf = ms.filter(x => x[0] === 'info');
+      const m = ms.filter(x => x[0] !== 'info').map(([c, t]) => `<div class="msg ${c}">${esc(t)}</div>`).join('')
+        + (inf.length ? `<details class="pg-inf"><summary>Odstępy i łączenie – ChPLW (${inf.length})</summary>${inf.map(([c, t]) => `<div class="msg info">${esc(t)}</div>`).join('')}</details>` : '');
+      return `<div class="pg-it ${s.c}" data-fl="${esc(fl.id)}" data-it="${esc(it.id)}">
+        <div class="pg-d"><b>${fmtDate(d).slice(0, 5)}</b><small>${it.age} ${it.age === 1 ? 'dzień' : 'dni'}</small></div>
+        <div class="pg-v"><span class="t">${esc(v ? v.n : it.vacId)} <span class="pill ${s.c}">${esc(s.l)}</span></span><span class="s">${esc(v ? v.dz.map(x => DISEASES[x] || x).join(', ') : '')} · ${esc((ROUTES[it.route] || '').toLowerCase())}</span>${m}</div>
+        <div class="pg-a">${s.c !== 'done' && v && !v.off ? '<button class="btn small" type="button" data-pg="use">Licz</button>' : ''}${s.c === 'done' && !it.done ? '' : `<button class="btn small ghost" type="button" data-pg="done" aria-pressed="${!!it.done}">${it.done ? 'Cofnij' : 'Wykonane'}</button>`}<button class="btn small ghost" type="button" data-pg="del" aria-label="Usuń z programu">✕</button></div>
+      </div>`;
+    }).join('') || '<div class="empty"><span>Dodaj pierwsze szczepienie poniżej.</span></div>';
+    return `<div class="card pg-fl" data-fl="${esc(fl.id)}">
+      <div class="card-h"><h2>${esc(fl.farm || 'ferma bez nazwy')}</h2><span class="pill">${esc(BIRDS[fl.bird] ? BIRDS[fl.bird].l : fl.bird)}</span></div>
+      <p class="note">Wylęg / wstawienie ${fmtDate(fl.hatch)} · dziś ${age >= 0 ? `wiek ${age} ${age === 1 ? 'dzień' : 'dni'} (${ageWeeks(age)})` : `za ${-age} dni`}${fl.birds ? ` · ${fmt0(fl.birds)} ptaków` : ''}</p>
+      <div class="pg-items">${rows}</div>
+      <div class="row tight pg-new">
+        <label>Wiek (dni)<input type="number" min="0" max="600" step="1" inputmode="numeric" data-pg-f="age" placeholder="np. 14"></label>
+        <label class="wide">Szczepionka<select data-pg-f="vac">${progVacOpts(fl, null)}</select></label>
+        <label>Droga<select data-pg-f="route"><option value="">—</option></select></label>
+      </div>
+      <div class="tools"><button class="btn small" type="button" data-pg="add">Dodaj szczepienie</button><button class="btn small danger" type="button" data-pg="delfl">Usuń stado</button></div>
+    </div>`;
+  }).join('') || '<div class="card"><div class="empty"><b>Brak stad w programie.</b><span>Dodaj stado powyżej – potem jego szczepienia.</span></div></div>';
+  todo.sort((a, b) => a.s.dd - b.s.dd);
+  $('pg-today').innerHTML = todo.length ? `<div class="card pg-todo"><h2>Do zrobienia</h2>${todo.map(({fl, it, v, s}) => `<div class="pg-it ${s.c}" data-fl="${esc(fl.id)}" data-it="${esc(it.id)}"><div class="pg-v"><span class="t">${esc(fl.farm)} – ${esc(v ? v.n : it.vacId)} <span class="pill ${s.c}">${esc(s.l)}</span></span><span class="s">wiek ${it.age} dni · ${esc((ROUTES[it.route] || '').toLowerCase())}</span></div><div class="pg-a">${v && !v.off ? '<button class="btn small" type="button" data-pg="use">Licz</button>' : ''}</div></div>`).join('')}</div>` : '';
+  progBadge();
+}
+function progUse(fl, it){
+  const v = VACS.find(x => x.id === it.vacId); if(!v) return;
+  $('farm').value = fl.farm || ''; $('date').value = todayISO();
+  if(BIRDS[fl.bird]) setBird(fl.bird);
+  const age = Math.max(0, isoDiff(todayISO(), fl.hatch)); $('age').value = String(isoDiff(todayISO(), fl.hatch) >= 0 ? age : it.age);
+  if(fl.birds) $('birds').value = String(fl.birds);
+  refreshGuides(); useVaccine(it.vacId);
+  const b = document.querySelector(`#route [data-route="${it.route}"]`); if(b && !b.disabled){ S.rPref = it.route; setRoute(it.route); }
+  onFarmChange();
+}
+function progAction(ev){
+  const btn = ev.target.closest('[data-pg]'); if(!btn) return;
+  const p = progGet(), flEl = btn.closest('[data-fl]'), fl = flEl && p.flocks.find(f => f.id === flEl.dataset.fl); if(!fl) return;
+  const itEl = btn.closest('[data-it]'), it = itEl && fl.items.find(x => x.id === itEl.dataset.it), a = btn.dataset.pg;
+  if(a === 'use' && it) return progUse(fl, it);
+  if(a === 'done' && it){ it.done = !it.done; progSet(p); return renderProgram(); }
+  if(a === 'del' && it){ if(!armConfirm(btn)) return; fl.items = fl.items.filter(x => x !== it); progSet(p); return renderProgram(); }
+  if(a === 'delfl'){ if(!armConfirm(btn)) return; p.flocks = p.flocks.filter(f => f !== fl); progSet(p); toast('Usunięto stado z programu.'); return renderProgram(); }
+  if(a === 'add'){
+    const box = btn.closest('.pg-fl'), age = Math.round(pf(box.querySelector('[data-pg-f="age"]').value)), vid = box.querySelector('[data-pg-f="vac"]').value, route = box.querySelector('[data-pg-f="route"]').value;
+    if(!isNum(age) || age < 0){ toast('Wpisz wiek w dniach.'); box.querySelector('[data-pg-f="age"]').focus(); return; }
+    if(!vid){ toast('Wybierz szczepionkę.'); box.querySelector('[data-pg-f="vac"]').focus(); return; }
+    fl.items.push({id:uid(), age, vacId:vid, route}); progSet(p); renderProgram(); toast('Dodano do programu.');
+  }
+}
+function progField(ev){
+  const f = ev.target.dataset && ev.target.dataset.pgF; if(!f) return;
+  const box = ev.target.closest('.pg-fl'), p = progGet(), fl = p.flocks.find(x => x.id === box.dataset.fl); if(!fl) return;
+  const vs = box.querySelector('[data-pg-f="vac"]'), rs = box.querySelector('[data-pg-f="route"]');
+  if(f === 'age'){ const cur = vs.value, a = Math.round(pf(ev.target.value)); vs.innerHTML = progVacOpts(fl, isNum(a) ? a : null); vs.value = cur; }
+  if(f === 'vac' || f === 'age'){ const v = VACCINES.find(x => x.id === vs.value), cur = rs.value; rs.innerHTML = progRouteOpts(v, fl.bird); if([...rs.options].some(o => o.value === cur)) rs.value = cur; }
+}
+function progAdd(){
+  const farm = $('pg-farm').value.trim(), hatch = $('pg-hatch').value, bird = $('pg-bird').value, birds = Math.round(pf($('pg-birds').value));
+  if(!farm){ toast('Wpisz fermę (kurnik).'); $('pg-farm').focus(); return; }
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(hatch)){ toast('Wybierz datę wylęgu lub wstawienia.'); $('pg-hatch').focus(); return; }
+  const p = progGet(); p.flocks.unshift({id:uid(), farm, hatch, bird, birds:isNum(birds) && birds > 0 ? birds : null, items:[]}); progSet(p);
+  $('pg-farm').value = ''; $('pg-birds').value = ''; renderProgram(); toast('Dodano stado – teraz dodaj szczepienia.');
 }
 function renderRules(){
   const box = $('rules-body'); if(box.dataset.done) return; box.dataset.done = '1';
@@ -4746,13 +4941,14 @@ function opInit(){
 }
 
 /* ---------- Nawigacja i start ---------- */
-const TABS = ['obliczenia','raporty','zmiany','szczepionki','info'];
+const TABS = ['obliczenia','raporty','zmiany','program','szczepionki','info'];
 function showTab(t){
   if(!TABS.includes(t)) t = 'obliczenia';
   TABS.forEach(x => { $('v-' + x).hidden = x !== t; });
   document.querySelectorAll('nav.tabs a').forEach(a => { if(a.dataset.tab === t) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
   if(t === 'raporty') renderReports();
   if(t === 'zmiany') renderMods();
+  if(t === 'program') renderProgram();
   if(t === 'szczepionki'){ renderKnowledge(); renderRules(); }
   if(t === 'info') renderInfo();
   window.scrollTo({top:0});
@@ -4820,10 +5016,13 @@ function bind(){
   $('r-list').addEventListener('keydown', ev => { if((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList.contains('item')){ ev.preventDefault(); reportAction(ev); } });
   ['k-q','k-sp','k-dz','k-rt','k-mf','k-st'].forEach(id => $(id).addEventListener('input', renderKnowledge));
   $('theme-btn').addEventListener('click', cycleTheme); applyTheme(lsGet(THEME_KEY));
-  $('k-list').addEventListener('click', ev => { const b = ev.target.closest('.item'); if(b){ S.selVac = b.dataset.id; renderKnowledge(); $('k-detail').scrollIntoView({behavior:'smooth', block:'nearest'}); } });
-  $('k-detail').addEventListener('click', ev => { if(ev.target.id === 'k-use') useVaccine(S.selVac); });
+  $('k-list').addEventListener('click', ev => { const b = ev.target.closest('.item'); if(b){ S.selVac = b.dataset.id; S.cmpShow = false; renderKnowledge(); $('k-detail').scrollIntoView({behavior:'smooth', block:'nearest'}); } });
+  $('k-detail').addEventListener('click', ev => { if(ev.target.id === 'k-use') useVaccine(S.selVac);
+    if(ev.target.id === 'k-cmp'){ const c = S.cmp = S.cmp || [], i = c.indexOf(S.selVac); if(i >= 0) c.splice(i, 1); else { if(c.length >= 3){ toast('Porównasz najwyżej 3 szczepionki – usuń jedną.'); return; } c.push(S.selVac); } renderKnowledge(); } });
+  $('k-cmpbar').addEventListener('click', ev => { const b = ev.target.closest('[data-cmp]'); if(!b) return; if(b.dataset.cmp === 'clear'){ S.cmp = []; S.cmpShow = false; } else S.cmpShow = !S.cmpShow; renderKnowledge(); if(S.cmpShow) $('k-detail').scrollIntoView({behavior:'smooth', block:'nearest'}); });
   $('b-export').addEventListener('click', exportBackup);
   $('b-csv').addEventListener('click', exportCSV);
+  $('pg-add').addEventListener('click', progAdd); $('pg-list').addEventListener('click', progAction); $('pg-today').addEventListener('click', progAction); $('pg-list').addEventListener('input', progField);
   $('tm-start').addEventListener('click', tmStart); $('tm-stop').addEventListener('click', tmStop);
   $('tm-big').addEventListener('click', bigToggle); $('i-big').addEventListener('click', bigToggle);
   $('bk-nag').addEventListener('click', ev => { const b = ev.target.closest('[data-bk]'); if(!b) return; if(b.dataset.bk === 'now') exportBackup(); else { lsSet(BKP_KEY, Object.assign({}, lsGet(BKP_KEY) || {}, {snooze:Date.now()})); } bkNag(); });
@@ -4919,18 +5118,19 @@ function bkNag(){
     <span class="tools"><button class="btn small" type="button" data-bk="now">Zapisz kopię teraz</button><button class="btn small ghost" type="button" data-bk="later">Za tydzień</button></span>`;
 }
 function exportBackup(){
-  const n = Object.keys(S.reps).length + Object.keys(S.mods).length + Object.keys(S.farms).length;
+  const n = Object.keys(S.reps).length + Object.keys(S.mods).length + Object.keys(S.farms).length + progGet().flocks.length;
   if(!n){ toast('Brak danych do zapisania.'); return; }
   lsSet(BKP_KEY, {t:Date.now()}); setTimeout(bkNag, 50);
-  downloadFile(`liczydlo-kopia-${todayISO()}.json`, JSON.stringify({app:'Liczydło APP', wersja:APP_VERSION, zapisano:new Date().toISOString(), raporty:S.reps, modyfikacje:S.mods, ustawienia:S.farms}, null, 1), 'application/json');
+  downloadFile(`liczydlo-kopia-${todayISO()}.json`, JSON.stringify({app:'Liczydło APP', wersja:APP_VERSION, zapisano:new Date().toISOString(), raporty:S.reps, modyfikacje:S.mods, ustawienia:S.farms, program:progGet()}, null, 1), 'application/json');
 }
 async function importBackup(file){
   let j; try { j = JSON.parse(await file.text()); } catch(e){ toast('To nie jest plik kopii Liczydła.'); return; }
   const groups = ['raporty', 'modyfikacje', 'ustawienia'].filter(k => j && j[k] && typeof j[k] === 'object');
-  if(!groups.length){ toast('Plik nie zawiera danych Liczydła.'); return; }
+  let pn = 0; if(j && j.program && Array.isArray(j.program.flocks)){ const p = progGet(), have = new Set(p.flocks.map(f => f.id)); j.program.flocks.forEach(f => { if(f && f.id && !have.has(f.id) && Array.isArray(f.items)){ p.flocks.push(f); pn++; } }); if(pn) progSet(p); }
+  if(!groups.length && !pn){ toast('Plik nie zawiera danych Liczydła.'); return; }
   const have = Object.assign({}, S.reps, S.mods, S.farms); let n = 0;
   for(const k of groups) for(const [id, d] of Object.entries(j[k])){ if(d && typeof d === 'object' && !have[id]){ try { await S.store.set(id, d); n++; } catch(e){} } }
-  toast(n ? `Wczytano pozycji z kopii: ${n}.` : 'Wszystko z kopii już jest w aplikacji.');
+  toast(n || pn ? `Wczytano z kopii: ${n} ${pl(n, 'pozycję', 'pozycje', 'pozycji')}${pn ? `, stada w programie: ${pn}` : ''}.` : 'Wszystko z kopii już jest w aplikacji.');
 }
 
 /* ---------- Strona tytułowa – znika po dotknięciu ekranu ---------- */

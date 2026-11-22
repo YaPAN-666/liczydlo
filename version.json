@@ -1,9 +1,10 @@
 {
- "wersja": "1.33.0",
+ "wersja": "1.33.1",
  "data": "2026-11-22",
  "zmiany": [
-  "Statystyki dla Operatora (tylko za zgodą użytkownika, anonimowo): oprócz szczepionek, dróg i drobiu także to, z których funkcji korzystacie – raporty, druk, program, odliczanie, porównanie i inne.",
-  "– Przegląd na telefonach (iPhone SE, Pixel 7, iPhone Pro Max), tablecie i komputerze, w jasnym i ciemnym motywie: wszystkie zakładki bez przewijania w bok i bez błędów.",
+  "Przeciągnięcie ekranu w dół nie odświeża już aplikacji. Wpisane dane w Obliczeniach są na bieżąco zapamiętywane i wracają po przypadkowym odświeżeniu lub zamknięciu (przez 24 h); czysty formularz – przycisk „Nowe obliczenie”.",
+  "(1.33.0) Statystyki dla Operatora (tylko za zgodą użytkownika, anonimowo): oprócz szczepionek, dróg i drobiu także to, z których funkcji korzystacie – raporty, druk, program, odliczanie, porównanie i inne.",
+  "(1.33.0) – Przegląd na telefonach (iPhone SE, Pixel 7, iPhone Pro Max), tablecie i komputerze, w jasnym i ciemnym motywie: wszystkie zakładki bez przewijania w bok i bez błędów.",
   "(1.32.0) Indyki: cztery nowe szczepionki z Rejestru Produktów Leczniczych – Dindoral (HE, woda, indyki rzeźne w 4. tyg.), Tur-3 (ND + TRT + PMV3, inaktywowana, stada reprodukcyjne), TAbic V.H. (ND, kury i indyki, oprysk i woda) oraz Nobilis AE+POX (AE i ospa, kury i indyki – wing-web, tylko karta, bez obliczeń).",
   "(1.32.0) – Nowe choroby w filtrach: paramyksowiroza typu 3 (PMV3) i ospa drobiu.",
   "(1.31.0) Nowa zakładka „Program”: stada z datą wylęgu i planem szczepień – daty, „Do zrobienia” (dziś i zaległe, licznik w zakładce), odhaczanie po zapisanym raporcie, przycisk „Licz”, który wypełnia obliczenia.",

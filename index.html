@@ -518,6 +518,8 @@ html.big .btn{padding:9px 16px} html.big .btn.small{padding:7px 12px} html.big i
 .cmp-k{margin-top:10px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .cmp-r{padding:3px 0 9px;border-bottom:1px solid var(--line);line-height:1.4;overflow-wrap:break-word;hyphens:auto;-webkit-hyphens:auto}
 details.pg-inf{margin-top:3px;font-size:.8rem} details.pg-inf summary{cursor:pointer;color:var(--info);font-weight:600}
+/* Bez „pociągnij, aby odświeżyć” – przypadkowe przeciągnięcie w dół nie przeładowuje aplikacji */
+html,body{overscroll-behavior-y:none}
 </style>
 </head>
 <body>
@@ -990,6 +992,7 @@ details.pg-inf{margin-top:3px;font-size:.8rem} details.pg-inf summary{cursor:poi
         <div class="tools">
           <button class="btn" type="button" id="save">Zapisz raport</button>
           <button class="btn ghost" type="button" id="copy">Kopiuj</button>
+          <button class="btn ghost" type="button" id="new-calc" title="Czyści formularz (sprzęt i ustawienia zostają)">Nowe obliczenie</button>
           <button class="btn ghost" type="button" id="tm-start" title="Odliczanie czasu zużycia szczepionki od rozpuszczenia; ekran nie gaśnie">Rozpuszczona – odliczaj</button>
           <span class="note" id="save-msg"></span>
         </div>
@@ -2169,7 +2172,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.33.0';
+const APP_VERSION = '1.33.1';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -3377,7 +3380,7 @@ async function saveReport(btn){
     const rid = uid(); await S.store.set(rid, doc); if(doc.route === 'spray') houseSave(); opFeat('raport'); if(/LISTA KONTROLNA/.test(doc.text || '')) opFeat('lista'); if(doc.pace) opFeat('tempo'); if(isNum(doc.deltaT)) opFeat('deltat');
     const m = doc.modId && S.mods[doc.modId];
     if(m && m.status === 'zalecona') await S.store.set(doc.modId, Object.assign({}, m, {status:'zastosowana', appliedReport:rid, appliedAt:new Date().toISOString()}));
-    S.chk = {}; chkCount(); document.querySelectorAll('#crew li.tick.done').forEach(li => { li.classList.remove('done'); li.setAttribute('aria-checked', 'false'); }); chkCount(); $('notes').value = ''; $('r-time').value = ''; $('r-temp').value = ''; $('save-msg').textContent = 'Zapisano ' + new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) + '.'; toast('Raport zapisany.'); }
+    S.chk = {}; draftSoon(); chkCount(); document.querySelectorAll('#crew li.tick.done').forEach(li => { li.classList.remove('done'); li.setAttribute('aria-checked', 'false'); }); chkCount(); $('notes').value = ''; $('r-time').value = ''; $('r-temp').value = ''; $('save-msg').textContent = 'Zapisano ' + new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) + '.'; toast('Raport zapisany.'); }
   catch(e){ toast(errText(e)); }
   finally { btn.disabled = false; }
 }
@@ -5064,6 +5067,7 @@ function bind(){
   $('b-export').addEventListener('click', exportBackup);
   $('b-csv').addEventListener('click', exportCSV);
   $('pg-add').addEventListener('click', progAdd); $('pg-list').addEventListener('click', progAction); $('pg-today').addEventListener('click', progAction); $('pg-list').addEventListener('input', progField);
+  $('new-calc').addEventListener('click', ev => { if(!armConfirm(ev.currentTarget)) return; clearTimeout(draftT); try { localStorage.removeItem(DRAFT_KEY); } catch(e){} S.restoring = true; location.hash = 'obliczenia'; location.reload(); });
   $('tm-start').addEventListener('click', tmStart); $('tm-stop').addEventListener('click', tmStop);
   $('tm-big').addEventListener('click', bigToggle); $('i-big').addEventListener('click', bigToggle);
   $('bk-nag').addEventListener('click', ev => { const b = ev.target.closest('[data-bk]'); if(!b) return; if(b.dataset.bk === 'now') exportBackup(); else { lsSet(BKP_KEY, Object.assign({}, lsGet(BKP_KEY) || {}, {snooze:Date.now()})); } bkNag(); });
@@ -5095,6 +5099,44 @@ function setNozzle(noz, quiet){
   flowSrcUI();
 }
 function applyDefaultsSpray(){ if(noVac()) return; const sd = sprayDefault(curVac(), Math.max(0, Math.round(num('age',0)))); $('s-ml').value = sd.ml; $('s-ml-hint').textContent = sd.hint; }
+/* ---------- Szkic formularza: wpisane dane przetrwają przypadkowe odświeżenie strony ---------- */
+const DRAFT_KEY = 'liczydlo.szkic.v1', DRAFT_H = 24;
+let draftT = null;
+function draftFields(){ return [...document.querySelectorAll('#v-obliczenia input[id], #v-obliczenia select[id], #v-obliczenia textarea[id]')].filter(e => e.type !== 'file' && e.type !== 'hidden'); }
+function draftSave(){
+  if(S.restoring) return;
+  const v = {}; draftFields().forEach(e => { v[e.id] = e.type === 'checkbox' ? e.checked : e.value; });
+  const has = v.birds || v.age || (v.vac && v.vac !== '-') || v.farm || v.notes;
+  if(!has){ try { localStorage.removeItem(DRAFT_KEY); } catch(e){} return; }
+  lsSet(DRAFT_KEY, {t:Date.now(), ver:APP_VERSION, route:S.route, ml:!!S.mlTouched, v});
+}
+function draftSoon(){ clearTimeout(draftT); draftT = setTimeout(draftSave, 400); }
+function draftRestore(){
+  const d = lsGet(DRAFT_KEY); if(!d || !d.v || !isNum(d.t) || Date.now() - d.t > DRAFT_H * 3600e3) return false;
+  const V = d.v; S.restoring = true;
+  try {
+    if(V.bird && BIRDS[V.bird]) setBird(V.bird);
+    if(V.age != null) $('age').value = V.age;
+    if(V.birds != null) $('birds').value = V.birds;
+    refreshGuides();
+    const v = V.vac && VACS.find(x => x.id === V.vac);
+    if(v){ S.dzAll = true; fillDz(); S.dzAll = false; $('dz').value = v.dz.includes(V.dz) ? V.dz : v.dz[0]; S.vacWant = v.id; S.picked = true; fillVac({keep:true}); $('vac').value = v.id; onVacChange(); saveWants(); }
+    const rb = d.route && document.querySelector(`#route [data-route="${d.route}"]`); if(rb && !rb.disabled){ S.rPref = d.route; setRoute(d.route); }
+    const skip = new Set(['bird', 'age', 'birds', 'dz', 'vac']);
+    draftFields().forEach(e => {
+      if(skip.has(e.id) || !(e.id in V)) return; const x = V[e.id];
+      if(e.type === 'checkbox'){ if(e.checked !== !!x){ e.checked = !!x; e.dispatchEvent(new Event('change', {bubbles:true})); } return; }
+      if(e.value === String(x)) return;
+      if(e.id === 's-p' || e.id === 's-qp'){ setP(e.id, x); return; }
+      if(e.id === 's-noz'){ setNozzle(x, true); return; }
+      if(e.tagName === 'SELECT' && ![...e.options].some(o => o.value === String(x))) return;
+      e.value = x; e.dispatchEvent(new Event(e.tagName === 'SELECT' ? 'change' : 'input', {bubbles:true}));
+    });
+    S.mlTouched = !!d.ml; flowSrcUI(); stabUI();
+  } catch(e){}
+  S.restoring = false; calc();
+  return true;
+}
 async function init(){
   initSplash(); authorInit();
   initInst();
@@ -5105,7 +5147,8 @@ async function init(){
   loadFonts();
   bind(); $('s-noz').dataset.cur = $('s-noz').value; loadEquipment(); $('s-season').value = seasonByDate();
   $('s-season').addEventListener('change', () => { S.seasonTouched = true; });
-  $('date').addEventListener('change', () => { if(!S.seasonTouched && $('date').value){ $('s-season').value = seasonByDate($('date').value + 'T12:00:00'); calc(); } }); flowSrcUI(); fillDz(); fillVac(); onVacChange();   // czysty start – nic nie wybrane
+  $('date').addEventListener('change', () => { if(!S.seasonTouched && $('date').value){ $('s-season').value = seasonByDate($('date').value + 'T12:00:00'); calc(); } }); flowSrcUI(); fillDz(); fillVac(); onVacChange(); if(draftRestore()) setTimeout(() => toast('Przywrócono dane wpisane przed odświeżeniem.', 4000), 1200);
+  ['input', 'change', 'click'].forEach(ev => $('v-obliczenia').addEventListener(ev, draftSoon));   // czysty start – nic nie wybrane
   showTab(location.hash.slice(1) || 'obliczenia');
   let db = null, dl = null;
   try { if(window.claude && typeof window.claude.use === 'function'){ [db, dl] = await Promise.all([window.claude.use('db').catch(() => null), window.claude.use('downloads').catch(() => null)]); } } catch(e){}

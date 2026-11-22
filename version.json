@@ -1,8 +1,9 @@
 {
- "wersja": "1.35.1",
+ "wersja": "1.35.2",
  "data": "2026-11-22",
  "zmiany": [
-  "Podpis „Studio Pracy Umysłowej” znów jednolity – bez pomarańczowych pierwszych liter.",
+  "Nowa ikona: liczydło bez ramki i pomarańczowa gwiazda Studia Pracy Umysłowej w prawym górnym rogu – wspólny znak wszystkich programów i aplikacji Studia.",
+  "(1.35.1) Podpis „Studio Pracy Umysłowej” znów jednolity – bez pomarańczowych pierwszych liter.",
   "(1.35.0) Praktyka z „Turkey Signals” (Roodbont, 2019): ilość wody bez pomiaru godzinowego – zużycie z doby ÷ godziny światła × czas pojenia; nowe pola „Wczorajsze zużycie” i „Godziny światła”.",
   "(1.35.0) – Oprysk: szerokość kurnika podpowiada liczbę przejść (pasy 2,5–3 m) i tempo marszu; w krokach plan oprysku pas po pasie, próba tempa przy świetle.",
   "(1.35.0) – Wskazówki: indyki przy szczepieniu w wodzie (obchód co 20–30 min, napełnianie podniesionych poideł albo dwie połowy dawki), krople do oka (zapas butelek w chłodzie), iniekcja (kontrola dawki, wymiana igieł co ok. 10 000 ptaków).",

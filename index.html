@@ -438,6 +438,7 @@ label.need > :is(input,select){border-color:var(--warn);box-shadow:0 0 0 2px col
 .need-go{display:inline;margin:0 1px;padding:2px 9px;border:1px solid var(--warn);border-radius:999px;background:var(--surface);color:var(--ink);font:600 .86rem/1.4 var(--f-body);cursor:pointer}
 .need-go:hover{background:var(--warn);color:var(--surface)}
 .need-go:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.kv dd.law{color:var(--bad);font-weight:600}
 </style>
 </head>
 <body>
@@ -1494,6 +1495,49 @@ const VACCINES = [
      'Delikatnie wymieszaj i użyj od razu; całość zużyj w 2 h (poniżej 25°C). Zawiesinę przygotowuj dopiero, gdy jest potrzebna.']},
     inovo:{ml:0.05, note:'18. dzień inkubacji; automat sprawdzony pod kątem bezpieczeństwa i dokładności dawki. Rozpuszczalnik: 4 ampułki 1000 dawek na 200 ml (4 × 2000 na 400 ml). Do jaja nie podawać razem z innymi produktami.'}}},
 
+{id:'innovax-ilt', n:'Innovax-ILT', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa wektorowa HVT, związana z komórkami (ciekły azot)', pf:'koncentrat i rozpuszczalnik do sporządzania zawiesiny do wstrzykiwań (rozpuszczalnik przejrzysty, czerwony)', dz:['Marek','ILT'], s:'HVT/ILT-138 – rekombinowany HVT z glikoproteinami gD i gI wirusa ILT, 10^3,1–10^4,1 PFU na dawkę', sp:['kury'], st:'v', src:[{t:'EMA – EPAR Innovax-ILT: ChPLW i ulotka (EU/2/15/182; odczytano wersję angielską)', u:'https://www.ema.europa.eu/pl/medicines/veterinary/EPAR/innovax-ilt'}], ma:'EU/2/15/182/001-002',
+ law:'ChPLW pkt 3.11: przed nabyciem i użyciem zasięgnij opinii właściwych władz weterynaryjnych (w Polsce – Inspekcja Weterynaryjna) o aktualnej polityce szczepień – prawo krajowe może zakazywać tych czynności w całym kraju lub jego części.',
+ min:{kury:1}, max:{kury:1}, minT:'jednodniowe pisklęta (podskórnie)', pk:[2000,4000], use:'2 h po rozpuszczeniu (poniżej 25°C)', wd:'0 dni',
+ lay:'Brak informacji o stosowaniu u przyszłych ptaków hodowlanych (stad rodzicielskich).',
+ mix:'Mieszać wolno tylko z Nobilis Rismavac (ten sam worek rozpuszczalnika: 400 ml na każde 2000 dawek obu albo 800 ml na każde 4000) – u piskląt z przeciwciałami matczynymi odporność na ILT może powstać później; MD po 5 dniach. Tego samego dnia, ale osobno: Nobilis ND Clone 30 lub Nobilis ND C2. Inne – decyzja indywidualna.',
+ sch:'Jednorazowo w wylęgarni, 1. dzień życia. Odporność: ILT po 4 tyg., trwa 60 tyg.; choroba Mareka po 9 dniach, na cały okres zagrożenia.',
+ safe:'Ciekły azot – tylko w dobrze wentylowanym pomieszczeniu. Przy wyjmowaniu ampułek: rękawice, długie rękawy, maska na twarz lub okulary; dłoń z ampułką z dala od ciała i twarzy. Ampułki mogą eksplodować przy gwałtownej zmianie temperatury – rozmrażać tylko w czystej wodzie 25–27°C, nigdy w gorącej ani lodowatej. Przy samowstrzyknięciu – od razu do lekarza z ulotką.',
+ ae:'Nieznane. Szczep szczepionkowy jest wydalany i może przechodzić na indyki – jest dla nich bezpieczny, ale unikaj bezpośredniego i pośredniego kontaktu szczepionych kur z indykami. Przy iniekcji uważaj, by nie uszkodzić naczyń krwionośnych szyi.',
+ od:'Po 10-krotnej dawce nie obserwowano objawów.',
+ store:'Koncentrat w ciekłym azocie (poniżej −140°C), ważność 3 lata; rozpuszczalnik poniżej 30°C. Pojemnik z azotem pionowo, w czystym, suchym, wentylowanym pomieszczeniu oddzielonym od wylęgu i kurcząt. Ampułki stoją dnem do góry – zamrożona zawartość w wierzchołku ampułki znaczy, że była rozmrożona: nie używać.',
+ r:{inj:{ml:0.2, site:'s.c. – szyja', bags:[400,800,1200,1600],
+   solv:'400 ml – 1 ampułka 2000 dawek; 800 ml – 2 × 2000 albo 1 × 4000; 1200 ml – 3 × 2000; 1600 ml – 4 × 2000 albo 2 × 4000',
+   note:'Sprzęt wyjałowić gotowaniem 20 min albo w autoklawie (15 min, 121°C) – bez chemicznych środków dezynfekcyjnych. Rozpuszczalnik przejrzysty, czerwony, bez osadu, 15–25°C. W trakcie szczepienia często delikatnie obracaj worek. Ampułki: 2000 dawek – klips łososiowo-różowy, 4000 – żółty; po zdjęciu z laski ampułka nie ma oznaczenia dawek – nie pomyl ich.',
+   prep:['Najpierw policz ampułki i rozpuszczalnik – po zdjęciu z laski nie odróżnisz ampułek 2000 i 4000 dawek.',
+     'Załóż rękawice, długie rękawy i maskę lub okulary. Ampułkę trzymaj w dłoni z dala od ciała i twarzy.',
+     'Wyjmij najwyżej 5 ampułek naraz, z jednej laski; resztę od razu odłóż do azotu.',
+     'Rozmrażaj szybko w czystej wodzie 25–27°C, delikatnie poruszając ampułką. Osusz ją i odłam szyjkę.',
+     'Zawartość od razu pobierz sterylną strzykawką z igłą 18 G i powoli wprowadź do worka przez korek; delikatnie zakręć i odwróć worek.',
+     'Nabierz trochę rozpuszczalnika, przepłucz ampułkę i wprowadź popłuczyny do worka. Powtórz dla kolejnych ampułek.',
+     'Wyjmij strzykawkę i odwróć worek 6–8 razy. Szczepionka jest przejrzysta, czerwona – gotowa do użycia; zużyj w 2 h.']}}},
+{id:'vaxxitek-hvt-ibd-h5', n:'Vaxxitek HVT+IBD+H5', m:'Boehringer Ingelheim Vetmedica GmbH', t:'żywa wektorowa HVT, związana z komórkami (ciekły azot)', pf:'koncentrat i rozpuszczalnik do sporządzania zawiesiny do wstrzykiwań (rozpuszczalnik czerwono-pomarańczowy)', dz:['HPAI'], s:'rHVT-IBD-H5 – rekombinowany HVT z białkiem VP2 wirusa IBD (Faragher 52/70) i hemaglutyniną H5 wirusa grypy ptaków, 3,6–4,4 log10 PFU na dawkę', sp:['kury','indyki'], st:'v', src:[{t:'EMA – EPAR Vaxxitek HVT+IBD+H5: ChPLW i ulotka PL (EU/2/25/354)', u:'https://www.ema.europa.eu/pl/medicines/veterinary/EPAR/vaxxitek-hvtibdh5'}, {t:'MRiRW – odpowiedź na zapytanie poselskie nr 3313 (14.04.2026): GLW nie przewiduje szczepień przeciw HPAI', u:'https://api.sejm.gov.pl/sejm/term10/interpellations/attachment/ATTDT6HZS/z03313-o1.pdf'}], ma:'EU/2/25/354/001',
+ law:'Szczepienie przeciw grypie ptaków (HPAI H5). ChPLW pkt 3.11: każdy, kto chce tę szczepionkę posiadać, sprzedawać lub stosować, musi najpierw zasięgnąć opinii właściwych władz – prawo krajowe może tego zakazywać. W Polsce (MRiRW, 14.04.2026) szczepienia nie są zakazane, ale Główny Lekarz Weterynarii nie przewiduje ich wdrożenia, m.in. z powodu ograniczeń w handlu i eksporcie drobiu szczepionego. Nie szczep bez uzgodnienia z Inspekcją Weterynaryjną.',
+ docs:'Pozwolenie wydane w wyjątkowych okolicznościach (19.11.2025) – ograniczona ocena jakości, bezpieczeństwa i skuteczności. Szczepienie nie wytwarza przeciwciał przeciw neuraminidazie ani nukleoproteinie – testami da się odróżnić ptaki szczepione od zakażonych (DIVA).',
+ min:{kury:1, indyki:1}, max:{kury:1, indyki:1}, minT:'jednodniowe kurczęta i indyczęta (podskórnie) albo zarodki kurze w 18. dniu inkubacji (in ovo)', pk:[2000], use:'2 h po rozpuszczeniu (poniżej 25°C)', wd:'0 dni',
+ lay:'Produkt dla jednodniowych ptaków i zarodków – bezpieczeństwo w okresie nieśności nie zostało określone.',
+ mix:'Nie mieszać z innymi produktami (poza własnym rozpuszczalnikiem). Brak danych o stosowaniu z innymi produktami – decyzja indywidualna.',
+ sch:'Jednorazowo w wylęgarni. Wskazania ChPLW: HPAI H5 (także klad 2.3.4.4b) – mniejsza śmiertelność, objawy i wydalanie wirusa. Kurczęta: odporność po 4 tyg., trwa 24 tyg. Indyki: po 50 dniach, trwa 100 dni. Wg pkt 4.1 szczepionka uodparnia też na chorobę Mareka i IBD, ale ChPLW nie podaje dla nich wskazań ani terminów – nie zastępuje szczepień MD i IBD bez decyzji lekarza.',
+ safe:'Rękawice, okulary i obuwie ochronne przy wyjmowaniu z azotu, rozmrażaniu i otwieraniu ampułek. Ampułki mogą pękać przy nagłej zmianie temperatury – otwieraj w wyciągniętej ręce. Ciekły azot tylko w suchym, dobrze wentylowanym pomieszczeniu; wdychanie niebezpieczne.',
+ ae:'Nieznane. Szczep szczepionkowy jest wydalany i może przechodzić na indyki – jest dla nich bezpieczny, ale unikaj kontaktu szczepionych kurcząt z indykami. Po szczepieniu wykrywa się przeciwciała przeciw MDV, IBDV i AIV.',
+ od:'Nieznane.',
+ store:'Koncentrat w ciekłym azocie (ważność 3 lata); przypadkowo rozmrożone ampułki wyrzuć – nigdy nie zamrażaj ponownie. Rozpuszczalnik poniżej 30°C, chronić przed światłem, nie zamrażać. Po rozpuszczeniu poniżej 25°C, zużyć w 2 h; otwartych pojemników nie używać ponownie.',
+ r:{inj:{ml:0.2, site:'s.c. (podskórnie) – jednodniowe kurczęta i indyczęta', bags:[200,400,600,800,1000,1200,1600,1800,2400],
+   solv:'podskórnie 0,2 ml: 1 ampułka 2000 dawek na 400 ml rozpuszczalnika (worki 200–2400 ml)',
+   note:'Aseptyka. Zmętniałego rozpuszczalnika nie używaj. W trakcie szczepienia często delikatnie poruszaj workiem ruchem wirowym.',
+   prep:['Załóż rękawice, okulary i obuwie ochronne; z ciekłym azotem pracuj w wentylowanym miejscu.',
+     'Wyjmij z azotu tylko ampułki do zużycia od razu.',
+     'Rozmrażaj szybko w wodzie 25–30°C, wstrząsając ampułką; od razu przejdź dalej.',
+     'Zaraz po rozmrożeniu otwórz ampułkę w wyciągniętej ręce.',
+     'Sterylna strzykawka z igłą 18 G lub większą: przez membranę rurki worka pobierz 2 ml rozpuszczalnika, potem całą zawartość rozmrożonych ampułek.',
+     'Przenieś do worka i delikatnie wymieszaj, poruszając workiem w przód i w tył.',
+     'Przepłucz wnętrze i końcówki ampułek szczepionką z worka i wstrzyknij popłuczyny z powrotem do worka.',
+     'Podskórnie: 1 ampułka 2000 dawek na 400 ml. Zużyj od razu, najpóźniej w 2 h; nie zamrażaj.']},
+   inovo:{ml:0.05, sp:['kury'], note:'Tylko zarodki kurze, 18. dzień inkubacji; automat do iniekcji jaj sprawdzony pod kątem bezpieczeństwa i dawki. 4 ampułki 2000 dawek na 400 ml rozpuszczalnika. Wpływu przeciwciał matczynych HVT przy in ovo nie badano.'}}},
 /* ---------- Inne żywe ---------- */
 {id:'nobilis-ilt', n:'Nobilis ILT', m:'MSD Animal Health', t:'żywa', dz:['ILT'], s:'Serva', sp:['kury'], st:'v', src:[RPL(18333)],
  min:{kury:29}, minT:'4.–6. tydzień (w zagrożeniu wcześniej)', pk:[1000,2500], use:'2 h', wd:'0 dni',
@@ -1783,7 +1827,7 @@ const TXVS2_TEEJET = [[2,0.110],[3,0.131],[4,0.148],[5,0.164],[6,0.177]];
 const VMD_VS2 = [[2,114],[3,106]];
 const VS2_D = [106,114];
 const VS2_TXT = 'dysza TX-VS2 (biała) do opryskiwacza Birchmeier daje ok. 106–114 µm przy 2–3 bar – też za grubo';
-const DISEASES = {'ND':'Rzekomy pomór drobiu (ND)','IB':'Zakaźne zapalenie oskrzeli (IB)','IBD':'Choroba Gumboro (IBD)','aMPV':'Metapneumowirus – TRT/SHS','Marek':'Choroba Mareka','ILT':'Zakaźne zapalenie krtani i tchawicy (ILT)','AE':'Zakaźne zapalenie mózgu i rdzenia (AE)','CAV':'Zakaźna anemia kurcząt (CAV)','EDS':'Zespół spadku nieśności (EDS)','Reo':'Reowirusy','Salmonella':'Salmonelloza','E. coli':'Kolibakterioza (E. coli)','Pasteurella':'Cholera drobiu (pasterelloza)','ORT':'ORT (Ornithobacterium)','MG':'Mykoplazmoza (MG)','MS':'Mykoplazmoza – M. synoviae (MS)','HE':'Krwotoczne zapalenie jelit indyków (HE)','Derzsy':'Choroba Derzsy’ego – parwowiroza gęsi (GPV)','MDPV':'Parwowiroza kaczek piżmowych (MDPV)','Kokcydioza':'Kokcydioza','inne':'Inne'};
+const DISEASES = {'ND':'Rzekomy pomór drobiu (ND)','IB':'Zakaźne zapalenie oskrzeli (IB)','IBD':'Choroba Gumboro (IBD)','aMPV':'Metapneumowirus – TRT/SHS','Marek':'Choroba Mareka','HPAI':'Grypa ptaków – wysoce zjadliwa, podtyp H5 (HPAI)','ILT':'Zakaźne zapalenie krtani i tchawicy (ILT)','AE':'Zakaźne zapalenie mózgu i rdzenia (AE)','CAV':'Zakaźna anemia kurcząt (CAV)','EDS':'Zespół spadku nieśności (EDS)','Reo':'Reowirusy','Salmonella':'Salmonelloza','E. coli':'Kolibakterioza (E. coli)','Pasteurella':'Cholera drobiu (pasterelloza)','ORT':'ORT (Ornithobacterium)','MG':'Mykoplazmoza (MG)','MS':'Mykoplazmoza – M. synoviae (MS)','HE':'Krwotoczne zapalenie jelit indyków (HE)','Derzsy':'Choroba Derzsy’ego – parwowiroza gęsi (GPV)','MDPV':'Parwowiroza kaczek piżmowych (MDPV)','Kokcydioza':'Kokcydioza','inne':'Inne'};
 const ROUTES = {spray:'Oprysk',woda:'Woda do picia',oko:'Oko / nos',inj:'Iniekcja',inovo:'In ovo'};
 
 </script>
@@ -1944,8 +1988,8 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.27.2';
-const DATA_DATE = '17.11.2026';
+const APP_VERSION = '1.28.0';
+const DATA_DATE = '22.11.2026';
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
 let calcQueued = false, sumTimer = null;
@@ -2688,6 +2732,7 @@ function calc(){
     if(isNum(min) && dol < min) msgs.push(['bad', `Ptaki za młode. ChPLW: ${v.minT}${isNum(r.min) ? ` (ta droga od ${r.min}. dnia życia)` : ''}.`]);
     const max = v.max ? v.max[bird.g] : null;
     if(isNum(max) && dol > max) msgs.push(['bad', `Ptaki za stare. ChPLW: ${v.minT} – szczepionka dla ${max === 1 ? 'jednodniowych piskląt (wylęgarnia)' : `ptaków do ${max}. dnia życia`}.`]);
+    if(v.law) msgs.push(['bad', `Uwaga prawna – ${v.law}`]);
     const vn = vacNote(v, $('bird').value, dol);
     if(vn && !/dnia|dzień/.test(vn)) msgs.push(['bad', `${v.n}: ${vn} (ChPLW: ${v.lay}).`]);
     else if(bird.lay && v.lay) msgs.push(['warn', 'Nieśność – ChPLW: ' + v.lay]);
@@ -3872,7 +3917,7 @@ function renderKnowledge(){
   const v = S.selVac ? VACCINES.find(x => x.id === S.selVac) : null; const box = $('k-detail');
   if(!v){ box.innerHTML = '<div class="empty"><b>Wybierz szczepionkę z listy.</b><span>Zobaczysz drogi podania, objętości wody, krople, wiek, opakowania, karencję i źródło ChPLW.</span></div>'; return; }
   box.innerHTML = `<div class="card-h"><h2>${esc(v.n)}</h2>${stPill(v)}</div>
-    <dl class="kv">${v.off ? `<dt>Status</dt><dd><b>${esc(v.off)}</b></dd>` : ''}<dt>Producent</dt><dd>${esc(v.m)}</dd><dt>Rodzaj</dt><dd>${esc(v.t)}</dd><dt>Choroby</dt><dd>${esc(v.dz.map(d => DISEASES[d] || d).join('; '))}</dd><dt>Szczep</dt><dd>${esc(v.s)}</dd><dt>Drób</dt><dd>${esc(spText(v.sp))}</dd><dt>Wiek</dt><dd>${esc(v.minT)}</dd><dt>Schemat</dt><dd>${esc(v.sch)}</dd>
+    <dl class="kv">${v.off ? `<dt>Status</dt><dd><b>${esc(v.off)}</b></dd>` : ''}${v.law ? `<dt>Uwaga prawna</dt><dd class="law">${esc(v.law)}</dd>` : ''}<dt>Producent</dt><dd>${esc(v.m)}</dd><dt>Rodzaj</dt><dd>${esc(v.t)}</dd><dt>Choroby</dt><dd>${esc(v.dz.map(d => DISEASES[d] || d).join('; '))}</dd><dt>Szczep</dt><dd>${esc(v.s)}</dd><dt>Drób</dt><dd>${esc(spText(v.sp))}</dd><dt>Wiek</dt><dd>${esc(v.minT)}</dd><dt>Schemat</dt><dd>${esc(v.sch)}</dd>
       ${Object.entries(v.r || {}).map(([k,r]) => describeRoute(k, r)).join('')}
       <dt>Opakowania</dt><dd>${v.pk && v.pk.length ? esc(v.pk.join(', ')) + ' dawek' : 'sprawdź w ChPLW'}</dd><dt>Zużyć w</dt><dd>${esc(v.use)}</dd><dt>Karencja</dt><dd>${esc(v.wd)}</dd><dt>Nieśność</dt><dd>${esc(v.lay)}</dd><dt>Łączenie</dt><dd>${esc(v.mix)}</dd>${extraKV(v)}
       <dt>Źródło</dt><dd>${v.src && v.src.length ? v.src.map(linkSrc).join('<br>') : 'brak odczytu – sprawdź w <a href="https://rejestry.ezdrowie.gov.pl/rpl/search/public" target="_blank" rel="noopener">Rejestrze Produktów Leczniczych</a>'}</dd></dl>

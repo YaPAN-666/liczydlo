@@ -471,6 +471,25 @@ ol.steps{padding-left:28px}
 .themebtn{padding:4px 7px}
 .themebtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .themebtn svg{width:17px;height:17px}
+/* Odliczanie czasu zużycia szczepionki */
+.tm{position:fixed;left:0;right:0;bottom:0;z-index:58;padding:0 12px calc(10px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.tm-in{pointer-events:auto;max-width:720px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center}
+.tm.warn .tm-in{border-left-color:var(--warn)} .tm.bad .tm-in{border-left-color:var(--bad)}
+.tm-t{display:grid;gap:1px;min-width:0}
+.tm-t b{font-size:1.15rem;font-variant-numeric:tabular-nums}
+.tm.warn .tm-t b{color:var(--warn)} .tm.bad .tm-t b{color:var(--bad)}
+.tm-t span{font-size:.76rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tm-b{display:flex;gap:6px}
+.tm-bar{grid-column:1 / -1;height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden;order:3}
+.tm-bar i{display:block;height:100%;background:var(--ok);transition:width .4s}
+.tm.warn .tm-bar i{background:var(--warn)} .tm.bad .tm-bar i{background:var(--bad)}
+body.has-tm{padding-bottom:96px}
+body.has-tm .toast{bottom:calc(100px + env(safe-area-inset-bottom,0px))}
+#tm-big[aria-pressed="true"]{background:var(--brand);color:var(--surface)}
+html.big{font-size:18px} html.big body{font-size:17px}
+html.big .btn{padding:9px 16px} html.big .btn.small{padding:7px 12px} html.big input,html.big select{min-height:46px}
+@media print{.tm{display:none !important}}
+.bk-nag{display:grid;gap:8px;margin-bottom:12px} .bk-nag .tools{margin:0}
 </style>
 </head>
 <body>
@@ -788,6 +807,18 @@ ol.steps{padding-left:28px}
           <label>Wentylacja po oprysku (min)
             <input id="s-vent" type="number" min="10" max="60" step="1" inputmode="numeric" autocomplete="off">
             <span class="hint" id="s-vent-hint"></span></label>
+          <label>Długość kurnika (m) – opcjonalnie
+            <input id="s-len" type="number" min="5" max="300" step="1" inputmode="numeric" autocomplete="off" placeholder="np. 120">
+            <span class="hint">do tempa marszu; zapamiętam dla tej fermy</span></label>
+          <label>Przejścia wzdłuż kurnika
+            <input id="s-pass" type="number" min="1" max="12" step="1" inputmode="numeric" autocomplete="off" placeholder="1">
+            <span class="hint">ile razy łącznie przechodzisz całą długość (wszystkie osoby razem), np. 2 – tam i z powrotem</span></label>
+          <label>Temperatura w kurniku (°C)
+            <input id="s-t" type="number" min="0" max="45" step="0.5" inputmode="decimal" autocomplete="off" placeholder="np. 24">
+            <span class="hint">z termometru w strefie ptaków</span></label>
+          <label>Wilgotność względna (%)
+            <input id="s-rh" type="number" min="5" max="100" step="1" inputmode="numeric" autocomplete="off" placeholder="np. 60">
+            <span class="hint" id="s-rh-hint">z higrometru sterownika – razem z temperaturą da ocenę parowania kropli (Delta T)</span></label>
         </div>
       </div>
 
@@ -930,6 +961,7 @@ ol.steps{padding-left:28px}
         <div class="tools">
           <button class="btn" type="button" id="save">Zapisz raport</button>
           <button class="btn ghost" type="button" id="copy">Kopiuj</button>
+          <button class="btn ghost" type="button" id="tm-start" title="Odliczanie czasu zużycia szczepionki od rozpuszczenia; ekran nie gaśnie">Rozpuszczona – odliczaj</button>
           <span class="note" id="save-msg"></span>
         </div>
       </div>
@@ -950,6 +982,7 @@ ol.steps{padding-left:28px}
     <input type="file" id="b-file" accept="application/json,.json" hidden>
     <span class="note">Raporty są zapisane w tym telefonie. Kopia obejmuje też zalecenia i ustawienia ferm – przyda się przy zmianie telefonu.</span>
   </div>
+  <div id="bk-nag" class="msg warn bk-nag" hidden></div>
   <div id="r-list" class="items"></div>
 </section>
 
@@ -1016,6 +1049,7 @@ ol.steps{padding-left:28px}
         <button class="btn" type="button" id="i-install" hidden>Zainstaluj na telefonie</button>
         <button class="btn ghost" type="button" id="i-check">Sprawdź aktualizacje</button>
         <button class="btn ghost" type="button" id="i-author">Słowo od autora</button>
+        <button class="btn ghost" type="button" id="i-big" aria-pressed="false">Duży tekst</button>
       </div>
       <span class="note" id="i-msg"></span>
       <div id="i-changes"></div>
@@ -1091,6 +1125,13 @@ ol.steps{padding-left:28px}
 </main>
 <div class="updbar" id="updbar" role="status" hidden><span id="upd-text">Dostępna nowa wersja aplikacji.</span><button class="btn small" type="button" id="upd-btn">Aktualizuj</button></div>
 <div class="toast" id="toast" role="status" hidden></div>
+<div id="tm" class="tm" hidden role="timer" aria-live="off">
+  <div class="tm-in">
+    <div class="tm-t"><b id="tm-left">–</b><span id="tm-sub"></span></div>
+    <div class="tm-bar"><i id="tm-fill"></i></div>
+    <div class="tm-b"><button class="btn small ghost" type="button" id="tm-big" aria-pressed="false" title="Większy tekst w całej aplikacji">A+</button><button class="btn small ghost" type="button" id="tm-stop">Zakończ</button></div>
+  </div>
+</div>
 
 <script>
 /* =====================================================================
@@ -2050,7 +2091,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.29.0';
+const APP_VERSION = '1.30.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -2859,8 +2900,22 @@ function calc(){
     $('s-vent').placeholder = String(vc || VENT_DEF);
     $('s-vent-hint').textContent = `wentylacja wyłączona po oprysku · ${vc ? `ChPLW tej szczepionki: ${vc} min` : `domyślnie ${VENT_DEF} min`} · najmniej ${VENT_MIN} min (Aviagen), dłużej jest lepiej`;
     if(isNum(toff)) tiles.push({k:'Wentylacja wyłączona', v:fmtMin(toff), s:`oprysk ${fmtMin(tw)} + ${vent} min po oprysku`});
+    // Tempo marszu: cała droga (długość × przejścia) w czasie jednego opryskiwacza na całą objętość – tak samo dla każdej osoby
+    const hLen = pf($('s-len').value), hPass = Math.max(1, Math.round(pf($('s-pass').value) || 1)), pace = isNum(hLen) && hLen > 0 && isNum(t1) && t1 > 0 ? hLen * hPass / t1 : null;
+    if(pace){
+      tiles.push({k:'Tempo marszu', v:`${fmt(pace, 1)} m/min`, s:`10 m w ${fmt0(600 / pace)} s · ${fmt0(hLen)} m × ${hPass} ${pl(hPass, 'przejście', 'przejścia', 'przejść')}`});
+      msgs.push(['info', `Tempo: ok. ${fmt(pace, 1)} m/min – 10 m kurnika w ${fmt0(600 / pace)} s${k > 1 ? ' (każda osoba to samo tempo)' : ''}. Idź równo: wolniej – ptaki dostaną więcej roztworu, a na końcu zabraknie; szybciej – zostanie roztwór, a część ptaków dostanie mniej. Odliczaj słupki, okna lub linie poideł.`]);
+      if(pace > 40) msgs.push(['warn', `Tempo ${fmt0(pace)} m/min to prawie zwykły marsz – trudno celować w głowy ptaków. Dodaj przejść, załóż mniejszą dyszę lub obniż ciśnienie (w widełkach kropli ChPLW).`]);
+    }
+    // Delta T (temperatura sucha − mokra, wzór Stulla 2011): wytyczna oprysków polowych GRDC – najlepiej 2–8, ostrożnie poniżej 2 i powyżej 10
+    const hT = pf($('s-t').value), hRH = pf($('s-rh').value), dT = deltaT(hT, hRH);
+    $('r-temp').placeholder = isNum(hT) ? fmtT(hT) : 'np. 24';
+    if(isNum(dT)){
+      $('s-rh-hint').textContent = `Delta T ${fmt(dT, 1)} °C – ${dT > 10 ? 'bardzo sucho, krople szybko parują' : dT > 8 ? 'sucho – krople parują szybciej' : dT < 2 ? 'bardzo wilgotno – krople prawie nie parują' : 'dobre warunki (2–8)'}`;
+      if(dT > 8) msgs.push([dT > 10 ? 'warn' : 'info', `Sucho: ${fmtT(hT)} °C i ${fmt0(hRH)}% wilgotności – Delta T ${fmt(dT, 1)} °C (wytyczna oprysków GRDC: najlepiej 2–8, powyżej 10 ostrożnie). Krople w locie parują i drobnieją – mniej osiada na ptakach, a drobniejsze wnikają głębiej w drogi oddechowe. Trzymaj kroplę w górnej części widełek ChPLW i nie podnoś ciśnienia ponad potrzebę.`]);
+    } else $('s-rh-hint').textContent = isNum(hRH) && !isNum(hT) ? 'wpisz też temperaturę – policzę Delta T' : 'z higrometru sterownika – razem z temperaturą da ocenę parowania kropli (Delta T)';
     Object.assign(R, {ml1000:ml, water_l:V, pressure:p, flow:Q, flowPer:q1, nozzles:nn, nnLance:nozN('lanca', $('s-nn').value), flowSrc:qsrc, flowKey:src, flowQ:src === 'reczne' && measured ? qm : null, flowQbar:src === 'reczne' && measured ? qp : null,
-      nozzle:noz, sprayer:SP.id, sprayerName:sprayerName(SP), tank:tankL || null, pMax:SP.pMax || null, mode:MODE_L[mode] || $('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, season:sea, ventAfter:vent, minutes:tw, sprayMin:t1, sectorMin:ts,
+      nozzle:noz, sprayer:SP.id, sprayerName:sprayerName(SP), tank:tankL || null, pMax:SP.pMax || null, houseLen:isNum(hLen) && hLen > 0 ? hLen : null, passes:isNum(hLen) && hLen > 0 ? hPass : null, pace, airT:isNum(hT) ? hT : null, rh:isNum(hRH) ? hRH : null, deltaT:isNum(dT) ? dT : null, mode:MODE_L[mode] || $('s-mode').selectedOptions[0].textContent, modeKey:mode, sectors:nsec, persons:k, org:C.org, season:sea, ventAfter:vent, minutes:tw, sprayMin:t1, sectorMin:ts,
       crew:k > 1 && isNum(t1) ? C.persons.map(o => ({no:o.no, sec:o.sec, l:V * o.share, min:t1 * o.work})) : null});
     if(noz === 'vs2'){
       msgs.push(['info', 'TX-VS2 (biała): kropla ok. 114 µm przy 2 bar i 106 µm przy 3 bar (karta dysz MSD/Birchmeier), wydatek 0,11–0,13 l/min na dyszę (katalog TeeJet) – 3 razy mniejszy niż TX-VK6, więc oprysk trwa 3 razy dłużej. Ceva podaje dyszę tej wielkości do szczepień powtórnych; drobniejsza kropla łatwiej paruje i znosi ją ruch powietrza.']);
@@ -3154,6 +3209,8 @@ function reportText(){
       rows.push(rkv('Czas zabiegu', fmtMin(R.minutes)), rkv('Osoby', `${k} – ${orgText(R.org, n)}`), n > 1 ? rkv('Sektory', `${n}, po ${fmtMin(R.sectorMin)}`) : null);
       (R.crew || []).forEach(o => rows.push(rkv(`Osoba ${o.no}`, `${R.org === 'razem' ? 'razem' : secText(o.sec)} · ${fmt(o.l,2)} l · ${fmtMin(o.min)}`)));
     } else rows.push(rkv('Czas oprysku', fmtMin(R.minutes)), n > 1 ? rkv('Sektory', `${n}, po ${fmtMin(R.sectorMin)}`) : null);
+    if(isNum(R.pace)) rows.push(rkv('Tempo marszu', `ok. ${fmt(R.pace, 1)} m/min – 10 m w ${fmt0(600 / R.pace)} s (kurnik ${fmt0(R.houseLen)} m × ${R.passes} ${pl(R.passes, 'przejście', 'przejścia', 'przejść')})`));
+    if(isNum(R.deltaT)) rows.push(rkv('Warunki', `${fmtT(R.airT)} °C, wilgotność ${fmt0(R.rh)}% – Delta T ${fmt(R.deltaT, 1)} °C`));
     if(isNum(R.ventAfter)) rows.push(rkv('Wentylacja', `wyłączona ok. ${fmtMin(R.minutes + R.ventAfter)} (oprysk + ${R.ventAfter} min po) · ${tLim(R.season).l}`));
     if(m) rows.push(rkv('Wg zaleceń', `z ${fmtDate(m.date)}: ${changesText(m.changes) || (m.actions || []).join(' ') || 'lista kontrolna'}`));
     sec('OPRYSK', rows);
@@ -3235,11 +3292,11 @@ async function saveReport(btn){
   if(!S.store){ toast('Pamięć aplikacji jeszcze się łączy – spróbuj za chwilę.'); return; }
   const L = S.last; if(!L) return;
   if(L.empty){ const m = (L.miss || [['birds', 'liczbę ptaków']])[0]; toast(`Uzupełnij: ${(L.miss || [m]).map(x => x[1]).join(', ')}.`); focusField(m[0]); return; }
-  const doc = Object.assign({}, L.R, {date:$('date').value || todayISO(), farm:$('farm').value.trim(), bird:$('bird').value, birdLabel:L.bird.l, dz:$('dz').value === DZ_ALL ? (L.v ? L.v.dz[0] : '') : $('dz').value, vacId:L.v ? L.v.id : '', vacName:L.v ? L.v.n : 'spoza bazy', notes:$('notes').value.trim(), time:$('r-time').value || null, houseTemp:isNum(pf($('r-temp').value)) ? pf($('r-temp').value) : null, operator:$('r-who').value.trim() || null, text:reportText(), createdAt:new Date().toISOString()});
+  const doc = Object.assign({}, L.R, {date:$('date').value || todayISO(), farm:$('farm').value.trim(), bird:$('bird').value, birdLabel:L.bird.l, dz:$('dz').value === DZ_ALL ? (L.v ? L.v.dz[0] : '') : $('dz').value, vacId:L.v ? L.v.id : '', vacName:L.v ? L.v.n : 'spoza bazy', notes:$('notes').value.trim(), time:$('r-time').value || null, houseTemp:isNum(pf($('r-temp').value)) ? pf($('r-temp').value) : L.R.route === 'spray' && isNum(pf($('s-t').value)) ? pf($('s-t').value) : null, operator:$('r-who').value.trim() || null, text:reportText(), createdAt:new Date().toISOString()});
   btn.disabled = true;
   if(S.mode === 'local' && !IN_ARTIFACT && !S.persisted && navigator.storage && navigator.storage.persist){ S.persisted = true; navigator.storage.persist().catch(() => {}); }
   try {
-    const rid = uid(); await S.store.set(rid, doc);
+    const rid = uid(); await S.store.set(rid, doc); if(doc.route === 'spray') houseSave();
     const m = doc.modId && S.mods[doc.modId];
     if(m && m.status === 'zalecona') await S.store.set(doc.modId, Object.assign({}, m, {status:'zastosowana', appliedReport:rid, appliedAt:new Date().toISOString()}));
     S.chk = {}; chkCount(); document.querySelectorAll('#crew li.tick.done').forEach(li => { li.classList.remove('done'); li.setAttribute('aria-checked', 'false'); }); chkCount(); $('notes').value = ''; $('r-time').value = ''; $('r-temp').value = ''; $('save-msg').textContent = 'Zapisano ' + new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) + '.'; toast('Raport zapisany.'); }
@@ -3248,7 +3305,7 @@ async function saveReport(btn){
 }
 function renderReports(){
   const all = Object.entries(S.reps).map(([id,r]) => Object.assign({}, r, {id})).sort((a,b) => String(b.date).localeCompare(String(a.date)) || String(b.createdAt).localeCompare(String(a.createdAt)));
-  $('rep-count').textContent = all.length;
+  $('rep-count').textContent = all.length; bkNag();
   const farms = [...new Set(all.map(r => r.farm).filter(Boolean))];
   $('farm-list').innerHTML = farms.map(f => `<option value="${esc(f)}"></option>`).join('');
   const q = $('r-q').value.trim().toLowerCase();
@@ -3365,6 +3422,48 @@ function crewHTML(C, V, t1){
   return `<div class="tablewrap"><table><thead><tr><th>Osoba</th><th>Sektory</th><th>Roztwór</th><th>Czas pracy</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 // Czas zużycia szczepionki po rozpuszczeniu z ChPLW (pole „Zużyć w”), w minutach; przy zakresie – dolna granica.
+function deltaT(T, RH){
+  if(!isNum(T) || !isNum(RH) || RH < 5 || RH > 100 || T < -20 || T > 50) return null;
+  const A = Math.atan, Tw = T * A(0.151977 * Math.sqrt(RH + 8.313659)) + A(T + RH) - A(RH - 1.676331) + 0.00391838 * Math.pow(RH, 1.5) * A(0.023101 * RH) - 4.686035;
+  return Math.max(0, T - Tw);
+}
+/* ---------- Tryb w terenie: odliczanie czasu zużycia szczepionki, ekran nie gaśnie, duży tekst ---------- */
+const TM_KEY = 'liczydlo.odliczanie.v1', BIG_KEY = 'liczydlo.duzy.v1';
+let tmTick = null, tmLock = null;
+async function tmWake(on){
+  try {
+    if(on && !tmLock && 'wakeLock' in navigator && document.visibilityState === 'visible'){ tmLock = await navigator.wakeLock.request('screen'); tmLock.addEventListener('release', () => { tmLock = null; }); }
+    if(!on && tmLock){ await tmLock.release(); tmLock = null; }
+  } catch(e){ tmLock = null; }
+}
+function tmStart(){
+  const v = curVac(), min = v ? useMinutes(v) : null;
+  lsSet(TM_KEY, {t0:Date.now(), min, n:v ? v.n : 'szczepionka', use:v ? v.use : ''});
+  toast(min ? `Odliczam czas zużycia – ChPLW: ${v.use}. Ekran nie zgaśnie.` : 'ChPLW (w bazie) nie podaje czasu zużycia – liczę czas od rozpuszczenia. Ekran nie zgaśnie.', 4500);
+  tmPaint();
+}
+function tmStop(){ lsSet(TM_KEY, null); tmPaint(); }
+function tmPaint(){
+  const s = lsGet(TM_KEY), box = $('tm'); clearInterval(tmTick); tmTick = null;
+  if(!s || !isNum(s.t0)){ box.hidden = true; document.body.classList.remove('has-tm'); tmWake(false); return; }
+  box.hidden = false; document.body.classList.add('has-tm'); tmWake(true);
+  const draw = () => {
+    const el = (Date.now() - s.t0) / 60000, hm = m => { m = Math.max(0, Math.floor(m)); return m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')} min` : `${m} min`; };
+    const st = new Date(s.t0).toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'});
+    if(isNum(s.min)){
+      const left = s.min - el, f = Math.min(1, Math.max(0, el / s.min));
+      $('tm-left').textContent = left > 0 ? `zostało ${hm(left + 0.999)}` : `czas minął ${hm(-left)} temu`;
+      $('tm-sub').textContent = `${s.n} · rozpuszczona ${st} · ChPLW: ${s.use}`;
+      $('tm-fill').style.width = ((1 - f) * 100).toFixed(1) + '%';   // pasek maleje razem z pozostałym czasem
+      box.classList.toggle('warn', left > 0 && left <= Math.min(15, s.min * 0.15)); box.classList.toggle('bad', left <= 0);
+    } else {
+      $('tm-left').textContent = `od rozpuszczenia ${hm(el)}`; $('tm-sub').textContent = `${s.n} · rozpuszczona ${st} · czas zużycia sprawdź w ChPLW`; $('tm-fill').style.width = '0%';
+    }
+  };
+  draw(); tmTick = setInterval(draw, 15000);
+}
+function bigApply(on){ document.documentElement.classList.toggle('big', !!on); ['tm-big', 'i-big'].forEach(id => { const b = $(id); if(b) b.setAttribute('aria-pressed', String(!!on)); }); }
+function bigToggle(){ const on = !lsGet(BIG_KEY); lsSet(BIG_KEY, on); bigApply(on); toast(on ? 'Duży tekst włączony.' : 'Duży tekst wyłączony.'); }
 function useMinutes(v){ const m = String(v && v.use || '').match(/(\d+(?:[.,]\d+)?)\s*(?:[–-]\s*\d+(?:[.,]\d+)?\s*)?h\b/); return m ? parseFloat(m[1].replace(',', '.')) * 60 : null; }
 // Cel z zapasem na przygotowanie roztworu: ¾ czasu, ale nie mniej niż czas minus 30 min.
 function useTarget(um){ return Math.max(um * 0.75, um - 30); }
@@ -3875,7 +3974,11 @@ function applyFarmSettings(quiet){
   calc();
   return true;
 }
-function onFarmChange(){ S.farmApplied = null; if(!applyFarmSettings(false)) calc(); }
+// Długość kurnika i liczba przejść – zapamiętane dla fermy (na tym urządzeniu)
+const HOUSE_KEY = 'liczydlo.kurniki.v1';
+function houseLoad(){ const k = farmKey($('farm').value), h = k && (lsGet(HOUSE_KEY) || {})[k]; if(!h) return; if(!$('s-len').value && h.len) $('s-len').value = h.len; if(!$('s-pass').value && h.pass) $('s-pass').value = h.pass; }
+function houseSave(){ const k = farmKey($('farm').value), len = pf($('s-len').value); if(!k || !isNum(len) || len <= 0) return; const all = lsGet(HOUSE_KEY) || {}; all[k] = {len, pass:Math.max(1, Math.round(pf($('s-pass').value) || 1))}; lsSet(HOUSE_KEY, all); }
+function onFarmChange(){ S.farmApplied = null; houseLoad(); if(!applyFarmSettings(false)) calc(); }
 function farmAlert(R){
   const key = farmKey($('farm').value); if(!key) return '';
   const list = modsOf(key), act = list.find(([, m]) => m.status === 'zalecona'), wait = list.find(([, m]) => m.status === 'zastosowana');
@@ -4721,6 +4824,11 @@ function bind(){
   $('k-detail').addEventListener('click', ev => { if(ev.target.id === 'k-use') useVaccine(S.selVac); });
   $('b-export').addEventListener('click', exportBackup);
   $('b-csv').addEventListener('click', exportCSV);
+  $('tm-start').addEventListener('click', tmStart); $('tm-stop').addEventListener('click', tmStop);
+  $('tm-big').addEventListener('click', bigToggle); $('i-big').addEventListener('click', bigToggle);
+  $('bk-nag').addEventListener('click', ev => { const b = ev.target.closest('[data-bk]'); if(!b) return; if(b.dataset.bk === 'now') exportBackup(); else { lsSet(BKP_KEY, Object.assign({}, lsGet(BKP_KEY) || {}, {snooze:Date.now()})); } bkNag(); });
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible'){ if(lsGet(TM_KEY)) tmPaint(); } });
+  bigApply(lsGet(BIG_KEY)); tmPaint();
   $('b-import').addEventListener('click', () => $('b-file').click());
   $('b-file').addEventListener('change', ev => { const f = ev.target.files && ev.target.files[0]; if(f) importBackup(f); ev.target.value = ''; });
   $('upd-btn').addEventListener('click', applyUpdate);
@@ -4799,9 +4907,21 @@ async function downloadFile(name, text, type){
   try { const url = URL.createObjectURL(new Blob([text], {type:(type || 'text/plain') + ';charset=utf-8'})); const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500); }
   catch(e){ toast('Nie udało się pobrać pliku.'); }
 }
+// Przypomnienie o kopii: raporty tylko w tym telefonie giną po wyczyszczeniu danych przeglądarki
+const BKP_KEY = 'liczydlo.kopiadata.v1', BKP_DAYS = 14;
+function bkNag(){
+  const box = $('bk-nag'); if(!box) return;
+  const n = Object.keys(S.reps).length, k = lsGet(BKP_KEY) || {}, day = 864e5, now = Date.now();
+  const since = isNum(k.t) ? Object.values(S.reps).filter(r => r.createdAt && Date.parse(r.createdAt) > k.t).length : n;
+  const show = S.mode === 'local' && since > 0 && !(isNum(k.snooze) && now - k.snooze < 7 * day) && (!isNum(k.t) ? n >= 3 : now - k.t > BKP_DAYS * day);
+  box.hidden = !show; if(!show){ box.innerHTML = ''; return; }
+  box.innerHTML = `<span>${isNum(k.t) ? `Ostatnia kopia ${fmtDate(new Date(k.t).toISOString().slice(0, 10))} – od tego czasu ${since} ${pl(since, 'nowy raport', 'nowe raporty', 'nowych raportów')}.` : `${n} ${pl(n, 'raport jest', 'raporty są', 'raportów jest')} tylko w tym telefonie i nie ma jeszcze kopii.`} Wyczyszczenie danych przeglądarki albo zmiana telefonu je usunie – zapisz kopię (plik) i trzymaj ją np. na dysku lub w poczcie.</span>
+    <span class="tools"><button class="btn small" type="button" data-bk="now">Zapisz kopię teraz</button><button class="btn small ghost" type="button" data-bk="later">Za tydzień</button></span>`;
+}
 function exportBackup(){
   const n = Object.keys(S.reps).length + Object.keys(S.mods).length + Object.keys(S.farms).length;
   if(!n){ toast('Brak danych do zapisania.'); return; }
+  lsSet(BKP_KEY, {t:Date.now()}); setTimeout(bkNag, 50);
   downloadFile(`liczydlo-kopia-${todayISO()}.json`, JSON.stringify({app:'Liczydło APP', wersja:APP_VERSION, zapisano:new Date().toISOString(), raporty:S.reps, modyfikacje:S.mods, ustawienia:S.farms}, null, 1), 'application/json');
 }
 async function importBackup(file){

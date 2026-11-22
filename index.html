@@ -439,6 +439,38 @@ label.need > :is(input,select){border-color:var(--warn);box-shadow:0 0 0 2px col
 .need-go:hover{background:var(--warn);color:var(--surface)}
 .need-go:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .kv dd.law{color:var(--bad);font-weight:600}
+/* Lista kontrolna: kroki „krok po kroku” do odhaczania */
+.steps li.tick{cursor:pointer;border-radius:6px;padding:2px 4px 2px 28px;margin-left:-4px;position:relative;transition:background .15s,color .15s}
+.steps li.tick::before{content:"";position:absolute;left:5px;top:.28em;width:15px;height:15px;border:1.6px solid var(--line-strong,var(--muted));border-radius:4px;background:var(--surface)}
+.steps li.tick.done{color:var(--muted)}
+.steps li.tick.done::before{background:var(--ok);border-color:var(--ok);-webkit-mask:none}
+.steps li.tick.done::after{content:"";position:absolute;left:10px;top:calc(.28em + 2px);width:4px;height:8px;border:solid var(--surface);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.steps li.tick:hover{background:var(--info-soft)}
+.steps li.tick:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.chk-n{margin-left:6px;font-size:.74rem;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.chk-n.all{color:var(--ok)}
+.chk-hint{margin:6px 0 0}
+/* Motyw */
+.themebtn{display:inline-flex;align-items:center;gap:5px}
+.themebtn svg{width:15px;height:15px;flex:none}
+/* Po szczepieniu */
+details.aftervac{margin:10px 0 8px}
+details.aftervac .steps{list-style:disc}
+#print{display:none}
+@media print{
+  @page{size:A4;margin:14mm 14mm 16mm}
+  html.printing body > *:not(#print){display:none !important}
+  html.printing #print{display:block;font-size:10.5pt}
+  html.printing{--ink:#16201a;--muted:#56655c;--surface:#fff;--surface-2:#eef1ed;--line:#d1dad3;--ok:#2b6a48;--bad:#a12a2a;--warn:#94560a}
+  html.printing body{background:#fff !important;color:#000}
+  html.printing #print .rep{border:0;box-shadow:none;padding:0;max-width:none}
+  html.printing #print *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html.printing #print h4,html.printing #print dl{break-inside:avoid}
+}
+ol.steps{padding-left:28px}
+.themebtn{padding:4px 7px}
+.themebtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.themebtn svg{width:17px;height:17px}
 </style>
 </head>
 <body>
@@ -568,6 +600,7 @@ label.need > :is(input,select){border-color:var(--warn);box-shadow:0 0 0 2px col
       <h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 120 100"><rect x="6" y="6" width="108" height="88" rx="10" fill="none" stroke="#f1f6f2" stroke-width="8"/><g stroke="#f1f6f2" stroke-width="3.5" opacity=".85"><line x1="9" y1="30" x2="111" y2="30"/><line x1="9" y1="50" x2="111" y2="50"/><line x1="9" y1="70" x2="111" y2="70"/></g><g fill="#e8a964"><ellipse cx="24" cy="30" rx="7" ry="8.5"/><ellipse cx="39" cy="30" rx="7" ry="8.5"/><ellipse cx="54" cy="30" rx="7" ry="8.5"/><ellipse cx="24" cy="50" rx="7" ry="8.5"/><ellipse cx="39" cy="50" rx="7" ry="8.5"/><ellipse cx="24" cy="70" rx="7" ry="8.5"/><ellipse cx="39" cy="70" rx="7" ry="8.5"/><ellipse cx="54" cy="70" rx="7" ry="8.5"/><ellipse cx="69" cy="70" rx="7" ry="8.5"/></g><g fill="#f1f6f2"><ellipse cx="96" cy="30" rx="7" ry="8.5"/><ellipse cx="81" cy="50" rx="7" ry="8.5"/><ellipse cx="96" cy="50" rx="7" ry="8.5"/><ellipse cx="96" cy="70" rx="7" ry="8.5"/></g></svg></span><span class="nm"><span class="lz-l">L</span>iczydło</span> <span class="sub">kalkulator szczepień drobiu</span></h1>
       <div class="headtools">
         <span class="chip" id="chip-mode"><span class="dot"></span><span>Łączenie z pamięcią…</span></span>
+        <button class="btn small ghost themebtn" type="button" id="theme-btn" title="Motyw: automatyczny" aria-label="Motyw: automatyczny"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg><span id="theme-l">auto</span></button>
         <a class="btn small ghost" href="#info" id="info-link">O aplikacji / Sugestie</a>
       </div>
     </div>
@@ -912,6 +945,7 @@ label.need > :is(input,select){border-color:var(--warn);box-shadow:0 0 0 2px col
   </div>
   <div class="tools" id="backup-tools" hidden>
     <button class="btn small ghost" type="button" id="b-export">Zapisz kopię raportów</button>
+    <button class="btn small ghost" type="button" id="b-csv">Zestawienie (Excel, CSV)</button>
     <button class="btn small ghost" type="button" id="b-import">Wczytaj kopię</button>
     <input type="file" id="b-file" accept="application/json,.json" hidden>
     <span class="note">Raporty są zapisane w tym telefonie. Kopia obejmuje też zalecenia i ustawienia ferm – przyda się przy zmianie telefonu.</span>
@@ -937,8 +971,25 @@ label.need > :is(input,select){border-color:var(--warn);box-shadow:0 0 0 2px col
       <label>Szukaj<input id="k-q" type="search" placeholder="nazwa, choroba"></label>
       <label>Drób<select id="k-sp"><option value="">wszystkie gatunki</option><option value="kury">kury</option><option value="indyki">indyki</option><option value="kaczki">kaczki (pekin, mulard)</option><option value="kaczki-p">kaczki piżmowe</option><option value="gesi">gęsi</option></select></label>
       <label>Choroba<select id="k-dz"></select></label>
-      <label>Droga podania<select id="k-rt"><option value="">wszystkie</option><option value="spray">oprysk</option><option value="woda">woda do picia</option><option value="oko">oko / nos</option><option value="inj">iniekcja</option></select></label>
+      <label>Droga podania<select id="k-rt"><option value="">wszystkie</option><option value="spray">oprysk</option><option value="woda">woda do picia</option><option value="oko">oko / nos</option><option value="inj">iniekcja</option><option value="inovo">in ovo</option></select></label>
+      <label>Producent<select id="k-mf"></select></label>
+      <label>Status<select id="k-st"><option value="">wszystkie</option><option value="on">w obrocie</option><option value="off">wycofane</option><option value="law">z uwagą prawną</option></select></label>
     </div>
+    <details class="howto aftervac"><summary>Po szczepieniu – co jest normalne, a co zgłosić</summary>
+      <h4 class="steps-h">Zwykle przemija samo</h4>
+      <ul class="steps">
+        <li>Żywe szczepionki oddechowe (ND, IB, aMPV, ILT) podane w oprysku, do oka lub w wodzie: wiele ChPLW dopuszcza łagodne, przemijające objawy oddechowe – kichanie, rzężenia, wypływ z nosa lub oczu. Czas i nasilenie podaje karta szczepionki („Po szczepieniu”).</li>
+        <li>Szczepionki inaktywowane z adiuwantem olejowym: miejscowy obrzęk w miejscu wkłucia, który może utrzymywać się długo – opis w karcie szczepionki.</li>
+      </ul>
+      <h4 class="steps-h">Wezwij lekarza weterynarii</h4>
+      <ul class="steps">
+        <li>Objawy silniejsze, dłuższe lub inne niż opisane w ChPLW, wyraźny wzrost padnięć, spadek pobierania wody lub paszy, objawy nerwowe.</li>
+        <li>Brak skuteczności – choroba w stadzie mimo szczepienia.</li>
+        <li>Wypadek u człowieka, zwłaszcza samowstrzyknięcie szczepionki olejowej: od razu do lekarza z ulotką – nawet gdy wkłucie wygląda niegroźnie.</li>
+      </ul>
+      <h4 class="steps-h">Zgłoszenie do URPL</h4>
+      <p class="note">Zgłasza się każde podejrzenie zdarzenia niepożądanego – także opisane w ulotce, po użyciu niezgodnym z ChPLW, brak skuteczności i reakcje u ludzi; poważne (zwłaszcza padnięcia) od razu. Najlepiej przez lekarza weterynarii: formularz na stronie URPL albo system <a href="https://smz2.ezdrowie.gov.pl" target="_blank" rel="noopener">SMZ</a>; telefon 22 492 11 00 (dni robocze 8–16). Podaj nazwę i serię szczepionki, stado, opis zdarzenia i swoje dane. <a href="https://www.gov.pl/web/urpl/co-nalezy-zglaszac" target="_blank" rel="noopener">URPL – co należy zgłaszać</a></p>
+    </details>
     <span class="note"><span class="pill v">ChPLW PL</span> odczytano z ulotki lub ChPLW w Rejestrze Produktów Leczniczych · <span class="pill p">dane częściowe</span> ChPLW zagraniczna lub niepełny odczyt · <span class="pill u">do weryfikacji</span> sprawdź w ChPLW</span>
   </div>
   <div class="cols side">
@@ -1988,8 +2039,22 @@ function injFor(v, bk, age){
   });
   return o;
 }
-const APP_VERSION = '1.28.0';
+// Motyw: auto (wg systemu) / jasny / ciemny – wybór zapamiętany na tym urządzeniu
+const THEME_KEY = 'liczydlo.motyw.v1', THEMES = {auto:'auto', light:'jasny', dark:'ciemny'};
+function applyTheme(m){
+  if(!THEMES[m]) m = 'auto'; const de = document.documentElement;
+  if(m === 'auto') de.removeAttribute('data-theme'); else de.setAttribute('data-theme', m);
+  const b = document.getElementById('theme-btn'), l = document.getElementById('theme-l');
+  if(b){ b.title = b.ariaLabel = `Motyw: ${THEMES[m]} (zmień)`; b.setAttribute('aria-label', b.title); } if(l) l.textContent = THEMES[m];
+  return m;
+}
+function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); toast(`Motyw: ${THEMES[m]}.`); }
+applyTheme(lsGet(THEME_KEY));
+const APP_VERSION = '1.29.0';
 const DATA_DATE = '22.11.2026';
+// Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
+const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
+function mfrOf(v){ const m = MFR.find(([re]) => re.test(v.m || '')); return m ? m[1] : (v.m || '').replace(/\s*\(.*$/, ''); }
 const IN_ARTIFACT = !!(window.claude && typeof window.claude.use === 'function');
 const S = {mode:'init', store:null, dl:null, reps:{}, mods:{}, farms:{}, sumChk:{}, farmApplied:null, answered:false, sum:null, route:'spray', mlTouched:false, last:null, open:null, selVac:null, reg:null, waiting:null, installEvt:null, persisted:false, knowKey:null, spPick:null, grpKey:null};
 let calcQueued = false, sumTimer = null;
@@ -2145,8 +2210,24 @@ function stabAmount(id, V, milkGl){
   return {id:'brak', n:s.n, txt:'', rule:'', wait:''};
 }
 // Lista kroków szczepienia przez wodę (dozownik albo zbiornik) – wg MSD, Aviagen, Elanco, Zootecnica
+// Kroki „krok po kroku” można odhaczać (lista kontrolna) – stan w S.chk, kluczem jest treść kroku;
+// odhaczone i pominięte kroki trafiają do raportu (sekcja LISTA KONTROLNA).
+function stepLi(a){ return a.filter(Boolean).map(x => { const on = !!(S.chk && S.chk[x]); return `<li class="tick${on ? ' done' : ''}" tabindex="0" role="checkbox" aria-checked="${on}">${esc(x)}</li>`; }).join(''); }
+const CHK_HINT = '<p class="note chk-hint">Dotknij kroku, żeby go odhaczyć – wynik listy trafi do raportu.</p>';
+function chkCount(){
+  document.querySelectorAll('#crew details.howto').forEach(d => { const a = d.querySelectorAll('li.tick'), n = d.querySelectorAll('li.tick.done').length, el = d.querySelector('.chk-n'); if(el) el.textContent = a.length ? `${n}/${a.length}` : ''; if(el) el.classList.toggle('all', !!a.length && n === a.length); });
+}
+function chkToggle(li){
+  const x = li.textContent; S.chk = S.chk || {};
+  if(S.chk[x]) delete S.chk[x]; else S.chk[x] = true;
+  li.classList.toggle('done', !!S.chk[x]); li.setAttribute('aria-checked', String(!!S.chk[x])); chkCount();
+}
+function chkState(){
+  const a = [...document.querySelectorAll('#crew li.tick')].map(li => ({x:li.textContent, ok:li.classList.contains('done')}));
+  return a.some(y => y.ok) ? a : null;
+}
 function waterSteps(o){
-  const L = a => a.filter(Boolean).map(x => `<li>${esc(x)}</li>`).join('');
+  const L = stepLi;
   const st = isNum(o.stock) ? fmt(o.stock, 1) : '…', sb = o.stab || {id:'brak'}, mk = sb.txt ? ` + ${sb.txt}` : '', dye = (STAB[sb.id] || {}).dye,
     wt = sb.id === 'brak' ? '' : sb.wait === '' ? '; poczekaj, aż granulat się rozpuści i woda się zabarwi' : `; odczekaj ${sb.wait === 'wg etykiety' ? 'czas z etykiety' : sb.wait}, aż ${sb.id === 'mleko' ? 'mleko się rozpuści i zwiąże' : 'stabilizator się rozpuści i zneutralizuje'} chlor`;
   const before = [
@@ -2167,7 +2248,7 @@ function waterSteps(o){
     dye ? `Sprawdź języki i wola u 50–100 ptaków z kilku miejsc kurnika – co najmniej 90% zabarwionych${dye === 1 ? ' na niebiesko' : ' (gdy stabilizator ma barwnik)'}.` : 'Sprawdź, czy wszystkie ptaki piły – obejdź kurnik i obejrzyj wola u 50–100 ptaków.',
     o.doz ? 'Przepłucz dozownik czystą wodą. Chlorowanie wznów dopiero po 24 h.' : 'Umyj zbiornik czystą wodą. Chlorowanie wznów dopiero po 24 h.'];
   const n1 = before.filter(Boolean).length, n2 = day.filter(Boolean).length;
-  return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – ${o.doz ? 'dozownik' : 'zbiornik'}</summary>
+  return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – ${o.doz ? 'dozownik' : 'zbiornik'} <span class="chk-n"></span></summary>${CHK_HINT}
     <h4 class="steps-h">Dzień wcześniej</h4><ol class="steps">${L(before)}</ol>
     <h4 class="steps-h">Dzień szczepienia</h4><ol class="steps" start="${n1 + 1}">${L(day)}</ol>
     <h4 class="steps-h">Po szczepieniu</h4><ol class="steps" start="${n1 + n2 + 1}">${L(after)}</ol></details>`;
@@ -2176,7 +2257,7 @@ function waterSteps(o){
 function distTxt(d, w){ if(/nad |od głów/.test(d)) return d; const m = d.match(/^(.*?)(\s*\(.*\))$/); return m ? `${m[1]} ${w}${m[2]}` : `${d} ${w}`; }
 // Oprysk krok po kroku – ChPLW (odległość, woda) + dobre praktyki MSD i Ceva (materiały szkoleniowe 2025)
 function spraySteps(o){
-  const L = a => a.filter(Boolean).map(x => `<li>${esc(x)}</li>`).join('');
+  const L = stepLi;
   const before = [
     'Opryskiwacz tylko do szczepień: umyty ciepłą wodą, bez detergentów i środków dezynfekcyjnych – ich resztki niszczą szczepionkę.',
     `Załóż ${o.nn > 1 ? `${o.nn} dysze ${o.nz}` : `dyszę ${o.nz}`} i ustaw ${isNum(o.p) && o.p > 0 ? fmtT(o.p) + ' bar' : 'ciśnienie'}. Najpewniej zmierzyć wydatek: woda z jednej dyszy przez 60 s do menzurki – wynik wpisz przy „Pomiar własny”.`,
@@ -2192,7 +2273,7 @@ function spraySteps(o){
     'Umyj opryskiwacz ciepłą wodą bez detergentów i dezynfekcji, rozkręć i wyczyść dyszę i filtry, wysusz; przechowuj otwarty w suchym miejscu.',
     o.resp ? 'Kontrola szczepienia (Ceva): 2–5 dni po oprysku (jednodniówki do 5. dnia, po szczepieniu powtórnym nieco krócej) kilkanaście wymazów z tchawicy lub szczeliny podniebiennej do PCR pokaże, czy szczep szczepionkowy dotarł do ptaków. Pobranie i badanie – z lekarzem weterynarii.' : null];
   const n1 = before.filter(Boolean).length, n2 = day.filter(Boolean).length;
-  return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – oprysk</summary>
+  return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – oprysk <span class="chk-n"></span></summary>${CHK_HINT}
     <h4 class="steps-h">Przed szczepieniem</h4><ol class="steps">${L(before)}</ol>
     <h4 class="steps-h">W kurniku</h4><ol class="steps" start="${n1 + 1}">${L(day)}</ol>
     <h4 class="steps-h">Po szczepieniu</h4><ol class="steps" start="${n1 + n2 + 1}">${L(after)}</ol></details>`;
@@ -2960,7 +3041,7 @@ function calc(){
   $('farm-alert').innerHTML = route === 'spray' ? farmAlert(R) : '';
   const ord = {bad:0, warn:1, ok:2, info:3}; msgs.sort((a,b) => ord[a[0]] - ord[b[0]]);
   $('tiles').innerHTML = tiles.map(t => `<div class="tile${t.main ? ' main' : ''}${t.cls ? ' ' + t.cls : ''}"><span>${esc(t.k)}</span><b>${esc(t.v)}</b><small>${esc(t.s || '')}</small></div>`).join('');
-  $('crew').innerHTML = crewH;
+  $('crew').innerHTML = crewH; chkCount();
   $('need').innerHTML = reqM.length ? needHTML(reqM, REQ_WHAT[route] || 'wtedy dokończę obliczenia') : '';
   $('msgs').innerHTML = msgs.map(([c,t]) => `<div class="msg ${c}">${esc(t)}</div>`).join('');
   $('res-sub').textContent = `${ROUTES[route]} · ${fmt0(birds)} ptaków`;
@@ -2970,8 +3051,8 @@ function calc(){
 function extraKV(v){ return [['Dokumentacja', v.docs], ['Postać', v.pf], ['Adiuwant', v.adjT], ['Dla szczepiącego', v.safe], ['Po szczepieniu', v.ae], ['Przedawkowanie', v.od], ['Przechowywanie', v.store], ['Pozwolenie', v.ma]].filter(x => x[1]).map(([k, t]) => `<dt>${k}</dt><dd>${esc(t)}</dd>`).join(''); }
 // Przygotowanie szczepionki do iniekcji krok po kroku – z ChPLW (pole prep)
 function injSteps(r){
-  const L = a => a.filter(Boolean).map(x => `<li>${esc(x)}</li>`).join('');
-  return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – przygotowanie szczepionki (ChPLW)</summary>
+  const L = stepLi;
+  return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – przygotowanie szczepionki (ChPLW) <span class="chk-n"></span></summary>${CHK_HINT}
     <ol class="steps">${L(r.prep)}</ol>${r.solv ? `<p class="note">Rozpuszczalnik wg ChPLW: ${esc(r.solv)}.</p>` : ''}</details>`;
 }
 function renderKnow(v){
@@ -3090,6 +3171,8 @@ function reportText(){
       rkv('Ważna do', /^\d{4}-\d{2}-\d{2}$/.test(a.exp || '') ? fmtDate(a.exp) : a.exp), rkv('Gospodarstwo', a.farmId ? `${a.farmId} (jednostka epidemiologiczna)` : ''),
       rkv('Dokumenty', a.docs && a.docs.length ? a.docs.join(', ') : 'nie potwierdzono'), rkv('Podstawa', 'brak ChPLW – dokumenty serii od laboratorium')]);
   }
+  const ck = chkState();
+  if(ck){ const un = ck.filter(y => !y.ok); sec('LISTA KONTROLNA', [rkv('Wykonano', `${ck.length - un.length} z ${ck.length} kroków`), ...(un.length ? ['  Nie odhaczono:', ...un.map(y => rwrap('  [ ] ', y.x, 6))] : [])]); }
   const w = L.msgs.filter(m => m[0] === 'bad' || m[0] === 'warn').map(m => m[1]);
   if(w.length) out.push('', 'UWAGI Z OBLICZEŃ', ...rbul(w));
   // Przebieg zabiegu – pola z listy kontrolnej szczepienia (Ceva): godzina, temperatura w kurniku, szczepiący
@@ -3159,7 +3242,7 @@ async function saveReport(btn){
     const rid = uid(); await S.store.set(rid, doc);
     const m = doc.modId && S.mods[doc.modId];
     if(m && m.status === 'zalecona') await S.store.set(doc.modId, Object.assign({}, m, {status:'zastosowana', appliedReport:rid, appliedAt:new Date().toISOString()}));
-    $('notes').value = ''; $('r-time').value = ''; $('r-temp').value = ''; $('save-msg').textContent = 'Zapisano ' + new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) + '.'; toast('Raport zapisany.'); }
+    S.chk = {}; chkCount(); document.querySelectorAll('#crew li.tick.done').forEach(li => { li.classList.remove('done'); li.setAttribute('aria-checked', 'false'); }); chkCount(); $('notes').value = ''; $('r-time').value = ''; $('r-temp').value = ''; $('save-msg').textContent = 'Zapisano ' + new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}) + '.'; toast('Raport zapisany.'); }
   catch(e){ toast(errText(e)); }
   finally { btn.disabled = false; }
 }
@@ -3180,7 +3263,7 @@ function renderReports(){
       <span class="s">${esc(r.birdLabel || '')} · ${esc(String(r.age))} dni · ${fmt0(r.birds)} szt. · ${esc(r.vacName)} (${esc((ROUTES[r.route] || '').toLowerCase())}) · ${esc(r.packs)} · ${main}</span>
       ${open && S.sum === r.id ? sumPanel(r) : ''}
       ${open ? `${repHTML(r.text)}
-      <div class="tools">${r.route === 'spray' ? `<button class="btn small" type="button" data-act="sum">${S.sum === r.id ? 'Zamknij podsumowanie' : 'Podsumowanie'}</button>` : ''}<button class="btn small ghost" type="button" data-act="copy">Kopiuj</button>${canShare() ? '<button class="btn small ghost" type="button" data-act="share">Udostępnij</button>' : ''}${(S.dl || !IN_ARTIFACT) ? '<button class="btn small ghost" type="button" data-act="dl">Pobierz (.txt)</button>' : ''}<button class="btn small danger" type="button" data-act="del">Usuń</button></div>` : ''}</div>`;
+      <div class="tools">${r.route === 'spray' ? `<button class="btn small" type="button" data-act="sum">${S.sum === r.id ? 'Zamknij podsumowanie' : 'Podsumowanie'}</button>` : ''}<button class="btn small ghost" type="button" data-act="copy">Kopiuj</button>${canShare() ? '<button class="btn small ghost" type="button" data-act="share">Udostępnij</button>' : ''}${(S.dl || !IN_ARTIFACT) ? '<button class="btn small ghost" type="button" data-act="dl">Pobierz (.txt)</button>' : ''}<button class="btn small ghost" type="button" data-act="print">Drukuj / PDF</button><button class="btn small danger" type="button" data-act="del">Usuń</button></div>` : ''}</div>`;
   }).join('') || '<div class="empty">Brak raportów pasujących do wyszukiwania.</div>';
   if(S.sum && S.open === S.sum && S.reps[S.sum]) sumCalc(S.reps[S.sum]);   // podsumowanie liczy się od razu i na bieżąco – bez przycisku „Przelicz”
 }
@@ -3198,6 +3281,7 @@ async function reportAction(ev){
   if(btn.dataset.act === 'sum-save'){ ev.stopPropagation(); return sumSave(id, r, false); }
   if(btn.dataset.act === 'sum-perm'){ ev.stopPropagation(); return sumSave(id, r, true); }
   if(btn.dataset.act === 'copy') return copyText(r.text || '');
+  if(btn.dataset.act === 'print') return printReport(r);
   if(btn.dataset.act === 'dl') return downloadFile(`raport_szczepienia_${r.date}_${(r.farm || 'ferma').replace(/[^\p{L}\p{N}]+/gu,'_')}.txt`, r.text || '', 'text/plain');
   if(btn.dataset.act === 'share'){ try { await navigator.share({title:'Raport szczepienia – Liczydło', text:r.text || ''}); } catch(e){} return; }
   if(btn.dataset.act === 'del'){ if(!armConfirm(btn)) return; try { await S.store.remove(id); S.open = null; toast('Usunięto raport.'); } catch(e){ toast(errText(e)); } }
@@ -3909,9 +3993,11 @@ function describeRoute(k, r){
   return `<dt>${esc(ROUTES[k])}</dt><dd>${esc(d || 'wg ChPLW')}${r.note ? `<br><span class="note">${esc(r.note)}</span>` : ''}${r.prep && r.prep.length ? `<details class="howto"><summary>Przygotowanie krok po kroku (${r.prep.length})</summary><ol class="steps">${r.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ol></details>` : ''}</dd>`;
 }
 function renderKnowledge(){
-  if(!$('k-dz').options.length) fillSelect($('k-dz'), [{v:'', l:'wszystkie'}, ...Object.entries(DISEASES).map(([k,l]) => ({v:k, l}))]);
-  const q = $('k-q').value.trim().toLowerCase(), sp = $('k-sp').value, dz = $('k-dz').value, rt = $('k-rt').value;
-  const rows = VACCINES.filter(v => (!q || [v.n, v.m, v.s, v.dz.join(' '), v.dz.map(d => DISEASES[d] || '').join(' ')].join(' ').toLowerCase().includes(q)) && (!sp || v.sp.includes(sp)) && (!dz || v.dz.includes(dz)) && (!rt || (v.r && v.r[rt]))).sort((a,b) => a.n.localeCompare(b.n,'pl'));
+  if(!$('k-dz').options.length) fillSelect($('k-dz'), [{v:'', l:'wszystkie'}, ...Object.entries(DISEASES).filter(([k]) => VACCINES.some(v => v.dz.includes(k))).map(([k,l]) => ({v:k, l}))]);
+  if(!$('k-mf').options.length){ const mf = {}; VACCINES.forEach(v => { const k = mfrOf(v); mf[k] = (mf[k] || 0) + 1; }); fillSelect($('k-mf'), [{v:'', l:'wszyscy'}, ...Object.keys(mf).sort((a,b) => a.localeCompare(b,'pl')).map(k => ({v:k, l:`${k} (${mf[k]})`}))]); }
+  const q = $('k-q').value.trim().toLowerCase(), sp = $('k-sp').value, dz = $('k-dz').value, rt = $('k-rt').value, mf = $('k-mf').value, st = $('k-st').value;
+  const rows = VACCINES.filter(v => (!q || [v.n, v.m, v.s, v.dz.join(' '), v.dz.map(d => DISEASES[d] || '').join(' ')].join(' ').toLowerCase().includes(q)) && (!sp || v.sp.includes(sp)) && (!dz || v.dz.includes(dz)) && (!rt || (v.r && v.r[rt]))
+    && (!mf || mfrOf(v) === mf) && (!st || (st === 'off' ? !!v.off : st === 'law' ? !!v.law : !v.off))).sort((a,b) => a.n.localeCompare(b.n,'pl'));
   $('k-count').textContent = `${rows.length} z ${VACCINES.length} szczepionek`;
   $('k-list').innerHTML = rows.map(v => `<button type="button" class="item${S.selVac === v.id ? ' sel' : ''}" data-id="${esc(v.id)}"><span class="t">${esc(v.n)} ${stPill(v)}</span><span class="s">${esc(v.dz.join(' + '))} · ${esc(spText(v.sp))} · ${esc(Object.keys(v.r || {}).map(k => ROUTES[k].toLowerCase()).join(', ') || 'droga wg ChPLW')}</span></button>`).join('') || '<div class="empty">Brak szczepionek dla wybranych filtrów.</div>';
   const v = S.selVac ? VACCINES.find(x => x.id === S.selVac) : null; const box = $('k-detail');
@@ -4607,6 +4693,8 @@ function bind(){
   $('s-spr').addEventListener('change', () => { saveEquipment(); calc(); });
   $('s-nn').addEventListener('change', () => { saveEquipment(); calc(); });
   ['w-mode', 'w-pct', 'w-stab', 'w-stab-amt', 'w-stab-unit'].forEach(id => $(id).addEventListener('change', saveEquipment));
+  $('crew').addEventListener('click', ev => { const li = ev.target.closest('li.tick'); if(li) chkToggle(li); });
+  $('crew').addEventListener('keydown', ev => { const li = ev.target.closest && ev.target.closest('li.tick'); if(li && (ev.key === ' ' || ev.key === 'Enter')){ ev.preventDefault(); chkToggle(li); } });
   $('crew').addEventListener('toggle', ev => { if(ev.target.matches && ev.target.matches('details.howto')) S.howtoOpen = ev.target.open; }, true);
   let ageTimer = null;   // wiek wpisywany cyfra po cyfrze – listy po chwili, nie po każdej cyfrze
   $('age').addEventListener('input', () => { clearTimeout(ageTimer); ageTimer = setTimeout(() => { if(!S.mlTouched) applyDefaultsSpray(); refreshGuides(); if(applyInjDefaults(false)) calc(); }, 300); });
@@ -4627,10 +4715,12 @@ function bind(){
   $('m-list').addEventListener('change', modCheck);
   $('m-farms').addEventListener('click', farmAction);
   $('r-list').addEventListener('keydown', ev => { if((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList.contains('item')){ ev.preventDefault(); reportAction(ev); } });
-  ['k-q','k-sp','k-dz','k-rt'].forEach(id => $(id).addEventListener('input', renderKnowledge));
+  ['k-q','k-sp','k-dz','k-rt','k-mf','k-st'].forEach(id => $(id).addEventListener('input', renderKnowledge));
+  $('theme-btn').addEventListener('click', cycleTheme); applyTheme(lsGet(THEME_KEY));
   $('k-list').addEventListener('click', ev => { const b = ev.target.closest('.item'); if(b){ S.selVac = b.dataset.id; renderKnowledge(); $('k-detail').scrollIntoView({behavior:'smooth', block:'nearest'}); } });
   $('k-detail').addEventListener('click', ev => { if(ev.target.id === 'k-use') useVaccine(S.selVac); });
   $('b-export').addEventListener('click', exportBackup);
+  $('b-csv').addEventListener('click', exportCSV);
   $('b-import').addEventListener('click', () => $('b-file').click());
   $('b-file').addEventListener('change', ev => { const f = ev.target.files && ev.target.files[0]; if(f) importBackup(f); ev.target.value = ''; });
   $('upd-btn').addEventListener('click', applyUpdate);
@@ -4684,6 +4774,26 @@ init();
 
 /* ---------- Pliki, kopia zapasowa, udostępnianie ---------- */
 function canShare(){ return !IN_ARTIFACT && typeof navigator.share === 'function'; }
+// Wydruk raportu (także „Zapisz jako PDF” w oknie drukowania): tylko karta raportu, A4, z podpisem
+function printReport(r){
+  let box = $('print'); if(!box){ box = document.createElement('div'); box.id = 'print'; document.body.appendChild(box); }
+  box.innerHTML = repHTML(r.text);
+  const done = () => { document.documentElement.classList.remove('printing'); box.innerHTML = ''; window.removeEventListener('afterprint', done); };
+  document.documentElement.classList.add('printing'); window.addEventListener('afterprint', done);
+  const t = document.title; document.title = `Raport szczepienia ${r.date || ''} ${r.farm || ''}`.trim();
+  setTimeout(() => { try { window.print(); } catch(e){ toast('Drukowanie niedostępne w tej przeglądarce.'); } document.title = t; if(!('onafterprint' in window)) setTimeout(done, 500); }, 60);
+}
+// Zestawienie raportów do arkusza (Excel, Arkusze Google): CSV ze średnikami, przecinek dziesiętny, BOM dla polskich znaków
+function exportCSV(){
+  const all = Object.values(S.reps).sort((a,b) => String(a.date).localeCompare(String(b.date)));
+  if(!all.length){ toast('Brak raportów do zestawienia.'); return; }
+  const n = (x, d = 2) => isNum(x) ? String(Math.round(x * 10 ** d) / 10 ** d).replace('.', ',') : '';
+  const c = x => { const s = x == null ? '' : String(x); return /[;"\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const H = ['Data','Godzina','Ferma','Drób','Wiek (dni)','Liczba ptaków','Choroba','Szczepionka','Droga podania','Fiolki','Dawki','Seria','Ważna do','Woda / rozpuszczalnik (l)','Dawka iniekcji (ml)','Ciśnienie (bar)','Dysza','Kropla (µm)','Czas (min)','Osoby','Temp. w kurniku (°C)','Szczepiący','Uwagi'];
+  const rows = all.map(r => [r.date, r.time, r.farm, r.birdLabel, r.age, r.birds, DISEASES[r.dz] || r.dz, r.vacName, ROUTES[r.route] || r.route, r.packs, r.doses, r.lot, r.exp,
+    n(r.water_l != null ? r.water_l : r.diluent_ml != null ? r.diluent_ml / 1000 : r.vaccine_ml != null ? r.vaccine_ml / 1000 : null, 2), n(r.dose_ml, 3), n(r.pressure, 1), r.route === 'spray' && r.nozzle ? NOZ[nozOf(r.nozzle)].n : '', n(r.vmd, 0), n(r.minutes, 0), r.persons, n(r.houseTemp, 1), r.operator, r.notes]);
+  downloadFile(`liczydlo-raporty-${todayISO()}.csv`, '﻿' + [H, ...rows].map(a => a.map(c).join(';')).join('\r\n'), 'text/csv');
+}
 async function downloadFile(name, text, type){
   if(S.dl){ try { await S.dl.save({filename:name, data:text}); } catch(e){ if(e && e.code !== 'declined') toast('Nie udało się pobrać pliku.'); } return; }
   try { const url = URL.createObjectURL(new Blob([text], {type:(type || 'text/plain') + ';charset=utf-8'})); const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500); }

@@ -1,9 +1,13 @@
 {
- "wersja": "1.28.0",
+ "wersja": "1.29.0",
  "data": "2026-11-22",
  "zmiany": [
-  "Dwie nowe szczepionki z ChPLW (EMA): Innovax-ILT (MSD – ILT i choroba Mareka, podskórnie 1. dnia) oraz Vaxxitek HVT+IBD+H5 (Boehringer – grypa ptaków H5, kury i indyki, podskórnie lub in ovo).",
-  "– Nowa choroba w filtrach: grypa ptaków H5 (HPAI). Szczepionki z zastrzeżeniem prawnym z ChPLW mają czerwoną „Uwagę prawną” w karcie i w obliczeniach – szczepień przeciw HPAI w Polsce nie wdrożono.",
+  "Lista kontrolna: kroki „Krok po kroku” (oprysk, woda, iniekcja) można odhaczać – licznik przy nagłówku, a w raporcie sekcja z wynikiem i pominiętymi krokami.",
+  "– Raport: przycisk „Drukuj / PDF” (A4, z podpisem). Zakładka Raporty: „Zestawienie (Excel, CSV)” wszystkich raportów.",
+  "– Przełącznik motywu w nagłówku: automatyczny, jasny, ciemny.",
+  "– Szczepionki: nowe filtry – producent i status (w obrocie, wycofane, z uwagą prawną), droga „in ovo”. Ściąga „Po szczepieniu – co jest normalne, a co zgłosić” (z zasadami zgłaszania do URPL).",
+  "(1.28.0) Dwie nowe szczepionki z ChPLW (EMA): Innovax-ILT (MSD – ILT i choroba Mareka, podskórnie 1. dnia) oraz Vaxxitek HVT+IBD+H5 (Boehringer – grypa ptaków H5, kury i indyki, podskórnie lub in ovo).",
+  "(1.28.0) – Nowa choroba w filtrach: grypa ptaków H5 (HPAI). Szczepionki z zastrzeżeniem prawnym z ChPLW mają czerwoną „Uwagę prawną” w karcie i w obliczeniach – szczepień przeciw HPAI w Polsce nie wdrożono.",
   "(1.27.2) Drobne poprawki wyglądu: wyraźniejsze pasy pozostałych dysz na wykresie kropli (zwłaszcza w ciemnym motywie) i krótsza podpowiedź w wyszukiwarce szczepionek.",
   "(1.27.1) Przegląd z dokumentami EMA i rejestru: poprawiona karta wycofanej Nobilis OR inac (dawka 0,25 ml, tylko kury) – pozostałe szczepionki zgodne. Nowe zasady o dyszach TX i dyszach z karty AS 1200.",
   "(1.27.1) – Odległość lancy pod polem „Tryb pracy” bierze się teraz z ChPLW wybranej szczepionki (np. Poulvac TRT – ok. 50 cm).",

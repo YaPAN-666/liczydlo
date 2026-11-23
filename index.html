@@ -2203,7 +2203,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.38.1';
+const APP_VERSION = '1.39.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -2242,20 +2242,29 @@ const FLOW_SRC = {
 // Czas pracy i litry na jedno ładowanie akumulatora – z tej samej ulotki (zależnie od ciśnienia).
 const SPRAYERS = {
   rec15:   {n:'Birchmeier REC 15 AC1', pMin:0.5, pMax:6,  q0:2.0, qMax:1.0, out:1.4, tank:15, as:true,
-            h:'0,5–6 bar · zbiornik 15 l · pompa tłokowa maks. ok. 1,4 l/min · akumulator 18 V 4 Ah: 4,1–17,9 h i 165–240 l na ładowanie · praca w 5–30 °C · współpracuje z AS 1200'},
+            rest:0.12, bat:[[0.5,18,230],[1,15,260],[2,11,260],[3,7.9,230],[4,6.1,210],[5,4.9,180],[6,4.1,160]],
+            h:'0,5–6 bar · zbiornik 15 l · pompa tłokowa maks. ok. 1,4 l/min · akumulator 18 V 4 Ah: 4,1–18 h i 160–260 l na ładowanie (instrukcja) · resztka techniczna 0,12 l · praca w 5–30 °C · współpracuje z AS 1200'},
   rec15pc: {n:'Birchmeier REC 15 PC1', pMin:0.5, pMax:6,  q0:2.0, qMax:1.0, out:1.1, tank:15, as:true,
             h:'0,5–6 bar · zbiornik 15 l · pompa jak REC 15 AC1, ale maks. wydatek oprysku ok. 1,1 l/min (wersja z dyszą płaską XR 8001 VS) · akumulator 4 Ah: 1,6–11,6 h'},
   rex15:   {n:'Birchmeier REX 15 AC1', pMin:1,   pMax:10, q0:6.0, qMax:3.5, out:2.8, tank:15, as:true,
-            h:'1–10 bar · zbiornik 15 l · pompa membranowa maks. ok. 2,8 l/min · akumulator 5,2 Ah: 0,7–8,8 h · 10 kg · współpracuje z AS 1200'},
+            rest:0.24, bat:[[1,8.8,490],[2,5.0,390],[4,2.4,260],[6,1.5,190],[8,1.0,150],[10,0.72,120]],
+            h:'1–10 bar, z niektórymi akcesoriami maks. 6 bar (instrukcja) · zbiornik 15 l · pompa membranowa maks. ok. 2,8 l/min · akumulator 5,2 Ah: 0,7–8,8 h i 120–490 l na ładowanie · resztka techniczna 0,24 l · współpracuje z AS 1200'},
   reb15:   {n:'Birchmeier REB 15 AC1', pMin:0.5, pMax:3,  q0:3.1, qMax:2.3, out:1.9, tank:15, as:true,
-            h:'0,5–3 bar · zbiornik 15 l · pompa membranowa maks. ok. 1,9 l/min · akumulator 2 Ah: 2,4–7,8 h · współpracuje z AS 1200 (instrukcja AS 1200, 2026)'},
+            bat:[[0.5,8.1,110],[1,5.4,100],[2,3.5,90],[3,2.4,70]],
+            h:'0,5–3 bar · zbiornik 15 l · pompa membranowa maks. ok. 1,9 l/min · akumulator 2 Ah: 2,4–8,1 h i 70–110 l na ładowanie (instrukcja) · współpracuje z AS 1200 (instrukcja AS 1200, 2026)'},
   c50:     {n:'Birchmeier C 50 AC1', pMin:1, pMax:6, q0:6.0, qMax:4.0, out:4.0, tank:50, as:true,
             h:'opryskiwacz na wózku · 1–6 bar · zbiornik 50 l · wąż 10 m · pompa membranowa 6 l/min (4 l/min przy 6 bar) · akumulator 18 V 8 Ah: 1–16 h · 29,5 kg · współpracuje z AS 1200'}
 };
 // Dmuchawa AS 1200 (instrukcja, także GR1 v0426): prędkość powietrza i czas pracy akumulatora (2 × 10 Ah) na danym poziomie.
 // Do szczepienia aplikacja liczy tylko poziomy 1–2; wyższe (3: 34 m/s 1 h 50 min, 4: 44 m/s 50 min, 5: 56 m/s 25 min,
 // max: 65 m/s 15 min – od „max” ochronniki słuchu) to nawiew do ochrony roślin.
-const AS1200 = {dm1:{v:21, t:'5 h 40 min'}, dm2:{v:26, t:'3 h 20 min'}};
+// Zasięg oprysku wg instrukcji: poziom 1 – 0–5 m, poziom 2 – 1,2–7 m (3: 1,5–9, 4: 2–11, 5: 2,5–13 m).
+// Tabela instrukcji: przy wyższym ciśnieniu i większym wydatku dyszy ciecz wypada ze strumienia powietrza – najszybciej na poziomie 1.
+const AS1200 = {dm1:{v:21, t:'5 h 40 min', r:'0–5 m'}, dm2:{v:26, t:'3 h 20 min', r:'1,2–7 m'}};
+// Parametry pracy opryskiwaczy (instrukcje Birchmeier 12081203, 12087903, 12086103): [bar, h, l] – praca ciągła z dyszą fabryczną,
+// czas pracy i litry na jedno ładowanie akumulatora. Z TX-VK6 (mniejszy wydatek) czas będzie dłuższy.
+function batAt(s, p){ const t = s && s.bat; if(!t || !isNum(p)) return null; let a = t[0], b = t[t.length - 1]; if(p <= a[0]) return {h:a[1], l:a[2]}; if(p >= b[0]) return {h:b[1], l:b[2]};
+  for(let i = 1; i < t.length; i++) if(p <= t[i][0]){ a = t[i - 1]; b = t[i]; const f = (p - a[0]) / (b[0] - a[0]); return {h:a[1] + (b[1] - a[1]) * f, l:a[2] + (b[2] - a[2]) * f}; } return null; }
 // Karta dysz Birchmeiera do AS 1200 (wkładka 12173201, wyd. 2026): TXVK-6 – jedyna dysza zalecana do szczepienia drobiu,
 // kropla VF, wydatek [bar, l/min] – taki sam jak w katalogu TeeJet dla jednej dyszy (0,33 l/min przy 2 bar).
 // Wcześniej aplikacja miała tu wartości 2 razy większe (0,66 l/min przy 2 bar) – aktualna karta ich nie potwierdza.
@@ -2282,7 +2291,7 @@ function sprayerUI(){
   $('s-p-hint').textContent = `${fmtT(s.pMin)}–${fmtT(s.pMax)} bar co 0,5 · ${$('s-mode').value === 'lanca' ? 'zalecane 2–3 bar' : 'z dmuchawą 2–2,5 bar, maks. 3'}`;
   $('s-spr-hint').textContent = s.h;
   const a = AS1200[mode.value];
-  $('s-mode-hint').textContent = a ? `AS 1200: ${a.v} m/s, 1 dysza, akumulator dmuchawy ok. ${a.t} · poziomy 3–5 i max (34–65 m/s, zasięg do 13 m) to nawiew do ochrony roślin – za silny do szczepienia, aplikacja ich nie liczy` : (() => { const v = curVac(), d = v && v.r && v.r.spray && v.r.spray.dist; return d ? `lanca ${distTxt(d, 'nad ptakami')} (ChPLW)` : 'lanca 30–40 cm nad ptakami'; })();
+  $('s-mode-hint').textContent = a ? `AS 1200: ${a.v} m/s, zasięg ${a.r}, 1 dysza, akumulator dmuchawy ok. ${a.t} · poziomy 3–5 i max (34–65 m/s, zasięg do 13 m) to nawiew do ochrony roślin – za silny do szczepienia, aplikacja ich nie liczy` : (() => { const v = curVac(), d = v && v.r && v.r.spray && v.r.spray.dist; return d ? `lanca ${distTxt(d, 'nad ptakami')} (ChPLW)` : 'lanca 30–40 cm nad ptakami'; })();
   $('s-nn-wrap').hidden = mode.value !== 'lanca';
   $('s-nn-hint').textContent = 'wydatek lancy = liczba dysz × wydatek jednej dyszy';
   return forced;
@@ -3074,6 +3083,10 @@ function calc(){
       const pOk = pMaxPump(SP, pp => nn * (src === 'reczne' ? qm * Math.sqrt(pp / qp) : flowTab(tab, pp)));
       msgs.push([Q > cap * 1.1 ? 'bad' : 'warn', `Pompa ${SP.n} przy ${fmtT(p)} bar daje ok. ${fmt(cap,2)} l/min, a ${nn > 1 ? nzT + ' potrzebują' : 'dysza ' + NZ.n + ' potrzebuje'} ${fmt(Q,2)} l/min – ciśnienie się nie utrzyma i wydatek będzie mniejszy niż w planie.${pOk ? ` Ustaw najwyżej ok. ${fmtT(pOk)} bar` : ' Zmniejsz ciśnienie'}${noz === 'vk18' ? ' albo załóż TX-VK6' : ''}.`]);
     }
+    if(SP.rest && maxL > 0){ const minL = V * Math.min(...C.persons.map(o => o.share)), sh = SP.rest / minL;
+      if(sh >= 0.03) msgs.push([sh >= 0.08 ? 'warn' : 'info', `Resztka techniczna ${SP.n}: ok. ${fmt(SP.rest,2)} l roztworu zostaje w opryskiwaczu i nie da się jej wypryskać (instrukcja Birchmeier). Przy ${fmt(minL,2)} l na opryskiwacz to ok. ${fmt0(sh * 100)}% dawek. Przy małej objętości uwzględnij to w planie – zapas dawek ustal z lekarzem weterynarii.`]); }
+    { const bt = batAt(SP, p > 0 ? p : null); if(bt && maxL > bt.l * 0.5) msgs.push([maxL > bt.l * 0.9 ? 'warn' : 'info', `Akumulator ${SP.n} przy ${fmtT(p)} bar wystarcza na ok. ${fmt0(bt.l)} l (${fmt(bt.h,1)} h pracy ciągłej, instrukcja). Na opryskiwacz przypada ${fmt(maxL,2)} l – miej naładowany zapas.`]); }
+    if(SP.id === 'rex15' && p > 6 + 1e-9) msgs.push(['info', 'REX 15: instrukcja ogranicza ciśnienie do 6 bar przy niektórych akcesoriach – sprawdź swoją lancę i rękojeść.']);
     if(p > 6 + 1e-9) msgs.push(['warn', `Powyżej 6 bar nie ma danych kropli i wydatku ${NZ.n} – kropla drobnieje, a okna z ChPLW nie da się sprawdzić.`]);
     if(k > 1 && C.uneven) msgs.push(['warn', `Nierówny podział: ${C.persons.map(o => `osoba ${o.no} – ${secText(o.sec)}`).join(', ')}. Osoby skończą w różnym czasie – lepiej liczba sektorów podzielna przez liczbę osób albo praca razem, sektor po sektorze.`]);
     if(k > 1) msgs.push(['info', `${k} ${plOsoba(k)}: rozpuść wszystkie fiolki w całej objętości wody, wymieszaj i dopiero wtedy rozlej do opryskiwaczy wg tabeli. Opryskiwacze ustaw tak samo – ta sama dysza i ciśnienie.`]);
@@ -3082,7 +3095,7 @@ function calc(){
     if(mode !== 'lanca' && dol <= 7) msgs.push(['warn','Pisklęta w 1. tygodniu szczep bez dmuchawy (lanca 30–40 cm nad ptakami).']);
     if(mode === 'dm2') msgs.push(['warn','Poziom 2 tylko, gdy zasięg poziomu 1 nie wystarcza.']);
     if(mode !== 'lanca' && noz === 'vk6' && src !== 'reczne') msgs.push(['info', `Karta dysz Birchmeiera do AS 1200 (wyd. 2026) podaje dla TXVK-6 ${fmt(flowTab(TXVK6_BIRCH_AS, p > 0 ? p : 2),2)} l/min przy ${fmtT(p > 0 ? p : 2)} bar – tyle samo co katalog TeeJet, i wskazuje ją jako jedyną dyszę zalecaną do szczepienia drobiu. Pomiar wydatku cylindrem (60 s) nadal jest najpewniejszy.`]);
-    if(mode !== 'lanca') msgs.push(['info','Z dmuchawą: ptaki ok. 1–3 m od wylotu, strumień skośnie w dół nad stado. Dmuchawa AS 1200 pracuje w temperaturze 5–30°C (instrukcja AS 1200) – w cieplejszym kurniku sprawdź jej działanie.']);
+    if(mode !== 'lanca') msgs.push(['info','Z dmuchawą: ptaki ok. 1–3 m od wylotu, strumień skośnie w dół nad stado. Instrukcja AS 1200: przy zbyt wysokim ciśnieniu i dużym wydatku dyszy ciecz wypada ze strumienia powietrza – dlatego z dmuchawą najwyżej 3 bar i mała dysza. Dmuchawa AS 1200 pracuje w temperaturze 5–30°C (instrukcja AS 1200) – w cieplejszym kurniku sprawdź jej działanie.']);
     const allowed = sprayFarm(sp);
     const vmd0 = src === 'reczne' && isNum(q1) ? vmdEst(p, q1, noz) : vmdAt(p > 0 ? p : 2.5, noz);
     if(sp.dRep && isNum(vmd0) && !inWin(sp.dRep, vmd0)) msgs.push(['warn', `ChPLW: szczepienie powtórne – drobna kropla ${fmtRange(sp.dRep)} µm. ${NZ.n} daje ok. ${fmt0(vmd0)} µm, więc nadaje się tylko do szczepienia pierwotnego (${fmtRange(sp.d)} µm). Do powtórnego potrzebny rozpylacz drobnokroplisty${sp.dRep[1] < VS2_D[0] && noz !== 'vs2' ? ` – ${VS2_TXT}` : ''}.`]);
@@ -4429,8 +4442,8 @@ function renderRules(){
     <li>Dysze TX (TeeJet ConeJet, pusty stożek 80°) – wspólne dla lancy i dmuchawy, na nakrętkę TeeJet: <b>TX-VS2</b> biała, stal nierdzewna, sitko 100 mesh, 0,11–0,18 l/min przy 2–6 bar, kropla 114–106 µm przy 2–3 bar; <b>TX-VK6</b> czerwona, ceramika, sitko 50 mesh, 0,33–0,54 l/min i 153–122 µm przy 2–6 bar; <b>TX-VK18</b> pomarańczowa, ceramika, sitko 50 mesh, 0,97–1,67 l/min i 235–188 µm przy 2–6 bar. TeeJet dopuszcza dla nich 2–20 bar, ale wielkość kropli jest znana tylko do 6 bar (TX-VS2 do 3 bar), dlatego aplikacja ocenia kroplę w tym zakresie. Poniżej 2 bar stożek się nie rozwija i krople są nierówne.</li>
     <li>Inne dysze z karty AS 1200 nie nadają się do szczepienia: przeciwznoszeniowe AITXA i AIXR dają krople grube do skrajnie grubych (klasy C–XC, setki µm), MV 425 i MV 850 – średnie, a NF 125 i ULV 015 – mgłę (klasa XF). Birchmeier zaleca do szczepienia drobiu tylko TXVK-6.</li>
     <li>TX-VK18 daje ok. 3 razy większy wydatek i kroplę ok. 190–235 µm – pasuje tylko do szczepionek, których ChPLW dopuszcza grubą kroplę. Pompa REC 15 daje najwyżej ok. 1,4 l/min (1,0 l/min przy 6 bar), więc TX-VK18 na REC 15 tylko do ok. 3,9 bar.</li>
-    <li>Opryskiwacze: REC 15 i REC 15 PC1 0,5–6 bar, REX 15 1–10 bar, REB 15 0,5–3 bar (plecakowe, zbiornik 15 l); C 50 1–6 bar (wózek, zbiornik 50 l, wąż 10 m). Dmuchawa AS 1200 współpracuje z REB 15, REC 15, REX 15 i C 50 (instrukcja AS 1200, 2026). REC 15 PC1 (wersja z dyszą płaską) daje najwyżej ok. 1,1 l/min.</li>
-    <li>Dmuchawa AS 1200: 2 akumulatory 18 V 10 Ah (ładowanie ok. 70 min), 3,5 kg, 0,5–10 bar, 5–30 °C, zasięg do 13 m. Poziomy (prędkość powietrza / czas pracy): 1 – 21 m/s / 5 h 40 min, 2 – 26 m/s / 3 h 20 min, 3 – 34 m/s / 1 h 50 min, 4 – 44 m/s / 50 min, 5 – 56 m/s / 25 min, max – 65 m/s / 15 min (od „max” ochronniki słuchu). Do szczepienia tylko poziom 1 (wyjątkowo 2).</li>
+    <li>Opryskiwacze: REC 15 i REC 15 PC1 0,5–6 bar, REX 15 1–10 bar, REB 15 0,5–3 bar (plecakowe, zbiornik 15 l); C 50 1–6 bar (wózek, zbiornik 50 l, wąż 10 m). Dmuchawa AS 1200 współpracuje z REB 15, REC 15, REX 15 i C 50 (instrukcja AS 1200, 2026). REC 15 PC1 (wersja z dyszą płaską) daje najwyżej ok. 1,1 l/min. Instrukcje: resztka techniczna, której nie da się wypryskać – REC 15 0,12 l, REX 15 0,24 l; REX 15 z niektórymi akcesoriami maks. 6 bar. Akumulator na jedno ładowanie (praca ciągła z dyszą fabryczną): REC 15 – 260 l przy 1–2 bar, 160 l przy 6 bar; REX 15 – 390 l przy 2 bar; REB 15 – 90 l przy 2 bar. Po pracy: min. 2 l czystej wody, pryskać przy maks. ciśnieniu do opróżnienia; przechowywać otwarty, w temp. co najmniej 5 °C.</li>
+    <li>Dmuchawa AS 1200: 2 akumulatory 18 V 10 Ah (ładowanie ok. 70 min), 3,5 kg, 0,5–10 bar, 5–30 °C, zasięg do 13 m. Poziomy (prędkość powietrza / czas pracy): 1 – 21 m/s / 5 h 40 min, 2 – 26 m/s / 3 h 20 min, 3 – 34 m/s / 1 h 50 min, 4 – 44 m/s / 50 min, 5 – 56 m/s / 25 min, max – 65 m/s / 15 min (od „max” ochronniki słuchu). Zasięg oprysku: poziom 1 – 0–5 m, 2 – 1,2–7 m, 3 – 1,5–9 m, 4 – 2–11 m, 5 – 2,5–13 m. Przy wysokim ciśnieniu i dużym wydatku dyszy ciecz wypada ze strumienia powietrza (tabela w instrukcji). Do szczepienia tylko poziom 1 (wyjątkowo 2).</li>
     <li>AS 1200 nie jest przeznaczona do kwasów, ługów i środków dezynfekcyjnych (instrukcja) – po szczepieniu przepłucz ją czystą wodą (min. 1 l w opryskiwaczu) i wyczyść dyszę i filtr; nie przedmuchuj dyszy ustami.</li>
     <li>Po zabiegu opróżnij zbiornik, wlej czystą wodę i przepompuj ją przez lancę (instrukcja REC 15). Regularnie czyść filtr w zaworze spustowym, wąż zasysający i dyszę.</li>
     <li>Pisklęta – bez dmuchawy, 30–40 cm nad ptakami. Szczepienia przypominające – dmuchawa AS 1200 poziom 1 (wyjątkowo 2). Wentylacja (jedna na cały kurnik) wyłączona przez cały oprysk i co najmniej 10–15 min po nim, aż krople opadną; dłużej jest lepiej, jeśli temperatura i ptaki na to pozwalają. Limit samego oprysku zależy od pory roku: lato ok. 20 min, wiosna/jesień ok. 30, zima ok. 40.</li>

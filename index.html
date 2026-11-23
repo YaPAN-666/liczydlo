@@ -522,6 +522,11 @@ html.big .btn{padding:9px 16px} html.big .btn.small{padding:7px 12px} html.big i
 details.pg-inf{margin-top:3px;font-size:.8rem} details.pg-inf summary{cursor:pointer;color:var(--info);font-weight:600}
 /* Bez „pociągnij, aby odświeżyć” – przypadkowe przeciągnięcie w dół nie przeładowuje aplikacji */
 html,body{overscroll-behavior-y:none}
+
+.dv-cat{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:2px 0 6px;font-size:.7rem;line-height:1.2}
+.dv-cat span{display:flex;flex-direction:column;align-items:center;padding:3px 2px;border-radius:7px;border:1px solid var(--line);color:var(--muted);text-align:center}
+.dv-cat span i{font-style:normal;font-family:var(--f-mono);font-size:.64rem;opacity:.85}
+.dv-cat span.on{border-color:var(--ink);color:var(--ink);font-weight:600;background:var(--surface-2)}
 </style>
 </head>
 <body>
@@ -817,6 +822,7 @@ html,body{overscroll-behavior-y:none}
               <div class="dv-mk" id="dv-mk" hidden><b class="dv-v" id="dv-v"></b><svg viewBox="0 0 14 18" aria-hidden="true"><path d="M7 0C7 0 0 8.4 0 11.4a7 7 0 0 0 14 0C14 8.4 7 0 7 0Z"/></svg><i class="dv-line"></i></div>
             </div>
             <p class="dv-tip" id="dv-tip"></p>
+            <p class="dv-cat" id="dv-cat" aria-label="Rodzaje kropli"></p>
             <div class="dv-leg" id="dv-leg"></div>
           </div>
           <label>Liczba sektorów
@@ -2205,7 +2211,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.40.1';
+const APP_VERSION = '1.41.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -2262,6 +2268,10 @@ const SPRAYERS = {
 // max: 65 m/s 15 min – od „max” ochronniki słuchu) to nawiew do ochrony roślin.
 // Zasięg oprysku wg instrukcji: poziom 1 – 0–5 m, poziom 2 – 1,2–7 m (3: 1,5–9, 4: 2–11, 5: 2,5–13 m).
 // Tabela instrukcji: przy wyższym ciśnieniu i większym wydatku dyszy ciecz wypada ze strumienia powietrza – najszybciej na poziomie 1.
+// Rodzaje kropli (opis w ChPLW bez liczb → widełki przyjęte): MSD Nobilis Vaccination Series – zamgławiacz 20–50 µm,
+// drobna kropla poniżej 100 µm; Aviagen (2026) – drobne poniżej 70 µm (dolne drogi oddechowe), grube powyżej 100 µm (górne).
+const DROP_CAT = [{k:'aer', l:'aerozol', d:[null,50]}, {k:'drob', l:'drobna', d:[50,70]}, {k:'sred', l:'średnia', d:[70,100]}, {k:'grub', l:'gruba', d:[100,null]}];
+const dropCat = x => isNum(x) ? DROP_CAT.find(c => (!isNum(c.d[0]) || x >= c.d[0]) && (!isNum(c.d[1]) || x < c.d[1])) : null;
 const AS1200 = {dm1:{v:21, t:'5 h 40 min', r:'0–5 m'}, dm2:{v:26, t:'3 h 20 min', r:'1,2–7 m'}};
 // Parametry pracy opryskiwaczy (instrukcje Birchmeier 12081203, 12087903, 12086103): [bar, h, l] – praca ciągła z dyszą fabryczną,
 // czas pracy i litry na jedno ładowanie akumulatora. Z TX-VK6 (mniejszy wydatek) czas będzie dłuższy.
@@ -2629,11 +2639,12 @@ function dropViz(v, D){
     $('dv-axis').innerHTML = dvFit([...marks, ...base], W, 6.6).map(m => `<span class="${m.c}" style="left:${m.x}%">${m.t}</span>`).join('');
     $('dv-grid').innerHTML = ticks.filter(x => x > DV_R[0] && x < DV_R[1]).map(x => `<i style="left:${dvX(x)}%"></i>`).join('');
   }
+  { const cc = dropCat(vmd); $('dv-cat').innerHTML = DROP_CAT.map(c => `<span class="${cc === c ? 'on' : ''}">${c.l}<i>${!isNum(c.d[0]) ? '< ' + c.d[1] : !isNum(c.d[1]) ? '> ' + c.d[0] : c.d[0] + '–' + c.d[1]} µm</i></span>`).join(''); }
   $('dv-mk').hidden = !vmd;
   if(vmd){ $('dv-mk').style.left = dvX(vmd) + '%'; $('dv-v').textContent = `${D.est ? 'ok. ' : ''}${fmt0(vmd)} µm`; }
   const okP = win ? D.PS.filter(pp => isNum(D.vAt(pp)) && inWin(win, D.vAt(pp))) : [];
   const st = !v ? (noVac() ? 'wybierz szczepionkę' : 'spoza bazy – bez widełek') : !(D.p > 0) ? 'wybierz ciśnienie' : !vmd ? `brak danych kropli przy ${fmtT(D.p)} bar`
-    : D.state === 'ok' ? '✓ w widełkach ChPLW' : D.state === 'coarse' ? `✗ za gruba o ${fmt0(vmd - win[1])} µm` : D.state === 'fine' ? `✗ za drobna o ${fmt0(win[0] - vmd)} µm` : mikro ? '! ChPLW: mikrokrople' : 'ChPLW nie podaje µm';
+    : D.state === 'ok' ? (D.sp.dAssumed ? '✓ w przyjętych widełkach' : '✓ w widełkach ChPLW') : D.state === 'coarse' ? `✗ za gruba o ${fmt0(vmd - win[1])} µm` : D.state === 'fine' ? `✗ za drobna o ${fmt0(win[0] - vmd)} µm` : mikro ? '! ChPLW: mikrokrople' : 'ChPLW nie podaje µm';
   $('dv-st').textContent = st;
   $('dv-tip').textContent = !v ? 'Po wyborze szczepionki pokażę widełki kropli z jej ChPLW.' : !vmd ? (D.p > 0 ? (D.noz === 'vs2' ? 'Dla TX-VS2 są dane kropli tylko dla 2–3 bar (karta dysz MSD/Birchmeier).' : 'Tabele kropli TeeJet obejmują 2–6 bar.') : '')
     : D.state === 'ok' ? (okP.length === D.PS.length ? `${D.NZ.n} mieści się w widełkach w całym zakresie ${dvRange(D.PS)} bar.` : `${D.NZ.n} mieści się w widełkach przy ${dvRange(okP)} bar.`)
@@ -4437,7 +4448,7 @@ function renderRules(){
     <li>Linie napełnij roztworem przed opuszczeniem: spuszczaj z końców, aż pojawi się barwnik (Aviagen: ok. 1 l na 3 m linii smoczkowej).</li>
     <li>Kontrola (Aviagen): po szczepieniu obejrzyj 100 ptaków z co najmniej 3 miejsc kurnika – co najmniej 90% z zabarwionym językiem lub wolem. Serologia ok. 3 tyg. po szczepieniu (20 próbek) pokazuje, czy stado zareagowało równo.</li></ul></div>
   <div><h3>Oprysk</h3><ul class="list">
-    <li>Co znaczą określenia kropli w ChPLW: <b>gruba kropla</b> (coarse spray) – co najmniej 100 µm, zwykle 100–200 µm; osiada w oczach, nozdrzach i górnych drogach oddechowych, używana do pierwszego szczepienia (ChPLW: Nobilis Ma5 + Clone 30, Primun, HatchPak IB H120 – ≥100 µm; Cevac Mass L, TAbic IB VAR206 – 100–200 µm; Avishield – 150–170 µm; wyjątek: Nobilis IB Primo QX – ≥250 µm). <b>Drobna kropla / mikrokrople</b> – poniżej 100 µm (MSD: poniżej 100 µm przy dyszy, przy ptakach DV50 poniżej 50 µm; zamgławiacz 20–50 µm, rozpylacz z wirującym dyskiem ok. 70 µm). Aviagen (2026): krople poniżej 70 µm docierają do dolnych dróg oddechowych i zwiększają ryzyko odczynu, krople powyżej 100 µm osiadają w górnych drogach – szczepienie bezpieczniejsze i bardziej równe. Gdy ChPLW wymaga „mikrokropli” bez liczb (Aviffa-RTI), aplikacja przyjmuje widełki 50–100 µm i pokazuje je innym kolorem z ostrzeżeniem (Primun powtórne 50–80 µm, Avinew 80–100 µm, Nobilis MG 6/85 i MS Live – poniżej 100 µm). <b>Aerozol</b> z atomizera – ok. 20–50 µm; krople poniżej ok. 70 µm docierają do dolnych dróg oddechowych i dają silniejszy odczyn, dlatego stosuje się je dopiero przy szczepieniu powtórnym. ChPLW nie używają określenia „średnia kropla”.
+    <li>Co znaczą określenia kropli w ChPLW: <b>gruba kropla</b> (coarse spray) – co najmniej 100 µm, zwykle 100–200 µm; osiada w oczach, nozdrzach i górnych drogach oddechowych, używana do pierwszego szczepienia (ChPLW: Nobilis Ma5 + Clone 30, Primun, HatchPak IB H120 – ≥100 µm; Cevac Mass L, TAbic IB VAR206 – 100–200 µm; Avishield – 150–170 µm; wyjątek: Nobilis IB Primo QX – ≥250 µm). <b>Drobna kropla / mikrokrople</b> – poniżej 100 µm (MSD: poniżej 100 µm przy dyszy, przy ptakach DV50 poniżej 50 µm; zamgławiacz 20–50 µm, rozpylacz z wirującym dyskiem ok. 70 µm). Aviagen (2026): krople poniżej 70 µm docierają do dolnych dróg oddechowych i zwiększają ryzyko odczynu, krople powyżej 100 µm osiadają w górnych drogach – szczepienie bezpieczniejsze i bardziej równe. Gdy ChPLW wymaga „mikrokropli” bez liczb (Aviffa-RTI), aplikacja przyjmuje widełki 50–100 µm i pokazuje je innym kolorem z ostrzeżeniem.</li><li><b>Rodzaje kropli</b> (pod wykresem kropli; zestawienie MSD i Aviagen): aerozol (mgła) poniżej 50 µm – zamgławiacz, najgłębiej w płuca i worki powietrzne, najsilniejszy odczyn; drobna 50–70 µm – dolne drogi oddechowe; średnia 70–100 µm – granica między drobną a grubą (Aviagen: poniżej 70 drobna, powyżej 100 gruba); gruba powyżej 100 µm – oczy, nozdrza, górne drogi oddechowe, najbezpieczniejsza. „Mikrokrople” i „fine spray” obejmują drobną i średnią (50–100 µm). MSD: gruba kropla to ponad 250 µm przy wylocie dyszy i ponad 100 µm przy ptakach – krople w locie parują i maleją. Gdy ChPLW podaje tylko rodzaj kropli bez liczb, aplikacja pokazuje odpowiednie widełki jako przyjęte (pomarańczowe), z ostrzeżeniem (Primun powtórne 50–80 µm, Avinew 80–100 µm, Nobilis MG 6/85 i MS Live – poniżej 100 µm). <b>Aerozol</b> z atomizera – ok. 20–50 µm; krople poniżej ok. 70 µm docierają do dolnych dróg oddechowych i dają silniejszy odczyn, dlatego stosuje się je dopiero przy szczepieniu powtórnym. ChPLW nie używają określenia „średnia kropla”.
     <li>Woda na 1000 dawek dla opryskiwacza Birchmeier w kurniku: z ChPLW, gdy podaje ilość dla takiego sprzętu (np. Poulvac IB Primer i Poulvac TRT – opryskiwacz plecakowy: ściółka 500 ml, klatki 250 ml). Gdy ChPLW podaje ją tylko dla atomizera albo automatu w wylęgarni, albo wcale – pisklęta jednodniowe 250 ml, starsze 500 ml (jak w ChPLW Primun), w granicach zakresu z ChPLW. Wodę liczę na liczbę ptaków (1 dawka = 1 ptak); nadwyżkę dawek z otwartych fiolek rozpuść w tej samej wodzie.</li>
     <li>Kropla wg ChPLW: szczepienie pierwotne i pisklęta – gruba (≥100 µm, np. Primun, Poulvac TRT 120–150 µm, TAbic IB VAR206 100–200 µm); przypominające – drobniejsza (50–80 µm), gdy ChPLW na to pozwala. Drobny aerozol poniżej 100 µm (Nobilis MG 6/85, Nobilis MS Live) wymaga zamgławiacza – TX-VK6 daje ok. 120–150 µm, a TX-VS2 ok. 106–114 µm.</li>
     <li>Ochrona szczepiącego: maska na nos i usta oraz okulary ochronne albo hełm z obiegiem powietrza – wymagają ich ChPLW m.in. Poulvac TRT, Poulvac NDW, Nobilis ND Clone 30, Primun Bronchitis H120, Nobilis IB Primo QX i Nobilis MS Live. Po zabiegu umyj ręce i twarz.</li>

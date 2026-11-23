@@ -1,8 +1,9 @@
 {
- "wersja": "1.41.0",
+ "wersja": "1.41.1",
  "data": "2026-11-22",
  "zmiany": [
-  "Rodzaje kropli pod wykresem: aerozol (< 50 µm), drobna (50–70), średnia (70–100), gruba (> 100) – podświetlony jest rodzaj, który daje wybrana dysza przy danym ciśnieniu (MSD, Aviagen). Gdy ChPLW podaje tylko rodzaj kropli, widełki są przyjęte i pomarańczowe; status mówi wtedy „w przyjętych widełkach”.",
+  "Z artykułów Ceva (WATTAgNet, Poultry World) i Pas Reform: gruba kropla co najmniej 100–150 µm, w wylęgarni najlepiej równe 150–170 µm przy dyszy; pisklęta 15–20 min w skrzynkach po oprysku; odstęp 10–14 dni między szczepieniami na te same narządy (zakładka Program).",
+  "(1.41.0) Rodzaje kropli pod wykresem: aerozol (< 50 µm), drobna (50–70), średnia (70–100), gruba (> 100) – podświetlony jest rodzaj, który daje wybrana dysza przy danym ciśnieniu (MSD, Aviagen). Gdy ChPLW podaje tylko rodzaj kropli, widełki są przyjęte i pomarańczowe; status mówi wtedy „w przyjętych widełkach”.",
   "(1.40.1) Opis kropli uzupełniony o poradnik Aviagen (2026): krople poniżej 70 µm docierają do dolnych dróg oddechowych, powyżej 100 µm – do górnych. Mycie opryskiwacza: Aviagen dopuszcza alkohol z końcowym płukaniem.",
   "(1.40.0) Mikrokrople: gdy ChPLW wymaga „mikrokropli” bez podania µm (Aviffa-RTI), aplikacja pokazuje przyjęte widełki 50–100 µm – na wykresie kropli innym, pomarańczowym kolorem – i ostrzega, że nie pochodzą z ChPLW. Tak samo (pomarańczowo) wyglądają inne przyjęte widełki, np. ≥100 µm przy „grubej kropli” bez liczb.",
   "(1.39.0) Dane z instrukcji Birchmeier (REC 15, REX 15, REB 15, AS 1200): resztka techniczna w opryskiwaczu (ile dawek nie trafi do ptaków przy małej objętości), litry na jedno ładowanie akumulatora przy danym ciśnieniu, limit 6 bar dla REX 15 z niektórymi akcesoriami, zasięg dmuchawy na poziomie 1 i 2.",

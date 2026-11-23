@@ -1,8 +1,9 @@
 {
- "wersja": "1.36.0",
+ "wersja": "1.37.0",
  "data": "2026-11-22",
  "zmiany": [
-  "Innovax-ND-IBD-ILT (MSD – ND, IBD, ILT i choroba Mareka): pełna karta z ChPLW z obliczeniami – podskórnie 0,2 ml 1. dnia (worki 400–1600 ml) albo in ovo 0,05 ml (18.–19. dzień), przygotowanie krok po kroku, łączenie z Rismavac, Nobilis ND i IB oraz uwaga prawna z ChPLW.",
+  "Krok po kroku uzupełniony z poradników MSD (Nobilis Vaccination Series) i „Sygnałów brojlerów”: woda – natlenianie wyłączone 48 h przed, czyszczenie poideł i filtrów, martwa przestrzeń linii, dostęp do poideł dla brojlerów, odkręcenie czystej wody przed końcem roztworu, wpis serii do książki fermy, ostrzeżenie dla piskląt do 5. dnia; oprysk – ochrona szczepiącego (maska P3), wentylacja o 10–20% mniej, pisklęta 15 min w skrzynkach, kurnik otwarty, roztwór zużyty w 1 h, mycie wodą destylowaną.",
+  "(1.36.0) Innovax-ND-IBD-ILT (MSD – ND, IBD, ILT i choroba Mareka): pełna karta z ChPLW z obliczeniami – podskórnie 0,2 ml 1. dnia (worki 400–1600 ml) albo in ovo 0,05 ml (18.–19. dzień), przygotowanie krok po kroku, łączenie z Rismavac, Nobilis ND i IB oraz uwaga prawna z ChPLW.",
   "(1.35.3) Nowe adresy ikon – telefon pobierze ikonę z gwiazdą Studia także dla aplikacji już zainstalowanej.",
   "(1.35.2) Nowa ikona: liczydło bez ramki i pomarańczowa gwiazda Studia Pracy Umysłowej w prawym górnym rogu – wspólny znak wszystkich programów i aplikacji Studia.",
   "(1.35.1) Podpis „Studio Pracy Umysłowej” znów jednolity – bez pomarańczowych pierwszych liter.",

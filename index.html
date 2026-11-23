@@ -2202,7 +2202,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.36.0';
+const APP_VERSION = '1.37.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -2384,7 +2384,9 @@ function waterSteps(o){
     wt = sb.id === 'brak' ? '' : sb.wait === '' ? '; poczekaj, aż granulat się rozpuści i woda się zabarwi' : `; odczekaj ${sb.wait === 'wg etykiety' ? 'czas z etykiety' : sb.wait}, aż ${sb.id === 'mleko' ? 'mleko się rozpuści i zwiąże' : 'stabilizator się rozpuści i zneutralizuje'} chlor`;
   const before = [
     `Zmierz zużycie wody wodomierzem w tych godzinach, w których będzie szczepienie (${fmtT(o.h)} h), i wpisz je wyżej. Aviagen: dolicz ok. 5% na większe pragnienie po wstrzymaniu wody. Bez pomiaru godzinowego wpisz zużycie z całej doby i godziny światła – Turkey Signals: np. 2000 l ÷ 17 h × 2 h ≈ 236 l.`,
-    'Wyłącz chlorowanie, zakwaszacze i leki w wodzie – MSD: co najmniej 48 h przed; Elanco: 24 h przed i 24 h po. Sprawdź chlor paskami i pH wody (6,0–7,5).',
+    'Wyłącz chlorowanie, zakwaszacze i leki w wodzie – MSD: co najmniej 48 h przed; Elanco: 24 h przed i 24 h po. Sprawdź chlor paskami i pH wody (6,0–7,5) – MSD: już 1 ppm chloru inaktywuje szczepionkę. Natlenianie wody, jeśli jest, wyłącz najpóźniej 48 h przed.',
+    'Poidła wyczyść mechanicznie, bez chemii, i zdejmij filtry – osad w nich trzyma resztki leków i środków (MSD). Linie ustaw poziomo. W martwej przestrzeni instalacji może zostać do 10% wody – sprawdź swoją (MSD).',
+    o.broil ? 'Dostęp do wody na czas szczepienia (MSD, brojlery): najwyżej 15 ptaków na smoczek albo 35 na miseczkę, poidło dzwonowe 0,6 cm na ptaka. Gdy poideł dzwonowych za mało – dostaw na czas szczepienia.' : null,
     o.doz ? `Umyj dozownik, wiadro i wąż ssący samą wodą. Sprawdź, czy dozownik daje ustawiony %: ${o.pct > 0 ? `przy ${fmtT(o.pct)}% ubytek 1 l z wiadra = ${fmt0(100 / o.pct)} l na wodomierzu` : 'ubytek z wiadra porównaj z wodomierzem'}.` : 'Umyj zbiornik samą wodą – bez detergentów i środków dezynfekcyjnych.',
     o.doz ? 'Najlepiej próba bez szczepionki: woda + stabilizator z barwnikiem przez dozownik – widać, ile roztworu zejdzie i czy barwnik dochodzi do końca linii.' : null,
     sb.id === 'brak' ? null : isNum(sb.qty) ? `Przygotuj stabilizator: ${sb.txt} (${sb.rule}) – liczony na całą wodę${o.doz ? ', cała ilość idzie do wiadra' : ''}.` : `Przygotuj stabilizator – dawka z ${sb.id === 'mleko' ? 'ChPLW' : 'etykiety'}, liczona na całą wodę${o.doz ? '; cała ilość idzie do wiadra' : ''}.`];
@@ -2395,11 +2397,13 @@ function waterSteps(o){
     `Fiolki${o.packs && o.packs !== '–' ? ` (${o.packs} dawek)` : ''} otwieraj pod wodą, przepłucz kilka razy, wlej ${o.doz ? 'do wiadra' : 'do zbiornika'} i wymieszaj.`,
     o.doz ? `Ustaw dozownik na ${o.pct > 0 ? fmtT(o.pct) : '…'}% i włóż wąż ssący do wiadra.` : null,
     `Napełnij linie: otwórz końce linii i spuszczaj, aż ${dye === 1 ? 'pojawi się zabarwiony roztwór' : dye === 2 ? 'pojawi się roztwór ze stabilizatorem (zabarwiony, jeśli preparat ma barwnik)' : sb.id === 'mleko' ? 'pojawi się mleczny roztwór' : 'spłynie woda stojąca w liniach'} (Aviagen: ok. 1 l na każde 3 m linii smoczkowej). Zamknij końce. Najlepiej przy przyciemnionym świetle.`,
-    `Opuść linie, zapal światło i obchodź kurnik, żeby ptaki piły. Roztwór ma zejść w ${o.win}.`,
+    `Opuść linie, zapal światło i obchodź kurnik, żeby ptaki piły – zwłaszcza boczne strefy, gdzie siedzą słabsze ptaki (Sygnały brojlerów). Roztwór ma zejść w ${o.win}.`,
+    'Tuż przed końcem roztworu odkręć dopływ czystej wody – linie się nie zapowietrzą (MSD).',
     o.turk ? 'Indyki (Turkey Signals): część ptaków nie podejdzie do poideł nawet po wstrzymaniu wody. Obchodź kurnik co 20–30 min. Pewniej: poidła podnieś, napełnij roztworem i opuść wszystkie naraz albo podaj dawkę w dwóch połowach, każdą najwyżej w 2 h.' : null];
   const after = [
     dye ? `Sprawdź języki i wola u 50–100 ptaków z kilku miejsc kurnika – co najmniej 90% zabarwionych${dye === 1 ? ' na niebiesko' : ' (gdy stabilizator ma barwnik)'}.` : 'Sprawdź, czy wszystkie ptaki piły – obejdź kurnik i obejrzyj wola u 50–100 ptaków.',
-    o.doz ? 'Przepłucz dozownik czystą wodą. Chlorowanie wznów dopiero po 24 h.' : 'Umyj zbiornik czystą wodą. Chlorowanie wznów dopiero po 24 h.'];
+    o.doz ? 'Przepłucz dozownik czystą wodą. Chlorowanie wznów dopiero po 24 h.' : 'Umyj zbiornik czystą wodą. Chlorowanie wznów dopiero po 24 h.',
+    'Zapisz w książce fermy nazwę, serię i datę ważności szczepionki; puste fiolki oddaj do utylizacji.'];
   const n1 = before.filter(Boolean).length, n2 = day.filter(Boolean).length;
   return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – ${o.doz ? 'dozownik' : 'zbiornik'} <span class="chk-n"></span></summary>${CHK_HINT}
     <h4 class="steps-h">Dzień wcześniej</h4><ol class="steps">${L(before)}</ol>
@@ -2415,16 +2419,18 @@ function spraySteps(o){
     'Opryskiwacz tylko do szczepień: umyty ciepłą wodą, bez detergentów i środków dezynfekcyjnych – ich resztki niszczą szczepionkę.',
     `Załóż ${o.nn > 1 ? `${o.nn} dysze ${o.nz}` : `dyszę ${o.nz}`} i ustaw ${isNum(o.p) && o.p > 0 ? fmtT(o.p) + ' bar' : 'ciśnienie'}. Najpewniej zmierzyć wydatek: woda z jednej dyszy przez 60 s do menzurki – wynik wpisz przy „Pomiar własny”.`,
     o.water ? `Woda wg ChPLW: ${o.water}${/temperatur|°C|chłodn|zimn|pokojow/i.test(o.water) ? '' : ` – najlepiej chłodna (Ceva: 6–8 °C, MSD: 8–20 °C)`}. Naczynia i mieszadło plastikowe.` : 'Woda do roztworu destylowana lub demineralizowana, chłodna (Ceva: 6–8 °C, MSD: 8–20 °C). Naczynia i mieszadło plastikowe.',
-    'Raz na jakiś czas sprawdź rozkład kropli: papier wodoczuły rozłożony na wysokości głów ptaków pokazuje, czy krople są równe i gęste (MSD).'];
+    'Raz na jakiś czas sprawdź rozkład kropli: papier wodoczuły rozłożony na wysokości głów ptaków pokazuje, czy krople są równe i gęste (MSD).',
+    'Ochrona szczepiącego (MSD): okulary, dobrze dopasowana maska z filtrem P3 i odzież ochronna. Nie dotykaj twarzy; po rozpuszczeniu szczepionki i po szczepieniu umyj i zdezynfekuj ręce.'];
   const day = [
-    `Przyciemnij światło i zgrupuj ptaki; wyłącz albo ogranicz wentylację i ogrzewanie.${o.chicks ? ' Skrzynki z pisklętami ustaw w rzędzie, z dala od nagrzewnic i wentylatorów.' : ''}`,
-    `Szczepionkę rozpuść tuż przed opryskiem${o.use ? ` (ChPLW: zużyć w ${o.use})` : ''}: fiolki przepłucz wodą, wymieszaj${isNum(o.V) && o.V > 0 ? ` – razem ${fmt(o.V, 2)} l roztworu` : ''}.`,
+    `Przyciemnij światło i zgrupuj ptaki – pomaga obniżenie temperatury o 1–2 °C (MSD). Ogrzewanie wyłącz, wentylację wyłącz albo ogranicz (MSD: o 10–20%; przy zamgławiaczu – wyłącz).${o.chicks ? ' Skrzynki z pisklętami ustaw w rzędzie, z dala od nagrzewnic i wentylatorów, otwórz tuż przed opryskiem. Po oprysku pisklęta zostają ok. 15 min w skrzynkach, aż wyschną (MSD).' : ''}`,
+    'Kurnik otwarty: szczep w chłodnej porze – rano, wieczorem albo w nocy (Sygnały brojlerów). Kurtyny zasunięte w czasie oprysku i ok. 15 min po nim (MSD).',
+    `Szczepionkę rozpuść tuż przed opryskiem${o.use ? ` (ChPLW: zużyć w ${o.use})` : ' – najpóźniej w ciągu 1 h (Sygnały brojlerów)'}: fiolki przepłucz wodą, wymieszaj${isNum(o.V) && o.V > 0 ? ` – razem ${fmt(o.V, 2)} l roztworu` : ''}.`,
     o.mode === 'lanca' ? `Pryskaj równym tempem ${distTxt(o.dist || '30–40 cm', 'nad głowami')} – szczepionka ma trafić w oczy, nozdrza i dziób każdego ptaka, nie w ściółkę i puste miejsca.` : 'Prowadź strumień dmuchawy skośnie w dół nad stadem, ptaki 1–3 m od wylotu, równym tempem – szczepionka ma trafić w każdego ptaka, nie w ściółkę i puste miejsca.',
     'Plan przejść (Turkey Signals): podziel kurnik na pasy szerokości 2,5–3 m wzdłuż linii poideł i paszociągów i prowadź oprysk pas po pasie. Zakładki nie szkodzą, pominięty albo w połowie opryskany pas – tak. Tempo marszu i prowadzenie lancy wypróbuj wcześniej przy zapalonym świetle, oprysk rób przy przyciemnionym, z latarką czołową.',
     o.resp ? 'Zaszczep całe stado w jednym zabiegu, bez pomijania ptaków – pominięte zakażą się później od zaszczepionych, a szczep krążący z ptaka na ptaka może odzyskiwać zjadliwość (Ceva).' : null,
     `Wentylacja wyłączona jeszcze ${o.vent} min po oprysku. Przerwij i włącz ją, gdy temperatura wzrośnie o 2–3 °C albo ptaki zaczną dyszeć.`];
   const after = [
-    'Umyj opryskiwacz ciepłą wodą bez detergentów i dezynfekcji, rozkręć i wyczyść dyszę i filtry, wysusz; przechowuj otwarty w suchym miejscu.',
+    'Umyj opryskiwacz ciepłą wodą bez detergentów i dezynfekcji, rozkręć i wyczyść dyszę i filtry, przepłucz wodą destylowaną i przedmuchaj powietrzem (MSD), wysusz; przechowuj ze zdjętym zbiornikiem w suchym miejscu – inaczej pleśń.',
     o.resp ? 'Kontrola szczepienia (Ceva): 2–5 dni po oprysku (jednodniówki do 5. dnia, po szczepieniu powtórnym nieco krócej) kilkanaście wymazów z tchawicy lub szczeliny podniebiennej do PCR pokaże, czy szczep szczepionkowy dotarł do ptaków. Pobranie i badanie – z lekarzem weterynarii.' : null];
   const n1 = before.filter(Boolean).length, n2 = day.filter(Boolean).length;
   return `<details class="howto"${S.howtoOpen ? ' open' : ''}><summary>Krok po kroku – oprysk <span class="chk-n"></span></summary>${CHK_HINT}
@@ -3107,6 +3113,7 @@ function calc(){
       if(res.l){ L = mid(res.l); range = res.l; basis = res.basis; }
       else { L = Math.min(W_CAP, Math.max(1, age)); basis = `orientacyjnie: 1 l × wiek (maks. ${W_CAP} l) na 1000`;
         msgs.push(['warn', !v ? 'Szczepionka spoza bazy – wpisz zmierzone zużycie stada; teraz wynik orientacyjny.' : w && w.rule === 'measured' ? `ChPLW: woda = ilość wypijana przez stado w ${fmtT(w.h || 2)} h. Wpisz zmierzone zużycie – teraz wynik orientacyjny.` : 'Brak reguły w ChPLW (w bazie) – wpisz zmierzone zużycie; teraz wynik orientacyjny.']);
+        if($('bird').value === 'kury-brojlery') msgs.push(['info', 'MSD i Sygnały brojlerów: 1–1,5 l × wiek w dniach na 1000 brojlerów, najwyżej 40–45 l. Pewniej: odczyt wodomierza co najmniej 2 dni przed szczepieniem w tych samych godzinach.']);
         if(bird.g === 'indyki') msgs.push(['warn','U indyków ilość wody zawsze ustalaj z pomiaru zużycia.']);
         else if(WATERFOWL.includes(bird.g)) msgs.push(['warn','U kaczek i gęsi ilość wody zawsze ustalaj z pomiaru zużycia – reguła 1 l × wiek pochodzi z ChPLW dla kurcząt.']); }
       V = L * birds / 1000;
@@ -3122,6 +3129,7 @@ function calc(){
     tiles.push({k:'Czas wypicia', v:win, s:w && w.win ? 'wg ChPLW' : 'zalecenie ogólne'});
     if(w && isNum(w.vacc)) tiles.push({k:'Szczepionka płynna', v:fmt(birds * w.vacc, 1) + ' ml', s:`${fmtT(w.vacc,3)} ml na ptaka`});
     if(w && w.thirst) msgs.push(['info', 'Wstrzymanie wody przed podaniem: ' + w.thirst + '.']);
+    if(age < 5) msgs.push(['warn', 'MSD: do ok. 5. dnia życia pisklęta piją nieregularnie i mało – szczepienie przez wodę bywa wtedy nieskuteczne. Pilnuj, żeby wszystkie piły; sprawdź wola z barwnikiem.']);
     if(doz){
       // Dozownik proporcjonalny: w wiadrze cała szczepionka; dozownik dodaje pct% roztworu do każdego litra wody,
       // więc roztworu ma być tyle, ile wody ptaki wypiją w czasie szczepienia × pct%.
@@ -3135,7 +3143,7 @@ function calc(){
     }
     if(sid === 'brak') msgs.push(['warn', 'Bez stabilizatora woda musi być wolna od chloru (np. destylowana), a bez barwnika nie sprawdzisz, czy wszystkie ptaki piły.']);
     if(w && w.milk && sid !== 'mleko' && sid !== 'brak') msgs.push(['info', `ChPLW tej szczepionki podaje jako stabilizator mleko (${w.milk}). Dziś zamiast mleka stosuje się zwykle gotowy stabilizator z barwnikiem (wg MSD Vac-Safe może zastąpić mleko w proszku) – o zamianie decyduje lekarz weterynarii.`]);
-    crewH = waterSteps({doz, pct, stock, V, stab, packs:R.packs, win, thirst:w && w.thirst, h:w && w.h ? w.h : 2, turk:bird.g === 'indyki'});
+    crewH = waterSteps({doz, pct, stock, V, stab, packs:R.packs, win, thirst:w && w.thirst, h:w && w.h ? w.h : 2, turk:bird.g === 'indyki', broil:$('bird').value === 'kury-brojlery'});
     Object.assign(R, {water_l:V, l1000:L, waterBasis:basis, milk_kg:sid === 'mleko' ? V * milk / 1000 : 0, stab:stab.txt ? {id:sid, txt:stab.txt, rule:stab.rule} : null, waterMode:wmode, doser:doz && pct > 0 ? {pct, stock_l:stock} : null});
   }
   if(route === 'oko'){

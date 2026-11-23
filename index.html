@@ -596,9 +596,10 @@ html,body{overscroll-behavior-y:none}
   <div class="gate-in author-in">
     <h2 id="author-h">Słowo od autora</h2>
     <div class="author-txt">
-      <p><span class="lz-l">L</span>iczydło powstało, żeby ułatwić i usprawnić pracę technikom i lekarzom weterynarii, którzy pracują z drobiem.</p>
-      <p>Zaczynało jako prosty kalkulator, a z czasem wyrosło na rozbudowane narzędzie. Wciąż się rozwija, więc może jeszcze cierpieć na przypadłości wieku pisklęcego.</p>
-      <p>Aplikacja rozwija się dzięki Waszym sugestiom, uwagom krytycznym i wskazówkom. Wpisujcie je w zakładce <b>O aplikacji → Sugestie i zgłoszenia</b> – będę za nie bardzo wdzięczny.</p>
+      <p><span class="lz-l">L</span>iczydło zaczęło się od małego kalkulatora. Miał pomagać w pracy mojej pięknej żonie, Małgosi.</p>
+      <p>Z czasem aplikacja rosła, aż doszła do obecnej postaci. Nie wiem, jak będzie wyglądać ostatecznie, i chyba nigdy nie o to chodziło. Liczydło rozwija się razem z ludźmi, którzy z niego korzystają. Wiele rozwiązań, które dziś w nim widzicie, powstało z czyjejś uwagi, pytania albo pomysłu zgłoszonego w trakcie pracy.</p>
+      <p>Dlatego proszę Was o komentarze, zgłoszenia i krytykę, także tę ostrą. Jeśli coś liczy się źle, czegoś brakuje albo coś da się zrobić prościej, napiszcie w zakładce <b>O aplikacji → Sugestie i zgłoszenia</b>. Przeczytam każdą wiadomość.</p>
+      <p>Aplikację stworzyłem ja, ale jej właścicielką jest Małgorzata. To ona wspaniałomyślnie postanowiła udostępnić Liczydło swoim braciom i siostrom na wspólnym froncie ferm drobiu.</p>
       <p class="author-sign">Owocnej pracy!</p>
     </div>
     <p class="credit">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
@@ -2202,7 +2203,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.38.0';
+const APP_VERSION = '1.38.1';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];

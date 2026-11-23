@@ -1,4 +1,4 @@
-LICZYDŁO APP – wersja 1.37.0
+LICZYDŁO WET – wersja 1.38.0
 =====================================
 
 Zawartość folderu „liczydlo”:

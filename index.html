@@ -382,7 +382,9 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .dv-brk::before{left:-1.5px;border-right:0;border-radius:3px 0 0 3px}
 .dv-brk::after{right:-1.5px;border-left:0;border-radius:0 3px 3px 0}
 .dv-brk.open-l::before,.dv-brk.open-r::after{display:none}
-.dv-brk.assumed::before,.dv-brk.assumed::after{border-style:dashed}
+.dv-brk.assumed::before,.dv-brk.assumed::after{border-style:dashed;border-color:var(--warn)}
+.dv-win.assumed{background:var(--warn-soft);background:color-mix(in srgb,var(--warn) 28%,transparent)}
+.dv-axis span.w.a{color:var(--warn)}
 .dv-axis{position:absolute;left:0;right:0;top:68px;height:14px}
 .dv-axis span{position:absolute;top:0;transform:translateX(-50%);font:500 .68rem/1 var(--f-mono);color:var(--muted);white-space:nowrap;animation:dvFade .35s ease}
 @keyframes dvFade{from{opacity:0}to{opacity:1}}
@@ -417,7 +419,7 @@ details.chlog{margin-top:8px}details.chlog summary{color:var(--brand);padding:6p
 .dv-leg span{display:inline-flex;align-items:center;gap:5px}
 .dv-leg .sw{display:inline-block;width:16px;height:9px;border-radius:2px}
 .dv-leg .sw.w{background:color-mix(in srgb,var(--ok) 30%,transparent);border:2px solid var(--ok);border-top:0;border-bottom:0}
-.dv-leg .sw.w.a{border-style:dashed}
+.dv-leg .sw.w.a{border-style:dashed;border-color:var(--warn);background:color-mix(in srgb,var(--warn) 28%,transparent)}
 .dv-leg .sw.r{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--info) 45%,transparent) 0 3px,color-mix(in srgb,var(--info) 15%,transparent) 3px 6px)}
 .dv-leg .sw.m{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--bad) 30%,transparent) 0 3px,transparent 3px 6px)}
 .tile.t-ok{border-color:var(--ok);background:var(--ok-soft)}
@@ -1447,7 +1449,7 @@ const VACCINES = [
  lay:'Nie w okresie nieśności ani 4 tyg. przed jej rozpoczęciem.', mix:'Nie mieszać z innymi produktami. Indyków nie szczepić jednocześnie z innymi szczepieniami ani zabiegami stresującymi. Nie szczepić przy innych wrażliwych gatunkach (perliczki, bażanty).',
  sch:'Indyki: 1. dzień życia, przypominające w 3. tygodniu i w 7.–9. tygodniu; odporność po 15 dniach, do 12 tyg. po ostatnim szczepieniu. Kury: jedno szczepienie od 10. tygodnia, potem przypominające szczepionką inaktywowaną z adiuwantem olejowym – odporność przez cały okres nieśności.',
  safe:'Sprzęt czysty, bez środków antyseptycznych i dezynfekcyjnych.', ae:'Nie stwierdzono.', od:'Dawka 10 razy większa – bez objawów niepożądanych.', store:'W lodówce, chronić przed światłem, nie zamrażać.',
- r:{spray:{mikro:true, ml:[250,250], water:'woda jałowa (destylowana lub dejonizowana)', note:'Ulotka PL: 1000 dawek rozpuścić w 1 ml, uzupełnić jałową wodą do 250 ml; rozpylacz wytwarzający mikrokrople (wielkości w µm nie podaje). Pisklęta w zwartej grupie w trakcie i 15 min po.'},
+ r:{spray:{mikro:true, d:[50,100], dAssumed:'ChPLW PL: „rozpylacz wytwarzający mikrokrople” – wielkości w µm nie podaje; przyjęto 50–100 µm. Mikrokrople to drobna kropla poniżej 100 µm (MSD Nobilis Vaccination Series: drobna kropla poniżej 100 µm przy dyszy; ChPLW Avinew: mikrokrople 80–100 µm), a krople poniżej ok. 50 µm szybko parują i wnikają do dolnych dróg oddechowych – silniejszy odczyn', ml:[250,250], water:'woda jałowa (destylowana lub dejonizowana)', note:'Ulotka PL: 1000 dawek rozpuścić w 1 ml, uzupełnić jałową wodą do 250 ml; rozpylacz wytwarzający mikrokrople (wielkości w µm nie podaje). Pisklęta w zwartej grupie w trakcie i 15 min po.'},
     oko:{ml:50, bird:'1 kropla 0,05 ml na gałkę oczną', note:'Ulotka PL: 1000 dawek w 1 ml, uzupełnić jałową wodą do 50 ml (więcej przy 2000 i 5000 dawek).'},
     woda:{rule:'measured', h:2, min:7, win:'1–2 h', thirst:'2 h', note:'Ulotka PL: od 7. dnia; tyle wody, ile ptaki wypiją w 1–2 h. Woda czysta, bez dezynfekcji; 2 h bez wody przed szczepieniem; podać tuż przed piciem.'}}},
 {id:'nobilis-rhino-cv', n:'Nobilis Rhino CV', m:'MSD Animal Health (Intervet International B.V.)', t:'żywa', pf:'liofilizat do sporządzania zawiesiny do podawania na oczy i nozdrza', dz:['aMPV'], s:'aMPV 11/94, 10^1,5–10^3,7 TCID50', sp:['kury'], st:'v', src:[RPL(18783, '10/2025')], ma:'1623/05',
@@ -2203,7 +2205,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.39.0';
+const APP_VERSION = '1.40.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -2605,7 +2607,7 @@ function dropViz(v, D){
   const zb = $('dv-zoom'); zb.setAttribute('aria-pressed', String(zoom)); zb.lastChild.textContent = zoom ? 'Cała skala' : 'Przybliż';
   zb.title = zoom ? `Pokaż całą skalę 0–300 µm (teraz ${DV_R[0]}–${DV_R[1]} µm)` : 'Przybliż zakres wokół widełek i pasa dyszy';
   dvBand($('dv-mist'), [0, 50]); dvBand($('dv-win'), win); dvBand($('dv-brk'), win); dvBand($('dv-rep'), rep);
-  $('dv-brk').classList.toggle('assumed', !!D.sp.dAssumed);
+  $('dv-brk').classList.toggle('assumed', !!D.sp.dAssumed); $('dv-win').classList.toggle('assumed', !!D.sp.dAssumed);
   const others = NOZ_ORDER.filter(n => n !== D.noz);
   dvLane($('dv-l1'), D.PS.map(pp => [pp, D.vAt(pp)]), D.p, D.NZ.n + (D.est ? ' (pomiar)' : ''), true, W);
   dvLane($('dv-l2'), D.PS.map(pp => [pp, vmdAt(pp, others[0])]), null, NOZ[others[0]].n, false, W);
@@ -2614,11 +2616,11 @@ function dropViz(v, D){
   // opisane kolorem pasa (wąskie widełki – jeden opis „150–170”); opisy nie nachodzą na siebie
   const span = DV_R[1] - DV_R[0], step = span <= 50 ? 5 : span <= 100 ? 10 : span <= 200 ? 20 : 50;
   const ticks = []; for(let x = Math.ceil(DV_R[0] / step) * step; x <= DV_R[1] + 1e-9; x += step) ticks.push(x);
-  const akey = JSON.stringify([DV_R, win, rep, Math.round(W)]);
+  const akey = JSON.stringify([DV_R, win, rep, Math.round(W), !!D.sp.dAssumed]);
   if(akey !== DV_AXIS){
     DV_AXIS = akey;
     const inR = x => x >= DV_R[0] && x <= DV_R[1], marks = [];
-    [[win, 'w', 3], [rep, 'r', 2]].forEach(([w, c, pri]) => {
+    [[win, D.sp.dAssumed ? 'w a' : 'w', 3], [rep, 'r', 2]].forEach(([w, c, pri]) => {
       const e = (w || []).filter(isNum).filter(inR).filter(x => !marks.some(m => m.v === x));
       if(e.length === 2 && (e[1] - e[0]) / span * W < 34) marks.push({x:dvX((e[0] + e[1]) / 2), t:`${e[0]}–${e[1]}`, c, pri, v:e[0]});
       else e.forEach(x => marks.push({x:dvX(x), t:String(x), c, pri, v:x}));
@@ -2636,7 +2638,7 @@ function dropViz(v, D){
   $('dv-tip').textContent = !v ? 'Po wyborze szczepionki pokażę widełki kropli z jej ChPLW.' : !vmd ? (D.p > 0 ? (D.noz === 'vs2' ? 'Dla TX-VS2 są dane kropli tylko dla 2–3 bar (karta dysz MSD/Birchmeier).' : 'Tabele kropli TeeJet obejmują 2–6 bar.') : '')
     : D.state === 'ok' ? (okP.length === D.PS.length ? `${D.NZ.n} mieści się w widełkach w całym zakresie ${dvRange(D.PS)} bar.` : `${D.NZ.n} mieści się w widełkach przy ${dvRange(okP)} bar.`)
     : D.state ? D.tip : mikro ? `${D.NZ.n} daje ok. ${fmt0(vmd)} µm – grubszą niż mikrokrople. Sposób podania ustal z lekarzem weterynarii.` : 'ChPLW nie podaje wielkości kropli – kropla tylko dla orientacji.';
-  $('dv-leg').innerHTML = [win ? `<span><i class="sw w${D.sp.dAssumed ? ' a' : ''}"></i>widełki ChPLW ${esc(fmtRange(win))} µm${rep ? ' – pierwotne' : ''}${D.sp.dAssumed ? ' (przyjęte)' : ''}${!isNum(win[1]) ? ' – bez górnej granicy w ChPLW' : !isNum(win[0]) ? ' – bez dolnej granicy w ChPLW' : ''}</span>` : '',
+  $('dv-leg').innerHTML = [win ? `<span><i class="sw w${D.sp.dAssumed ? ' a' : ''}"></i>${D.sp.dAssumed ? 'widełki przyjęte' : 'widełki ChPLW'} ${esc(fmtRange(win))} µm${rep ? ' – pierwotne' : ''}${D.sp.dAssumed ? ' (ChPLW nie podaje µm)' : ''}${!isNum(win[1]) ? ' – bez górnej granicy w ChPLW' : !isNum(win[0]) ? ' – bez dolnej granicy w ChPLW' : ''}</span>` : '',
     rep ? `<span><i class="sw r"></i>powtórne ${esc(fmtRange(rep))} µm</span>` : '', '<span><i class="sw m"></i>poniżej 50 µm – parują</span>', '<span>liczby pod pasem dyszy – ciśnienie (bar)</span>',
     `<span class="dv-hint">${zoom ? 'przesuń wykres palcem ← →, stuknij – cała skala' : 'stuknij wykres – przybliżenie'}</span>`].filter(Boolean).join('');
   $('dv-plot').setAttribute('aria-label', `Kropla ${vmd ? fmt0(vmd) + ' µm' : 'nieznana'}${win ? `, widełki ChPLW ${fmtRange(win)} µm` : ''} – ${st}`);
@@ -3103,9 +3105,10 @@ function calc(){
     if(allowed.length && ml > 0){ const lo = Math.min(...allowed.map(a => a[0])), hi = Math.max(...allowed.map(a => a[1])); if(ml < lo || ml > hi) msgs.push(['warn', `${fmtT(ml)} ml na 1000 dawek – poza zakresem z ChPLW (${fmtT(lo)}–${fmtT(hi)} ml).`]); }
     // Kropla: ta sama ocena co w podglądzie (dropState) – okno z ChPLW, podpowiedź ciśnienia albo dyszy
     const D = DROP || dropState(v);
-    if(D.state === 'fine') msgs.push(['warn', `Kropla ok. ${fmt0(D.vmd)} µm – drobniejsza niż w ChPLW (${fmtRange(sp.d)} µm). ${D.tip}`]);
-    else if(D.state === 'coarse') msgs.push([D.lvl, `ChPLW wymaga kropli ${fmtRange(sp.d)} µm – ${NZ.n} daje grubszą (ok. ${fmt0(D.vmd)} µm). ${D.tip}`]);
-    else if(D.state === 'ok') msgs.push(['ok', `Kropla ok. ${fmt0(D.vmd)} µm – zgodna z ChPLW (${fmtRange(sp.d)} µm).${sp.dAssumed ? ` Uwaga: ${sp.dAssumed}.` : sp.dSrc ? ` Źródło: ${sp.dSrc}.` : ''}`]);
+    if(D.state === 'fine') msgs.push(['warn', `Kropla ok. ${fmt0(D.vmd)} µm – drobniejsza niż ${sp.dAssumed ? 'przyjęte widełki' : 'w ChPLW'} (${fmtRange(sp.d)} µm). ${D.tip}`]);
+    else if(D.state === 'coarse') msgs.push([D.lvl, `${sp.dAssumed ? 'Przyjęte widełki kropli' : 'ChPLW wymaga kropli'} ${fmtRange(sp.d)} µm – ${NZ.n} daje grubszą (ok. ${fmt0(D.vmd)} µm). ${D.tip}`]);
+    else if(D.state === 'ok') msgs.push(['ok', `Kropla ok. ${fmt0(D.vmd)} µm – zgodna z ${sp.dAssumed ? 'przyjętymi widełkami' : 'ChPLW'} (${fmtRange(sp.d)} µm).${!sp.dAssumed && sp.dSrc ? ` Źródło: ${sp.dSrc}.` : ''}`]);
+    if(sp.dAssumed) msgs.push(['warn', `ChPLW nie podaje wielkości kropli w µm. Widełki ${fmtRange(sp.d)} µm (na wykresie innym kolorem) przyjęła aplikacja. ${(r => r.charAt(0).toUpperCase() + r.slice(1))(sp.dAssumed.replace(/^[^–]*– wielkości w µm nie podaje; przyjęto [^,.]*[,.]\s*(bo\s+)?/, ''))}. Traktuj je orientacyjnie; w razie wątpliwości ustal sposób podania z lekarzem weterynarii.`]);
     Object.assign(R, {vmd:isNum(D.vmd) ? D.vmd : null, dWin:sp.d || null, dState:D.state});
     if(sp.water) msgs.push(['info', 'Woda wg ChPLW: ' + sp.water + '.']);
     if(sp.dist) msgs.push(['info', `Bez dmuchawy: ${distTxt(sp.dist, 'nad ptakami')}.`]);
@@ -4434,7 +4437,7 @@ function renderRules(){
     <li>Linie napełnij roztworem przed opuszczeniem: spuszczaj z końców, aż pojawi się barwnik (Aviagen: ok. 1 l na 3 m linii smoczkowej).</li>
     <li>Kontrola (Aviagen): po szczepieniu obejrzyj 100 ptaków z co najmniej 3 miejsc kurnika – co najmniej 90% z zabarwionym językiem lub wolem. Serologia ok. 3 tyg. po szczepieniu (20 próbek) pokazuje, czy stado zareagowało równo.</li></ul></div>
   <div><h3>Oprysk</h3><ul class="list">
-    <li>Co znaczą określenia kropli w ChPLW: <b>gruba kropla</b> (coarse spray) – co najmniej 100 µm, zwykle 100–200 µm; osiada w oczach, nozdrzach i górnych drogach oddechowych, używana do pierwszego szczepienia (ChPLW: Nobilis Ma5 + Clone 30, Primun, HatchPak IB H120 – ≥100 µm; Cevac Mass L, TAbic IB VAR206 – 100–200 µm; Avishield – 150–170 µm; wyjątek: Nobilis IB Primo QX – ≥250 µm). <b>Drobna kropla / mikrokrople</b> – poniżej 100 µm (Primun powtórne 50–80 µm, Avinew 80–100 µm, Nobilis MG 6/85 i MS Live – poniżej 100 µm). <b>Aerozol</b> z atomizera – ok. 20–50 µm; krople poniżej ok. 70 µm docierają do dolnych dróg oddechowych i dają silniejszy odczyn, dlatego stosuje się je dopiero przy szczepieniu powtórnym. ChPLW nie używają określenia „średnia kropla”.
+    <li>Co znaczą określenia kropli w ChPLW: <b>gruba kropla</b> (coarse spray) – co najmniej 100 µm, zwykle 100–200 µm; osiada w oczach, nozdrzach i górnych drogach oddechowych, używana do pierwszego szczepienia (ChPLW: Nobilis Ma5 + Clone 30, Primun, HatchPak IB H120 – ≥100 µm; Cevac Mass L, TAbic IB VAR206 – 100–200 µm; Avishield – 150–170 µm; wyjątek: Nobilis IB Primo QX – ≥250 µm). <b>Drobna kropla / mikrokrople</b> – poniżej 100 µm (MSD: poniżej 100 µm przy dyszy, przy ptakach DV50 poniżej 50 µm; zamgławiacz 20–50 µm, rozpylacz z wirującym dyskiem ok. 70 µm). Gdy ChPLW wymaga „mikrokropli” bez liczb (Aviffa-RTI), aplikacja przyjmuje widełki 50–100 µm i pokazuje je innym kolorem z ostrzeżeniem (Primun powtórne 50–80 µm, Avinew 80–100 µm, Nobilis MG 6/85 i MS Live – poniżej 100 µm). <b>Aerozol</b> z atomizera – ok. 20–50 µm; krople poniżej ok. 70 µm docierają do dolnych dróg oddechowych i dają silniejszy odczyn, dlatego stosuje się je dopiero przy szczepieniu powtórnym. ChPLW nie używają określenia „średnia kropla”.
     <li>Woda na 1000 dawek dla opryskiwacza Birchmeier w kurniku: z ChPLW, gdy podaje ilość dla takiego sprzętu (np. Poulvac IB Primer i Poulvac TRT – opryskiwacz plecakowy: ściółka 500 ml, klatki 250 ml). Gdy ChPLW podaje ją tylko dla atomizera albo automatu w wylęgarni, albo wcale – pisklęta jednodniowe 250 ml, starsze 500 ml (jak w ChPLW Primun), w granicach zakresu z ChPLW. Wodę liczę na liczbę ptaków (1 dawka = 1 ptak); nadwyżkę dawek z otwartych fiolek rozpuść w tej samej wodzie.</li>
     <li>Kropla wg ChPLW: szczepienie pierwotne i pisklęta – gruba (≥100 µm, np. Primun, Poulvac TRT 120–150 µm, TAbic IB VAR206 100–200 µm); przypominające – drobniejsza (50–80 µm), gdy ChPLW na to pozwala. Drobny aerozol poniżej 100 µm (Nobilis MG 6/85, Nobilis MS Live) wymaga zamgławiacza – TX-VK6 daje ok. 120–150 µm, a TX-VS2 ok. 106–114 µm.</li>
     <li>Ochrona szczepiącego: maska na nos i usta oraz okulary ochronne albo hełm z obiegiem powietrza – wymagają ich ChPLW m.in. Poulvac TRT, Poulvac NDW, Nobilis ND Clone 30, Primun Bronchitis H120, Nobilis IB Primo QX i Nobilis MS Live. Po zabiegu umyj ręce i twarz.</li>

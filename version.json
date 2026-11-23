@@ -1,8 +1,9 @@
 {
- "wersja": "1.39.0",
+ "wersja": "1.40.0",
  "data": "2026-11-22",
  "zmiany": [
-  "Dane z instrukcji Birchmeier (REC 15, REX 15, REB 15, AS 1200): resztka techniczna w opryskiwaczu (ile dawek nie trafi do ptaków przy małej objętości), litry na jedno ładowanie akumulatora przy danym ciśnieniu, limit 6 bar dla REX 15 z niektórymi akcesoriami, zasięg dmuchawy na poziomie 1 i 2.",
+  "Mikrokrople: gdy ChPLW wymaga „mikrokropli” bez podania µm (Aviffa-RTI), aplikacja pokazuje przyjęte widełki 50–100 µm – na wykresie kropli innym, pomarańczowym kolorem – i ostrzega, że nie pochodzą z ChPLW. Tak samo (pomarańczowo) wyglądają inne przyjęte widełki, np. ≥100 µm przy „grubej kropli” bez liczb.",
+  "(1.39.0) Dane z instrukcji Birchmeier (REC 15, REX 15, REB 15, AS 1200): resztka techniczna w opryskiwaczu (ile dawek nie trafi do ptaków przy małej objętości), litry na jedno ładowanie akumulatora przy danym ciśnieniu, limit 6 bar dla REX 15 z niektórymi akcesoriami, zasięg dmuchawy na poziomie 1 i 2.",
   "(1.38.1) Nowe „Słowo od autora” – o tym, jak powstało Liczydło i dla kogo.",
   "(1.38.0) Nowa nazwa: Liczydło WET (wcześniej Liczydło APP) – na ekranie startowym, w raportach, kopii danych i przy udostępnianiu linku. Stare raporty z dopiskiem APP czytają się bez zmian. Szkic formularza zapisuje się też przy zamknięciu lub przełączeniu aplikacji tuż po zmianie.",
   "(1.37.0) Krok po kroku uzupełniony z poradników MSD (Nobilis Vaccination Series) i „Sygnałów brojlerów”: woda – natlenianie wyłączone 48 h przed, czyszczenie poideł i filtrów, martwa przestrzeń linii, dostęp do poideł dla brojlerów, odkręcenie czystej wody przed końcem roztworu, wpis serii do książki fermy, ostrzeżenie dla piskląt do 5. dnia; oprysk – ochrona szczepiącego (maska P3), wentylacja o 10–20% mniej, pisklęta 15 min w skrzynkach, kurnik otwarty, roztwór zużyty w 1 h, mycie wodą destylowaną.",

@@ -1,8 +1,9 @@
 {
- "wersja": "1.41.2",
+ "wersja": "1.41.3",
  "data": "2026-11-22",
  "zmiany": [
-  "Drogi podania, których nie ma w ChPLW wybranej szczepionki, są wyraźnie przekreślone (czerwona kreska, napis „nie w ChPLW · zmień szczepionkę”) – dobrze widoczne także w motywie ciemnym.",
+  "AVI Stabilizator – opis sprawdzony z etykietą: opakowanie 27 g na 1000 l, mieszanie plastikowym mieszadełkiem, woda wypita w 2 h, kontrola niebieskiej wody na końcu linii, przechowywanie poniżej 25 °C.",
+  "(1.41.2) Drogi podania, których nie ma w ChPLW wybranej szczepionki, są wyraźnie przekreślone (czerwona kreska, napis „nie w ChPLW · zmień szczepionkę”) – dobrze widoczne także w motywie ciemnym.",
   "(1.41.1) Z artykułów Ceva (WATTAgNet, Poultry World) i Pas Reform: gruba kropla co najmniej 100–150 µm, w wylęgarni najlepiej równe 150–170 µm przy dyszy; pisklęta 15–20 min w skrzynkach po oprysku; odstęp 10–14 dni między szczepieniami na te same narządy (zakładka Program).",
   "(1.41.0) Rodzaje kropli pod wykresem: aerozol (< 50 µm), drobna (50–70), średnia (70–100), gruba (> 100) – podświetlony jest rodzaj, który daje wybrana dysza przy danym ciśnieniu (MSD, Aviagen). Gdy ChPLW podaje tylko rodzaj kropli, widełki są przyjęte i pomarańczowe; status mówi wtedy „w przyjętych widełkach”.",
   "(1.40.1) Opis kropli uzupełniony o poradnik Aviagen (2026): krople poniżej 70 µm docierają do dolnych dróg oddechowych, powyżej 100 µm – do górnych. Mycie opryskiwacza: Aviagen dopuszcza alkohol z końcowym płukaniem.",

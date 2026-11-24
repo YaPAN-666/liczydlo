@@ -2213,7 +2213,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.41.2';
+const APP_VERSION = '1.41.3';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -2361,12 +2361,12 @@ function bestPacks(need, packs){
 // pochodzenia zwierzęcego, wg MSD może zastąpić mleko w proszku, 10 min przed szczepionką; AviBlue (Elanco) –
 // granulat musujący, 1 płaska nakrętka na 200 l (butelka 375 g na 3000 l), neutralizuje chlor, metale ciężkie,
 // zakwaszacze i środki dezynfekcyjne; przy dozowniku ilość na całą wodę (Elanco: 1000 l przy 2% = 5 nakrętek w 20 l).
-// AVI Stabilizator (etykieta) – saszetka 27 g na 1000 l: tiosiarczan sodu + barwnik, 10–15 min przed szczepionką;
+// AVI Stabilizator (etykieta, zdjęcia 24.11.2026) – opakowanie 27 g na 1000 l: tiosiarczan sodu + barwnik, 10–15 min przed szczepionką;
 // Cevamune (Ceva, lista kontrolna szczepienia w wodzie) – 1 tabletka na 100 l, 15 min przed szczepionką.
 // Mleko w proszku – tylko gdy wymaga go ChPLW albo nie ma stabilizatora (Ceva 2,5 g/l).
 const STAB = {
   vacsafe:{n:'Vac-Safe', per:100, u:['tabletka','tabletki','tabletek'], ru:'tabletka', wait:'10 min', dye:1, h:'tabletka musująca: neutralizuje chlor (do 5 ppm), niebieski barwnik; wg MSD może zastąpić mleko w proszku'},
-  avistab:{n:'AVI Stabilizator', per:1000, g:27, wait:'10–15 min', dye:1, h:'saszetka 27 g na 1000 l: tiosiarczan sodu neutralizuje chlor i zasadowe pH, niebieski barwnik zostaje na języku 1–4 h. Etykieta podaje wodę 20–22 °C – MSD i Ceva zalecają chłodniejszą (w linii 8–15 °C, w zbiorniku 14–20 °C).'},
+  avistab:{n:'AVI Stabilizator', per:1000, g:27, wait:'10–15 min', dye:1, h:'opakowanie 27 g na 1000 l (Vet Planet / LABO-WET): tiosiarczan sodu neutralizuje wolny chlor i zasadowe pH, niebieski barwnik (E133) zostaje na języku 1–4 h. Mieszać plastikowym mieszadełkiem do rozpuszczenia, odczekać 10–15 min, potem szczepionka; woda ma zejść w ciągu 2 h – sprawdź, czy niebieska dotarła do końca linii. Przechowywać poniżej 25 °C, chronić przed słońcem. Etykieta podaje wodę 20–22 °C – MSD i Ceva zalecają chłodniejszą (w linii 8–15 °C, w zbiorniku 14–20 °C).'},
   cevamune:{n:'Cevamune', per:100, u:['tabletka','tabletki','tabletek'], ru:'tabletka', wait:'15 min', dye:2, h:'tabletka (Ceva): 1 na 100 l, neutralizuje chlor; wg listy kontrolnej Ceva wrzuć do wody 15 min przed szczepionką'},
   aviblue:{n:'AviBlue', per:200, u:['nakrętka','nakrętki','nakrętek'], ru:'płaska nakrętka', wait:'', dye:1, h:'granulat musujący: neutralizuje chlor, metale ciężkie, zakwaszacze i środki dezynfekcyjne; butelka 375 g na 3000 l'},
   inny:{n:'stabilizator', dye:2, h:'wpisz dawkę na 100 l z etykiety preparatu'},

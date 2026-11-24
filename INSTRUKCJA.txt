@@ -1,4 +1,4 @@
-LICZYDŁO WET – wersja 1.43.0
+LICZYDŁO WET – wersja 1.43.1
 =====================================
 
 Zawartość folderu „liczydlo”:

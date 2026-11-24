@@ -301,7 +301,9 @@ details.howto summary{cursor:pointer;font-weight:600;font-size:.92rem}
 /* Droga podania: zawsze cztery przyciski; „inna szczepionka” – przejście do szczepionki z tą drogą */
 #route{display:grid;grid-template-columns:repeat(4,1fr)}
 #route button{min-width:0}
-#route button.alt{color:var(--muted);font-weight:400;background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(0,0,0,.035) 6px 12px)}
+#route button.alt{color:var(--muted);font-weight:400;background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--muted) 16%,transparent) 6px 12px)}
+#route button.na .rn{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--bad)}
+#route button.na small{color:var(--bad);opacity:.9}
 #route button small{display:block;margin:2px 0 0}
 @media (max-width:560px){
   #route{grid-template-columns:1fr 1fr}
@@ -2211,7 +2213,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.41.1';
+const APP_VERSION = '1.41.2';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -2846,7 +2848,7 @@ function buildRoutes(){
   const bk = birdKey(), g = bk ? BIRDS[bk].g : null, any = r => VACS.some(x => (!g || x.sp.includes(g)) && rOk(x, r, bk)), fit = r => routeCands(r).length > 0;
   $('route').innerHTML = RT.map(r => routes.includes(r)
     ? `<button type="button" data-route="${r}" aria-pressed="${r === S.route}"${off(r) ? ' disabled' : ''}>${esc(ROUTES[r])}${off(r) ? ` <small>od ${routeMin(v, r)}. dnia</small>` : ''}</button>`
-    : `<button type="button" class="alt" data-route="${r}" data-alt="1" aria-pressed="false"${fit(r) ? '' : ' disabled'}>${esc(ROUTES[r])} <small>${fit(r) ? (nv ? 'dobierz szczepionkę' : 'inna szczepionka') : any(r) ? 'nie dla tego wieku' : 'brak w bazie'}</small></button>`).join('');
+    : `<button type="button" class="alt${nv ? '' : ' na'}" data-route="${r}" data-alt="1" aria-pressed="false"${fit(r) ? '' : ' disabled'}${nv ? '' : ` aria-label="${esc(ROUTES[r])} – nie dla tej szczepionki"`}><span class="rn">${esc(ROUTES[r])}</span> <small>${fit(r) ? (nv ? 'dobierz szczepionkę' : 'nie w ChPLW · zmień szczepionkę') : any(r) ? 'nie dla tego wieku' : 'brak w bazie'}</small></button>`).join('');
   RT.forEach(r => { $('in-' + r).hidden = nv || r !== S.route; });
   $('route-hint').textContent = nv ? 'Drogi podania pokażę po wyborze szczepionki – albo wybierz drogę, a dobiorę szczepionkę.' : v ? (routes.length === 1 ? `ChPLW tej szczepionki przewiduje tylko: ${ROUTES[routes[0]].toLowerCase()}.` : `ChPLW: ${routes.map(r => ROUTES[r].toLowerCase()).join(', ')}.`) + (routes.length < RT.length ? ' Przycisk „inna szczepionka” wybierze szczepionkę z tą drogą.' : '') : 'szczepionka spoza bazy – wybierz drogę z ulotki';
 }

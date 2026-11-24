@@ -1,8 +1,9 @@
 {
- "wersja": "1.42.0",
+ "wersja": "1.43.0",
  "data": "2026-11-22",
  "zmiany": [
-  "Nowa szczepionka: Respivac aMPV (Hipra) – kury i indyki, oprysk od 1. dnia (krople ≥ 120 µm, 0,14–1 ml na dawkę) i woda do picia. Dane z UPD, ChPLW (NOAH UK) i opinii CVMP z 21.05.2026 (indyki).",
+  "Nowa dysza TX-VK8 (szara, 173 µm i 0,44 l/min przy 2 bar) i dane z instrukcji Ceva Desvac ELEC KIT (to ten sam REC 15): zalecane dysze, ilość wody na 1000 ptaków, mycie alkoholem izopropylowym, usterki i dioda akumulatora.",
+  "(1.42.0) Nowa szczepionka: Respivac aMPV (Hipra) – kury i indyki, oprysk od 1. dnia (krople ≥ 120 µm, 0,14–1 ml na dawkę) i woda do picia. Dane z UPD, ChPLW (NOAH UK) i opinii CVMP z 21.05.2026 (indyki).",
   "(1.41.3) AVI Stabilizator – opis sprawdzony z etykietą: opakowanie 27 g na 1000 l, mieszanie plastikowym mieszadełkiem, woda wypita w 2 h, kontrola niebieskiej wody na końcu linii, przechowywanie poniżej 25 °C.",
   "(1.41.2) Drogi podania, których nie ma w ChPLW wybranej szczepionki, są wyraźnie przekreślone (czerwona kreska, napis „nie w ChPLW · zmień szczepionkę”) – dobrze widoczne także w motywie ciemnym.",
   "(1.41.1) Z artykułów Ceva (WATTAgNet, Poultry World) i Pas Reform: gruba kropla co najmniej 100–150 µm, w wylęgarni najlepiej równe 150–170 µm przy dyszy; pisklęta 15–20 min w skrzynkach po oprysku; odstęp 10–14 dni między szczepieniami na te same narządy (zakładka Program).",

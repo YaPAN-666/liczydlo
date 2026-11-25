@@ -1,8 +1,9 @@
 {
- "wersja": "1.43.1",
+ "wersja": "1.43.2",
  "data": "2026-11-22",
  "zmiany": [
-  "Respivac aMPV sprawdzona z polską ChPLW i ulotką: tylko kury (indyki – dopiero po aktualizacji polskiej ChPLW), podtyp B, zużyć w 2 h, przechowywanie 2–8 °C, szczepienie co 9 tygodni.",
+  "Pomarańczowa gwiazdka Studia także w logo na ekranie startowym i w nagłówku aplikacji (ikona na telefonie już ją miała).",
+  "(1.43.1) Respivac aMPV sprawdzona z polską ChPLW i ulotką: tylko kury (indyki – dopiero po aktualizacji polskiej ChPLW), podtyp B, zużyć w 2 h, przechowywanie 2–8 °C, szczepienie co 9 tygodni.",
   "(1.43.0) Nowa dysza TX-VK8 (szara, 173 µm i 0,44 l/min przy 2 bar) i dane z instrukcji Ceva Desvac ELEC KIT (to ten sam REC 15): zalecane dysze, ilość wody na 1000 ptaków, mycie alkoholem izopropylowym, usterki i dioda akumulatora.",
   "(1.42.0) Nowa szczepionka: Respivac aMPV (Hipra) – kury i indyki, oprysk od 1. dnia (krople ≥ 120 µm, 0,14–1 ml na dawkę) i woda do picia. Dane z UPD, ChPLW (NOAH UK) i opinii CVMP z 21.05.2026 (indyki).",
   "(1.41.3) AVI Stabilizator – opis sprawdzony z etykietą: opakowanie 27 g na 1000 l, mieszanie plastikowym mieszadełkiem, woda wypita w 2 h, kontrola niebieskiej wody na końcu linii, przechowywanie poniżej 25 °C.",

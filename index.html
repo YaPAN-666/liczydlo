@@ -529,17 +529,23 @@ html,body{overscroll-behavior-y:none}
 .dv-cat span{display:flex;flex-direction:column;align-items:center;padding:3px 2px;border-radius:7px;border:1px solid var(--line);color:var(--muted);text-align:center}
 .dv-cat span i{font-style:normal;font-family:var(--f-mono);font-size:.64rem;opacity:.85}
 .dv-cat span.on{border-color:var(--ink);color:var(--ink);font-weight:600;background:var(--surface-2)}
+
+.brandrow h1 .mark{position:relative}
+.brandrow h1 .mark{place-items:end start;padding:0 0 5px 4px;box-sizing:border-box}
+.brandrow h1 .mark svg:not(.mk-star){width:23px}
+.brandrow h1 .mark svg.mk-star{position:absolute;top:3px;right:3px;width:10px;height:10px}
 </style>
 </head>
 <body>
 
 <div class="splash" id="splash" role="dialog" aria-label="Liczydło WET – strona tytułowa">
   <div class="center">
-    <svg class="abacus" viewBox="0 0 120 100" aria-hidden="true">
+    <svg class="abacus" viewBox="0 -16 138 116" aria-hidden="true">
       <rect x="6" y="6" width="108" height="88" rx="10" fill="none" stroke="currentColor" stroke-width="6"/>
       <g stroke="currentColor" stroke-width="2.5" opacity=".8"><line x1="9" y1="30" x2="111" y2="30"/><line x1="9" y1="50" x2="111" y2="50"/><line x1="9" y1="70" x2="111" y2="70"/></g>
       <g fill="#e8a964"><ellipse cx="24" cy="30" rx="6.5" ry="8"/><ellipse cx="38" cy="30" rx="6.5" ry="8"/><ellipse cx="52" cy="30" rx="6.5" ry="8"/><ellipse cx="24" cy="50" rx="6.5" ry="8"/><ellipse cx="38" cy="50" rx="6.5" ry="8"/><ellipse cx="24" cy="70" rx="6.5" ry="8"/><ellipse cx="38" cy="70" rx="6.5" ry="8"/><ellipse cx="52" cy="70" rx="6.5" ry="8"/><ellipse cx="66" cy="70" rx="6.5" ry="8"/></g>
       <g fill="currentColor"><ellipse cx="96" cy="30" rx="6.5" ry="8"/><ellipse cx="82" cy="50" rx="6.5" ry="8"/><ellipse cx="96" cy="50" rx="6.5" ry="8"/><ellipse cx="96" cy="70" rx="6.5" ry="8"/></g>
+      <path fill="#E39A3B" d="M124 -15Q126.34 -4.34 137 -2Q126.34 0.33999999999999986 124 11Q121.66 0.33999999999999986 111 -2Q121.66 -4.34 124 -15Z"/>
     </svg>
     <div class="name"><span class="txt"><span class="lz-l">L</span>iczydło</span></div>
     <div class="app">WET</div>
@@ -656,7 +662,7 @@ html,body{overscroll-behavior-y:none}
 <header class="appbar">
   <div class="appbar-in">
     <div class="brandrow">
-      <h1><span class="mark" aria-hidden="true"><svg viewBox="0 0 120 100"><rect x="6" y="6" width="108" height="88" rx="10" fill="none" stroke="#f1f6f2" stroke-width="8"/><g stroke="#f1f6f2" stroke-width="3.5" opacity=".85"><line x1="9" y1="30" x2="111" y2="30"/><line x1="9" y1="50" x2="111" y2="50"/><line x1="9" y1="70" x2="111" y2="70"/></g><g fill="#e8a964"><ellipse cx="24" cy="30" rx="7" ry="8.5"/><ellipse cx="39" cy="30" rx="7" ry="8.5"/><ellipse cx="54" cy="30" rx="7" ry="8.5"/><ellipse cx="24" cy="50" rx="7" ry="8.5"/><ellipse cx="39" cy="50" rx="7" ry="8.5"/><ellipse cx="24" cy="70" rx="7" ry="8.5"/><ellipse cx="39" cy="70" rx="7" ry="8.5"/><ellipse cx="54" cy="70" rx="7" ry="8.5"/><ellipse cx="69" cy="70" rx="7" ry="8.5"/></g><g fill="#f1f6f2"><ellipse cx="96" cy="30" rx="7" ry="8.5"/><ellipse cx="81" cy="50" rx="7" ry="8.5"/><ellipse cx="96" cy="50" rx="7" ry="8.5"/><ellipse cx="96" cy="70" rx="7" ry="8.5"/></g></svg></span><span class="nm"><span class="lz-l">L</span>iczydło</span> <span class="sub">kalkulator szczepień drobiu</span></h1>
+      <h1><span class="mark" aria-hidden="true"><svg class="mk-star" viewBox="0 0 24 24"><path fill="#E39A3B" d="M12 1Q13.98 10.02 23 12Q13.98 13.98 12 23Q10.02 13.98 1 12Q10.02 10.02 12 1Z"/></svg><svg viewBox="0 0 120 100"><rect x="6" y="6" width="108" height="88" rx="10" fill="none" stroke="#f1f6f2" stroke-width="8"/><g stroke="#f1f6f2" stroke-width="3.5" opacity=".85"><line x1="9" y1="30" x2="111" y2="30"/><line x1="9" y1="50" x2="111" y2="50"/><line x1="9" y1="70" x2="111" y2="70"/></g><g fill="#e8a964"><ellipse cx="24" cy="30" rx="7" ry="8.5"/><ellipse cx="39" cy="30" rx="7" ry="8.5"/><ellipse cx="54" cy="30" rx="7" ry="8.5"/><ellipse cx="24" cy="50" rx="7" ry="8.5"/><ellipse cx="39" cy="50" rx="7" ry="8.5"/><ellipse cx="24" cy="70" rx="7" ry="8.5"/><ellipse cx="39" cy="70" rx="7" ry="8.5"/><ellipse cx="54" cy="70" rx="7" ry="8.5"/><ellipse cx="69" cy="70" rx="7" ry="8.5"/></g><g fill="#f1f6f2"><ellipse cx="96" cy="30" rx="7" ry="8.5"/><ellipse cx="81" cy="50" rx="7" ry="8.5"/><ellipse cx="96" cy="50" rx="7" ry="8.5"/><ellipse cx="96" cy="70" rx="7" ry="8.5"/></g></svg></span><span class="nm"><span class="lz-l">L</span>iczydło</span> <span class="sub">kalkulator szczepień drobiu</span></h1>
       <div class="headtools">
         <span class="chip" id="chip-mode"><span class="dot"></span><span>Łączenie z pamięcią…</span></span>
         <button class="btn small ghost themebtn" type="button" id="theme-btn" title="Motyw: automatyczny" aria-label="Motyw: automatyczny"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg><span id="theme-l">auto</span></button>
@@ -2227,7 +2233,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.43.1';
+const APP_VERSION = '1.43.2';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];

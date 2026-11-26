@@ -568,6 +568,14 @@ label.chk{display:flex;align-items:center;gap:8px;font-weight:500}
 .tr-mk.baza{background:#E39A3B}
 .tr-mk.st{background:#16201a;width:22px;height:22px}
 .tr-mk.pick{width:26px;height:26px;background:#E39A3B;border-width:3px;box-shadow:0 0 0 6px rgba(227,154,59,.3)}
+
+.tr-si{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line)}
+.tr-godz{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted)}
+.tr-godz input{font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.tr-t{display:block;font-size:.8rem;color:var(--muted)}
+.tr-t.ok{color:var(--ok)} .tr-t.bad{color:var(--bad);font-weight:600}
+.tr-alert{margin:0;padding:8px 10px;border-radius:8px;font-size:.86rem}
+.tr-alert.ok{background:var(--ok-soft);color:var(--ok)} .tr-alert.bad{background:var(--bad-soft);color:var(--bad)}
 </style>
 </head>
 <body>
@@ -1096,6 +1104,7 @@ label.chk{display:flex;align-items:center;gap:8px;font-weight:500}
   </div>
   <div class="card">
     <h2>Plan objazdu</h2>
+    <p class="note">Przy fermie możesz wpisać godzinę, o której musisz tam być – aplikacja ułoży kolejność tak, żeby zdążyć, poda, o której wyjechać z poprzedniego punktu, i ile najdłużej możesz zostać na wcześniejszych fermach.</p>
     <p class="note">Zaznacz fermy na ten dzień. Do 12 ferm aplikacja znajdzie najlepszą możliwą kolejność, przy większej liczbie – bardzo dobrą. Kolejność bioasekuracji z karty fermy jest zawsze zachowana: najpierw stada młode i zdrowe, na koniec chore i starsze.</p>
     <div id="tr-sel" class="tr-sel"></div>
     <div class="row">
@@ -2298,7 +2307,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.45.0';
+const APP_VERSION = '1.46.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -5599,6 +5608,7 @@ const trOdl = (a, b) => { const R = 6371000, r = Math.PI / 180, dla = (b[0]-a[0]
 const trKm = m => m >= 1000 ? fmt(m / 1000, m < 10000 ? 1 : 0) + ' km' : Math.round(m) + ' m';
 const trCz = s => { const m = Math.round(s / 60); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0') + ' min'; };
 const trHM = min => { const m = ((Math.round(min) % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+const trMin = hm => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(hm || '').trim()); return m ? +m[1] * 60 + +m[2] : null; };
 const trNav = (la, lo) => 'https://www.google.com/maps/dir/?api=1&destination=' + la.toFixed(6) + ',' + lo.toFixed(6) + '&travelmode=driving';
 
 /* ---------- Leaflet na żądanie (tylko po otwarciu zakładki) ---------- */
@@ -5767,12 +5777,13 @@ function trPlanUI(){
   $('tr-kon').innerHTML = opt('powrot', 'Powrót do startu', p.kon) + opt('ostatnia', 'Kończę na ostatniej fermie', p.kon) + d.fermy.map(f => opt(f.id, 'Koniec: ' + f.n, p.kon)).join('');
   if(p.start !== 'gps' && !ids.has(p.start)) $('tr-start').value = 'gps';
   $('tr-odj').value = p.odj || '07:00'; $('tr-przerwa').value = isNum(p.przerwa) ? p.przerwa : 10;
-  $('tr-sel').innerHTML = d.fermy.length ? d.fermy.map(f => `<label class="chk"><input type="checkbox" data-sel="${f.id}"${p.sel.includes(f.id) ? ' checked' : ''}> ${esc(f.n)} <small class="note">${isNum(f.czas) ? f.czas : 60} min${trBioOpis(f) ? ' · ' + esc(trBioOpis(f)) : ''}</small></label>`).join('') : '<p class="note">Najpierw zapisz fermy.</p>';
+  $('tr-sel').innerHTML = d.fermy.length ? d.fermy.map(f => `<div class="tr-si"><label class="chk"><input type="checkbox" data-sel="${f.id}"${p.sel.includes(f.id) ? ' checked' : ''}> ${esc(f.n)} <small class="note">${isNum(f.czas) ? f.czas : 60} min${trBioOpis(f) ? ' · ' + esc(trBioOpis(f)) : ''}</small></label><label class="tr-godz" title="Godzina, o której musisz być na tej fermie (opcjonalnie)">na godz.<input type="time" data-godz="${f.id}" value="${esc((p.godz || {})[f.id] || '')}"></label></div>`).join('') : '<p class="note">Najpierw zapisz fermy.</p>';
   trWynikUI();
 }
 function trPlanZapisz(){
   const d = trGet(), p = d.plan;
   p.sel = [...document.querySelectorAll('#tr-sel [data-sel]')].filter(c => c.checked).map(c => c.dataset.sel);
+  p.godz = {}; document.querySelectorAll('#tr-sel [data-godz]').forEach(i => { if(i.value) p.godz[i.dataset.godz] = i.value; });
   p.start = $('tr-start').value; p.kon = $('tr-kon').value; p.odj = $('tr-odj').value || '07:00';
   p.przerwa = Math.max(0, +$('tr-przerwa').value || 0); trSet(d);
 }
@@ -5819,6 +5830,33 @@ function trKomiwojazer(K, rg){
     const [t2, c2] = popraw(t); if(c2 < najC){ najC = c2; naj = t2; } }
   return naj;
 }
+// Harmonogram trasy t (kolejność węzłów od 0): przyjazd, czekanie do umówionej godziny, wyjazd; spóźnienia w minutach
+function trHarm(t, M, info, odj, przerwa){
+  let zeg = odj, sp = 0; const H = [];
+  for(let i = 1; i < t.length; i++){ const a = t[i - 1], b = t[i], o = info[b]; zeg += M.s[a][b] / 60;
+    const przy = zeg, pocz = o.godz != null ? Math.max(zeg, o.godz) : zeg; if(o.godz != null && przy > o.godz + 0.5) sp += przy - o.godz;
+    H.push({b, przy, pocz, odj:pocz + o.czas}); zeg = pocz + o.czas + (i === t.length - 1 || o.koniec ? 0 : przerwa); }
+  return {H, sp, kon:zeg};
+}
+// kolejność przy umówionych godzinach: koszt = spóźnienia (bardzo drogie) + godzina końca + kilometry; bioasekuracja jak wyżej
+function trZGodzinami(M, info, rg, odj, przerwa, powrot, iE){
+  const n = info.length, wolne = [...Array(n).keys()].slice(1).filter(i => i !== iE);
+  const ocen = kol => { const t = [0].concat(kol, iE > 0 ? [iE] : []), h = trHarm(t, M, info, odj, przerwa);
+    let km = 0; for(let i = 1; i < t.length; i++) km += M.d[t[i - 1]][t[i]]; let kon = h.kon; if(powrot){ kon += M.s[t[t.length - 1]][0] / 60; km += M.d[t[t.length - 1]][0]; }
+    let kara = 0, mx = -Infinity; for(const i of kol){ const r = rg[i]; if(r == null) continue; if(r < mx) kara += 1e9 * (mx - r); else mx = r; }
+    return kara + h.sp * 1e6 + kon * 60 + km * 0.03; };
+  let naj = wolne.slice(), najC = ocen(naj);
+  if(wolne.length <= 8){ const perm = (a, k) => { if(k === a.length){ const c = ocen(a); if(c < najC){ najC = c; naj = a.slice(); } return; }
+      for(let i = k; i < a.length; i++){ [a[k], a[i]] = [a[i], a[k]]; perm(a, k + 1); [a[k], a[i]] = [a[i], a[k]]; } }; perm(wolne.slice(), 0); }
+  else { const starty = [wolne.slice(), wolne.slice().sort((x, y) => (info[x].godz ?? 1e9) - (info[y].godz ?? 1e9))];
+    for(let s = 0; s < 10; s++) starty.push(wolne.slice().sort(() => Math.random() - .5));
+    for(let t of starty){ let c = ocen(t), lep = true;
+      while(lep){ lep = false;
+        for(let i = 0; i < t.length - 1; i++) for(let k = i + 1; k < t.length; k++){ const u = t.slice(0, i).concat(t.slice(i, k + 1).reverse(), t.slice(k + 1)), cu = ocen(u); if(cu < c - 1e-6){ t = u; c = cu; lep = true; } }
+        for(let i = 0; i < t.length; i++){ const x = t[i], r = t.slice(0, i).concat(t.slice(i + 1)); for(let k = 0; k <= r.length; k++){ if(k === i) continue; const u = r.slice(0, k).concat([x], r.slice(k)), cu = ocen(u); if(cu < c - 1e-6){ t = u; c = cu; lep = true; break; } } } }
+      if(c < najC){ najC = c; naj = t; } } }
+  return [0].concat(naj, iE > 0 ? [iE] : []);
+}
 async function trUluz(){
   trPlanZapisz();
   const d = trGet(), p = d.plan, F = p.sel.map(id => d.fermy.find(f => f.id === id)).filter(Boolean);
@@ -5842,20 +5880,29 @@ async function trUluz(){
     if(p.kon === 'ostatnia') for(let j = 1; j < n; j++) K[j][0] = 0;
     else if(!endF) for(let j = 1; j < n; j++) K[j][0] = M.s[j][0] + M.d[j][0] * 0.03;
     await new Promise(r => setTimeout(r, 30));
-    const t = trKomiwojazer(K, rg);
+    const odj0 = trMin(p.odj) ?? 420, godz = p.godz || {};
+    const info = [{czas:0}].concat(lista.map(f => ({czas:isNum(f.czas) ? f.czas : 60, godz:trMin(godz[f.id])})), endF ? [{czas:0, godz:trMin(godz[endF.id]), koniec:true}] : []);
+    const zGodz = info.some(o => o.godz != null);
+    const t = zGodz ? trZGodzinami(M, info, rg, odj0, p.przerwa, p.kon === 'powrot', iE) : trKomiwojazer(K, rg);
     const jedz = p.kon === 'powrot' ? n : n - 1;
     const sumy = kol => { let m = 0, s = 0; for(let i = 0; i < jedz; i++){ const a = kol[i], b = kol[(i + 1) % n]; m += M.d[a][b]; s += M.s[a][b]; } return {m, s}; };
     const kolWej = [...Array(n).keys()], przed = sumy(kolWej), po = sumy(t);
-    // harmonogram: przyjazd, wyjazd
-    const [hh, mm] = (p.odj || '07:00').split(':').map(Number); let zeg = hh * 60 + mm;
-    const stopy = [];
-    for(let i = 1; i < n; i++){ const a = t[i - 1], b = t[i]; zeg += M.s[a][b] / 60;
-      const f = b === iE ? endF : lista[b - 1], czas = b === iE ? 0 : (isNum(f.czas) ? f.czas : 60);
-      stopy.push({id:f.id, n:f.n, la:f.la, lo:f.lo, bio:b === iE ? '' : trBioOpis(f), m:M.d[a][b], s:M.s[a][b], przy:zeg, odj:zeg + czas, czas, koniec:b === iE});
-      zeg += czas + (b === iE || i === n - 1 ? 0 : p.przerwa); }
+    // harmonogram: przyjazd, czekanie do umówionej godziny, wyjazd
+    const h = trHarm(t, M, info, odj0, p.przerwa); let zeg = h.kon;
+    const stopy = h.H.map((x, i) => { const b = x.b, a = t[i], f = b === iE ? endF : lista[b - 1], o = info[b];
+      return {id:f.id, n:f.n, la:f.la, lo:f.lo, bio:b === iE ? '' : trBioOpis(f), m:M.d[a][b], s:M.s[a][b], przy:x.przy, pocz:x.pocz, odj:x.odj, czas:o.czas, godz:o.godz, koniec:b === iE}; });
+    // najpóźniejsze godziny (od końca): rozpoczęcie na fermie i wyjazd z poprzedniego punktu, żeby zdążyć na wszystkie umówione godziny
+    let Lnast = Infinity;
+    for(let i = stopy.length - 1; i >= 0; i--){ const st = stopy[i];
+      const Lpocz = Math.min(st.godz != null ? st.godz : Infinity, Lnast);
+      st.najpPocz = Lpocz; st.najpWyjPrzed = isFinite(Lpocz) ? Lpocz - st.s / 60 : null;
+      Lnast = isFinite(Lpocz) ? Lpocz - st.s / 60 - (i > 0 ? p.przerwa : 0) - (i > 0 ? stopy[i - 1].czas : 0) : Infinity; }
+    // ile najdłużej można zostać na fermie, żeby zdążyć dalej
+    stopy.forEach((st, i) => { const nx = stopy[i + 1]; if(nx && nx.najpWyjPrzed != null){ const doK = nx.najpWyjPrzed - p.przerwa; st.najdluzej = doK - st.pocz; st.wyjNajp = doK; } });
+    const najpWyjazd = stopy.length && stopy[0].najpWyjPrzed != null ? stopy[0].najpWyjPrzed : null;
     let powrot = null; if(p.kon === 'powrot'){ const a = t[n - 1]; zeg += M.s[a][0] / 60; powrot = {m:M.d[a][0], s:M.s[a][0], przy:zeg}; }
     const grpZle = lista.some(f => trRanga(f) != null);
-    p.wynik = {kol:stopy.map(s => s.id), stopy, powrot, start:[+start[0].toFixed(6), +start[1].toFixed(6)], startN, odj:p.odj, m:po.m, s:po.s, przed, prosta:M.prosta, przerwa:p.przerwa, bio:grpZle, t:Date.now(), koniecZeg:zeg};
+    p.wynik = {kol:stopy.map(s => s.id), stopy, powrot, najpWyjazd, sp:h.sp, zGodz, start:[+start[0].toFixed(6), +start[1].toFixed(6)], startN, odj:p.odj, m:po.m, s:po.s, przed, prosta:M.prosta, przerwa:p.przerwa, bio:grpZle, t:Date.now(), koniecZeg:zeg};
     trSet(d); opFeat('trasa');
     // przebieg po drogach na mapę
     try { const pts = [start].concat(stopy.map(s => [s.la, s.lo]), powrot ? [start] : []);
@@ -5874,6 +5921,17 @@ function trLinki(w){
     L2.push('https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=' + k(cz[0]) + '&destination=' + k(cz[cz.length - 1]) + (cz.length > 2 ? '&waypoints=' + cz.slice(1, -1).map(k).join('%7C') : '')); }
   return L2;
 }
+function trGodzOpis(s){
+  const o = [];
+  if(s.godz != null){ const roz = s.przy - s.godz;
+    o.push(roz > 0.5 ? `<span class="tr-t bad">umówione na ${trHM(s.godz)} – spóźnienie ${trCz(roz * 60)}</span>`
+      : `<span class="tr-t ok">umówione na ${trHM(s.godz)}${roz < -1 ? ' – będziesz ' + trCz(-roz * 60) + ' wcześniej' : ' – na czas'}</span>`);
+    if(s.najpWyjPrzed != null) o.push(`<span class="tr-t">wyjedź z poprzedniego punktu najpóźniej o ${trHM(s.najpWyjPrzed)}</span>`); }
+  if(s.najdluzej != null && isFinite(s.najdluzej) && s.czas){ o.push(s.najdluzej >= s.czas - 0.5
+      ? `<span class="tr-t">możesz zostać do ${trHM(s.wyjNajp)} (najdłużej ${trCz(Math.max(0, s.najdluzej) * 60)}) i zdążyć dalej</span>`
+      : `<span class="tr-t bad">żeby zdążyć dalej, zostań najwyżej ${trCz(Math.max(0, s.najdluzej) * 60)} – wyjedź o ${trHM(s.wyjNajp)}</span>`); }
+  return o.join('');
+}
 function trWynikUI(){
   const w = trGet().plan.wynik, box = $('tr-wynik');
   if(!w){ box.hidden = true; return; }
@@ -5881,8 +5939,10 @@ function trWynikUI(){
   const zysk = w.przed && w.przed.s - w.s > 60 ? `<span class="note"> · oszczędność ${trCz(w.przed.s - w.s)} i ${trKm(Math.max(0, w.przed.m - w.m))} wobec kolejności z listy</span>` : '';
   const linki = trLinki(w);
   box.innerHTML = `<div class="card-h"><h3>Trasa: ${w.stopy.length} ${w.stopy.length === 1 ? 'ferma' : 'ferm'}</h3><span class="mono">${trKm(w.m)} · ${trCz(w.s)} jazdy</span></div>
+    ${w.zGodz ? (w.sp > 0.5 ? `<p class="tr-alert bad"><b>Nie zdążysz na wszystkie umówione godziny</b> – spóźnienie łącznie ok. ${trCz(w.sp * 60)}. Wyjedź wcześniej, skróć czas na fermach albo zmień godzinę.</p>`
+      : `<p class="tr-alert ok">Zdążysz na wszystkie umówione godziny.${w.najpWyjazd != null ? ` Wyjedź najpóźniej o <b>${trHM(w.najpWyjazd)}</b>.` : ''}</p>`) : ''}
     <p class="note">Start ${esc(w.startN)} o ${esc(w.odj)} · koniec ok. ${trHM(w.koniecZeg)}${zysk}${w.prosta ? '<br><b>Bez połączenia z serwerem tras – odległości w linii prostej ×1,3, czasy orientacyjne.</b>' : ''}${w.bio ? '<br>Bioasekuracja zachowana: najpierw stada najmłodsze, potem starsze, chore na końcu.' : ''}</p>
-    <ol class="tr-stopy">${w.stopy.map((s, i) => `<li><div><b>${esc(s.n)}</b>${s.koniec ? ' <span class="pill">koniec</span>' : ''}${s.bio ? `<span class="note tr-bion">${esc(s.bio)}</span>` : ''}<span class="note">przyjazd ${trHM(s.przy)}${s.czas ? ' · wyjazd ' + trHM(s.odj) : ''} · ${trKm(s.m)}, ${trCz(s.s)} jazdy</span></div>
+    <ol class="tr-stopy">${w.stopy.map((s, i) => `<li><div><b>${esc(s.n)}</b>${s.koniec ? ' <span class="pill">koniec</span>' : ''}${s.bio ? `<span class="note tr-bion">${esc(s.bio)}</span>` : ''}<span class="note">przyjazd ${trHM(s.przy)}${s.czas ? ' · wyjazd ' + trHM(s.odj) : ''} · ${trKm(s.m)}, ${trCz(s.s)} jazdy</span>${trGodzOpis(s)}</div>
       <a class="btn small ghost" href="${trNav(s.la, s.lo)}" target="_blank" rel="noopener">Nawiguj</a></li>`).join('')}
       ${w.powrot ? `<li class="pow"><div><b>Powrót: ${esc(w.startN)}</b><span class="note">ok. ${trHM(w.powrot.przy)} · ${trKm(w.powrot.m)}, ${trCz(w.powrot.s)} jazdy</span></div></li>` : ''}</ol>
     <div class="tools">${linki.map((u, i) => `<a class="btn small" href="${u}" target="_blank" rel="noopener">${linki.length > 1 ? 'Google Maps – część ' + (i + 1) : 'Cała trasa w Google Maps'}</a>`).join('')}</div>

@@ -1,8 +1,9 @@
 {
- "wersja": "1.44.0",
+ "wersja": "1.45.0",
  "data": "2026-11-22",
  "zmiany": [
-  "Nowa zakładka „Trasa”: wyszukiwanie adresu (rejestr adresów GUGiK, zapasowo OpenStreetMap) z podglądem na mapie i zdjęciu lotniczym, baza ferm z dokładnym punktem (np. brama wjazdowa), nawigacja do fermy i plan objazdu – najkrótsza kolejność po drogach z godzinami przyjazdu, czasem na fermie, przerwą na przebranie i kolejnością bioasekuracji (najpierw stada młode/zdrowe, na koniec chore/starsze). Fermy trafiają do kopii raportów.",
+  "Trasa – bioasekuracja przy fermie: zaznaczasz „Bioasekuracja”, wpisujesz wiek stada (liczy się sam z każdym dniem, podpowiedź z zakładki Program) i ewentualnie chorobę. Plan objazdu prowadzi od stad najmłodszych (do 7 dni, do 3 tyg., do 6 tyg., starsze) do starszych, stada chore zawsze na końcu; fermy bez bioasekuracji tam, gdzie najkrócej.",
+  "(1.44.0) Nowa zakładka „Trasa”: wyszukiwanie adresu (rejestr adresów GUGiK, zapasowo OpenStreetMap) z podglądem na mapie i zdjęciu lotniczym, baza ferm z dokładnym punktem (np. brama wjazdowa), nawigacja do fermy i plan objazdu – najkrótsza kolejność po drogach z godzinami przyjazdu, czasem na fermie, przerwą na przebranie i kolejnością bioasekuracji (najpierw stada młode/zdrowe, na koniec chore/starsze). Fermy trafiają do kopii raportów.",
   "(1.43.2) Pomarańczowa gwiazdka Studia także w logo na ekranie startowym i w nagłówku aplikacji (ikona na telefonie już ją miała).",
   "(1.43.1) Respivac aMPV sprawdzona z polską ChPLW i ulotką: tylko kury (indyki – dopiero po aktualizacji polskiej ChPLW), podtyp B, zużyć w 2 h, przechowywanie 2–8 °C, szczepienie co 9 tygodni.",
   "(1.43.0) Nowa dysza TX-VK8 (szara, 173 µm i 0,44 l/min przy 2 bar) i dane z instrukcji Ceva Desvac ELEC KIT (to ten sam REC 15): zalecane dysze, ilość wody na 1000 ptaków, mycie alkoholem izopropylowym, usterki i dioda akumulatora.",

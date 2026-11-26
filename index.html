@@ -2298,7 +2298,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.44.0';
+const APP_VERSION = '1.45.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -5576,7 +5576,21 @@ function renderInfo(){
    Zapis lokalny: liczydlo.trasa.v1 (i w kopii raportów). */
 const TR_KEY = 'liczydlo.trasa.v1';
 const TR_UUG = 'https://services.gugik.gov.pl/uug/', TR_OSRM = 'https://router.project-osrm.org/';
-const TR_GRP = {1:'najpierw – stada młode / zdrowe', 2:'zwykła kolejność', 3:'na koniec – stada chore / starsze'};
+// Bioasekuracja: fermy z zaznaczoną bioasekuracją odwiedzane od stad najmłodszych do najstarszych, stada chore zawsze na końcu.
+// Przedziały wieku (dni): do 7, do 21, do 42, starsze – wewnątrz przedziału kolejność dowolna (najkrótsza). Fermy bez zaznaczenia – bez ograniczeń.
+const TR_PRZ = [[7, 'pisklęta do 7 dni'], [21, 'do 3 tygodni'], [42, 'do 6 tygodni'], [Infinity, 'starsze niż 6 tygodni']];
+function trWiek(f){ if(!f.wyl) return null; const d = Math.floor((Date.parse(todayISO()) - Date.parse(f.wyl)) / 864e5); return isFinite(d) && d >= 0 ? d : null; }
+function trRanga(f){   // null – bez ograniczeń; 1–4 przedziały wieku; 9 – stado chore
+  if(!f.bio && !(+f.grp === 1 || +f.grp === 3)) return null;
+  if(f.chor || +f.grp === 3) return 9;
+  const w = trWiek(f); if(w == null) return +f.grp === 1 ? 1 : 3;
+  return 1 + TR_PRZ.findIndex(([g]) => w <= g);
+}
+function trBioOpis(f){ const r = trRanga(f); if(r == null) return '';
+  if(r === 9) return 'stado chore – na koniec' + (f.chorN ? ' (' + f.chorN + ')' : '');
+  const w = trWiek(f); return w != null ? 'stado ' + w + ' ' + (w === 1 ? 'dzień' : 'dni') + ' – ' + TR_PRZ[r - 1][1] : 'bioasekuracja (wiek nieznany)'; }
+// data wylęgu z zakładki „Program” – stado tej samej fermy
+function trWylZProgramu(n){ try { const fl = progGet().flocks.find(x => x.farm && n && x.farm.trim().toLowerCase() === n.trim().toLowerCase() && x.hatch); return fl ? fl.hatch : null; } catch(e){ return null; } }
 let trMap = null, trBase = null, trOrto = null, trPick = null, trPickData = null, trLayer = null, trEdit = null, trLoading = null;
 
 function trGet(){ const d = lsGet(TR_KEY); const o = d && typeof d === 'object' ? d : {}; if(!Array.isArray(o.fermy)) o.fermy = []; if(!o.plan) o.plan = {sel:[], start:'gps', kon:'powrot', odj:'07:00', przerwa:10}; return o; }
@@ -5694,7 +5708,8 @@ function trPokaz(id){
 /* ---------- baza ferm ---------- */
 function trForm(f){
   const d = trGet(), nowa = !f, p = trPickData;
-  f = f || {n:'', adr:p ? p.n : '', uw:'', czas:60, grp:2, baza:false};
+  f = f || {n:'', adr:p ? p.n : '', uw:'', czas:60, bio:false, baza:false};
+  const wiek = trWiek(f), bio = f.bio || +f.grp === 1 || +f.grp === 3, chor = f.chor || +f.grp === 3;
   $('tr-form').hidden = false;
   $('tr-form').innerHTML = `<h3>${nowa ? 'Nowa ferma' : 'Ferma: ' + esc(f.n)}</h3>
     <div class="row">
@@ -5702,10 +5717,19 @@ function trForm(f){
       <label>Adres<input id="trf-adr" type="text" value="${esc(f.adr || '')}" placeholder="miejscowość, ulica, numer"></label>
       <label class="wide">Uwagi dla kierowcy<input id="trf-uw" type="text" value="${esc(f.uw || '')}" placeholder="np. wjazd od strony lasu, kod bramy, telefon"></label>
       <label>Czas na fermie (min)<input id="trf-czas" type="number" min="0" step="5" inputmode="numeric" value="${isNum(f.czas) ? f.czas : 60}"><span class="hint">szczepienie z przygotowaniem</span></label>
-      <label>Kolejność bioasekuracji<select id="trf-grp">${[1, 2, 3].map(g => `<option value="${g}"${+f.grp === g ? ' selected' : ''}>${TR_GRP[g]}</option>`).join('')}</select></label>
       <label class="chk"><input id="trf-baza" type="checkbox"${f.baza ? ' checked' : ''}> Baza – tu zaczynam i kończę dzień</label>
+      <label class="chk wide"><input id="trf-bio" type="checkbox"${bio ? ' checked' : ''}> Bioasekuracja – uwzględnij w kolejności objazdu</label>
+    </div>
+    <div class="row tr-bio" id="trf-biobox"${bio ? '' : ' hidden'}>
+      <label>Wiek stada (dni)<input id="trf-wiek" type="number" min="0" max="800" step="1" inputmode="numeric" value="${wiek != null ? wiek : ''}" placeholder="np. 14"><span class="hint" id="trf-wiek-h">${f.wyl ? 'wylęg/wstawienie ' + esc(f.wyl) + ' – wiek liczy się sam' : 'wiek będzie się liczył sam z każdym dniem'}</span></label>
+      <label class="chk"><input id="trf-chor" type="checkbox"${chor ? ' checked' : ''}> Choroba w stadzie</label>
+      <label class="wide" id="trf-chorbox"${chor ? '' : ' hidden'}>Jaka choroba / objawy<input id="trf-chorn" type="text" value="${esc(f.chorN || '')}" placeholder="np. objawy oddechowe, biegunka"><span class="hint">Stado chore zawsze na końcu trasy. Przy podejrzeniu choroby zwalczanej z urzędu (grypa ptaków, rzekomy pomór) – nie wjeżdżaj, zgłoś do powiatowego lekarza weterynarii.</span></label>
+      <p class="note wide">Kolejność: najpierw stada najmłodsze (do 7 dni, do 3 tyg., do 6 tyg., starsze), stada chore na końcu. Fermy bez zaznaczonej bioasekuracji aplikacja wstawia tam, gdzie wychodzi najkrócej.</p>
     </div>
     <div class="tools"><button class="btn" type="button" data-tr="zapisz" data-id="${nowa ? '' : f.id}">Zapisz fermę</button><button class="btn ghost" type="button" data-tr="form-x">Anuluj</button></div>`;
+  const tg = () => { $('trf-biobox').hidden = !$('trf-bio').checked; $('trf-chorbox').hidden = !$('trf-chor').checked; };
+  $('trf-bio').onchange = () => { tg(); if($('trf-bio').checked && $('trf-wiek').value === ''){ const w = trWylZProgramu($('trf-n').value); if(w){ const d = Math.floor((Date.parse(todayISO()) - Date.parse(w)) / 864e5); if(d >= 0){ $('trf-wiek').value = d; $('trf-wiek-h').textContent = 'z zakładki Program: wylęg ' + w; } } } };
+  $('trf-chor').onchange = tg;
   $('tr-form').scrollIntoView({behavior:'smooth', block:'center'});
 }
 function trZapiszForm(id){
@@ -5713,7 +5737,10 @@ function trZapiszForm(id){
   if(!n){ toast('Wpisz nazwę fermy.'); return; }
   let f = id && d.fermy.find(x => x.id === id);
   if(!f){ if(!trPickData){ toast('Najpierw wskaż punkt na mapie.'); return; } f = {id:uid(), la:+trPickData.la.toFixed(6), lo:+trPickData.lo.toFixed(6), t:Date.now()}; d.fermy.push(f); }
-  Object.assign(f, {n, adr:$('trf-adr').value.trim(), uw:$('trf-uw').value.trim(), czas:Math.max(0, +$('trf-czas').value || 0), grp:+$('trf-grp').value || 2, baza:$('trf-baza').checked});
+  Object.assign(f, {n, adr:$('trf-adr').value.trim(), uw:$('trf-uw').value.trim(), czas:Math.max(0, +$('trf-czas').value || 0), baza:$('trf-baza').checked});
+  delete f.grp; f.bio = $('trf-bio').checked; f.chor = f.bio && $('trf-chor').checked; f.chorN = f.chor ? $('trf-chorn').value.trim() : '';
+  const wk = $('trf-wiek').value.trim();
+  if(f.bio && wk !== '' && isFinite(+wk) && +wk >= 0){ const d = new Date(Date.parse(todayISO()) - Math.round(+wk) * 864e5); f.wyl = d.toISOString().slice(0, 10); } else if(!f.bio || wk === '') delete f.wyl;
   if(f.baza) d.fermy.forEach(x => { if(x !== f) x.baza = false; });
   d.fermy.sort((a, b) => a.n.localeCompare(b.n, 'pl'));
   delete d.plan.wynik; trSet(d);
@@ -5725,7 +5752,7 @@ function trListaFerm(){
   $('tr-count').textContent = d.fermy.length;
   if(!d.fermy.length){ $('tr-fermy').innerHTML = '<p class="note">Brak zapisanych ferm. Wyszukaj adres albo stuknij mapę, wskaż dokładne miejsce i stuknij „Zapisz jako fermę”.</p>'; return; }
   $('tr-fermy').innerHTML = d.fermy.map(f => `<div class="tr-f" data-id="${f.id}">
-      <div class="tr-fh"><b>${esc(f.n)}</b>${f.baza ? '<span class="pill">baza</span>' : ''}${+f.grp !== 2 ? `<span class="pill g${f.grp}">${f.grp === 1 ? 'najpierw' : 'na koniec'}</span>` : ''}</div>
+      <div class="tr-fh"><b>${esc(f.n)}</b>${f.baza ? '<span class="pill">baza</span>' : ''}${trRanga(f) === 9 ? '<span class="pill g3">chore</span>' : trRanga(f) != null ? `<span class="pill g1">${trWiek(f) != null ? trWiek(f) + ' dni' : 'bioasekuracja'}</span>` : ''}</div>
       <div class="note">${esc(f.adr || '')}${f.uw ? ' · <i>' + esc(f.uw) + '</i>' : ''} · ${isNum(f.czas) ? f.czas : 60} min na fermie</div>
       <div class="tools"><button class="btn small ghost" type="button" data-tr="pokaz">Pokaż</button><button class="btn small ghost" type="button" data-tr="punkt">Popraw punkt</button><button class="btn small ghost" type="button" data-tr="edytuj">Edytuj</button><a class="btn small ghost" href="${trNav(f.la, f.lo)}" target="_blank" rel="noopener">Nawiguj</a><button class="btn small danger" type="button" data-tr="usun">Usuń</button></div>
     </div>`).join('');
@@ -5740,7 +5767,7 @@ function trPlanUI(){
   $('tr-kon').innerHTML = opt('powrot', 'Powrót do startu', p.kon) + opt('ostatnia', 'Kończę na ostatniej fermie', p.kon) + d.fermy.map(f => opt(f.id, 'Koniec: ' + f.n, p.kon)).join('');
   if(p.start !== 'gps' && !ids.has(p.start)) $('tr-start').value = 'gps';
   $('tr-odj').value = p.odj || '07:00'; $('tr-przerwa').value = isNum(p.przerwa) ? p.przerwa : 10;
-  $('tr-sel').innerHTML = d.fermy.length ? d.fermy.map(f => `<label class="chk"><input type="checkbox" data-sel="${f.id}"${p.sel.includes(f.id) ? ' checked' : ''}> ${esc(f.n)} <small class="note">${isNum(f.czas) ? f.czas : 60} min${+f.grp !== 2 ? ' · ' + (f.grp === 1 ? 'najpierw' : 'na koniec') : ''}</small></label>`).join('') : '<p class="note">Najpierw zapisz fermy.</p>';
+  $('tr-sel').innerHTML = d.fermy.length ? d.fermy.map(f => `<label class="chk"><input type="checkbox" data-sel="${f.id}"${p.sel.includes(f.id) ? ' checked' : ''}> ${esc(f.n)} <small class="note">${isNum(f.czas) ? f.czas : 60} min${trBioOpis(f) ? ' · ' + esc(trBioOpis(f)) : ''}</small></label>`).join('') : '<p class="note">Najpierw zapisz fermy.</p>';
   trWynikUI();
 }
 function trPlanZapisz(){
@@ -5762,14 +5789,19 @@ async function trMacierz(P){
   } catch(e){ const D = [], T = []; for(let i = 0; i < n; i++){ D.push([]); T.push([]); for(let k = 0; k < n; k++){ const m = i === k ? 0 : trOdl(P[i], P[k]) * 1.3; D[i].push(m); T[i].push(m / 13.9); } } return {d:D, s:T, prosta:true}; }
 }
 // pętla 0 → wszystkie → 0 o najmniejszym koszcie; do 12 węzłów dokładnie (Held–Karp), więcej – heurystyka z poprawkami
-function trKomiwojazer(K){
+// rg[i] – ranga bioasekuracji węzła (null = bez ograniczeń); węzeł o wyższej randze nie może wystąpić przed węzłem o niższej
+function trKomiwojazer(K, rg){
   const n = K.length; if(n <= 2) return [...Array(n).keys()];
-  const dl = t => { let c = 0; for(let i = 0; i < t.length; i++) c += K[t[i]][t[(i + 1) % t.length]]; return c; };
+  rg = rg || [];
+  const kara = t => { let c = 0, mx = -Infinity; for(let i = 1; i < t.length; i++){ const r = rg[t[i]]; if(r == null) continue; if(r < mx) c += 1e9 * (mx - r); else mx = r; } return c; };
+  const dl = t => { let c = kara(t); for(let i = 0; i < t.length; i++) c += K[t[i]][t[(i + 1) % t.length]]; return c; };
   if(n <= 12){
     const m = n - 1, F = 1 << m, dp = new Float64Array(F * m).fill(Infinity), pr = new Int16Array(F * m).fill(-1);
-    for(let j = 0; j < m; j++) dp[(1 << j) * m + j] = K[0][j + 1];
+    // wymagani poprzednicy: wszystkie węzły o niższej randze
+    const req = new Int32Array(m); for(let k = 0; k < m; k++){ const r = rg[k + 1]; if(r == null) continue; for(let j = 0; j < m; j++) if(rg[j + 1] != null && rg[j + 1] < r) req[k] |= 1 << j; }
+    for(let j = 0; j < m; j++) if(!req[j]) dp[(1 << j) * m + j] = K[0][j + 1];
     for(let s = 1; s < F; s++) for(let j = 0; j < m; j++){ const v = dp[s * m + j]; if(!(s & (1 << j)) || v === Infinity) continue;
-      for(let k = 0; k < m; k++){ if(s & (1 << k)) continue; const s2 = s | (1 << k), c = v + K[j + 1][k + 1]; if(c < dp[s2 * m + k]){ dp[s2 * m + k] = c; pr[s2 * m + k] = j; } } }
+      for(let k = 0; k < m; k++){ if(s & (1 << k) || (req[k] & s) !== req[k]) continue; const s2 = s | (1 << k), c = v + K[j + 1][k + 1]; if(c < dp[s2 * m + k]){ dp[s2 * m + k] = c; pr[s2 * m + k] = j; } } }
     let best = Infinity, last = -1; for(let j = 0; j < m; j++){ const c = dp[(F - 1) * m + j] + K[j + 1][0]; if(c < best){ best = c; last = j; } }
     const t = []; let s = F - 1, j = last; while(j >= 0){ t.push(j + 1); const p = pr[s * m + j]; s ^= 1 << j; j = p; } return [0].concat(t.reverse());
   }
@@ -5780,8 +5812,10 @@ function trKomiwojazer(K){
         for(let k = 1; k <= res.length; k++){ if(k === i) continue; const u = res.slice(0, k).concat(seg, res.slice(k)), cu = dl(u); if(cu < c - 1e-6){ t = u; c = cu; lep = true; break; } } } }
     return [t, c]; };
   let naj = null, najC = Infinity; const st = Math.min(n - 1, 12);
+  // start heurystyki: tylko węzły dozwolone (wszyscy wymagani poprzednicy odwiedzeni)
+  const wolno = (uz, k) => { const r = rg[k]; if(r == null) return true; for(let j = 1; j < n; j++) if(!uz[j] && rg[j] != null && rg[j] < r) return false; return true; };
   for(let s = 0; s < st; s++){ const uz = new Uint8Array(n); uz[0] = 1; const t = [0]; let a = 1 + Math.floor(s * (n - 1) / st); t.push(a); uz[a] = 1;
-    for(let q = 2; q < n; q++){ let b = -1, bc = Infinity; for(let k = 1; k < n; k++) if(!uz[k] && K[a][k] < bc){ bc = K[a][k]; b = k; } t.push(b); uz[b] = 1; a = b; }
+    for(let q = 2; q < n; q++){ let b = -1, bc = Infinity; for(let k = 1; k < n; k++) if(!uz[k] && wolno(uz, k) && K[a][k] < bc){ bc = K[a][k]; b = k; } if(b < 0) for(let k = 1; k < n; k++) if(!uz[k]){ b = k; break; } t.push(b); uz[b] = 1; a = b; }
     const [t2, c2] = popraw(t); if(c2 < najC){ najC = c2; naj = t2; } }
   return naj;
 }
@@ -5802,13 +5836,13 @@ async function trUluz(){
     btn.textContent = lista.length > 11 ? `Liczę trasę (${lista.length} ferm)…` : 'Liczę trasę…';
     const M = await trMacierz(P);
     // koszt: czas jazdy + kilometry (1 km ≈ 30 s); bioasekuracja: zakaz przejazdu z grupy późniejszej do wcześniejszej
-    const grp = [0].concat(lista.map(f => +f.grp || 2), endF ? [4] : []);
-    const K = []; for(let i = 0; i < n; i++){ K.push(new Float64Array(n)); for(let k = 0; k < n; k++) K[i][k] = M.s[i][k] + M.d[i][k] * 0.03 + (i && k && grp[i] > grp[k] ? 1e7 * (grp[i] - grp[k]) : 0); }
+    const rg = [null].concat(lista.map(trRanga), endF ? [null] : []);
+    const K = []; for(let i = 0; i < n; i++){ K.push(new Float64Array(n)); for(let k = 0; k < n; k++) K[i][k] = M.s[i][k] + M.d[i][k] * 0.03; }
     if(endF){ for(let j = 1; j < n; j++) K[iE][j] = 1e9; K[iE][0] = 0; }
     if(p.kon === 'ostatnia') for(let j = 1; j < n; j++) K[j][0] = 0;
     else if(!endF) for(let j = 1; j < n; j++) K[j][0] = M.s[j][0] + M.d[j][0] * 0.03;
     await new Promise(r => setTimeout(r, 30));
-    const t = trKomiwojazer(K);
+    const t = trKomiwojazer(K, rg);
     const jedz = p.kon === 'powrot' ? n : n - 1;
     const sumy = kol => { let m = 0, s = 0; for(let i = 0; i < jedz; i++){ const a = kol[i], b = kol[(i + 1) % n]; m += M.d[a][b]; s += M.s[a][b]; } return {m, s}; };
     const kolWej = [...Array(n).keys()], przed = sumy(kolWej), po = sumy(t);
@@ -5817,10 +5851,10 @@ async function trUluz(){
     const stopy = [];
     for(let i = 1; i < n; i++){ const a = t[i - 1], b = t[i]; zeg += M.s[a][b] / 60;
       const f = b === iE ? endF : lista[b - 1], czas = b === iE ? 0 : (isNum(f.czas) ? f.czas : 60);
-      stopy.push({id:f.id, n:f.n, la:f.la, lo:f.lo, m:M.d[a][b], s:M.s[a][b], przy:zeg, odj:zeg + czas, czas, koniec:b === iE});
+      stopy.push({id:f.id, n:f.n, la:f.la, lo:f.lo, bio:b === iE ? '' : trBioOpis(f), m:M.d[a][b], s:M.s[a][b], przy:zeg, odj:zeg + czas, czas, koniec:b === iE});
       zeg += czas + (b === iE || i === n - 1 ? 0 : p.przerwa); }
     let powrot = null; if(p.kon === 'powrot'){ const a = t[n - 1]; zeg += M.s[a][0] / 60; powrot = {m:M.d[a][0], s:M.s[a][0], przy:zeg}; }
-    const grpZle = lista.some(f => +f.grp !== 2);
+    const grpZle = lista.some(f => trRanga(f) != null);
     p.wynik = {kol:stopy.map(s => s.id), stopy, powrot, start:[+start[0].toFixed(6), +start[1].toFixed(6)], startN, odj:p.odj, m:po.m, s:po.s, przed, prosta:M.prosta, przerwa:p.przerwa, bio:grpZle, t:Date.now(), koniecZeg:zeg};
     trSet(d); opFeat('trasa');
     // przebieg po drogach na mapę
@@ -5847,8 +5881,8 @@ function trWynikUI(){
   const zysk = w.przed && w.przed.s - w.s > 60 ? `<span class="note"> · oszczędność ${trCz(w.przed.s - w.s)} i ${trKm(Math.max(0, w.przed.m - w.m))} wobec kolejności z listy</span>` : '';
   const linki = trLinki(w);
   box.innerHTML = `<div class="card-h"><h3>Trasa: ${w.stopy.length} ${w.stopy.length === 1 ? 'ferma' : 'ferm'}</h3><span class="mono">${trKm(w.m)} · ${trCz(w.s)} jazdy</span></div>
-    <p class="note">Start ${esc(w.startN)} o ${esc(w.odj)} · koniec ok. ${trHM(w.koniecZeg)}${zysk}${w.prosta ? '<br><b>Bez połączenia z serwerem tras – odległości w linii prostej ×1,3, czasy orientacyjne.</b>' : ''}${w.bio ? '<br>Kolejność bioasekuracji zachowana: najpierw stada młode / zdrowe, na koniec chore / starsze.' : ''}</p>
-    <ol class="tr-stopy">${w.stopy.map((s, i) => `<li><div><b>${esc(s.n)}</b>${s.koniec ? ' <span class="pill">koniec</span>' : ''}<span class="note">przyjazd ${trHM(s.przy)}${s.czas ? ' · wyjazd ' + trHM(s.odj) : ''} · ${trKm(s.m)}, ${trCz(s.s)} jazdy</span></div>
+    <p class="note">Start ${esc(w.startN)} o ${esc(w.odj)} · koniec ok. ${trHM(w.koniecZeg)}${zysk}${w.prosta ? '<br><b>Bez połączenia z serwerem tras – odległości w linii prostej ×1,3, czasy orientacyjne.</b>' : ''}${w.bio ? '<br>Bioasekuracja zachowana: najpierw stada najmłodsze, potem starsze, chore na końcu.' : ''}</p>
+    <ol class="tr-stopy">${w.stopy.map((s, i) => `<li><div><b>${esc(s.n)}</b>${s.koniec ? ' <span class="pill">koniec</span>' : ''}${s.bio ? `<span class="note tr-bion">${esc(s.bio)}</span>` : ''}<span class="note">przyjazd ${trHM(s.przy)}${s.czas ? ' · wyjazd ' + trHM(s.odj) : ''} · ${trKm(s.m)}, ${trCz(s.s)} jazdy</span></div>
       <a class="btn small ghost" href="${trNav(s.la, s.lo)}" target="_blank" rel="noopener">Nawiguj</a></li>`).join('')}
       ${w.powrot ? `<li class="pow"><div><b>Powrót: ${esc(w.startN)}</b><span class="note">ok. ${trHM(w.powrot.przy)} · ${trKm(w.powrot.m)}, ${trCz(w.powrot.s)} jazdy</span></div></li>` : ''}</ol>
     <div class="tools">${linki.map((u, i) => `<a class="btn small" href="${u}" target="_blank" rel="noopener">${linki.length > 1 ? 'Google Maps – część ' + (i + 1) : 'Cała trasa w Google Maps'}</a>`).join('')}</div>

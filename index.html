@@ -534,6 +534,40 @@ html,body{overscroll-behavior-y:none}
 .brandrow h1 .mark{place-items:end start;padding:0 0 5px 4px;box-sizing:border-box}
 .brandrow h1 .mark svg:not(.mk-star){width:23px}
 .brandrow h1 .mark svg.mk-star{position:absolute;top:3px;right:3px;width:10px;height:10px}
+
+/* ---------- Trasa ---------- */
+.tr-search{display:flex;gap:8px}
+.tr-search input{flex:1;min-width:0;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.tr-res{display:grid;gap:6px}
+.tr-r{display:grid;text-align:left;gap:2px;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);cursor:pointer}
+.tr-r small{color:var(--muted);font-size:.78rem}
+.tr-mapbox{position:relative;isolation:isolate;z-index:0}
+.tr-map{height:min(56vh,420px);min-height:260px;border-radius:10px;border:1px solid var(--line);overflow:hidden;background:var(--surface-2);z-index:0}
+.tr-off{padding:16px}
+.tr-lay{position:absolute;right:8px;top:8px;z-index:500;background:var(--surface);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.tr-lay button{font:inherit;font-size:.78rem;font-weight:600;border:0;background:transparent;color:var(--muted);padding:6px 10px;cursor:pointer;border-radius:8px}
+.tr-lay button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+.tr-pick{display:grid;gap:8px;padding:10px 12px;border:1px solid var(--brand);border-radius:10px;background:var(--brand-soft)}
+.tr-pk{display:grid;gap:2px}
+.tr-form{display:grid;gap:10px;padding:12px;border:1px dashed var(--line);border-radius:10px}
+.tr-form h3{margin:0}
+label.chk{display:flex;align-items:center;gap:8px;font-weight:500}
+.tr-fermy,.tr-sel{display:grid;gap:8px}
+.tr-f{display:grid;gap:4px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.tr-fh{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pill.g1{background:var(--brand-soft);color:var(--brand)}
+.pill.g3{background:var(--bad-soft);color:var(--bad)}
+.tr-wynik{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.tr-wynik h3{margin:0}
+.tr-stopy{margin:0;padding-left:22px;display:grid;gap:8px}
+.tr-stopy li{display:flex;gap:8px;justify-content:space-between;align-items:center}
+.tr-stopy li > div{display:grid;gap:2px;min-width:0}
+.tr-stopy li.pow{list-style:none;margin-left:-22px;padding-left:22px;border-top:1px dashed var(--line);padding-top:6px}
+.tr-mk{position:relative;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#23553e;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35);display:grid;place-items:center;color:#fff;font:700 11px/1 var(--f-mono,monospace)}
+.tr-mk.nr{width:24px;height:24px;background:#1C6FD1}
+.tr-mk.baza{background:#E39A3B}
+.tr-mk.st{background:#16201a;width:22px;height:22px}
+.tr-mk.pick{width:26px;height:26px;background:#E39A3B;border-width:3px;box-shadow:0 0 0 6px rgba(227,154,59,.3)}
 </style>
 </head>
 <body>
@@ -674,6 +708,7 @@ html,body{overscroll-behavior-y:none}
       <a href="#raporty" data-tab="raporty">Raporty <span class="pill" id="rep-count">0</span></a>
       <a href="#zmiany" data-tab="zmiany">Zmiany <span class="pill" id="mod-count">0</span></a>
       <a href="#program" data-tab="program">Program <span class="pill" id="prog-count" hidden>0</span></a>
+      <a href="#trasa" data-tab="trasa">Trasa</a>
       <a href="#szczepionki" data-tab="szczepionki">Szczepionki</a>
     </nav>
   </div>
@@ -1042,6 +1077,36 @@ html,body{overscroll-behavior-y:none}
   </div>
   <div id="pg-today"></div>
   <div id="pg-list" class="stack"></div>
+</section>
+
+<section class="view" id="v-trasa" hidden>
+  <div class="card">
+    <h2>Trasa</h2>
+    <p class="note">Znajdź adres fermy, wskaż na mapie dokładne miejsce – np. bramę wjazdową, a nie środek działki – i zapisz fermę w bazie. Potem zaznacz fermy na dany dzień, a aplikacja ułoży najkrótszą trasę objazdu z godzinami przyjazdu. Adresy: rejestr adresów GUGiK (zapasowo OpenStreetMap). Mapa i trasy wymagają internetu; baza ferm zostaje w telefonie (i w kopii raportów).</p>
+    <div class="tr-search"><input id="tr-q" type="search" placeholder="np. Strzała, Krótka 24 albo 08-110 Siedlce, Sienkiewicza 5" autocomplete="off" enterkeyhint="search"><button class="btn" type="button" id="tr-szukaj">Szukaj</button></div>
+    <div id="tr-res" class="tr-res"></div>
+    <div class="tr-mapbox"><div id="tr-map" class="tr-map"></div>
+      <div class="seg tr-lay" id="tr-lay" role="group" aria-label="Podkład mapy"><button type="button" data-l="mapa" aria-pressed="true">Mapa</button><button type="button" data-l="orto" aria-pressed="false">Zdjęcie lotnicze</button></div></div>
+    <div id="tr-pick" class="tr-pick" hidden></div>
+    <div id="tr-form" class="tr-form" hidden></div>
+  </div>
+  <div class="card">
+    <div class="card-h"><h2>Fermy <span class="pill" id="tr-count">0</span></h2></div>
+    <div id="tr-fermy" class="tr-fermy"></div>
+  </div>
+  <div class="card">
+    <h2>Plan objazdu</h2>
+    <p class="note">Zaznacz fermy na ten dzień. Do 12 ferm aplikacja znajdzie najlepszą możliwą kolejność, przy większej liczbie – bardzo dobrą. Kolejność bioasekuracji z karty fermy jest zawsze zachowana: najpierw stada młode i zdrowe, na koniec chore i starsze.</p>
+    <div id="tr-sel" class="tr-sel"></div>
+    <div class="row">
+      <label>Start<select id="tr-start"></select></label>
+      <label>Koniec<select id="tr-kon"></select></label>
+      <label>Wyjazd o<input id="tr-odj" type="time" value="07:00"></label>
+      <label>Przerwa między fermami (min)<input id="tr-przerwa" type="number" min="0" step="5" inputmode="numeric" value="10"><span class="hint">przebranie, dezynfekcja</span></label>
+    </div>
+    <div class="tools"><button class="btn" type="button" id="tr-go">Ułóż trasę</button></div>
+    <div id="tr-wynik" class="tr-wynik" hidden></div>
+  </div>
 </section>
 
 <!-- ============ RAPORTY ============ -->
@@ -2233,7 +2298,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.43.2';
+const APP_VERSION = '1.44.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -5091,7 +5156,7 @@ function opInit(){
 }
 
 /* ---------- Nawigacja i start ---------- */
-const TABS = ['obliczenia','raporty','zmiany','program','szczepionki','info'];
+const TABS = ['obliczenia','raporty','zmiany','program','trasa','szczepionki','info'];
 function showTab(t){
   if(!TABS.includes(t)) t = 'obliczenia';
   TABS.forEach(x => { $('v-' + x).hidden = x !== t; });
@@ -5099,6 +5164,7 @@ function showTab(t){
   if(t === 'raporty') renderReports();
   if(t === 'zmiany') renderMods();
   if(t === 'program') renderProgram();
+  if(t === 'trasa') renderTrasa();
   if(t === 'szczepionki'){ renderKnowledge(); renderRules(); }
   if(t === 'info') renderInfo();
   window.scrollTo({top:0});
@@ -5312,14 +5378,15 @@ function bkNag(){
     <span class="tools"><button class="btn small" type="button" data-bk="now">Zapisz kopię teraz</button><button class="btn small ghost" type="button" data-bk="later">Za tydzień</button></span>`;
 }
 function exportBackup(){
-  const n = Object.keys(S.reps).length + Object.keys(S.mods).length + Object.keys(S.farms).length + progGet().flocks.length;
+  const n = Object.keys(S.reps).length + Object.keys(S.mods).length + Object.keys(S.farms).length + progGet().flocks.length + trGet().fermy.length;
   if(!n){ toast('Brak danych do zapisania.'); return; }
   lsSet(BKP_KEY, {t:Date.now()}); setTimeout(bkNag, 50); opFeat('kopia');
-  downloadFile(`liczydlo-kopia-${todayISO()}.json`, JSON.stringify({app:'Liczydło WET', wersja:APP_VERSION, zapisano:new Date().toISOString(), raporty:S.reps, modyfikacje:S.mods, ustawienia:S.farms, program:progGet()}, null, 1), 'application/json');
+  downloadFile(`liczydlo-kopia-${todayISO()}.json`, JSON.stringify({app:'Liczydło WET', wersja:APP_VERSION, zapisano:new Date().toISOString(), raporty:S.reps, modyfikacje:S.mods, ustawienia:S.farms, program:progGet(), trasa:trGet()}, null, 1), 'application/json');
 }
 async function importBackup(file){
   let j; try { j = JSON.parse(await file.text()); } catch(e){ toast('To nie jest plik kopii Liczydła.'); return; }
   const groups = ['raporty', 'modyfikacje', 'ustawienia'].filter(k => j && j[k] && typeof j[k] === 'object');
+  if(j && j.trasa && Array.isArray(j.trasa.fermy)){ const t = trGet(), have = new Set(t.fermy.map(f => f.id)); j.trasa.fermy.forEach(f => { if(f && f.id && !have.has(f.id) && isFinite(f.la) && isFinite(f.lo)) t.fermy.push(f); }); trSet(t); }
   let pn = 0; if(j && j.program && Array.isArray(j.program.flocks)){ const p = progGet(), have = new Set(p.flocks.map(f => f.id)); j.program.flocks.forEach(f => { if(f && f.id && !have.has(f.id) && Array.isArray(f.items)){ p.flocks.push(f); pn++; } }); if(pn) progSet(p); }
   if(!groups.length && !pn){ toast('Plik nie zawiera danych Liczydła.'); return; }
   const have = Object.assign({}, S.reps, S.mods, S.farms); let n = 0;
@@ -5498,6 +5565,334 @@ function renderInfo(){
   if(!IN_ARTIFACT) fetchVersion().then(j => { if(j.zmiany && j.zmiany.length) $('i-changes').innerHTML = `<h3>Ostatnia zmiana (wersja ${esc(j.wersja)})</h3><p class="note">${esc(j.zmiany[0])}</p>`
     + (j.zmiany.length > 1 ? `<details class="chlog"><summary>Spis zmian w wersjach</summary><ul class="list">${j.zmiany.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : ''); }).catch(() => {});
 }
+
+
+/* ================= TRASA – adresy ferm, dokładne punkty i plan objazdu =================
+   Okrojona wersja Terra Incognita APP: wyszukiwanie adresu (rejestr adresów GUGiK – UUG, zapasowo OpenStreetMap),
+   podgląd na mapie (Leaflet z cdnjs, mapa OpenStreetMap albo ortofotomapa Geoportalu), baza ferm z dokładnym punktem
+   (np. brama wjazdowa, nie środek działki) i optymalizacja kolejności objazdu po drogach (OSRM, dane OpenStreetMap):
+   do 12 ferm – kolejność najlepsza możliwa (Held–Karp), więcej – najlepszy z wielu przebiegów heurystyki z poprawkami.
+   Kolejność bioasekuracji (najpierw stada młode/zdrowe, na koniec chore/starsze) jest twardym warunkiem.
+   Zapis lokalny: liczydlo.trasa.v1 (i w kopii raportów). */
+const TR_KEY = 'liczydlo.trasa.v1';
+const TR_UUG = 'https://services.gugik.gov.pl/uug/', TR_OSRM = 'https://router.project-osrm.org/';
+const TR_GRP = {1:'najpierw – stada młode / zdrowe', 2:'zwykła kolejność', 3:'na koniec – stada chore / starsze'};
+let trMap = null, trBase = null, trOrto = null, trPick = null, trPickData = null, trLayer = null, trEdit = null, trLoading = null;
+
+function trGet(){ const d = lsGet(TR_KEY); const o = d && typeof d === 'object' ? d : {}; if(!Array.isArray(o.fermy)) o.fermy = []; if(!o.plan) o.plan = {sel:[], start:'gps', kon:'powrot', odj:'07:00', przerwa:10}; return o; }
+function trSet(d){ lsSet(TR_KEY, d); }
+const trOdl = (a, b) => { const R = 6371000, r = Math.PI / 180, dla = (b[0]-a[0])*r, dlo = (b[1]-a[1])*r; return 2*R*Math.asin(Math.sqrt(Math.sin(dla/2)**2 + Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dlo/2)**2)); };
+const trKm = m => m >= 1000 ? fmt(m / 1000, m < 10000 ? 1 : 0) + ' km' : Math.round(m) + ' m';
+const trCz = s => { const m = Math.round(s / 60); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0') + ' min'; };
+const trHM = min => { const m = ((Math.round(min) % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+const trNav = (la, lo) => 'https://www.google.com/maps/dir/?api=1&destination=' + la.toFixed(6) + ',' + lo.toFixed(6) + '&travelmode=driving';
+
+/* ---------- Leaflet na żądanie (tylko po otwarciu zakładki) ---------- */
+function trLeaflet(){
+  if(window.L && window.L.map) return Promise.resolve();
+  if(trLoading) return trLoading;
+  trLoading = new Promise((ok, er) => {
+    const c = document.createElement('link'); c.rel = 'stylesheet'; c.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'; document.head.appendChild(c);
+    const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    s.onload = () => ok(); s.onerror = () => { trLoading = null; er(new Error('leaflet')); }; document.head.appendChild(s);
+  });
+  return trLoading;
+}
+
+/* ---------- adresy (GUGiK UUG, zapasowo OpenStreetMap) ---------- */
+// „Strzała ul. Krótka 24”, „08-110 Siedlce al. Sienkiewicza 5”, „Mokobody 12, pow. siedlecki” – skróty i kod/powiat do zawężenia wyników
+function trRozbierz(q){
+  let t = ' ' + String(q || '').replace(/\s+/g, ' ').trim() + ' '; const filtr = [];
+  const wytnij = re => { t = t.replace(re, (m, x) => { if(x) filtr.push(x.trim().toLowerCase()); return ' , '; }); };
+  wytnij(/[ ,](?:powiat\s+|pow\.\s*)([^\s,]+)/gi); wytnij(/[ ,](?:gmina\s+|gm\.\s*)([^\s,]+)/gi); wytnij(/[ ,](?:województwo\s+|woj\.\s*)([^\s,]+)/gi);
+  t = t.replace(/[ ,](\d{2}-\d{3})(?=[ ,])/g, (m, k) => { filtr.push(k); return ' , '; });
+  t = t.replace(/[ ,](?:ul\.?|ulica|al\.?|aleja|aleje|pl\.?|plac|os\.?|osiedle)(?=[\s.]|$)\.?\s*/gi, ' , ');
+  t = t.replace(/\s*,[\s,]*/g, ', ').replace(/^[\s,]+|[\s,]+$/g, '').replace(/,\s*(\d+[a-z]?(?:\/\d+)?)$/i, ' $1');
+  const cz = t.split(/,\s*/).filter(Boolean); if(cz.length > 2) t = cz[0] + ', ' + cz.slice(1).join(' ');
+  return {adres:t, filtr:filtr.map(f => f.replace(/(ki|ka|kie|cki|cka|ckie|ski|ska|skie)$/, '').slice(0, 7))};
+}
+async function trAdresy(q0){
+  const {adres:q, filtr} = trRozbierz(q0); let R = [];
+  try { const j = await fetch(TR_UUG + '?request=GetAddress&address=' + encodeURIComponent(q) + '&srid=4326').then(r => r.json());
+    R = Object.values(j.results || {}).map(a => ({la:+a.y, lo:+a.x, n:[a.city, a.citypart && a.citypart !== a.city ? a.citypart : '', [a.street, a.number].filter(Boolean).join(' ')].filter(Boolean).join(', '),
+      op:[a.code, String(a.jednostka || '').replace(/[{}]/g, '').split(',').slice(1).join(' · ')].filter(Boolean).join(' · ')})).filter(a => isFinite(a.la) && isFinite(a.lo)); } catch(e){}
+  if(!R.length){ try { const j = await fetch('https://nominatim.openstreetmap.org/search?format=json&countrycodes=pl&limit=8&accept-language=pl&q=' + encodeURIComponent(q + (filtr.length ? ' ' + filtr.join(' ') : ''))).then(r => r.json());
+    R = j.map(a => ({la:+a.lat, lo:+a.lon, n:a.display_name.split(',').slice(0, 3).join(','), op:a.display_name.split(',').slice(3).join(',').trim() + ' · OpenStreetMap'})); } catch(e){} }
+  if(filtr.length && R.length > 1){ const f = R.filter(a => filtr.every(x => (a.op + ' ' + a.n).toLowerCase().includes(x))); if(f.length) R = f; }
+  return R;
+}
+async function trAdresWPunkcie(la, lo){
+  let R = [];
+  try { const j = await fetch(TR_UUG + '?request=GetAddressReverse&location=' + encodeURIComponent('POINT(' + lo + ' ' + la + ')') + '&srid=4326').then(r => r.json());
+    R = Object.values(j.results || {}).map(a => { let x = +a.x, y = +a.y; const m = String(a.geometry_wkt || '').match(/POINT\(([-\d.]+) ([-\d.]+)\)/); if((!isFinite(x) || x > 180) && m){ x = +m[1]; y = +m[2]; }
+      return {la:y, lo:x, n:[a.city, [a.street, a.number].filter(Boolean).join(' ')].filter(Boolean).join(', ')}; }).filter(a => isFinite(a.la) && isFinite(a.lo) && a.la <= 90 && a.n); } catch(e){}
+  if(!R.length){ try { const a = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1&accept-language=pl&lat=' + la + '&lon=' + lo).then(r => r.json());
+    const d = a.address || {}, msc = d.city || d.town || d.village || d.hamlet || d.suburb || '';
+    if(a.lat && (d.house_number || d.road || msc)) R = [{la:+a.lat, lo:+a.lon, n:[msc, [d.road, d.house_number].filter(Boolean).join(' ')].filter(Boolean).join(', ')}]; } catch(e){} }
+  R.forEach(a => a.odl = trOdl([la, lo], [a.la, a.lo])); R.sort((a, b) => a.odl - b.odl); return R[0] || null;
+}
+
+/* ---------- mapa ---------- */
+const trIk = (t, kl) => L.divIcon({className:'', html:'<div class="tr-mk' + (kl ? ' ' + kl : '') + '">' + t + '</div>', iconSize:[0, 0]});
+async function trMapa(){
+  if(trMap){ setTimeout(() => trMap.invalidateSize(), 60); return true; }
+  try { await trLeaflet(); } catch(e){ $('tr-map').innerHTML = '<p class="note tr-off">Mapa wymaga internetu – nie udało się jej wczytać. Spróbuj ponownie po połączeniu.</p>'; return false; }
+  $('tr-map').innerHTML = '';
+  const d = trGet(), f0 = d.fermy[0];
+  trMap = L.map('tr-map', {zoomControl:true, maxZoom:20}).setView(f0 ? [f0.la, f0.lo] : [52.17, 22.28], f0 ? 13 : 9);
+  trBase = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:20, maxNativeZoom:19, attribution:'© OpenStreetMap'}).addTo(trMap);
+  trOrto = L.tileLayer.wms('https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/StandardResolution', {layers:'Raster', format:'image/jpeg', maxZoom:20, attribution:'Ortofotomapa © GUGiK'});
+  trLayer = L.layerGroup().addTo(trMap);
+  trMap.on('click', e => trWskaz(e.latlng.lat, e.latlng.lng, true));
+  trRysujFermy();
+  setTimeout(() => trMap.invalidateSize(), 60);
+  return true;
+}
+function trWarstwa(orto){
+  if(!trMap) return;
+  if(orto){ trMap.removeLayer(trBase); trOrto.addTo(trMap); } else { trMap.removeLayer(trOrto); trBase.addTo(trMap); }
+  document.querySelectorAll('#tr-lay button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.l === 'orto') === orto)));
+}
+function trRysujFermy(){
+  if(!trMap) return; trLayer.clearLayers();
+  const d = trGet(), w = d.plan.wynik, nr = {};
+  if(w && w.kol) w.kol.forEach((id, i) => nr[id] = i + 1);
+  d.fermy.forEach(f => { if(trEdit === f.id) return;
+    L.marker([f.la, f.lo], {icon:trIk(nr[f.id] || '', 'ferma' + (f.baza ? ' baza' : '') + (nr[f.id] ? ' nr' : '')), title:f.n, keyboard:false}).addTo(trLayer).on('click', () => trPokaz(f.id)); });
+  if(w && w.geo && w.geo.length > 1){ L.polyline(w.geo, {color:'#fff', weight:8, opacity:.85, interactive:false}).addTo(trLayer); L.polyline(w.geo, {color:'#1C6FD1', weight:5, opacity:.95, interactive:false}).addTo(trLayer); }
+  if(w && w.start && w.startN !== 'baza') L.marker(w.start, {icon:trIk('S', 'st'), keyboard:false, title:'Start'}).addTo(trLayer);
+}
+// wskazany punkt (wynik wyszukiwania albo stuknięcie mapy); podczas poprawiania fermy – nowy punkt fermy
+async function trWskaz(la, lo, zMapy, nazwa){
+  if(!trMap) return;
+  if(trPick) trMap.removeLayer(trPick);
+  trPick = L.marker([la, lo], {icon:trIk('', 'pick'), draggable:true, keyboard:false, zIndexOffset:900}).addTo(trMap);
+  trPick.on('dragend', () => { const p = trPick.getLatLng(); trWskaz(p.lat, p.lng, true); });
+  trPickData = {la, lo, n:nazwa || '', zMapy};
+  trKarta();
+  if(!nazwa){ const a = await trAdresWPunkcie(la, lo); if(trPickData && trPickData.la === la && trPickData.lo === lo){ trPickData.n = a ? a.n : ''; trPickData.odl = a ? a.odl : null; trKarta(); } }
+}
+function trKarta(){
+  const p = trPickData, box = $('tr-pick'); if(!p){ box.hidden = true; return; }
+  box.hidden = false;
+  const ed = trEdit && trGet().fermy.find(f => f.id === trEdit);
+  box.innerHTML = `<div class="tr-pk"><b>${ed ? 'Nowy punkt fermy „' + esc(ed.n) + '”' : 'Wskazany punkt'}</b>
+    <span>${p.n ? esc(p.n) + (p.zMapy && p.odl != null && p.odl > 40 ? ` <small>(najbliższy adres ${trKm(p.odl)} stąd)</small>` : '') : '<small>szukam adresu…</small>'}</span>
+    <small class="mono">${p.la.toFixed(6)}, ${p.lo.toFixed(6)}</small></div>
+    <div class="tools">${ed ? `<button class="btn small" type="button" data-tr="punkt-ok">Zapisz ten punkt</button><button class="btn small ghost" type="button" data-tr="punkt-anuluj">Anuluj</button>`
+      : `<button class="btn small" type="button" data-tr="nowa">Zapisz jako fermę</button>`}
+      <a class="btn small ghost" href="${trNav(p.la, p.lo)}" target="_blank" rel="noopener">Nawiguj</a></div>
+    <p class="note">Przeciągnij znacznik albo stuknij mapę, żeby wskazać dokładne miejsce – np. bramę wjazdową. Zdjęcie lotnicze pomaga trafić w wjazd.</p>`;
+}
+function trPokaz(id){
+  const f = trGet().fermy.find(x => x.id === id); if(!f || !trMap) return;
+  trMap.setView([f.la, f.lo], Math.max(trMap.getZoom(), 16));
+  L.popup({offset:[0, -6]}).setLatLng([f.la, f.lo]).setContent(`<b>${esc(f.n)}</b><br>${esc(f.adr || '')}${f.uw ? '<br><i>' + esc(f.uw) + '</i>' : ''}<br><a href="${trNav(f.la, f.lo)}" target="_blank" rel="noopener">Nawiguj</a>`).openOn(trMap);
+  $('tr-map').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* ---------- baza ferm ---------- */
+function trForm(f){
+  const d = trGet(), nowa = !f, p = trPickData;
+  f = f || {n:'', adr:p ? p.n : '', uw:'', czas:60, grp:2, baza:false};
+  $('tr-form').hidden = false;
+  $('tr-form').innerHTML = `<h3>${nowa ? 'Nowa ferma' : 'Ferma: ' + esc(f.n)}</h3>
+    <div class="row">
+      <label>Nazwa<input id="trf-n" type="text" value="${esc(f.n)}" list="farm-list" placeholder="np. Nowak, kurnik 2"></label>
+      <label>Adres<input id="trf-adr" type="text" value="${esc(f.adr || '')}" placeholder="miejscowość, ulica, numer"></label>
+      <label class="wide">Uwagi dla kierowcy<input id="trf-uw" type="text" value="${esc(f.uw || '')}" placeholder="np. wjazd od strony lasu, kod bramy, telefon"></label>
+      <label>Czas na fermie (min)<input id="trf-czas" type="number" min="0" step="5" inputmode="numeric" value="${isNum(f.czas) ? f.czas : 60}"><span class="hint">szczepienie z przygotowaniem</span></label>
+      <label>Kolejność bioasekuracji<select id="trf-grp">${[1, 2, 3].map(g => `<option value="${g}"${+f.grp === g ? ' selected' : ''}>${TR_GRP[g]}</option>`).join('')}</select></label>
+      <label class="chk"><input id="trf-baza" type="checkbox"${f.baza ? ' checked' : ''}> Baza – tu zaczynam i kończę dzień</label>
+    </div>
+    <div class="tools"><button class="btn" type="button" data-tr="zapisz" data-id="${nowa ? '' : f.id}">Zapisz fermę</button><button class="btn ghost" type="button" data-tr="form-x">Anuluj</button></div>`;
+  $('tr-form').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function trZapiszForm(id){
+  const d = trGet(), n = $('trf-n').value.trim();
+  if(!n){ toast('Wpisz nazwę fermy.'); return; }
+  let f = id && d.fermy.find(x => x.id === id);
+  if(!f){ if(!trPickData){ toast('Najpierw wskaż punkt na mapie.'); return; } f = {id:uid(), la:+trPickData.la.toFixed(6), lo:+trPickData.lo.toFixed(6), t:Date.now()}; d.fermy.push(f); }
+  Object.assign(f, {n, adr:$('trf-adr').value.trim(), uw:$('trf-uw').value.trim(), czas:Math.max(0, +$('trf-czas').value || 0), grp:+$('trf-grp').value || 2, baza:$('trf-baza').checked});
+  if(f.baza) d.fermy.forEach(x => { if(x !== f) x.baza = false; });
+  d.fermy.sort((a, b) => a.n.localeCompare(b.n, 'pl'));
+  delete d.plan.wynik; trSet(d);
+  $('tr-form').hidden = true; trPickData = null; if(trPick && trMap){ trMap.removeLayer(trPick); trPick = null; } trKarta();
+  opFeat('trasa'); toast('Zapisano fermę „' + n + '”.'); renderTrasa();
+}
+function trListaFerm(){
+  const d = trGet();
+  $('tr-count').textContent = d.fermy.length;
+  if(!d.fermy.length){ $('tr-fermy').innerHTML = '<p class="note">Brak zapisanych ferm. Wyszukaj adres albo stuknij mapę, wskaż dokładne miejsce i stuknij „Zapisz jako fermę”.</p>'; return; }
+  $('tr-fermy').innerHTML = d.fermy.map(f => `<div class="tr-f" data-id="${f.id}">
+      <div class="tr-fh"><b>${esc(f.n)}</b>${f.baza ? '<span class="pill">baza</span>' : ''}${+f.grp !== 2 ? `<span class="pill g${f.grp}">${f.grp === 1 ? 'najpierw' : 'na koniec'}</span>` : ''}</div>
+      <div class="note">${esc(f.adr || '')}${f.uw ? ' · <i>' + esc(f.uw) + '</i>' : ''} · ${isNum(f.czas) ? f.czas : 60} min na fermie</div>
+      <div class="tools"><button class="btn small ghost" type="button" data-tr="pokaz">Pokaż</button><button class="btn small ghost" type="button" data-tr="punkt">Popraw punkt</button><button class="btn small ghost" type="button" data-tr="edytuj">Edytuj</button><a class="btn small ghost" href="${trNav(f.la, f.lo)}" target="_blank" rel="noopener">Nawiguj</a><button class="btn small danger" type="button" data-tr="usun">Usuń</button></div>
+    </div>`).join('');
+}
+
+/* ---------- plan objazdu ---------- */
+function trPlanUI(){
+  const d = trGet(), p = d.plan, ids = new Set(d.fermy.map(f => f.id));
+  p.sel = (p.sel || []).filter(id => ids.has(id));
+  const opt = (v, t, s) => `<option value="${esc(v)}"${s === v ? ' selected' : ''}>${esc(t)}</option>`;
+  $('tr-start').innerHTML = opt('gps', 'Moja pozycja (GPS)', p.start) + d.fermy.map(f => opt(f.id, (f.baza ? 'Baza: ' : '') + f.n, p.start)).join('');
+  $('tr-kon').innerHTML = opt('powrot', 'Powrót do startu', p.kon) + opt('ostatnia', 'Kończę na ostatniej fermie', p.kon) + d.fermy.map(f => opt(f.id, 'Koniec: ' + f.n, p.kon)).join('');
+  if(p.start !== 'gps' && !ids.has(p.start)) $('tr-start').value = 'gps';
+  $('tr-odj').value = p.odj || '07:00'; $('tr-przerwa').value = isNum(p.przerwa) ? p.przerwa : 10;
+  $('tr-sel').innerHTML = d.fermy.length ? d.fermy.map(f => `<label class="chk"><input type="checkbox" data-sel="${f.id}"${p.sel.includes(f.id) ? ' checked' : ''}> ${esc(f.n)} <small class="note">${isNum(f.czas) ? f.czas : 60} min${+f.grp !== 2 ? ' · ' + (f.grp === 1 ? 'najpierw' : 'na koniec') : ''}</small></label>`).join('') : '<p class="note">Najpierw zapisz fermy.</p>';
+  trWynikUI();
+}
+function trPlanZapisz(){
+  const d = trGet(), p = d.plan;
+  p.sel = [...document.querySelectorAll('#tr-sel [data-sel]')].filter(c => c.checked).map(c => c.dataset.sel);
+  p.start = $('tr-start').value; p.kon = $('tr-kon').value; p.odj = $('tr-odj').value || '07:00';
+  p.przerwa = Math.max(0, +$('tr-przerwa').value || 0); trSet(d);
+}
+function trPozycja(){ return new Promise((ok, er) => { if(!navigator.geolocation){ er(new Error('brak')); return; }
+  navigator.geolocation.getCurrentPosition(p => ok([p.coords.latitude, p.coords.longitude]), er, {enableHighAccuracy:true, timeout:15000, maximumAge:60000}); }); }
+async function trMacierz(P){
+  const n = P.length;
+  try { const ac = new AbortController(), t = setTimeout(() => ac.abort(), 25000);
+    const r = await fetch(TR_OSRM + 'table/v1/driving/' + P.map(p => p[1].toFixed(6) + ',' + p[0].toFixed(6)).join(';') + '?annotations=duration,distance', {signal:ac.signal}); clearTimeout(t);
+    const j = await r.json(); if(j.code !== 'Ok') throw new Error(j.code);
+    const D = j.distances, T = j.durations;
+    for(let i = 0; i < n; i++) for(let k = 0; k < n; k++) if(i !== k && (D[i][k] == null || T[i][k] == null)){ const m = trOdl(P[i], P[k]) * 1.3; D[i][k] = m; T[i][k] = m / 13.9; }
+    return {d:D, s:T, prosta:false};
+  } catch(e){ const D = [], T = []; for(let i = 0; i < n; i++){ D.push([]); T.push([]); for(let k = 0; k < n; k++){ const m = i === k ? 0 : trOdl(P[i], P[k]) * 1.3; D[i].push(m); T[i].push(m / 13.9); } } return {d:D, s:T, prosta:true}; }
+}
+// pętla 0 → wszystkie → 0 o najmniejszym koszcie; do 12 węzłów dokładnie (Held–Karp), więcej – heurystyka z poprawkami
+function trKomiwojazer(K){
+  const n = K.length; if(n <= 2) return [...Array(n).keys()];
+  const dl = t => { let c = 0; for(let i = 0; i < t.length; i++) c += K[t[i]][t[(i + 1) % t.length]]; return c; };
+  if(n <= 12){
+    const m = n - 1, F = 1 << m, dp = new Float64Array(F * m).fill(Infinity), pr = new Int16Array(F * m).fill(-1);
+    for(let j = 0; j < m; j++) dp[(1 << j) * m + j] = K[0][j + 1];
+    for(let s = 1; s < F; s++) for(let j = 0; j < m; j++){ const v = dp[s * m + j]; if(!(s & (1 << j)) || v === Infinity) continue;
+      for(let k = 0; k < m; k++){ if(s & (1 << k)) continue; const s2 = s | (1 << k), c = v + K[j + 1][k + 1]; if(c < dp[s2 * m + k]){ dp[s2 * m + k] = c; pr[s2 * m + k] = j; } } }
+    let best = Infinity, last = -1; for(let j = 0; j < m; j++){ const c = dp[(F - 1) * m + j] + K[j + 1][0]; if(c < best){ best = c; last = j; } }
+    const t = []; let s = F - 1, j = last; while(j >= 0){ t.push(j + 1); const p = pr[s * m + j]; s ^= 1 << j; j = p; } return [0].concat(t.reverse());
+  }
+  const popraw = t => { let lep = true, c = dl(t);
+    while(lep){ lep = false;
+      for(let i = 1; i < n - 1; i++) for(let k = i + 1; k < n; k++){ const u = t.slice(0, i).concat(t.slice(i, k + 1).reverse(), t.slice(k + 1)), cu = dl(u); if(cu < c - 1e-6){ t = u; c = cu; lep = true; } }
+      for(let len = 1; len <= 3; len++) for(let i = 1; i + len <= n; i++){ const seg = t.slice(i, i + len), res = t.slice(0, i).concat(t.slice(i + len));
+        for(let k = 1; k <= res.length; k++){ if(k === i) continue; const u = res.slice(0, k).concat(seg, res.slice(k)), cu = dl(u); if(cu < c - 1e-6){ t = u; c = cu; lep = true; break; } } } }
+    return [t, c]; };
+  let naj = null, najC = Infinity; const st = Math.min(n - 1, 12);
+  for(let s = 0; s < st; s++){ const uz = new Uint8Array(n); uz[0] = 1; const t = [0]; let a = 1 + Math.floor(s * (n - 1) / st); t.push(a); uz[a] = 1;
+    for(let q = 2; q < n; q++){ let b = -1, bc = Infinity; for(let k = 1; k < n; k++) if(!uz[k] && K[a][k] < bc){ bc = K[a][k]; b = k; } t.push(b); uz[b] = 1; a = b; }
+    const [t2, c2] = popraw(t); if(c2 < najC){ najC = c2; naj = t2; } }
+  return naj;
+}
+async function trUluz(){
+  trPlanZapisz();
+  const d = trGet(), p = d.plan, F = p.sel.map(id => d.fermy.find(f => f.id === id)).filter(Boolean);
+  if(!F.length){ toast('Zaznacz fermy do objazdu.'); return; }
+  const btn = $('tr-go'); btn.disabled = true; btn.textContent = 'Liczę trasę…';
+  try {
+    let start, startN;
+    if(p.start === 'gps'){ btn.textContent = 'Ustalam Twoją pozycję…';
+      try { start = await trPozycja(); startN = 'Twoja pozycja'; }
+      catch(e){ toast('Nie udało się ustalić pozycji (GPS wyłączony albo brak zgody) – wybierz start z listy ferm.', 5000); return; } }
+    else { const s = d.fermy.find(f => f.id === p.start); start = [s.la, s.lo]; startN = s.n; }
+    const lista = F.filter(f => f.id !== p.start && f.id !== p.kon);
+    const endF = p.kon !== 'powrot' && p.kon !== 'ostatnia' ? d.fermy.find(f => f.id === p.kon) : null;
+    const P = [start].concat(lista.map(f => [f.la, f.lo]), endF ? [[endF.la, endF.lo]] : []), iE = endF ? P.length - 1 : -1, n = P.length;
+    btn.textContent = lista.length > 11 ? `Liczę trasę (${lista.length} ferm)…` : 'Liczę trasę…';
+    const M = await trMacierz(P);
+    // koszt: czas jazdy + kilometry (1 km ≈ 30 s); bioasekuracja: zakaz przejazdu z grupy późniejszej do wcześniejszej
+    const grp = [0].concat(lista.map(f => +f.grp || 2), endF ? [4] : []);
+    const K = []; for(let i = 0; i < n; i++){ K.push(new Float64Array(n)); for(let k = 0; k < n; k++) K[i][k] = M.s[i][k] + M.d[i][k] * 0.03 + (i && k && grp[i] > grp[k] ? 1e7 * (grp[i] - grp[k]) : 0); }
+    if(endF){ for(let j = 1; j < n; j++) K[iE][j] = 1e9; K[iE][0] = 0; }
+    if(p.kon === 'ostatnia') for(let j = 1; j < n; j++) K[j][0] = 0;
+    else if(!endF) for(let j = 1; j < n; j++) K[j][0] = M.s[j][0] + M.d[j][0] * 0.03;
+    await new Promise(r => setTimeout(r, 30));
+    const t = trKomiwojazer(K);
+    const jedz = p.kon === 'powrot' ? n : n - 1;
+    const sumy = kol => { let m = 0, s = 0; for(let i = 0; i < jedz; i++){ const a = kol[i], b = kol[(i + 1) % n]; m += M.d[a][b]; s += M.s[a][b]; } return {m, s}; };
+    const kolWej = [...Array(n).keys()], przed = sumy(kolWej), po = sumy(t);
+    // harmonogram: przyjazd, wyjazd
+    const [hh, mm] = (p.odj || '07:00').split(':').map(Number); let zeg = hh * 60 + mm;
+    const stopy = [];
+    for(let i = 1; i < n; i++){ const a = t[i - 1], b = t[i]; zeg += M.s[a][b] / 60;
+      const f = b === iE ? endF : lista[b - 1], czas = b === iE ? 0 : (isNum(f.czas) ? f.czas : 60);
+      stopy.push({id:f.id, n:f.n, la:f.la, lo:f.lo, m:M.d[a][b], s:M.s[a][b], przy:zeg, odj:zeg + czas, czas, koniec:b === iE});
+      zeg += czas + (b === iE || i === n - 1 ? 0 : p.przerwa); }
+    let powrot = null; if(p.kon === 'powrot'){ const a = t[n - 1]; zeg += M.s[a][0] / 60; powrot = {m:M.d[a][0], s:M.s[a][0], przy:zeg}; }
+    const grpZle = lista.some(f => +f.grp !== 2);
+    p.wynik = {kol:stopy.map(s => s.id), stopy, powrot, start:[+start[0].toFixed(6), +start[1].toFixed(6)], startN, odj:p.odj, m:po.m, s:po.s, przed, prosta:M.prosta, przerwa:p.przerwa, bio:grpZle, t:Date.now(), koniecZeg:zeg};
+    trSet(d); opFeat('trasa');
+    // przebieg po drogach na mapę
+    try { const pts = [start].concat(stopy.map(s => [s.la, s.lo]), powrot ? [start] : []);
+      if(pts.length >= 2 && pts.length <= 100){ const r = await fetch(TR_OSRM + 'route/v1/driving/' + pts.map(q => q[1].toFixed(6) + ',' + q[0].toFixed(6)).join(';') + '?overview=full&geometries=geojson').then(r => r.json());
+        if(r.code === 'Ok'){ let c = r.routes[0].geometry.coordinates.map(q => [+q[1].toFixed(5), +q[0].toFixed(5)]); if(c.length > 3000) c = c.filter((_, i) => i % Math.ceil(c.length / 3000) === 0 || i === c.length - 1);
+          const d2 = trGet(); if(d2.plan.wynik && d2.plan.wynik.t === p.wynik.t){ d2.plan.wynik.geo = c; trSet(d2); } } } } catch(e){}
+    trWynikUI(); trRysujFermy();
+    const w = trGet().plan.wynik; if(trMap){ const b = L.latLngBounds([w.start].concat(w.stopy.map(s => [s.la, s.lo]))); trMap.fitBounds(b, {padding:[30, 30], maxZoom:15}); }
+    $('tr-wynik').scrollIntoView({behavior:'smooth', block:'start'});
+  } finally { btn.disabled = false; btn.textContent = 'Ułóż trasę'; }
+}
+// link Google Maps z punktami pośrednimi (do 9 na odcinek – dłuższa trasa w kilku częściach)
+function trLinki(w){
+  const pts = [w.start].concat(w.stopy.map(s => [s.la, s.lo]), w.powrot ? [w.start] : []), L2 = [], k = (q) => q[0].toFixed(6) + ',' + q[1].toFixed(6);
+  for(let i = 0; i < pts.length - 1; i += 9){ const cz = pts.slice(i, i + 10);
+    L2.push('https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=' + k(cz[0]) + '&destination=' + k(cz[cz.length - 1]) + (cz.length > 2 ? '&waypoints=' + cz.slice(1, -1).map(k).join('%7C') : '')); }
+  return L2;
+}
+function trWynikUI(){
+  const w = trGet().plan.wynik, box = $('tr-wynik');
+  if(!w){ box.hidden = true; return; }
+  box.hidden = false;
+  const zysk = w.przed && w.przed.s - w.s > 60 ? `<span class="note"> · oszczędność ${trCz(w.przed.s - w.s)} i ${trKm(Math.max(0, w.przed.m - w.m))} wobec kolejności z listy</span>` : '';
+  const linki = trLinki(w);
+  box.innerHTML = `<div class="card-h"><h3>Trasa: ${w.stopy.length} ${w.stopy.length === 1 ? 'ferma' : 'ferm'}</h3><span class="mono">${trKm(w.m)} · ${trCz(w.s)} jazdy</span></div>
+    <p class="note">Start ${esc(w.startN)} o ${esc(w.odj)} · koniec ok. ${trHM(w.koniecZeg)}${zysk}${w.prosta ? '<br><b>Bez połączenia z serwerem tras – odległości w linii prostej ×1,3, czasy orientacyjne.</b>' : ''}${w.bio ? '<br>Kolejność bioasekuracji zachowana: najpierw stada młode / zdrowe, na koniec chore / starsze.' : ''}</p>
+    <ol class="tr-stopy">${w.stopy.map((s, i) => `<li><div><b>${esc(s.n)}</b>${s.koniec ? ' <span class="pill">koniec</span>' : ''}<span class="note">przyjazd ${trHM(s.przy)}${s.czas ? ' · wyjazd ' + trHM(s.odj) : ''} · ${trKm(s.m)}, ${trCz(s.s)} jazdy</span></div>
+      <a class="btn small ghost" href="${trNav(s.la, s.lo)}" target="_blank" rel="noopener">Nawiguj</a></li>`).join('')}
+      ${w.powrot ? `<li class="pow"><div><b>Powrót: ${esc(w.startN)}</b><span class="note">ok. ${trHM(w.powrot.przy)} · ${trKm(w.powrot.m)}, ${trCz(w.powrot.s)} jazdy</span></div></li>` : ''}</ol>
+    <div class="tools">${linki.map((u, i) => `<a class="btn small" href="${u}" target="_blank" rel="noopener">${linki.length > 1 ? 'Google Maps – część ' + (i + 1) : 'Cała trasa w Google Maps'}</a>`).join('')}</div>
+    <p class="note">Przerwa między fermami (przebranie, dezynfekcja): ${w.przerwa} min. Trasy liczone po drogach (OSRM, dane OpenStreetMap) – czas przejazdu bez korków.</p>`;
+}
+
+/* ---------- zakładka ---------- */
+async function renderTrasa(){
+  trListaFerm(); trPlanUI();
+  if(await trMapa()) trRysujFermy();
+}
+async function trSzukaj(){
+  const q = $('tr-q').value.trim(); if(!q) return;
+  const box = $('tr-res'); box.innerHTML = '<p class="note">Szukam…</p>';
+  const R = await trAdresy(q);
+  if(!R.length){ box.innerHTML = '<p class="note">Nie znalazłem tego adresu. Spróbuj: „miejscowość, ulica numer” albo dodaj kod pocztowy lub powiat. Możesz też po prostu stuknąć mapę.</p>'; return; }
+  box.innerHTML = R.slice(0, 8).map((a, i) => `<button type="button" class="tr-r" data-i="${i}"><b>${esc(a.n)}</b><small>${esc(a.op || '')}</small></button>`).join('');
+  box.querySelectorAll('.tr-r').forEach(b => b.onclick = async () => { const a = R[+b.dataset.i]; box.innerHTML = '';
+    if(await trMapa()){ trMap.setView([a.la, a.lo], 18); trWskaz(a.la, a.lo, false, a.n); } });
+  if(R.length === 1) box.querySelector('.tr-r').click();
+}
+document.addEventListener('DOMContentLoaded', () => {
+  if(!$('v-trasa')) return;
+  $('tr-szukaj').onclick = trSzukaj;
+  $('tr-q').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); trSzukaj(); } });
+  $('tr-lay').addEventListener('click', e => { const b = e.target.closest('button'); if(b) trWarstwa(b.dataset.l === 'orto'); });
+  $('tr-go').onclick = trUluz;
+  ['tr-start', 'tr-kon', 'tr-odj', 'tr-przerwa'].forEach(id => $(id).addEventListener('change', trPlanZapisz));
+  $('tr-sel').addEventListener('change', trPlanZapisz);
+  $('v-trasa').addEventListener('click', e => {
+    const b = e.target.closest('[data-tr]'); if(!b) return;
+    const a = b.dataset.tr, row = b.closest('.tr-f'), id = row && row.dataset.id, d = trGet(), f = id && d.fermy.find(x => x.id === id);
+    if(a === 'nowa') trForm(null);
+    else if(a === 'zapisz') trZapiszForm(b.dataset.id);
+    else if(a === 'form-x') $('tr-form').hidden = true;
+    else if(a === 'pokaz' && f) trPokaz(f.id);
+    else if(a === 'edytuj' && f) trForm(f);
+    else if(a === 'punkt' && f){ trEdit = f.id; trRysujFermy(); if(trMap){ trMap.setView([f.la, f.lo], 18); trWarstwa(true); trWskaz(f.la, f.lo, false, f.adr || f.n); $('tr-map').scrollIntoView({behavior:'smooth', block:'center'}); } }
+    else if(a === 'punkt-ok'){ const g = d.fermy.find(x => x.id === trEdit); if(g && trPickData){ g.la = +trPickData.la.toFixed(6); g.lo = +trPickData.lo.toFixed(6); delete d.plan.wynik; trSet(d); toast('Zapisano nowy punkt fermy „' + g.n + '”.'); }
+      trEdit = null; trPickData = null; if(trPick){ trMap.removeLayer(trPick); trPick = null; } trKarta(); renderTrasa(); }
+    else if(a === 'punkt-anuluj'){ trEdit = null; trPickData = null; if(trPick){ trMap.removeLayer(trPick); trPick = null; } trKarta(); trRysujFermy(); }
+    else if(a === 'usun' && f){ if(!confirm('Usunąć fermę „' + f.n + '” z bazy adresów?')) return; d.fermy = d.fermy.filter(x => x.id !== f.id); delete d.plan.wynik; trSet(d); renderTrasa(); }
+  });
+});
 </script>
 </body>
 </html>

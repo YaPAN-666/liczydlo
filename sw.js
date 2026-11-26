@@ -1,7 +1,7 @@
 /* Liczydło WET – service worker (praca bez internetu i aktualizacje)
    Przy każdej nowej wersji zmienia się VERSION – telefon pobiera wtedy nowe pliki
    i pokazuje pasek „Dostępna nowa wersja”. */
-const VERSION = '1.43.2';
+const VERSION = '1.44.0';
 const CACHE = 'liczydlo-app-' + VERSION;
 const FONTS = 'liczydlo-fonts';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png?v=2', './icons/icon-512.png?v=2', './icons/icon-maskable-512.png?v=2', './icons/apple-touch-icon.png?v=2'];
@@ -49,7 +49,8 @@ self.addEventListener('fetch', event => {
     event.respondWith(caches.match(req, {ignoreSearch:true}).then(r => r || fetch(req)));
     return;
   }
-  if(url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com'){
+  // Biblioteka mapy (Leaflet z cdnjs) – zapamiętana jak czcionki; kafelki mapy, adresy i trasy zawsze z sieci.
+  if(url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com' || (url.hostname === 'cdnjs.cloudflare.com' && url.pathname.includes('/leaflet/'))){
     event.respondWith(caches.open(FONTS).then(async c => {
       const hit = await c.match(req);
       const net = fetch(req).then(res => { if(res && (res.ok || res.type === 'opaque')) c.put(req, res.clone()); return res; }).catch(() => hit);

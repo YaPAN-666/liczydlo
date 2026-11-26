@@ -576,6 +576,56 @@ label.chk{display:flex;align-items:center;gap:8px;font-weight:500}
 .tr-t.ok{color:var(--ok)} .tr-t.bad{color:var(--bad);font-weight:600}
 .tr-alert{margin:0;padding:8px 10px;border-radius:8px;font-size:.86rem}
 .tr-alert.ok{background:var(--ok-soft);color:var(--ok)} .tr-alert.bad{background:var(--bad-soft);color:var(--bad)}
+
+/* ---------- Ogłoszenie 2.0 ---------- */
+body.oglOtw{overflow:hidden}
+.oglF{position:fixed;inset:0;z-index:10000;background:radial-gradient(120% 80% at 50% 18%,#2f6b4f 0%,#1d4733 55%,#0f2a1d 100%);color:#f1f6f2;overflow:hidden;animation:oglWej .5s ease both;font-family:var(--f-body,system-ui,sans-serif)}
+.oglF.znika{animation:oglZnik .45s ease both}
+@keyframes oglWej{from{opacity:0}to{opacity:1}}@keyframes oglZnik{to{opacity:0;transform:scale(1.04)}}
+.oglTlo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.oglPr line{stroke:rgba(241,246,242,.14);stroke-width:2;stroke-dasharray:600;stroke-dashoffset:600;animation:oglRys 2.6s cubic-bezier(.3,.7,.2,1) var(--d) forwards}
+@keyframes oglRys{to{stroke-dashoffset:0}}
+.oglPac ellipse{opacity:0;animation:oglPac 1.6s cubic-bezier(.25,1.3,.4,1) var(--d) forwards}
+.oglPac ellipse.p{fill:rgba(232,169,100,.38)}.oglPac ellipse.b{fill:rgba(241,246,242,.22)}
+@keyframes oglPac{from{opacity:0;transform:translateX(0)}to{opacity:1;transform:translateX(var(--x))}}
+.oglIs{position:absolute;display:block;opacity:0;pointer-events:none;animation:oglMig var(--t) ease-in-out var(--d) infinite}.oglIs svg{width:100%;height:100%;fill:#E39A3B}
+@keyframes oglMig{0%,100%{opacity:0;transform:scale(.4) rotate(0)}50%{opacity:.75;transform:scale(1) rotate(45deg)}}
+.oglPrz{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.oglHero{min-height:100%;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(40px + env(safe-area-inset-top,0px)) 20px calc(30px + env(safe-area-inset-bottom,0px));position:relative;box-sizing:border-box}
+.oglIk{width:min(30vw,124px);height:auto;border-radius:24%;box-shadow:0 10px 40px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.08);opacity:0;animation:oglIkWej .9s cubic-bezier(.2,1.4,.4,1) .15s forwards}
+@keyframes oglIkWej{from{opacity:0;transform:scale(.3) rotate(-20deg)}to{opacity:1;transform:none}}
+.oglTyt{margin:22px 0 0;font-family:var(--f-head);font-size:clamp(40px,13vw,64px);font-weight:700;letter-spacing:.01em;line-height:1;white-space:nowrap;color:#f1f6f2}
+.oglTyt span{display:inline-block;opacity:0;transform:translateY(18px);animation:oglLit .5s cubic-bezier(.2,.9,.3,1.2) var(--d) forwards}
+.oglTyt span:first-child{color:#e8a964}
+@keyframes oglLit{to{opacity:1;transform:none}}
+.oglApp{margin-top:6px;font:700 15px/1 var(--f-mono);letter-spacing:.6em;padding-left:.6em;color:#e8a964;opacity:0;animation:oglLit .6s ease 1.1s forwards;transform:translateY(8px)}
+.oglWer{position:relative;margin-top:2px;opacity:0;animation:oglWerWej 1.1s cubic-bezier(.2,1.5,.4,1) 1.45s forwards}
+.oglWer b{display:block;font-family:var(--f-head);font-size:clamp(96px,32vw,156px);font-weight:700;line-height:1;letter-spacing:-.03em;background:linear-gradient(180deg,#FFD58A 0%,#E39A3B 55%,#B86F12 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 24px rgba(227,154,59,.32))}
+@keyframes oglWerWej{0%{opacity:0;transform:scale(2.2);filter:blur(10px)}60%{opacity:1;filter:none}100%{opacity:1;transform:none}}
+.oglBlask{position:absolute;left:50%;top:50%;width:260px;height:260px;margin:-130px 0 0 -130px;border-radius:50%;background:radial-gradient(circle,rgba(227,154,59,.35),transparent 65%);animation:oglPuls 3s ease-in-out 2.2s infinite;z-index:-1}
+@keyframes oglPuls{0%,100%{transform:scale(.85);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+.oglGw{position:absolute;right:-26px;top:8px;width:40px;height:40px;opacity:0;animation:oglGwWej .8s cubic-bezier(.2,1.6,.4,1) 2.15s forwards,oglObr 6s linear 3s infinite}.oglGw svg{width:100%;height:100%;fill:#FFD58A;filter:drop-shadow(0 0 8px rgba(255,200,100,.8))}
+@keyframes oglGwWej{from{opacity:0;transform:scale(0) rotate(-180deg)}to{opacity:1;transform:none}}@keyframes oglObr{to{transform:rotate(360deg)}}
+.oglHas{margin:14px 0 0;display:flex;align-items:center;gap:.6em;font-size:17px;font-weight:600;letter-spacing:.06em;opacity:0;animation:oglLit .7s ease 2.5s forwards;transform:translateY(10px)}
+.oglGwz{flex:0 0 13px;width:13px;height:13px;fill:#E39A3B}
+.oglDalej{margin-top:34px;background:none;border:0;color:#dfe9e2;font:600 14px var(--f-body,system-ui),sans-serif;letter-spacing:.12em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;opacity:0;animation:oglLit .6s ease 3s forwards}
+.oglDalej span{font-size:26px;line-height:1;animation:oglSkok 1.6s ease-in-out 3.4s infinite}@keyframes oglSkok{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+.oglTresc{padding:0 16px calc(36px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center}
+.oglKarta{background:var(--surface);color:var(--ink);border-radius:24px;max-width:560px;width:100%;padding:24px 22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.45);opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.9,.3,1);box-sizing:border-box}
+.oglTresc.widac .oglKarta{opacity:1;transform:none}
+.oglEt{display:inline-block;font:700 11.5px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:#1b1305;background:#E39A3B;border-radius:999px;padding:5px 10px;margin-bottom:6px}
+.oglP{margin:10px 0 0;line-height:1.55}
+.oglN{margin:18px 0 8px;font-family:var(--f-head);font-size:1.15rem}
+.oglL{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.oglL li{display:flex;gap:10px;align-items:flex-start;line-height:1.45;opacity:0;transform:translateX(-14px);transition:opacity .5s ease calc(.25s + var(--i) * .08s),transform .5s ease calc(.25s + var(--i) * .08s)}
+.oglTresc.widac .oglL li{opacity:1;transform:none}
+.oglL li .oglGwz{margin-top:4px}
+.oglW{margin-top:16px;width:100%}
+.oglZ{margin-top:10px;max-height:none;font-size:.86rem}
+.oglS{margin:20px 0 6px}
+.oglStart{width:100%;margin-top:8px;padding:12px;font-size:1rem;justify-content:center;text-align:center}
+.oglX{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:10px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:18px;cursor:pointer;z-index:2}
+@media (prefers-reduced-motion:reduce){.oglF *,.oglF{animation-duration:.01s!important;animation-delay:0s!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -1202,6 +1252,7 @@ label.chk{display:flex;align-items:center;gap:8px;font-weight:500}
         <button class="btn ghost" type="button" id="i-big" aria-pressed="false">Duży tekst</button>
       </div>
       <span class="note" id="i-msg"></span>
+      <div class="tools"><button class="btn ghost" type="button" id="i-ogl">🎉 Liczydło 2.0 – ogłoszenie</button></div>
       <div id="i-changes"></div>
     </div>
     <div class="card" id="fb">
@@ -2141,6 +2192,78 @@ const ROUTES = {spray:'Oprysk',woda:'Woda do picia',oko:'Oko / nos',inj:'Iniekcj
 
 </script>
 <script>
+/* ================= OGŁOSZENIE WERSJI 2.0 =================
+   Raz, na pełnym ekranie zamiast strony tytułowej (także dla nowych użytkowników), potem z „O aplikacji”.
+   Słowo od autora, najważniejsze możliwości, pełna lista zmian po rozwinięciu. Działa bez internetu (treść w aplikacji). */
+// plik dołączany PRZED app.js: initSplash startuje synchronicznie w trakcie wykonywania app.js
+const OGL_KEY = 'liczydlo.ogloszenie.v1';
+const OGL = {v:'2.0.0',
+  tekst:['Z przyjemnością ogłaszam Liczydło WET 2.0. Ta wersja jest efektem wielu niewielkich zmian – poprawek, nowych funkcji i dopracowanych szczegółów – które, wprowadzane krok po kroku, złożyły się na efekt finalny.',
+    'Liczydło powstało jako mały kalkulator dawek. Dziś prowadzi przez całe szczepienie: od doboru szczepionki zgodnie z ChPLW, przez ilość wody, wielkość kropli i czas oprysku, aż po raport, program szczepień stada i trasę objazdu ferm. Dziękuję za wszystkie uwagi – to dzięki nim Liczydło jest takie, jakie jest.'],
+  najw:['Obliczenia zgodne z ChPLW – dawki, woda i czas podania: oprysk, woda do picia, krople do oka, iniekcja i in ovo',
+    'Wielkość kropli na wykresie – widełki z ChPLW, rodzaje kropli, dysza i ciśnienie jednym stuknięciem',
+    'Sprzęt Birchmeier i dmuchawa AS 1200 – wydatek dysz, akumulator, resztka w zbiorniku, tempo marszu',
+    'Raporty z listą kontrolną – druk i PDF, zestawienie do Excela, kopia wszystkich danych',
+    'Program szczepień stada – daty, wiek ptaków i odstępy między szczepionkami według ChPLW',
+    'Trasa – adresy ferm z dokładnym punktem i plan objazdu z bioasekuracją i umówionymi godzinami',
+    'Wiedza z ChPLW i poradników MSD, Aviagen, Ceva i „Sygnałów” – krok po kroku przy każdym szczepieniu']};
+const oglGw = '<svg class="oglGwz" viewBox="121 11 26 26" aria-hidden="true"><path d="M134 11Q134 24 147 24Q134 24 134 37Q134 24 121 24Q134 24 134 11Z"/></svg>';
+function oglPokaz(zMenu, poZamknieciu){
+  const o = document.createElement('div'); o.className = 'oglF'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'Liczydło WET 2.0');
+  // tło: pręty liczydła rysowane od lewej, paciorki przesuwające się po nich, migoczące gwiazdy Studia
+  const preF = Array.from({length:8}, (_, i) => { const y = 70 + i * 82; return `<line style="--d:${(i * .15).toFixed(2)}s" x1="-20" y1="${y}" x2="540" y2="${y}"/>`; }).join('');
+  const pac = Array.from({length:8}, (_, i) => { const y = 70 + i * 82, n = 3 + (i * 5) % 4;
+    return Array.from({length:n}, (_, k) => `<ellipse class="${(i + k) % 3 ? 'p' : 'b'}" style="--d:${(1 + i * .2 + k * .12).toFixed(2)}s;--x:${(140 + (i * 47) % 160 - k * 26)}px" cx="${-30 - k * 26}" cy="${y}" rx="10" ry="12"/>`).join(''); }).join('');
+  const isk = Array.from({length:12}, (_, i) => { const x = (i * 37 + 11) % 96 + 2, y = (i * 53 + 7) % 88 + 4, s = 8 + (i * 7) % 14;
+    return `<i class="oglIs" style="left:${x}%;top:${y}%;width:${s}px;height:${s}px;--d:${(1.2 + (i % 7) * .35).toFixed(2)}s;--t:${(2.2 + (i % 5) * .5).toFixed(2)}s">${oglGw}</i>`; }).join('');
+  const lit = (t, od) => [...t].map((c, i) => `<span style="--d:${(od + i * .06).toFixed(3)}s">${c === ' ' ? '&nbsp;' : esc(c)}</span>`).join('');
+  o.innerHTML = `<svg class="oglTlo" viewBox="0 0 520 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g class="oglPr">${preF}</g><g class="oglPac">${pac}</g></svg>${isk}
+    <div class="oglPrz" id="oglPrz">
+      <section class="oglHero"><img class="oglIk" src="icons/icon-512.png?v=2" alt="">
+        <h1 class="oglTyt">${lit('Liczydło', .55)}</h1>
+        <div class="oglApp">WET</div>
+        <div class="oglWer"><span class="oglBlask"></span><b>2.0</b><i class="oglGw">${oglGw}</i></div>
+        <p class="oglHas">Policz ${oglGw} Zaplanuj ${oglGw} Zaszczep</p>
+        <button type="button" class="oglDalej" id="oglDalej" aria-label="Czytaj dalej">Co nowego<span>⌄</span></button></section>
+      <section class="oglTresc" id="oglTresc"><div class="oglKarta">
+        <div class="oglEt">Aktualizacja ${esc(OGL.v)}</div>
+        ${OGL.tekst.map(t => `<p class="oglP">${esc(t)}</p>`).join('')}
+        <h4 class="oglN">Najważniejsze możliwości</h4>
+        <ul class="oglL">${OGL.najw.map((n, i) => `<li style="--i:${i}">${oglGw}<span>${esc(n)}</span></li>`).join('')}</ul>
+        <button type="button" class="btn ghost oglW" id="oglW">Pokaż wszystkie zmiany ▾</button>
+        <div class="oglZ" id="oglZ" hidden><p class="note">Wczytuję listę zmian…</p></div>
+        <p class="credit oglS">Studio Pracy Umysłowej<br><span>Paweł Czarnocki</span></p>
+        <button type="button" class="btn oglStart" id="oglStart">Zaczynamy</button></div></section>
+    </div>
+    <button type="button" class="oglX" id="oglX" aria-label="Zamknij">✕</button>`;
+  document.body.appendChild(o); document.body.classList.add('oglOtw');
+  const zamknij = () => { o.classList.add('znika'); setTimeout(() => { o.remove(); document.body.classList.remove('oglOtw'); if(poZamknieciu) poZamknieciu(); }, 450); };
+  $('oglStart').onclick = zamknij; $('oglX').onclick = zamknij;
+  o.addEventListener('keydown', e => { if(e.key === 'Escape') zamknij(); });
+  $('oglDalej').onclick = () => $('oglTresc').scrollIntoView({behavior:'smooth'});
+  let wczytane = false;
+  $('oglW').onclick = async () => { const l = $('oglZ'); l.hidden = !l.hidden; $('oglW').textContent = l.hidden ? 'Pokaż wszystkie zmiany ▾' : 'Zwiń listę zmian ▴';
+    if(!l.hidden && !wczytane){ wczytane = true;
+      try { const j = await fetchVersion(); l.innerHTML = `<ul class="list">${(j.zmiany || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`; }
+      catch(e){ l.innerHTML = '<p class="note">Pełna lista zmian wymaga połączenia z internetem.</p>'; wczytane = false; } }
+    if(!l.hidden) l.scrollIntoView({behavior:'smooth', block:'start'}); };
+  try { const io = new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting){ x.target.classList.add('widac'); io.disconnect(); } }), {root:$('oglPrz'), threshold:.12}); io.observe($('oglTresc')); }
+  catch(e){ $('oglTresc').classList.add('widac'); }
+  try { $('oglStart').focus({preventScroll:true}); } catch(e){}
+  if(!zMenu) try { opFeat('ogloszenie'); } catch(e){}
+}
+// przy starcie: ogłoszenie raz, zamiast strony tytułowej; potem zwykła ścieżka (instrukcja instalacji, powitanie)
+function oglStart(){
+  if(IN_ARTIFACT) return false;
+  const w = lsGet(OGL_KEY); if(w && w.v === OGL.v) return false;
+  lsSet(OGL_KEY, {v:OGL.v, t:Date.now()});
+  const sp = $('splash'); if(sp) sp.hidden = true;
+  oglPokaz(false, () => { try { instMaybe(); } catch(e){} });
+  return true;
+}
+document.addEventListener('DOMContentLoaded', () => { const b = $('i-ogl'); if(b) b.onclick = () => oglPokaz(true); });
+
+
 /* =====================================================================
    KALKULATOR – obliczenia, raporty, wiedza o szczepionkach
    ===================================================================== */
@@ -2308,7 +2431,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.46.1';
+const APP_VERSION = '2.0.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -5468,6 +5591,7 @@ function splashBeads(sp){
 }
 function initSplash(){
   const sp = $('splash'); if(!sp) return;
+  if(oglStart()) return;   // ogłoszenie wersji 2.0 zamiast strony tytułowej (raz)
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(!reduce && typeof Element.prototype.animate === 'function'){ try { const run = splashBeads(sp); if(run) run(); } catch(e){ sp.querySelector('.name').classList.remove('anim'); } }
   let done = false;

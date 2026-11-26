@@ -1,8 +1,9 @@
 {
- "wersja": "1.46.0",
+ "wersja": "1.46.1",
  "data": "2026-11-22",
  "zmiany": [
-  "Trasa – umówione godziny: przy fermie wpisujesz, o której musisz tam być. Aplikacja układa kolejność tak, żeby zdążyć, podaje, o której najpóźniej wyjechać ze startu i z poprzedniego punktu, ile najdłużej możesz zostać na wcześniejszych fermach, ile będziesz za wcześnie albo o ile się spóźnisz.",
+  "Ochrona danych: aplikacja od startu prosi przeglądarkę o pamięć trwałą (dane nie są czyszczone przy braku miejsca), niedokończone obliczenie z notatkami nie znika już po 24 h, a kopia obejmuje wszystko – raporty, program, fermy i adresy z Trasy, kurniki, sprzęt. Stan ochrony widać w „O aplikacji”.",
+  "(1.46.0) Trasa – umówione godziny: przy fermie wpisujesz, o której musisz tam być. Aplikacja układa kolejność tak, żeby zdążyć, podaje, o której najpóźniej wyjechać ze startu i z poprzedniego punktu, ile najdłużej możesz zostać na wcześniejszych fermach, ile będziesz za wcześnie albo o ile się spóźnisz.",
   "(1.45.0) Trasa – bioasekuracja przy fermie: zaznaczasz „Bioasekuracja”, wpisujesz wiek stada (liczy się sam z każdym dniem, podpowiedź z zakładki Program) i ewentualnie chorobę. Plan objazdu prowadzi od stad najmłodszych (do 7 dni, do 3 tyg., do 6 tyg., starsze) do starszych, stada chore zawsze na końcu; fermy bez bioasekuracji tam, gdzie najkrócej.",
   "(1.44.0) Nowa zakładka „Trasa”: wyszukiwanie adresu (rejestr adresów GUGiK, zapasowo OpenStreetMap) z podglądem na mapie i zdjęciu lotniczym, baza ferm z dokładnym punktem (np. brama wjazdowa), nawigacja do fermy i plan objazdu – najkrótsza kolejność po drogach z godzinami przyjazdu, czasem na fermie, przerwą na przebranie i kolejnością bioasekuracji (najpierw stada młode/zdrowe, na koniec chore/starsze). Fermy trafiają do kopii raportów.",
   "(1.43.2) Pomarańczowa gwiazdka Studia także w logo na ekranie startowym i w nagłówku aplikacji (ikona na telefonie już ją miała).",

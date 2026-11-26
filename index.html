@@ -1129,7 +1129,7 @@ label.chk{display:flex;align-items:center;gap:8px;font-weight:500}
     <button class="btn small ghost" type="button" id="b-csv">Zestawienie (Excel, CSV)</button>
     <button class="btn small ghost" type="button" id="b-import">Wczytaj kopię</button>
     <input type="file" id="b-file" accept="application/json,.json" hidden>
-    <span class="note">Raporty są zapisane w tym telefonie. Kopia obejmuje też zalecenia i ustawienia ferm – przyda się przy zmianie telefonu.</span>
+    <span class="note">Wszystko, co zapisujesz, zostaje w tym telefonie – aktualizacje aplikacji tego nie kasują. Kopia obejmuje raporty, zalecenia, ustawienia ferm, program stad, fermy i adresy z Trasy, kurniki, sprzęt i niedokończone obliczenie – przyda się przy zmianie telefonu albo ponownej instalacji.</span>
   </div>
   <div id="bk-nag" class="msg warn bk-nag" hidden></div>
   <div id="r-list" class="items"></div>
@@ -1192,6 +1192,7 @@ label.chk{display:flex;align-items:center;gap:8px;font-weight:500}
         <dt>Użytkownik</dt><dd id="i-user">–</dd>
         <dt>Dane szczepionek</dt><dd id="i-data"></dd>
         <dt>Raporty</dt><dd id="i-mode"></dd>
+        <dt>Zapisane dane</dt><dd id="i-store"></dd>
         <dt>Identyfikator kopii</dt><dd><span class="code" id="i-code">–</span></dd>
       </dl>
       <div class="tools">
@@ -2307,7 +2308,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '1.46.0';
+const APP_VERSION = '1.46.1';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -5281,7 +5282,7 @@ function setNozzle(noz, quiet){
 }
 function applyDefaultsSpray(){ if(noVac()) return; const sd = sprayDefault(curVac(), Math.max(0, Math.round(num('age',0)))); $('s-ml').value = sd.ml; $('s-ml-hint').textContent = sd.hint; }
 /* ---------- Szkic formularza: wpisane dane przetrwają przypadkowe odświeżenie strony ---------- */
-const DRAFT_KEY = 'liczydlo.szkic.v1', DRAFT_H = 24;
+const DRAFT_KEY = 'liczydlo.szkic.v1', DRAFT_H = 24 * 3650;   // szkic nie wygasa – znika tylko po „Nowe obliczenie”
 let draftT = null;
 function draftFields(){ return [...document.querySelectorAll('#v-obliczenia input[id], #v-obliczenia select[id], #v-obliczenia textarea[id]')].filter(e => e.type !== 'file' && e.type !== 'hidden'); }
 function draftSave(){
@@ -5390,12 +5391,15 @@ function exportBackup(){
   const n = Object.keys(S.reps).length + Object.keys(S.mods).length + Object.keys(S.farms).length + progGet().flocks.length + trGet().fermy.length;
   if(!n){ toast('Brak danych do zapisania.'); return; }
   lsSet(BKP_KEY, {t:Date.now()}); setTimeout(bkNag, 50); opFeat('kopia');
-  downloadFile(`liczydlo-kopia-${todayISO()}.json`, JSON.stringify({app:'Liczydło WET', wersja:APP_VERSION, zapisano:new Date().toISOString(), raporty:S.reps, modyfikacje:S.mods, ustawienia:S.farms, program:progGet(), trasa:trGet()}, null, 1), 'application/json');
+  downloadFile(`liczydlo-kopia-${todayISO()}.json`, JSON.stringify({app:'Liczydło WET', wersja:APP_VERSION, zapisano:new Date().toISOString(), raporty:S.reps, modyfikacje:S.mods, ustawienia:S.farms, program:progGet(), trasa:trGet(), kurniki:lsGet(HOUSE_KEY), sprzet:lsGet(EQ_KEY), szkic:lsGet(DRAFT_KEY)}, null, 1), 'application/json');
 }
 async function importBackup(file){
   let j; try { j = JSON.parse(await file.text()); } catch(e){ toast('To nie jest plik kopii Liczydła.'); return; }
   const groups = ['raporty', 'modyfikacje', 'ustawienia'].filter(k => j && j[k] && typeof j[k] === 'object');
   if(j && j.trasa && Array.isArray(j.trasa.fermy)){ const t = trGet(), have = new Set(t.fermy.map(f => f.id)); j.trasa.fermy.forEach(f => { if(f && f.id && !have.has(f.id) && isFinite(f.la) && isFinite(f.lo)) t.fermy.push(f); }); trSet(t); }
+  if(j && j.kurniki && typeof j.kurniki === 'object' && !lsGet(HOUSE_KEY)) lsSet(HOUSE_KEY, j.kurniki);
+  if(j && j.sprzet && typeof j.sprzet === 'object' && !lsGet(EQ_KEY)) lsSet(EQ_KEY, j.sprzet);
+  if(j && j.szkic && typeof j.szkic === 'object' && !lsGet(DRAFT_KEY)) lsSet(DRAFT_KEY, j.szkic);
   let pn = 0; if(j && j.program && Array.isArray(j.program.flocks)){ const p = progGet(), have = new Set(p.flocks.map(f => f.id)); j.program.flocks.forEach(f => { if(f && f.id && !have.has(f.id) && Array.isArray(f.items)){ p.flocks.push(f); pn++; } }); if(pn) progSet(p); }
   if(!groups.length && !pn){ toast('Plik nie zawiera danych Liczydła.'); return; }
   const have = Object.assign({}, S.reps, S.mods, S.farms); let n = 0;
@@ -5567,13 +5571,29 @@ function loadFonts(){
 }
 function renderInfo(){
   licInfo(); opPaintInfo(); fbPaint();
-  $('i-ver').textContent = APP_VERSION;
+  $('i-ver').textContent = APP_VERSION; storePaint();
   $('i-data').textContent = `ChPLW i ulotki – stan na ${DATA_DATE}; ${VACCINES.length} ${pl(VACCINES.length, 'szczepionka', 'szczepionki', 'szczepionek')}`;
   $('i-mode').textContent = S.mode === 'db' ? 'w pamięci aplikacji (Claude)' : IN_ARTIFACT ? 'tylko w tej przeglądarce' : 'w tym telefonie (kopia w zakładce Raporty)';
   // Widać tylko ostatnią zmianę; pełny spis rozwija się po kliknięciu „Spis zmian w wersjach”
   if(!IN_ARTIFACT) fetchVersion().then(j => { if(j.zmiany && j.zmiany.length) $('i-changes').innerHTML = `<h3>Ostatnia zmiana (wersja ${esc(j.wersja)})</h3><p class="note">${esc(j.zmiany[0])}</p>`
     + (j.zmiany.length > 1 ? `<details class="chlog"><summary>Spis zmian w wersjach</summary><ul class="list">${j.zmiany.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : ''); }).catch(() => {});
 }
+
+/* ---------- Trwałość danych ----------
+   Aktualizacja aplikacji nie dotyka zapisanych danych (raporty, fermy, notatki, program, kurniki – localStorage).
+   Prosimy przeglądarkę o pamięć trwałą od razu przy starcie, żeby nie czyściła danych przy braku miejsca. */
+let storeState = null;
+async function storePersist(){
+  try { if(!navigator.storage || !navigator.storage.persist) return;
+    let ok = navigator.storage.persisted ? await navigator.storage.persisted() : false;
+    if(!ok) ok = await navigator.storage.persist();
+    storeState = ok; storePaint(); } catch(e){}
+}
+function storePaint(){ const el = $('i-store'); if(!el) return;
+  el.textContent = storeState === true ? 'chronione – przeglądarka nie usunie ich sama; aktualizacje ich nie ruszają'
+    : storeState === false ? 'aktualizacje ich nie ruszają, ale przeglądarka może je usunąć przy braku miejsca – zainstaluj aplikację i rób kopię'
+    : 'aktualizacje ich nie ruszają'; }
+if(!IN_ARTIFACT) storePersist();
 
 
 /* ================= TRASA – adresy ferm, dokładne punkty i plan objazdu =================

@@ -1,7 +1,8 @@
 {
- "wersja": "2.0.0",
- "data": "2026-11-22",
+ "wersja": "2.0.1",
+ "data": "2026-11-26",
  "zmiany": [
+  "Stuknij nazwę albo logo u góry – kod QR aplikacji na cały ekran oraz „Udostępnij aplikację” i „Kopiuj link”.",
   "Liczydło WET 2.0 – ogłoszenie na pełnym ekranie z animacją: słowo od autora, najważniejsze możliwości i pełna lista zmian. Później można je otworzyć w „O aplikacji”.",
   "(1.46.1) Ochrona danych: aplikacja od startu prosi przeglądarkę o pamięć trwałą (dane nie są czyszczone przy braku miejsca), niedokończone obliczenie z notatkami nie znika już po 24 h, a kopia obejmuje wszystko – raporty, program, fermy i adresy z Trasy, kurniki, sprzęt. Stan ochrony widać w „O aplikacji”.",
   "(1.46.0) Trasa – umówione godziny: przy fermie wpisujesz, o której musisz tam być. Aplikacja układa kolejność tak, żeby zdążyć, podaje, o której najpóźniej wyjechać ze startu i z poprzedniego punktu, ile najdłużej możesz zostać na wcześniejszych fermach, ile będziesz za wcześnie albo o ile się spóźnisz.",

@@ -2252,10 +2252,14 @@ function oglPokaz(zMenu, poZamknieciu){
   try { $('oglStart').focus({preventScroll:true}); } catch(e){}
   if(!zMenu) try { opFeat('ogloszenie'); } catch(e){}
 }
-// przy starcie: ogłoszenie raz, zamiast strony tytułowej; potem zwykła ścieżka (instrukcja instalacji, powitanie)
+// czy na tym urządzeniu były już dane Liczydła sprzed tego uruchomienia (sprawdzane, zanim app.js cokolwiek zapisze)
+const OGL_STARE = (() => { try { return Object.keys(localStorage).some(k => k.startsWith('liczydlo.') && k !== OGL_KEY); } catch(e){ return false; } })();
+// przy starcie: ogłoszenie raz, zamiast strony tytułowej; potem zwykła ścieżka (instrukcja instalacji, powitanie).
+// Dotychczasowy użytkownik – od razu. Nowy w przeglądarce – zwykła strona tytułowa; ogłoszenie przy pierwszym uruchomieniu zainstalowanej aplikacji.
 function oglStart(){
   if(IN_ARTIFACT) return false;
   const w = lsGet(OGL_KEY); if(w && w.v === OGL.v) return false;
+  if(!isStandalone() && ((w && w.czeka) || !OGL_STARE)){ if(!w) lsSet(OGL_KEY, {czeka:OGL.v}); return false; }
   lsSet(OGL_KEY, {v:OGL.v, t:Date.now()});
   const sp = $('splash'); if(sp) sp.hidden = true;
   oglPokaz(false, () => { try { instMaybe(); } catch(e){} });

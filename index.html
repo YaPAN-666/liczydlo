@@ -70,7 +70,17 @@ h3{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em
 .chip .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
 .chip.ok .dot{background:var(--ok)} .chip.warn .dot{background:var(--warn)} .chip.bad .dot{background:var(--bad)}
 .chip img{width:18px;height:18px;border-radius:50%}
-nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;margin:0 -4px;padding:0 4px}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin:0;padding:0 4px;position:relative;scroll-behavior:smooth}
+nav.tabs::-webkit-scrollbar{display:none}
+.tabs-wrap{position:relative;margin:0 -4px;min-width:0}
+/* strzałki: są ukryte sekcje po prawej/lewej – na telefonie nie widać wszystkich zakładek */
+.tabs-more{position:absolute;top:0;bottom:3px;width:48px;border:0;padding:0;display:flex;align-items:center;cursor:pointer;color:var(--brand);z-index:1;-webkit-tap-highlight-color:transparent}
+.tabs-more svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs-more.r{right:0;justify-content:flex-end;padding-right:4px;background:linear-gradient(90deg,transparent,var(--surface) 55%)}
+.tabs-more.l{left:0;justify-content:flex-start;padding-left:4px;background:linear-gradient(270deg,transparent,var(--surface) 55%)}
+.tabs-more.r svg{animation:tabsNudge 1.3s ease-in-out .8s 4}
+@keyframes tabsNudge{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){.tabs-more.r svg{animation:none}}
 nav.tabs a{flex:0 0 auto;text-decoration:none;color:var(--muted);font-family:var(--f-head);font-weight:600;font-size:1rem;letter-spacing:.02em;padding:8px 12px 10px;border-bottom:3px solid transparent}
 nav.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--brand)}
 nav.tabs a:focus-visible{outline:2px solid var(--brand);outline-offset:-2px;border-radius:4px}
@@ -542,7 +552,7 @@ html,body{overscroll-behavior-y:none}
 .tr-r{display:grid;text-align:left;gap:2px;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);cursor:pointer}
 .tr-r small{color:var(--muted);font-size:.78rem}
 .tr-mapbox{position:relative;isolation:isolate;z-index:0}
-.tr-map{height:min(56vh,420px);min-height:260px;border-radius:10px;border:1px solid var(--line);overflow:hidden;background:var(--surface-2);z-index:0}
+.tr-map{height:min(50vh,400px);min-height:260px;border-radius:10px;border:1px solid var(--line);overflow:hidden;background:var(--surface-2);z-index:0}
 .tr-off{padding:16px}
 .tr-lay{position:absolute;right:8px;top:8px;z-index:500;background:var(--surface);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .tr-lay button{font:inherit;font-size:.78rem;font-weight:600;border:0;background:transparent;color:var(--muted);padding:6px 10px;cursor:pointer;border-radius:8px}
@@ -552,27 +562,76 @@ html,body{overscroll-behavior-y:none}
 .tr-form{display:grid;gap:10px;padding:12px;border:1px dashed var(--line);border-radius:10px}
 .tr-form h3{margin:0}
 label.chk{display:flex;align-items:center;gap:8px;font-weight:500}
-.tr-fermy,.tr-sel{display:grid;gap:8px}
-.tr-f{display:grid;gap:4px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.tr-fermy{display:grid;gap:8px}
+.tr-f{display:grid;gap:6px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
 .tr-fh{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .pill.g1{background:var(--brand-soft);color:var(--brand)}
 .pill.g3{background:var(--bad-soft);color:var(--bad)}
-.tr-wynik{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
-.tr-wynik h3{margin:0}
-.tr-stopy{margin:0;padding-left:22px;display:grid;gap:8px}
-.tr-stopy li{display:flex;gap:8px;justify-content:space-between;align-items:center}
-.tr-stopy li > div{display:grid;gap:2px;min-width:0}
-.tr-stopy li.pow{list-style:none;margin-left:-22px;padding-left:22px;border-top:1px dashed var(--line);padding-top:6px}
+.tr-wynik{display:grid;gap:8px}
 .tr-mk{position:relative;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#23553e;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35);display:grid;place-items:center;color:#fff;font:700 11px/1 var(--f-mono,monospace)}
 .tr-mk.nr{width:24px;height:24px;background:#1C6FD1}
 .tr-mk.baza{background:#E39A3B}
 .tr-mk.st{background:#16201a;width:22px;height:22px}
 .tr-mk.pick{width:26px;height:26px;background:#E39A3B;border-width:3px;box-shadow:0 0 0 6px rgba(227,154,59,.3)}
-
-.tr-si{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line)}
-.tr-godz{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted)}
-.tr-godz input{font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.tr-mk.kon{background:#a8611c;width:22px;height:22px}
+.tr-pop .tools{margin-top:8px}
+/* Trasa na dziś – lista z przeciąganiem */
+.tr-lista{list-style:none;margin:0;padding:0;display:grid;gap:6px;position:relative}
+.tr-lista>li{display:flex;align-items:flex-start;gap:8px;padding:8px 8px 8px 4px;border:1px solid var(--line);border-radius:10px;background:var(--surface);position:relative}
+.tr-lista>li.tr-fix{background:var(--surface-2);border-style:dashed;padding-left:10px}
+.tr-lista>li.zle{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad)}
+.tr-lista>li.drag{z-index:5;border-color:var(--brand);box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.tr-lista.dragging{-webkit-user-select:none;user-select:none}
+.tr-lista>li.tr-st{display:grid;grid-template-columns:28px 24px minmax(0,1fr) auto;grid-template-areas:"h nr nm ac" "h mt mt mt";column-gap:8px;row-gap:3px;align-items:center}
+.tr-st>.tr-h{grid-area:h}
+.tr-st>.tr-nr{grid-area:nr}
+.tr-st>.tr-sn{grid-area:nm}
+.tr-st>.tr-sa{grid-area:ac}
+.tr-st>.tr-mt{grid-area:mt;display:grid;gap:2px;justify-items:start;min-width:0}
+.tr-lista>li.tr-pusto{display:block;border-style:dashed;color:var(--muted);font-size:.86rem;padding:12px}
+.tr-h{flex:0 0 auto;width:28px;align-self:stretch;min-height:40px;display:grid;place-items:center;border:0;border-radius:6px;background:transparent;color:var(--muted);cursor:grab;touch-action:none;padding:0}
+.tr-h svg{width:11px;height:18px}
+.tr-h:hover,.tr-lista>li.drag .tr-h{color:var(--brand);background:var(--brand-soft)}
+.tr-lista>li.drag .tr-h{cursor:grabbing}
+.tr-nr{flex:0 0 auto;width:24px;height:24px;margin-top:1px;border-radius:50%;display:grid;place-items:center;background:#1C6FD1;color:#fff;font:700 .76rem/1 var(--f-mono)}
+.tr-nr.s{background:var(--ink);color:var(--surface)}
+.tr-nr.k{background:#a8611c}
+.tr-sb{flex:1;min-width:0;display:grid;gap:3px}
+.tr-sn{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
+.tr-sn b{overflow-wrap:anywhere}
+.tr-lab{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tr-2{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.tr-2 select{flex:1 1 170px;width:auto}
+.tr-sa{flex:0 0 auto;display:flex;gap:4px}
+.tr-ib{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--brand);cursor:pointer;text-decoration:none;padding:0}
+.tr-ib.x{color:var(--muted)}
+.tr-ib svg{width:17px;height:17px}
+.tr-godz{display:inline-flex;align-items:center;gap:6px;justify-self:start;font-size:.8rem;color:var(--muted);white-space:nowrap}
+.tr-godz input{width:auto;min-width:6.5em;padding:4px 6px;font-size:.86rem}
 .tr-t{display:block;font-size:.8rem;color:var(--muted)}
+.tr-tip{display:flex;align-items:center;gap:8px;margin:0}
+.tr-tip svg{flex:0 0 auto;width:9px;height:15px}
+.tr-dodaj{font-weight:600;color:var(--brand);background:var(--surface);border:1px dashed var(--brand)}
+.tr-prz{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.tr-prz-in{display:inline-flex;align-items:center;gap:6px;color:var(--ink)}
+.tr-prz input{width:5.5em}
+.tr-akcje{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tr-akcje .btn{justify-content:center;padding:11px 10px;font-size:1rem}
+.tr-akcje .btn svg{flex:0 0 auto;width:18px;height:18px}
+.tr-navparts{display:grid;gap:6px}
+/* Baza ferm – zwijana */
+.tr-baza>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tr-baza>summary::-webkit-details-marker{display:none}
+.tr-zw{display:inline-flex;align-items:center;gap:4px;font-size:.84rem;font-weight:600;color:var(--brand)}
+.tr-zw svg{width:18px;height:18px;transition:transform .2s}
+.tr-baza[open] .tr-zw svg{transform:rotate(180deg)}
+.tr-bin{display:grid;gap:8px;margin-top:12px}
+.tr-fr{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.tr-fi{min-width:0;display:grid;gap:2px}
+.tr-tog,.tr-fst{flex:0 0 auto;white-space:nowrap}
+.tr-fm>summary{font-size:.8rem;font-weight:600;color:var(--brand);width:max-content}
+.tr-fm .tools{margin-top:6px}
+
 .tr-t.ok{color:var(--ok)} .tr-t.bad{color:var(--bad);font-weight:600}
 .tr-alert{margin:0;padding:8px 10px;border-radius:8px;font-size:.86rem}
 .tr-alert.ok{background:var(--ok-soft);color:var(--ok)} .tr-alert.bad{background:var(--bad-soft);color:var(--bad)}
@@ -781,14 +840,18 @@ body.oglOtw{overflow:hidden}
         <a class="btn small ghost" href="#info" id="info-link">O aplikacji / Sugestie</a>
       </div>
     </div>
-    <nav class="tabs" aria-label="Sekcje">
+    <div class="tabs-wrap">
+    <nav class="tabs" id="tabs" aria-label="Sekcje">
       <a href="#obliczenia" data-tab="obliczenia">Obliczenia</a>
       <a href="#raporty" data-tab="raporty">Raporty <span class="pill" id="rep-count">0</span></a>
-      <a href="#zmiany" data-tab="zmiany">Zmiany <span class="pill" id="mod-count">0</span></a>
-      <a href="#program" data-tab="program">Program <span class="pill" id="prog-count" hidden>0</span></a>
-      <a href="#trasa" data-tab="trasa">Trasa</a>
       <a href="#szczepionki" data-tab="szczepionki">Szczepionki</a>
+      <a href="#trasa" data-tab="trasa">Trasa</a>
+      <a href="#program" data-tab="program">Program <span class="pill" id="prog-count" hidden>0</span></a>
+      <a href="#zmiany" data-tab="zmiany">Zmiany <span class="pill" id="mod-count">0</span></a>
     </nav>
+    <button type="button" class="tabs-more l" id="tabs-l" aria-label="Poprzednie sekcje" tabindex="-1" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <button type="button" class="tabs-more r" id="tabs-r" aria-label="Więcej sekcji po prawej" tabindex="-1" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
   </div>
 </header>
 
@@ -1158,9 +1221,22 @@ body.oglOtw{overflow:hidden}
 </section>
 
 <section class="view" id="v-trasa" hidden>
+  <div class="card tr-plan" id="tr-plan">
+    <div class="card-h"><h2>Trasa na dziś <span class="pill" id="tr-ile">0</span></h2><span class="mono note" id="tr-sum"></span></div>
+    <p class="note">Dodaj fermy, ustaw kolejność – przesuń je ręcznie albo stuknij „Optymalizuj” – i stuknij „Nawiguj”. Przy fermie możesz wpisać godzinę, na którą jesteś umówiony.</p>
+    <ol id="tr-lista" class="tr-lista"></ol>
+    <p class="note tr-tip" id="tr-tip" hidden><svg viewBox="0 0 10 16" aria-hidden="true"><g fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="7" cy="3" r="1.5"/><circle cx="3" cy="8" r="1.5"/><circle cx="7" cy="8" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="7" cy="13" r="1.5"/></g></svg><span>Przytrzymaj uchwyt i przesuń fermę w górę lub w dół, żeby zmienić kolejność.</span></p>
+    <select id="tr-dodaj" class="tr-dodaj" aria-label="Dodaj fermę do trasy"></select>
+    <label class="tr-prz">Przerwa między fermami<span class="tr-prz-in"><input id="tr-przerwa" type="number" min="0" step="5" inputmode="numeric" value="10"> min</span><span class="hint">przebranie, dezynfekcja</span></label>
+    <div class="tr-akcje"><button class="btn ghost" type="button" id="tr-opt"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1Q13.98 10.02 23 12Q13.98 13.98 12 23Q10.02 13.98 1 12Q10.02 10.02 12 1Z" fill="currentColor"/></svg> Optymalizuj</button><button class="btn" type="button" id="tr-nav"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 21 3l-8 18-2-8z" fill="currentColor"/></svg> Nawiguj</button></div>
+    <p class="note"><b>Optymalizuj</b> – aplikacja ułoży najkrótszą kolejność z zachowaniem bioasekuracji i umówionych godzin. <b>Nawiguj</b> – Google Maps w kolejności z listy, bez zmian.</p>
+    <div id="tr-navparts" class="tr-navparts" hidden></div>
+    <div id="tr-wynik" class="tr-wynik" hidden></div>
+    <div class="tools"><button class="btn small ghost" type="button" data-tr="wyczysc" id="tr-wyczysc" hidden>Wyczyść trasę</button></div>
+  </div>
   <div class="card">
-    <h2>Trasa</h2>
-    <p class="note">Znajdź adres fermy, wskaż na mapie dokładne miejsce – np. bramę wjazdową, a nie środek działki – i zapisz fermę w bazie. Potem zaznacz fermy na dany dzień, a aplikacja ułoży najkrótszą trasę objazdu z godzinami przyjazdu. Adresy: rejestr adresów GUGiK (zapasowo OpenStreetMap). Mapa i trasy wymagają internetu; baza ferm zostaje w telefonie (i w kopii raportów).</p>
+    <h2>Mapa – nowa ferma</h2>
+    <p class="note">Znajdź adres albo stuknij mapę, przesuń znacznik w dokładne miejsce – np. na bramę wjazdową, a nie środek działki – i zapisz fermę. Stuknij zapisaną fermę na mapie, żeby dodać ją do trasy. Adresy: rejestr GUGiK (zapasowo OpenStreetMap). Mapa i trasy wymagają internetu; baza ferm zostaje w telefonie i w kopii danych.</p>
     <div class="tr-search"><input id="tr-q" type="search" placeholder="np. Strzała, Krótka 24 albo 08-110 Siedlce, Sienkiewicza 5" autocomplete="off" enterkeyhint="search"><button class="btn" type="button" id="tr-szukaj">Szukaj</button></div>
     <div id="tr-res" class="tr-res"></div>
     <div class="tr-mapbox"><div id="tr-map" class="tr-map"></div>
@@ -1169,22 +1245,10 @@ body.oglOtw{overflow:hidden}
     <div id="tr-form" class="tr-form" hidden></div>
   </div>
   <div class="card">
-    <div class="card-h"><h2>Fermy <span class="pill" id="tr-count">0</span></h2></div>
-    <div id="tr-fermy" class="tr-fermy"></div>
-  </div>
-  <div class="card">
-    <h2>Plan objazdu</h2>
-    <p class="note">Przy fermie możesz wpisać godzinę, o której musisz tam być – aplikacja ułoży kolejność tak, żeby zdążyć, poda, o której wyjechać z poprzedniego punktu, i ile najdłużej możesz zostać na wcześniejszych fermach.</p>
-    <p class="note">Zaznacz fermy na ten dzień. Do 12 ferm aplikacja znajdzie najlepszą możliwą kolejność, przy większej liczbie – bardzo dobrą. Kolejność bioasekuracji z karty fermy jest zawsze zachowana: najpierw stada młode i zdrowe, na koniec chore i starsze.</p>
-    <div id="tr-sel" class="tr-sel"></div>
-    <div class="row">
-      <label>Start<select id="tr-start"></select></label>
-      <label>Koniec<select id="tr-kon"></select></label>
-      <label>Wyjazd o<input id="tr-odj" type="time" value="07:00"></label>
-      <label>Przerwa między fermami (min)<input id="tr-przerwa" type="number" min="0" step="5" inputmode="numeric" value="10"><span class="hint">przebranie, dezynfekcja</span></label>
-    </div>
-    <div class="tools"><button class="btn" type="button" id="tr-go">Ułóż trasę</button></div>
-    <div id="tr-wynik" class="tr-wynik" hidden></div>
+    <details class="tr-baza" id="tr-baza">
+      <summary><h2>Baza ferm <span class="pill" id="tr-count">0</span></h2><span class="tr-zw"><span id="tr-baza-t">pokaż</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+      <div class="tr-bin"><input id="tr-filtr" type="search" placeholder="Szukaj fermy – nazwa albo adres" autocomplete="off" hidden><div id="tr-fermy" class="tr-fermy"></div></div>
+    </details>
   </div>
 </section>
 
@@ -2455,7 +2519,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '2.0.2';
+const APP_VERSION = '2.1.0';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -5331,7 +5395,7 @@ function opInit(){
 }
 
 /* ---------- Nawigacja i start ---------- */
-const TABS = ['obliczenia','raporty','zmiany','program','trasa','szczepionki','info'];
+const TABS = ['obliczenia','raporty','szczepionki','trasa','program','zmiany','info'];
 function showTab(t){
   if(!TABS.includes(t)) t = 'obliczenia';
   TABS.forEach(x => { $('v-' + x).hidden = x !== t; });
@@ -5343,6 +5407,31 @@ function showTab(t){
   if(t === 'szczepionki'){ renderKnowledge(); renderRules(); }
   if(t === 'info') renderInfo();
   window.scrollTo({top:0});
+  tabsWidoczna();
+}
+// zakładki przewijane w poziomie: strzałka pokazuje, że po prawej (lewej) są jeszcze sekcje
+function tabsStrzalki(){
+  const n = $('tabs'); if(!n) return;
+  const max = n.scrollWidth - n.clientWidth;
+  $('tabs-r').hidden = max <= 2 || n.scrollLeft >= max - 2;
+  $('tabs-l').hidden = max <= 2 || n.scrollLeft <= 2;
+}
+function tabsWidoczna(){
+  const n = $('tabs'), a = n && n.querySelector('a[aria-current="page"]'); if(!a){ tabsStrzalki(); return; }
+  const zapas = 44;
+  if(a.offsetLeft < n.scrollLeft + 4) n.scrollLeft = Math.max(0, a.offsetLeft - zapas);
+  else if(a.offsetLeft + a.offsetWidth > n.scrollLeft + n.clientWidth - 4) n.scrollLeft = a.offsetLeft + a.offsetWidth - n.clientWidth + zapas;
+  tabsStrzalki();
+}
+function tabsBind(){
+  const n = $('tabs'); if(!n) return;
+  n.addEventListener('scroll', tabsStrzalki, {passive:true});
+  window.addEventListener('resize', tabsStrzalki);
+  $('tabs-r').onclick = () => n.scrollBy({left:Math.max(140, n.clientWidth * .6), behavior:'smooth'});
+  $('tabs-l').onclick = () => n.scrollBy({left:-Math.max(140, n.clientWidth * .6), behavior:'smooth'});
+  try { new MutationObserver(tabsStrzalki).observe(n, {subtree:true, childList:true, characterData:true}); } catch(e){}
+  try { document.fonts.ready.then(tabsStrzalki); } catch(e){}
+  tabsStrzalki(); setTimeout(tabsStrzalki, 400);
 }
 function updateChip(){
   const c = $('chip-mode'); let cls = '', txt = 'Łączenie z pamięcią…';
@@ -5353,6 +5442,7 @@ function updateChip(){
 }
 function bind(){
   window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
+  tabsBind();
   fbPaint(); fbLoad();
   $('fb-send').addEventListener('click', fbSend);
   $('bird').addEventListener('change', () => {
@@ -5787,9 +5877,46 @@ function trBioOpis(f){ const r = trRanga(f); if(r == null) return '';
 // data wylęgu z zakładki „Program” – stado tej samej fermy
 function trWylZProgramu(n){ try { const fl = progGet().flocks.find(x => x.farm && n && x.farm.trim().toLowerCase() === n.trim().toLowerCase() && x.hatch); return fl ? fl.hatch : null; } catch(e){ return null; } }
 let trMap = null, trBase = null, trOrto = null, trPick = null, trPickData = null, trLayer = null, trEdit = null, trLoading = null;
+let trGps = null, trMC = null, trTimer = null, trZajety = false, trBazaOtw = null;
+const TR_IK = {
+  chwyt:'<svg viewBox="0 0 10 16" aria-hidden="true"><g fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="7" cy="3" r="1.5"/><circle cx="3" cy="8" r="1.5"/><circle cx="7" cy="8" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="7" cy="13" r="1.5"/></g></svg>',
+  nav:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 21 3l-8 18-2-8z" fill="currentColor"/></svg>',
+  opt:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1Q13.98 10.02 23 12Q13.98 13.98 12 23Q10.02 13.98 1 12Q10.02 10.02 12 1Z" fill="currentColor"/></svg>',
+  x:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'};
 
-function trGet(){ const d = lsGet(TR_KEY); const o = d && typeof d === 'object' ? d : {}; if(!Array.isArray(o.fermy)) o.fermy = []; if(!o.plan) o.plan = {sel:[], start:'gps', kon:'powrot', odj:'07:00', przerwa:10}; return o; }
-function trSet(d){ lsSet(TR_KEY, d); }
+// plan.kol – fermy trasy w kolejności objazdu (bez startu i mety); plan.wynik – godziny i kilometry dla tej kolejności (klucz = stan trasy)
+function trGet(){
+  const d = lsGet(TR_KEY), o = d && typeof d === 'object' ? d : {};
+  if(!Array.isArray(o.fermy)) o.fermy = [];
+  if(!o.plan || typeof o.plan !== 'object') o.plan = {start:'gps', kon:'powrot', odj:'07:00', przerwa:10};
+  const p = o.plan, ids = new Set(o.fermy.map(f => f.id));
+  if(!Array.isArray(p.kol)){   // wersje do 2.0: zaznaczone fermy (sel) i kolejność z ostatnio ułożonej trasy
+    const sel = Array.isArray(p.sel) ? p.sel : [], wk = p.wynik && Array.isArray(p.wynik.kol) ? p.wynik.kol : [];
+    p.kol = wk.filter(id => sel.includes(id)).concat(sel.filter(id => !wk.includes(id)));
+    delete p.wynik;
+  }
+  if(!p.start || (p.start !== 'gps' && !ids.has(p.start))) p.start = 'gps';
+  if(!p.kon || (p.kon !== 'powrot' && p.kon !== 'ostatnia' && !ids.has(p.kon))) p.kon = 'powrot';
+  p.kol = p.kol.filter((id, i, a) => ids.has(id) && a.indexOf(id) === i && id !== p.start && id !== p.kon);
+  if(!p.godz || typeof p.godz !== 'object') p.godz = {};
+  Object.keys(p.godz).forEach(k => { if(!p.kol.includes(k) || trMin(p.godz[k]) == null) delete p.godz[k]; });
+  if(!p.odj) p.odj = '07:00';
+  if(!isNum(p.przerwa)) p.przerwa = 10;
+  return o;
+}
+function trSet(d){ d.plan.sel = d.plan.kol.slice(); lsSet(TR_KEY, d); }   // sel – dla kopii danych czytanych przez starsze wersje
+const trF = (d, id) => d.fermy.find(f => f.id === id);
+function trPunkty(d){ const p = d.plan, endF = p.kon !== 'powrot' && p.kon !== 'ostatnia' ? trF(d, p.kon) || null : null;
+  return {lista:p.kol.map(id => trF(d, id)).filter(Boolean), endF}; }
+// stan trasy, od którego zależą godziny: kolejność, punkty, czasy na fermach, bioasekuracja, start, koniec, godziny, dzień
+function trKlucz(d, bezKol){
+  const p = d.plan, f = id => { const x = trF(d, id); return x ? [id, x.la, x.lo, isNum(x.czas) ? x.czas : 60, trRanga(x) ?? ''].join(':') : String(id); };
+  return [bezKol ? '' : p.kol.map(f).join(';'), f(p.start), f(p.kon), p.odj, p.przerwa, JSON.stringify(p.godz || {}), todayISO()].join('|');
+}
+function trWynik(d){ const w = d.plan.wynik; return w && w.klucz === trKlucz(d) ? w : null; }
+// pary [ferma odwiedzona za późno, ferma z późniejszej grupy bioasekuracji odwiedzona przed nią]
+function trBioKonflikty(lista){ const K = []; let mx = null;
+  lista.forEach(f => { const r = trRanga(f); if(r == null) return; if(mx && r < mx.r) K.push([f, mx.f]); if(!mx || r > mx.r) mx = {r, f}; }); return K; }
 const trOdl = (a, b) => { const R = 6371000, r = Math.PI / 180, dla = (b[0]-a[0])*r, dlo = (b[1]-a[1])*r; return 2*R*Math.asin(Math.sqrt(Math.sin(dla/2)**2 + Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dlo/2)**2)); };
 const trKm = m => m >= 1000 ? fmt(m / 1000, m < 10000 ? 1 : 0) + ' km' : Math.round(m) + ' m';
 const trCz = s => { const m = Math.round(s / 60); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0') + ' min'; };
@@ -5865,12 +5992,13 @@ function trWarstwa(orto){
 }
 function trRysujFermy(){
   if(!trMap) return; trLayer.clearLayers();
-  const d = trGet(), w = d.plan.wynik, nr = {};
-  if(w && w.kol) w.kol.forEach((id, i) => nr[id] = i + 1);
+  const d = trGet(), {lista, endF} = trPunkty(d), w = trWynik(d), nr = {};
+  lista.forEach((f, i) => nr[f.id] = i + 1);
   d.fermy.forEach(f => { if(trEdit === f.id) return;
-    L.marker([f.la, f.lo], {icon:trIk(nr[f.id] || '', 'ferma' + (f.baza ? ' baza' : '') + (nr[f.id] ? ' nr' : '')), title:f.n, keyboard:false}).addTo(trLayer).on('click', () => trPokaz(f.id)); });
+    const kon = !!endF && endF.id === f.id, st = d.plan.start === f.id;
+    L.marker([f.la, f.lo], {icon:trIk(nr[f.id] || (kon ? 'K' : st ? 'S' : ''), 'ferma' + (f.baza ? ' baza' : '') + (nr[f.id] ? ' nr' : '') + (kon ? ' kon' : '') + (st ? ' st' : '')), title:f.n, keyboard:false}).addTo(trLayer).on('click', () => trPokaz(f.id, true)); });
   if(w && w.geo && w.geo.length > 1){ L.polyline(w.geo, {color:'#fff', weight:8, opacity:.85, interactive:false}).addTo(trLayer); L.polyline(w.geo, {color:'#1C6FD1', weight:5, opacity:.95, interactive:false}).addTo(trLayer); }
-  if(w && w.start && w.startN !== 'baza') L.marker(w.start, {icon:trIk('S', 'st'), keyboard:false, title:'Start'}).addTo(trLayer);
+  if(w && !w.bezStartu && d.plan.start === 'gps') L.marker(w.start, {icon:trIk('S', 'st'), keyboard:false, title:'Start – Twoja pozycja'}).addTo(trLayer);
 }
 // wskazany punkt (wynik wyszukiwania albo stuknięcie mapy); podczas poprawiania fermy – nowy punkt fermy
 async function trWskaz(la, lo, zMapy, nazwa){
@@ -5894,13 +6022,17 @@ function trKarta(){
       <a class="btn small ghost" href="${trNav(p.la, p.lo)}" target="_blank" rel="noopener">Nawiguj</a></div>
     <p class="note">Przeciągnij znacznik albo stuknij mapę, żeby wskazać dokładne miejsce – np. bramę wjazdową. Zdjęcie lotnicze pomaga trafić w wjazd.</p>`;
 }
-function trPokaz(id){
-  const f = trGet().fermy.find(x => x.id === id); if(!f || !trMap) return;
-  trMap.setView([f.la, f.lo], Math.max(trMap.getZoom(), 16));
-  L.popup({offset:[0, -6]}).setLatLng([f.la, f.lo]).setContent(`<b>${esc(f.n)}</b><br>${esc(f.adr || '')}${f.uw ? '<br><i>' + esc(f.uw) + '</i>' : ''}<br><a href="${trNav(f.la, f.lo)}" target="_blank" rel="noopener">Nawiguj</a>`).openOn(trMap);
-  $('tr-map').scrollIntoView({behavior:'smooth', block:'center'});
+function trPokaz(id, zMapy){
+  const d = trGet(), f = trF(d, id); if(!f || !trMap) return;
+  if(!zMapy) trMap.setView([f.la, f.lo], Math.max(trMap.getZoom(), 16));
+  const w = d.plan.kol.includes(id), st = d.plan.start === id, kon = d.plan.kon === id;
+  const el = document.createElement('div'); el.className = 'tr-pop';
+  el.innerHTML = `<b>${esc(f.n)}</b><br>${esc(f.adr || '')}${f.uw ? '<br><i>' + esc(f.uw) + '</i>' : ''}
+    <div class="tools">${st || kon ? `<span class="pill">${st ? 'start trasy' : 'koniec trasy'}</span>` : `<button class="btn small${w ? ' ghost' : ''}" type="button" data-tp="tog">${w ? 'Usuń z trasy' : '+ Do trasy'}</button>`}<a class="btn small ghost" href="${trNav(f.la, f.lo)}" target="_blank" rel="noopener">Nawiguj</a></div>`;
+  const b = el.querySelector('[data-tp="tog"]'); if(b) b.onclick = () => { trTrasaTog(id); trMap.closePopup(); };
+  L.popup({offset:[0, -6]}).setLatLng([f.la, f.lo]).setContent(el).openOn(trMap);
+  if(!zMapy) $('tr-map').scrollIntoView({behavior:'smooth', block:'center'});
 }
-
 /* ---------- baza ferm ---------- */
 function trForm(f){
   const d = trGet(), nowa = !f, p = trPickData;
@@ -5913,7 +6045,8 @@ function trForm(f){
       <label>Adres<input id="trf-adr" type="text" value="${esc(f.adr || '')}" placeholder="miejscowość, ulica, numer"></label>
       <label class="wide">Uwagi dla kierowcy<input id="trf-uw" type="text" value="${esc(f.uw || '')}" placeholder="np. wjazd od strony lasu, kod bramy, telefon"></label>
       <label>Czas na fermie (min)<input id="trf-czas" type="number" min="0" step="5" inputmode="numeric" value="${isNum(f.czas) ? f.czas : 60}"><span class="hint">szczepienie z przygotowaniem</span></label>
-      <label class="chk"><input id="trf-baza" type="checkbox"${f.baza ? ' checked' : ''}> Baza – tu zaczynam i kończę dzień</label>
+      <label class="chk"><input id="trf-baza" type="checkbox"${f.baza ? ' checked' : ''}> Baza – tu zaczynam i kończę dzień</label>${nowa ? `
+      <label class="chk"><input id="trf-dotrasy" type="checkbox" checked> Dodaj do trasy na dziś</label>` : ''}
       <label class="chk wide"><input id="trf-bio" type="checkbox"${bio ? ' checked' : ''}> Bioasekuracja – uwzględnij w kolejności objazdu</label>
     </div>
     <div class="row tr-bio" id="trf-biobox"${bio ? '' : ' hidden'}>
@@ -5931,47 +6064,86 @@ function trForm(f){
 function trZapiszForm(id){
   const d = trGet(), n = $('trf-n').value.trim();
   if(!n){ toast('Wpisz nazwę fermy.'); return; }
-  let f = id && d.fermy.find(x => x.id === id);
+  let f = id && d.fermy.find(x => x.id === id); const nowa = !f;
   if(!f){ if(!trPickData){ toast('Najpierw wskaż punkt na mapie.'); return; } f = {id:uid(), la:+trPickData.la.toFixed(6), lo:+trPickData.lo.toFixed(6), t:Date.now()}; d.fermy.push(f); }
   Object.assign(f, {n, adr:$('trf-adr').value.trim(), uw:$('trf-uw').value.trim(), czas:Math.max(0, +$('trf-czas').value || 0), baza:$('trf-baza').checked});
   delete f.grp; f.bio = $('trf-bio').checked; f.chor = f.bio && $('trf-chor').checked; f.chorN = f.chor ? $('trf-chorn').value.trim() : '';
   const wk = $('trf-wiek').value.trim();
   if(f.bio && wk !== '' && isFinite(+wk) && +wk >= 0){ const d = new Date(Date.parse(todayISO()) - Math.round(+wk) * 864e5); f.wyl = d.toISOString().slice(0, 10); } else if(!f.bio || wk === '') delete f.wyl;
   if(f.baza) d.fermy.forEach(x => { if(x !== f) x.baza = false; });
+  if(nowa && !f.baza && $('trf-dotrasy') && $('trf-dotrasy').checked && !d.plan.kol.includes(f.id)) d.plan.kol.push(f.id);
   d.fermy.sort((a, b) => a.n.localeCompare(b.n, 'pl'));
   delete d.plan.wynik; trSet(d);
   $('tr-form').hidden = true; trPickData = null; if(trPick && trMap){ trMap.removeLayer(trPick); trPick = null; } trKarta();
   opFeat('trasa'); toast('Zapisano fermę „' + n + '”.'); renderTrasa();
 }
 function trListaFerm(){
-  const d = trGet();
-  $('tr-count').textContent = d.fermy.length;
-  if(!d.fermy.length){ $('tr-fermy').innerHTML = '<p class="note">Brak zapisanych ferm. Wyszukaj adres albo stuknij mapę, wskaż dokładne miejsce i stuknij „Zapisz jako fermę”.</p>'; return; }
-  $('tr-fermy').innerHTML = d.fermy.map(f => `<div class="tr-f" data-id="${f.id}">
-      <div class="tr-fh"><b>${esc(f.n)}</b>${f.baza ? '<span class="pill">baza</span>' : ''}${trRanga(f) === 9 ? '<span class="pill g3">chore</span>' : trRanga(f) != null ? `<span class="pill g1">${trWiek(f) != null ? trWiek(f) + ' dni' : 'bioasekuracja'}</span>` : ''}</div>
-      <div class="note">${esc(f.adr || '')}${f.uw ? ' · <i>' + esc(f.uw) + '</i>' : ''} · ${isNum(f.czas) ? f.czas : 60} min na fermie</div>
-      <div class="tools"><button class="btn small ghost" type="button" data-tr="pokaz">Pokaż</button><button class="btn small ghost" type="button" data-tr="punkt">Popraw punkt</button><button class="btn small ghost" type="button" data-tr="edytuj">Edytuj</button><a class="btn small ghost" href="${trNav(f.la, f.lo)}" target="_blank" rel="noopener">Nawiguj</a><button class="btn small danger" type="button" data-tr="usun">Usuń</button></div>
-    </div>`).join('');
+  const d = trGet(), p = d.plan, det = $('tr-baza'), n = d.fermy.length;
+  $('tr-count').textContent = n;
+  // zwinięta, gdy ferm jest więcej niż 3 – chyba że użytkownik sam ją rozwinął lub zwinął
+  if(det && trBazaOtw == null){ const chce = n <= 3; if(det.open !== chce){ det.dataset.auto = '1'; det.open = chce; } }
+  if(det) $('tr-baza-t').textContent = det.open ? 'zwiń' : 'pokaż';
+  $('tr-filtr').hidden = n <= 5;
+  if(!n){ $('tr-fermy').innerHTML = '<p class="note">Brak zapisanych ferm. Znajdź adres na mapie albo stuknij mapę, wskaż dokładne miejsce i stuknij „Zapisz jako fermę”.</p>'; return; }
+  $('tr-fermy').innerHTML = d.fermy.map(f => { const w = p.kol.includes(f.id), st = p.start === f.id, kon = p.kon === f.id, r = trRanga(f);
+    return `<div class="tr-f" data-id="${f.id}" data-q="${esc((f.n + ' ' + (f.adr || '')).toLowerCase())}">
+      <div class="tr-fr"><div class="tr-fi"><div class="tr-fh"><b>${esc(f.n)}</b>${f.baza ? '<span class="pill">baza</span>' : ''}${r === 9 ? '<span class="pill g3">chore</span>' : r != null ? `<span class="pill g1">${trWiek(f) != null ? trWiek(f) + ' dni' : 'bioasekuracja'}</span>` : ''}</div>
+        <div class="note">${esc(f.adr || '')}${f.uw ? ' · <i>' + esc(f.uw) + '</i>' : ''} · ${isNum(f.czas) ? f.czas : 60} min</div></div>
+        ${st || kon ? `<span class="pill tr-fst">${st ? 'start' : 'koniec'}</span>` : `<button class="btn small${w ? '' : ' ghost'} tr-tog" type="button" data-tr="tog" aria-pressed="${w}">${w ? '✓ W trasie' : '+ Do trasy'}</button>`}</div>
+      <details class="tr-fm"><summary>Więcej</summary><div class="tools"><button class="btn small ghost" type="button" data-tr="pokaz">Pokaż na mapie</button><button class="btn small ghost" type="button" data-tr="punkt">Popraw punkt</button><button class="btn small ghost" type="button" data-tr="edytuj">Edytuj</button><a class="btn small ghost" href="${trNav(f.la, f.lo)}" target="_blank" rel="noopener">Nawiguj</a><button class="btn small danger" type="button" data-tr="usun">Usuń</button></div></details>
+    </div>`; }).join('');
+  trFiltr();
 }
+function trFiltr(){ const q = ($('tr-filtr').value || '').trim().toLowerCase(); document.querySelectorAll('#tr-fermy .tr-f').forEach(e => { e.hidden = !!q && !e.dataset.q.includes(q); }); }
 
-/* ---------- plan objazdu ---------- */
+/* ---------- trasa na dziś ---------- */
 function trPlanUI(){
-  const d = trGet(), p = d.plan, ids = new Set(d.fermy.map(f => f.id));
-  p.sel = (p.sel || []).filter(id => ids.has(id));
+  if(trCiagnie) return;   // po puszczeniu wiersza lista i tak się odświeży
+  const d = trGet(), p = d.plan, {lista, endF} = trPunkty(d), w = trWynik(d), S = new Map(w ? w.stopy.map(s => [s.id, s]) : []);
+  const zle = new Set(trBioKonflikty(lista).map(k => k[0].id));
   const opt = (v, t, s) => `<option value="${esc(v)}"${s === v ? ' selected' : ''}>${esc(t)}</option>`;
-  $('tr-start').innerHTML = opt('gps', 'Moja pozycja (GPS)', p.start) + d.fermy.map(f => opt(f.id, (f.baza ? 'Baza: ' : '') + f.n, p.start)).join('');
-  $('tr-kon').innerHTML = opt('powrot', 'Powrót do startu', p.kon) + opt('ostatnia', 'Kończę na ostatniej fermie', p.kon) + d.fermy.map(f => opt(f.id, 'Koniec: ' + f.n, p.kon)).join('');
-  if(p.start !== 'gps' && !ids.has(p.start)) $('tr-start').value = 'gps';
-  $('tr-odj').value = p.odj || '07:00'; $('tr-przerwa').value = isNum(p.przerwa) ? p.przerwa : 10;
-  $('tr-sel').innerHTML = d.fermy.length ? d.fermy.map(f => `<div class="tr-si"><label class="chk"><input type="checkbox" data-sel="${f.id}"${p.sel.includes(f.id) ? ' checked' : ''}> ${esc(f.n)} <small class="note">${isNum(f.czas) ? f.czas : 60} min${trBioOpis(f) ? ' · ' + esc(trBioOpis(f)) : ''}</small></label><label class="tr-godz" title="Godzina, o której musisz być na tej fermie (opcjonalnie)">na godz.<input type="time" data-godz="${f.id}" value="${esc((p.godz || {})[f.id] || '')}"></label></div>`).join('') : '<p class="note">Najpierw zapisz fermy.</p>';
-  trWynikUI();
+  const pill = f => { const r = trRanga(f); return r === 9 ? '<span class="pill g3">chore</span>' : r != null ? `<span class="pill g1">${trWiek(f) != null ? trWiek(f) + ' dni' : 'bioasekuracja'}</span>` : ''; };
+  $('tr-ile').textContent = lista.length;
+  $('tr-sum').textContent = w && lista.length ? trKm(w.m) + ' · ' + trCz(w.s) + ' jazdy' : '';
+  const wiersz = (f, i) => { const s = S.get(f.id);
+    return `<li class="tr-st${zle.has(f.id) ? ' zle' : ''}" data-id="${f.id}">
+      <button type="button" class="tr-h" aria-label="Zmień kolejność: ${esc(f.n)} – strzałki w górę i w dół" title="Przytrzymaj i przesuń">${TR_IK.chwyt}</button>
+      <span class="tr-nr">${i + 1}</span>
+      <div class="tr-sn"><b>${esc(f.n)}</b>${pill(f)}${zle.has(f.id) ? '<span class="pill late">bioasekuracja!</span>' : ''}</div>
+      <div class="tr-sa"><a class="tr-ib" href="${trNav(f.la, f.lo)}" target="_blank" rel="noopener" title="Nawiguj do tej fermy" aria-label="Nawiguj do: ${esc(f.n)}">${TR_IK.nav}</a><button type="button" class="tr-ib x" data-tr="zdejmij" data-id="${f.id}" title="Usuń z trasy" aria-label="Usuń z trasy: ${esc(f.n)}">${TR_IK.x}</button></div>
+      <div class="tr-mt">${s ? `<span class="note">przyjazd ${trHM(s.przy)}${s.czas ? ' · wyjazd ' + trHM(s.odj) : ''} · ${trKm(s.m)}, ${trCz(s.s)}</span>${trGodzOpis(s)}` : `<span class="note">${isNum(f.czas) ? f.czas : 60} min na fermie</span>`}
+        <label class="tr-godz"><span>na godz.</span><input type="time" data-godz="${f.id}" value="${esc(p.godz[f.id] || '')}"></label></div></li>`; };
+  const start = `<li class="tr-fix"><span class="tr-nr s">S</span><div class="tr-sb"><span class="tr-lab">Start</span>
+      <div class="tr-2"><select id="tr-start" aria-label="Start trasy">${opt('gps', 'Moja pozycja (GPS)', p.start)}${d.fermy.map(f => opt(f.id, (f.baza ? 'Baza: ' : '') + f.n, p.start)).join('')}</select>
+      <label class="tr-godz"><span>wyjazd</span><input id="tr-odj" type="time" value="${esc(p.odj || '07:00')}"></label></div></div></li>`;
+  let konInfo = '';
+  if(w){ const k = w.powrot || (endF && w.stopy.length ? w.stopy[w.stopy.length - 1] : null); if(k) konInfo = `<span class="note">przyjazd ok. ${trHM(k.przy)} · ${trKm(k.m)}, ${trCz(k.s)}</span>`; }
+  const koniec = `<li class="tr-fix"><span class="tr-nr k">K</span><div class="tr-sb"><span class="tr-lab">Koniec</span>
+      <select id="tr-kon" aria-label="Koniec trasy">${opt('powrot', 'Powrót do startu', p.kon)}${opt('ostatnia', 'Kończę na ostatniej fermie', p.kon)}${d.fermy.map(f => opt(f.id, 'Jadę do: ' + f.n, p.kon)).join('')}</select>${konInfo}</div></li>`;
+  const pusto = `<li class="tr-pusto">${d.fermy.length ? 'Brak ferm w trasie – wybierz je niżej („+ Dodaj fermę do trasy”), w bazie ferm albo stuknij fermę na mapie.' : 'Najpierw zapisz fermy – znajdź adres na mapie poniżej.'}</li>`;
+  $('tr-lista').innerHTML = start + (lista.length ? lista.map(wiersz).join('') : pusto) + koniec;
+  const wolne = d.fermy.filter(f => !p.kol.includes(f.id) && f.id !== p.start && f.id !== p.kon).sort((a, b) => a.n.localeCompare(b.n, 'pl'));
+  $('tr-dodaj').innerHTML = '<option value="">+ Dodaj fermę do trasy…</option>' + wolne.map(f => opt(f.id, f.n + (f.adr ? ' – ' + f.adr : ''), '')).join('');
+  $('tr-dodaj').hidden = !wolne.length;
+  $('tr-przerwa').value = isNum(p.przerwa) ? p.przerwa : 10;
+  $('tr-tip').hidden = lista.length < 2;
+  $('tr-wyczysc').hidden = !lista.length;
+  trWynikUI(w, lista, endF);
+  if((lista.length || endF) && !w) trPrzeliczPozniej(250);
 }
-function trPlanZapisz(){
-  const d = trGet(), p = d.plan;
-  p.sel = [...document.querySelectorAll('#tr-sel [data-sel]')].filter(c => c.checked).map(c => c.dataset.sel);
-  p.godz = {}; document.querySelectorAll('#tr-sel [data-godz]').forEach(i => { if(i.value) p.godz[i.dataset.godz] = i.value; });
-  p.start = $('tr-start').value; p.kon = $('tr-kon').value; p.odj = $('tr-odj').value || '07:00';
-  p.przerwa = Math.max(0, +$('tr-przerwa').value || 0); trSet(d);
+function trWynikUI(w, lista, endF){
+  const box = $('tr-wynik');
+  if(!lista.length && !endF){ box.hidden = true; box.innerHTML = ''; return; }
+  box.hidden = false;
+  const kon = trBioKonflikty(lista), o = [];
+  if(kon.length) o.push(`<p class="tr-alert bad"><b>Kolejność niezgodna z bioasekuracją:</b> ${kon.slice(0, 3).map(([a, b]) => `„${esc(a.n)}” (${esc(trBioOpis(a).split(' – ')[0])}) jest po „${esc(b.n)}”`).join('; ')}${kon.length > 3 ? ' i inne' : ''}. Przesuń fermy albo stuknij „Optymalizuj”.</p>`);
+  if(!w){ o.push('<p class="note">Liczę godziny przejazdu…</p>'); box.innerHTML = o.join(''); return; }
+  if(w.zGodz) o.push(w.sp > 0.5 ? `<p class="tr-alert bad"><b>Nie zdążysz na wszystkie umówione godziny</b> – spóźnienie łącznie ok. ${trCz(w.sp * 60)}. Zmień kolejność, wyjedź wcześniej albo stuknij „Optymalizuj”.</p>`
+    : `<p class="tr-alert ok">Zdążysz na wszystkie umówione godziny.${w.najpWyjazd != null ? ` Wyjedź najpóźniej o <b>${trHM(w.najpWyjazd)}</b>.` : ''}</p>`);
+  if(w.opt) o.push(w.przed && w.przed.s - w.s > 60 ? `<p class="tr-alert ok">Trasa zoptymalizowana – oszczędność ${trCz(w.przed.s - w.s)} i ${trKm(Math.max(0, w.przed.m - w.m))} wobec poprzedniej kolejności.</p>` : '<p class="tr-alert ok">Trasa zoptymalizowana – ta kolejność jest najkrótsza.</p>');
+  o.push(`<p class="note">${w.bezStartu ? '' : 'Start: ' + esc(w.startN) + ' o ' + esc(w.odj) + ' · '}koniec ok. ${trHM(w.koniecZeg)} · razem ${trKm(w.m)}, ${trCz(w.s)} jazdy. Przerwa między fermami ${w.przerwa} min. Czasy przejazdu po drogach (OSRM, OpenStreetMap), bez korków.${w.prosta ? '<br><b>Bez połączenia z serwerem tras – odległości w linii prostej ×1,3, czasy orientacyjne.</b>' : ''}</p>`);
+  if(w.bezStartu) o.push(`<p class="note">Godziny liczone od przyjazdu na pierwszą fermę o ${esc(w.odj)} – bez dojazdu z Twojej pozycji. <button class="btn small ghost" type="button" data-tr="gps">Uwzględnij dojazd z mojej pozycji</button></p>`);
+  box.innerHTML = o.join('');
 }
 function trPozycja(){ return new Promise((ok, er) => { if(!navigator.geolocation){ er(new Error('brak')); return; }
   navigator.geolocation.getCurrentPosition(p => ok([p.coords.latitude, p.coords.longitude]), er, {enableHighAccuracy:true, timeout:15000, maximumAge:60000}); }); }
@@ -6043,69 +6215,170 @@ function trZGodzinami(M, info, rg, odj, przerwa, powrot, iE){
       if(c < najC){ najC = c; naj = t; } } }
   return [0].concat(naj, iE > 0 ? [iE] : []);
 }
-async function trUluz(){
-  trPlanZapisz();
-  const d = trGet(), p = d.plan, F = p.sel.map(id => d.fermy.find(f => f.id === id)).filter(Boolean);
-  if(!F.length){ toast('Zaznacz fermy do objazdu.'); return; }
-  const btn = $('tr-go'); btn.disabled = true; btn.textContent = 'Liczę trasę…';
-  try {
-    let start, startN;
-    if(p.start === 'gps'){ btn.textContent = 'Ustalam Twoją pozycję…';
-      try { start = await trPozycja(); startN = 'Twoja pozycja'; }
-      catch(e){ toast('Nie udało się ustalić pozycji (GPS wyłączony albo brak zgody) – wybierz start z listy ferm.', 5000); return; } }
-    else { const s = d.fermy.find(f => f.id === p.start); start = [s.la, s.lo]; startN = s.n; }
-    const lista = F.filter(f => f.id !== p.start && f.id !== p.kon);
-    const endF = p.kon !== 'powrot' && p.kon !== 'ostatnia' ? d.fermy.find(f => f.id === p.kon) : null;
-    const P = [start].concat(lista.map(f => [f.la, f.lo]), endF ? [[endF.la, endF.lo]] : []), iE = endF ? P.length - 1 : -1, n = P.length;
-    btn.textContent = lista.length > 11 ? `Liczę trasę (${lista.length} ferm)…` : 'Liczę trasę…';
-    const M = await trMacierz(P);
+// start trasy: ferma albo pozycja GPS (zapamiętana na 15 min); bez zgody na lokalizację – null
+async function trStart(d, pytaj){
+  const p = d.plan;
+  if(p.start !== 'gps'){ const s = trF(d, p.start); if(s) return {pt:[s.la, s.lo], n:s.n}; }
+  if(trGps && Date.now() - trGps.t < 15 * 60e3) return {pt:[trGps.la, trGps.lo], n:'Twoja pozycja'};
+  let wolno = !!pytaj;
+  if(!wolno){ try { wolno = (await navigator.permissions.query({name:'geolocation'})).state === 'granted'; } catch(e){} }
+  if(!wolno) return null;
+  try { const q = await trPozycja(); trGps = {la:q[0], lo:q[1], t:Date.now()}; return {pt:q, n:'Twoja pozycja'}; } catch(e){ return null; }
+}
+// macierz czasów i odległości – zapamiętana dla tego samego zestawu punktów (przesuwanie ferm liczy się bez internetu)
+async function trMacierzC(P){
+  const k = P.map(q => q[0].toFixed(5) + ',' + q[1].toFixed(5)).join(';');
+  if(trMC && trMC.k === k) return trMC.M;
+  const M = await trMacierz(P); if(!M.prosta) trMC = {k, M}; return M;
+}
+function trPrzeliczPozniej(ms){ clearTimeout(trTimer); trTimer = setTimeout(() => { if(!trZajety) trPrzelicz(false, false).catch(e => { console.error(e); const b = $('tr-wynik'); if(b) b.innerHTML = '<p class="note">Nie udało się policzyć godzin przejazdu – spróbuj ponownie.</p>'; }); }, ms == null ? 400 : ms); }
+// godziny i kilometry dla kolejności z listy; opt – najpierw ułóż najlepszą kolejność (bioasekuracja, umówione godziny)
+async function trPrzelicz(opt, pytaj){
+  const d = trGet(), p = d.plan, {lista, endF} = trPunkty(d);
+  if(!lista.length && !endF) return null;
+  const k0 = trKlucz(d), k0b = trKlucz(d, true), ids0 = p.kol.slice().sort().join(',');
+  const st = await trStart(d, !!(opt || pytaj));
+  if(opt && !st){ toast('Nie udało się ustalić Twojej pozycji (GPS wyłączony albo brak zgody) – wybierz start z listy ferm.', 5000); return null; }
+  const W = lista.slice().sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+  const pierwszy = lista[0] || endF, start = st ? st.pt : [pierwszy.la, pierwszy.lo];
+  const P = [start].concat(W.map(f => [f.la, f.lo]), endF ? [[endF.la, endF.lo]] : []), n = P.length, iE = endF ? n - 1 : -1;
+  const ix = new Map(W.map((f, i) => [f.id, i + 1]));
+  const M = await trMacierzC(P);
+  const odj0 = trMin(p.odj) ?? 420, godz = p.godz || {}, przerwa = isNum(p.przerwa) ? p.przerwa : 10;
+  const info = [{czas:0}].concat(W.map(f => ({czas:isNum(f.czas) ? f.czas : 60, godz:trMin(godz[f.id])})), endF ? [{czas:0, koniec:true}] : []);
+  const rg = [null].concat(W.map(trRanga), endF ? [null] : []);
+  const reczna = [0].concat(lista.map(f => ix.get(f.id)), endF ? [iE] : []);
+  const powrotOK = p.kon === 'powrot' && !!st, zGodz = info.some(o => o.godz != null);
+  let t = reczna;
+  if(opt && n > 2){
     // koszt: czas jazdy + kilometry (1 km ≈ 30 s); bioasekuracja: zakaz przejazdu z grupy późniejszej do wcześniejszej
-    const rg = [null].concat(lista.map(trRanga), endF ? [null] : []);
     const K = []; for(let i = 0; i < n; i++){ K.push(new Float64Array(n)); for(let k = 0; k < n; k++) K[i][k] = M.s[i][k] + M.d[i][k] * 0.03; }
     if(endF){ for(let j = 1; j < n; j++) K[iE][j] = 1e9; K[iE][0] = 0; }
-    if(p.kon === 'ostatnia') for(let j = 1; j < n; j++) K[j][0] = 0;
-    else if(!endF) for(let j = 1; j < n; j++) K[j][0] = M.s[j][0] + M.d[j][0] * 0.03;
+    else if(p.kon === 'ostatnia') for(let j = 1; j < n; j++) K[j][0] = 0;
     await new Promise(r => setTimeout(r, 30));
-    const odj0 = trMin(p.odj) ?? 420, godz = p.godz || {};
-    const info = [{czas:0}].concat(lista.map(f => ({czas:isNum(f.czas) ? f.czas : 60, godz:trMin(godz[f.id])})), endF ? [{czas:0, godz:trMin(godz[endF.id]), koniec:true}] : []);
-    const zGodz = info.some(o => o.godz != null);
-    const t = zGodz ? trZGodzinami(M, info, rg, odj0, p.przerwa, p.kon === 'powrot', iE) : trKomiwojazer(K, rg);
-    const jedz = p.kon === 'powrot' ? n : n - 1;
-    const sumy = kol => { let m = 0, s = 0; for(let i = 0; i < jedz; i++){ const a = kol[i], b = kol[(i + 1) % n]; m += M.d[a][b]; s += M.s[a][b]; } return {m, s}; };
-    const kolWej = [...Array(n).keys()], przed = sumy(kolWej), po = sumy(t);
-    // harmonogram: przyjazd, czekanie do umówionej godziny, wyjazd
-    const h = trHarm(t, M, info, odj0, p.przerwa); let zeg = h.kon;
-    const stopy = h.H.map((x, i) => { const b = x.b, a = t[i], f = b === iE ? endF : lista[b - 1], o = info[b];
-      return {id:f.id, n:f.n, la:f.la, lo:f.lo, bio:b === iE ? '' : trBioOpis(f), m:M.d[a][b], s:M.s[a][b], przy:x.przy, pocz:x.pocz, odj:x.odj, czas:o.czas, godz:o.godz, koniec:b === iE}; });
-    // najpóźniejsze godziny (od końca): rozpoczęcie na fermie i wyjazd z poprzedniego punktu, żeby zdążyć na wszystkie umówione godziny
-    let Lnast = Infinity;
-    for(let i = stopy.length - 1; i >= 0; i--){ const st = stopy[i];
-      const Lpocz = Math.min(st.godz != null ? st.godz : Infinity, Lnast);
-      st.najpPocz = Lpocz; st.najpWyjPrzed = isFinite(Lpocz) ? Lpocz - st.s / 60 : null;
-      Lnast = isFinite(Lpocz) ? Lpocz - st.s / 60 - (i > 0 ? p.przerwa : 0) - (i > 0 ? stopy[i - 1].czas : 0) : Infinity; }
-    // ile najdłużej można zostać na fermie, żeby zdążyć dalej
-    stopy.forEach((st, i) => { const nx = stopy[i + 1]; if(nx && nx.najpWyjPrzed != null){ const doK = nx.najpWyjPrzed - p.przerwa; st.najdluzej = doK - st.pocz; st.wyjNajp = doK; } });
-    const najpWyjazd = stopy.length && stopy[0].najpWyjPrzed != null ? stopy[0].najpWyjPrzed : null;
-    let powrot = null; if(p.kon === 'powrot'){ const a = t[n - 1]; zeg += M.s[a][0] / 60; powrot = {m:M.d[a][0], s:M.s[a][0], przy:zeg}; }
-    const grpZle = lista.some(f => trRanga(f) != null);
-    p.wynik = {kol:stopy.map(s => s.id), stopy, powrot, najpWyjazd, sp:h.sp, zGodz, start:[+start[0].toFixed(6), +start[1].toFixed(6)], startN, odj:p.odj, m:po.m, s:po.s, przed, prosta:M.prosta, przerwa:p.przerwa, bio:grpZle, t:Date.now(), koniecZeg:zeg};
-    trSet(d); opFeat('trasa');
-    // przebieg po drogach na mapę
-    try { const pts = [start].concat(stopy.map(s => [s.la, s.lo]), powrot ? [start] : []);
-      if(pts.length >= 2 && pts.length <= 100){ const r = await fetch(TR_OSRM + 'route/v1/driving/' + pts.map(q => q[1].toFixed(6) + ',' + q[0].toFixed(6)).join(';') + '?overview=full&geometries=geojson').then(r => r.json());
-        if(r.code === 'Ok'){ let c = r.routes[0].geometry.coordinates.map(q => [+q[1].toFixed(5), +q[0].toFixed(5)]); if(c.length > 3000) c = c.filter((_, i) => i % Math.ceil(c.length / 3000) === 0 || i === c.length - 1);
-          const d2 = trGet(); if(d2.plan.wynik && d2.plan.wynik.t === p.wynik.t){ d2.plan.wynik.geo = c; trSet(d2); } } } } catch(e){}
-    trWynikUI(); trRysujFermy();
-    const w = trGet().plan.wynik; if(trMap){ const b = L.latLngBounds([w.start].concat(w.stopy.map(s => [s.la, s.lo]))); trMap.fitBounds(b, {padding:[30, 30], maxZoom:15}); }
-    $('tr-wynik').scrollIntoView({behavior:'smooth', block:'start'});
-  } finally { btn.disabled = false; btn.textContent = 'Ułóż trasę'; }
+    t = zGodz ? trZGodzinami(M, info, rg, odj0, przerwa, powrotOK, iE) : trKomiwojazer(K, rg);
+  }
+  // harmonogram: przyjazd, czekanie do umówionej godziny, wyjazd
+  const h = trHarm(t, M, info, odj0, przerwa); let zeg = h.kon;
+  const wez = i => i === iE ? endF : W[i - 1];
+  const stopy = h.H.map((x, i) => { const b = x.b, a = t[i], f = wez(b), o = info[b];
+    return {id:f.id, n:f.n, la:f.la, lo:f.lo, m:M.d[a][b], s:M.s[a][b], przy:x.przy, pocz:x.pocz, odj:x.odj, czas:o.czas, godz:o.godz != null ? o.godz : null, koniec:b === iE}; });
+  // najpóźniejsze godziny (od końca): rozpoczęcie na fermie i wyjazd z poprzedniego punktu, żeby zdążyć na wszystkie umówione godziny
+  let Lnast = Infinity;
+  for(let i = stopy.length - 1; i >= 0; i--){ const s = stopy[i];
+    const Lp = Math.min(s.godz != null ? s.godz : Infinity, Lnast);
+    s.najpPocz = Lp; s.najpWyjPrzed = isFinite(Lp) ? Lp - s.s / 60 : null;
+    Lnast = isFinite(Lp) ? Lp - s.s / 60 - (i > 0 ? przerwa : 0) - (i > 0 ? stopy[i - 1].czas : 0) : Infinity; }
+  // ile najdłużej można zostać na fermie, żeby zdążyć dalej
+  stopy.forEach((s, i) => { const nx = stopy[i + 1]; if(nx && nx.najpWyjPrzed != null){ const doK = nx.najpWyjPrzed - przerwa; s.najdluzej = doK - s.pocz; s.wyjNajp = doK; } });
+  if(!st && stopy[0]) stopy[0].najpWyjPrzed = null;   // bez startu nie wiadomo, kiedy wyjechać do pierwszej fermy
+  const jedz = powrotOK ? n : n - 1;
+  const sumy = kol => { let m = 0, s = 0; for(let i = 0; i < jedz; i++){ const a = kol[i], b = kol[(i + 1) % n]; m += M.d[a][b]; s += M.s[a][b]; } return {m, s}; };
+  const po = sumy(t), przed = opt ? sumy(reczna) : null;
+  let powrot = null; if(powrotOK){ const a = t[n - 1]; zeg += M.s[a][0] / 60; powrot = {m:M.d[a][0], s:M.s[a][0], przy:zeg}; }
+  // zapis – tylko gdy w międzyczasie nic się nie zmieniło
+  const d2 = trGet(), p2 = d2.plan;
+  if(opt){ if(trKlucz(d2, true) !== k0b || p2.kol.slice().sort().join(',') !== ids0){ toast('Trasa zmieniła się w trakcie liczenia – stuknij „Optymalizuj” jeszcze raz.'); return null; }
+    p2.kol = t.slice(1).filter(i => i !== iE).map(i => W[i - 1].id); }
+  else if(trKlucz(d2) !== k0) return null;
+  const w = {kol:stopy.map(s => s.id), stopy, powrot, najpWyjazd:st && stopy.length && stopy[0].najpWyjPrzed != null ? stopy[0].najpWyjPrzed : null, sp:h.sp, zGodz,
+    start:[+start[0].toFixed(6), +start[1].toFixed(6)], startN:st ? st.n : '', bezStartu:!st, odj:p.odj, m:po.m, s:po.s, przed, opt:!!opt, prosta:M.prosta, przerwa, t:Date.now(), koniecZeg:zeg};
+  p2.wynik = w; w.klucz = trKlucz(d2); trSet(d2);
+  if(opt) opFeat('trasa');
+  trPlanUI(); trRysujFermy(); trGeo(w);
+  return w;
 }
-// link Google Maps z punktami pośrednimi (do 9 na odcinek – dłuższa trasa w kilku częściach)
-function trLinki(w){
-  const pts = [w.start].concat(w.stopy.map(s => [s.la, s.lo]), w.powrot ? [w.start] : []), L2 = [], k = (q) => q[0].toFixed(6) + ',' + q[1].toFixed(6);
-  for(let i = 0; i < pts.length - 1; i += 9){ const cz = pts.slice(i, i + 10);
-    L2.push('https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=' + k(cz[0]) + '&destination=' + k(cz[cz.length - 1]) + (cz.length > 2 ? '&waypoints=' + cz.slice(1, -1).map(k).join('%7C') : '')); }
+// przebieg po drogach na mapę (w tle)
+async function trGeo(w){
+  try { const pts = (w.bezStartu ? [] : [w.start]).concat(w.stopy.map(s => [s.la, s.lo]), w.powrot ? [w.start] : []);
+    if(pts.length < 2 || pts.length > 100) return;
+    const r = await fetch(TR_OSRM + 'route/v1/driving/' + pts.map(q => q[1].toFixed(6) + ',' + q[0].toFixed(6)).join(';') + '?overview=full&geometries=geojson').then(r => r.json());
+    if(r.code !== 'Ok') return;
+    let c = r.routes[0].geometry.coordinates.map(q => [+q[1].toFixed(5), +q[0].toFixed(5)]); if(c.length > 3000) c = c.filter((_, i) => i % Math.ceil(c.length / 3000) === 0 || i === c.length - 1);
+    const d = trGet(); if(d.plan.wynik && d.plan.wynik.t === w.t){ d.plan.wynik.geo = c; trSet(d); trRysujFermy(); }
+  } catch(e){}
+}
+async function trOptymalizuj(){
+  const d = trGet(), {lista} = trPunkty(d);
+  if(!lista.length){ toast('Najpierw dodaj fermy do trasy.'); return; }
+  const b = $('tr-opt'), nb = $('tr-nav'), html = b.innerHTML;
+  trZajety = true; clearTimeout(trTimer); b.disabled = nb.disabled = true;
+  b.innerHTML = TR_IK.opt + (d.plan.start === 'gps' && !trGps ? ' Ustalam pozycję…' : ' Optymalizuję…');
+  try { const w = await trPrzelicz(true, true);
+    if(w){ toast(w.przed && w.przed.s - w.s > 60 ? 'Trasa zoptymalizowana – oszczędność ' + trCz(w.przed.s - w.s) + '.' : 'Trasa zoptymalizowana.');
+      if(trMap){ const bb = L.latLngBounds((w.bezStartu ? [] : [w.start]).concat(w.stopy.map(s => [s.la, s.lo]))); trMap.fitBounds(bb, {padding:[30, 30], maxZoom:15}); } }
+  } finally { trZajety = false; b.disabled = nb.disabled = false; b.innerHTML = html; }
+}
+// linki Google Maps w kolejności z listy: do 9 punktów pośrednich na odcinek; start z GPS – bez „origin” (Google bierze bieżącą pozycję)
+function trLinkiNav(d){
+  const p = d.plan, {lista, endF} = trPunkty(d), k = q => q[0].toFixed(6) + ',' + q[1].toFixed(6);
+  const sF = p.start !== 'gps' ? trF(d, p.start) : null, start = sF ? [sF.la, sF.lo] : null;
+  const pts = lista.map(f => [f.la, f.lo]).concat(endF ? [[endF.la, endF.lo]] : []);
+  if(p.kon === 'powrot'){ if(start) pts.push(start); else if(trGps) pts.push([trGps.la, trGps.lo]); }
+  const L2 = []; let org = start;
+  for(let i = 0; i < pts.length; ){ const cz = pts.slice(i, i + 10), cel = cz[cz.length - 1], wp = cz.slice(0, -1);
+    L2.push('https://www.google.com/maps/dir/?api=1&travelmode=driving' + (org ? '&origin=' + k(org) : '') + '&destination=' + k(cel) + (wp.length ? '&waypoints=' + wp.map(k).join('%7C') : ''));
+    org = cel; i += cz.length; }
   return L2;
+}
+function trNawiguj(){
+  const d = trGet(), {lista, endF} = trPunkty(d), box = $('tr-navparts');
+  if(!lista.length && !endF){ toast('Najpierw dodaj fermy do trasy.'); return; }
+  const L2 = trLinkiNav(d); opFeat('trasa');
+  if(L2.length === 1){ box.hidden = true; const a = document.createElement('a'); a.href = L2[0]; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); return; }
+  box.hidden = false;
+  box.innerHTML = `<p class="note">Google Maps przyjmuje do 9 punktów pośrednich naraz – nawigacja jest w ${L2.length} częściach. Po dojechaniu do końca części otwórz następną.</p><div class="tools">${L2.map((u, i) => `<a class="btn small" href="${u}" target="_blank" rel="noopener">Nawiguj – część ${i + 1}</a>`).join('')}</div>`;
+  box.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+// zmiana trasy: zapis, odświeżenie listy, bazy i mapy; godziny przeliczają się same (trPlanUI)
+function trZmien(fn){ const d = trGet(); if(fn(d.plan, d) === false) return; trSet(d); $('tr-navparts').hidden = true; trPlanUI(); trListaFerm(); trRysujFermy(); }
+function trTrasaTog(id){
+  const d0 = trGet(), f = trF(d0, id); if(!f) return;
+  if(d0.plan.start === id || d0.plan.kon === id){ toast('„' + f.n + '” jest ' + (d0.plan.start === id ? 'startem' : 'końcem') + ' trasy.'); return; }
+  const bylo = d0.plan.kol.includes(id);
+  trZmien(p => { if(bylo){ p.kol = p.kol.filter(x => x !== id); delete p.godz[id]; } else p.kol.push(id); });
+  toast(bylo ? 'Usunięto z trasy: ' + f.n + '.' : 'Dodano do trasy: ' + f.n + ' (' + trGet().plan.kol.length + '. na liście).');
+}
+// przeciąganie za uchwyt (palec albo mysz) i strzałki na klawiaturze.
+// Przeciągany wiersz zostaje w drzewie DOM (przestawiane są sąsiednie wiersze) – inaczej przeglądarka zrywa „przechwycenie” palca.
+let trCiagnie = false;
+function trDrag(){
+  const ol = $('tr-lista');
+  ol.addEventListener('pointerdown', e => {
+    const h = e.target.closest('.tr-h'); if(!h || trZajety || trCiagnie || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    const li = h.closest('li.tr-st'); if(!li) return;
+    e.preventDefault();
+    const items = () => [...ol.querySelectorAll('li.tr-st')], przed = items().map(x => x.dataset.id).join(','), pid = e.pointerId;
+    let base = e.clientY + window.scrollY, ostY = e.clientY, raf = 0;
+    trCiagnie = true; li.classList.add('drag'); ol.classList.add('dragging');
+    const gora = (document.querySelector('.appbar') ? document.querySelector('.appbar').getBoundingClientRect().bottom : 0) + 56;
+    const srodek = el => { const r = el.getBoundingClientRect(); return r.top + window.scrollY + r.height / 2; };
+    const przestaw = () => {
+      const y = ostY + window.scrollY, L = items(), i = L.indexOf(li), prev = L[i - 1], next = L[i + 1];
+      if(next && y > srodek(next)){ const t0 = li.offsetTop; li.before(next); base += li.offsetTop - t0; }
+      else if(prev && y < srodek(prev)){ const t0 = li.offsetTop; li.after(prev); base += li.offsetTop - t0; }
+      li.style.transform = 'translateY(' + (y - base) + 'px)';
+    };
+    // palec przy górnej (pod paskiem zakładek) albo dolnej krawędzi ekranu – lista przewija się sama
+    const krok = () => { const v = ostY < gora ? -Math.min(18, (gora - ostY) / 3 + 4) : ostY > innerHeight - 56 ? Math.min(18, (ostY - innerHeight + 56) / 3 + 4) : 0;
+      if(v){ window.scrollBy(0, v); przestaw(); } raf = requestAnimationFrame(krok); };
+    raf = requestAnimationFrame(krok);
+    const mv = ev => { if(ev.pointerId !== pid) return; ev.preventDefault(); ostY = ev.clientY; przestaw(); };
+    const up = ev => { if(ev.pointerId !== pid) return; cancelAnimationFrame(raf);
+      window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up);
+      li.style.transform = ''; li.classList.remove('drag'); ol.classList.remove('dragging'); trCiagnie = false;
+      const kol = items().map(x => x.dataset.id);
+      if(kol.join(',') !== przed) trZmien(p => { p.kol = kol.concat(p.kol.filter(id => !kol.includes(id))); });
+      else trPlanUI();
+    };
+    window.addEventListener('pointermove', mv, {passive:false}); window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+  });
+  ol.addEventListener('keydown', e => {
+    const h = e.target.closest('.tr-h'); if(!h || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
+    e.preventDefault(); const id = h.closest('li').dataset.id;
+    trZmien(p => { const i = p.kol.indexOf(id), j = i + (e.key === 'ArrowUp' ? -1 : 1); if(i < 0 || j < 0 || j >= p.kol.length) return false; [p.kol[i], p.kol[j]] = [p.kol[j], p.kol[i]]; });
+    const b = ol.querySelector(`li[data-id="${id}"] .tr-h`); if(b) b.focus();
+  });
 }
 function trGodzOpis(s){
   const o = [];
@@ -6114,27 +6387,10 @@ function trGodzOpis(s){
       : `<span class="tr-t ok">umówione na ${trHM(s.godz)}${roz < -1 ? ' – będziesz ' + trCz(-roz * 60) + ' wcześniej' : ' – na czas'}</span>`);
     if(s.najpWyjPrzed != null) o.push(`<span class="tr-t">wyjedź z poprzedniego punktu najpóźniej o ${trHM(s.najpWyjPrzed)}</span>`); }
   if(s.najdluzej != null && isFinite(s.najdluzej) && s.czas){ o.push(s.najdluzej >= s.czas - 0.5
-      ? `<span class="tr-t">możesz zostać do ${trHM(s.wyjNajp)} (najdłużej ${trCz(Math.max(0, s.najdluzej) * 60)}) i zdążyć dalej</span>`
+      ? `<span class="tr-t">możesz zostać do ${trHM(s.wyjNajp)} i zdążyć dalej</span>`
       : `<span class="tr-t bad">żeby zdążyć dalej, zostań najwyżej ${trCz(Math.max(0, s.najdluzej) * 60)} – wyjedź o ${trHM(s.wyjNajp)}</span>`); }
   return o.join('');
 }
-function trWynikUI(){
-  const w = trGet().plan.wynik, box = $('tr-wynik');
-  if(!w){ box.hidden = true; return; }
-  box.hidden = false;
-  const zysk = w.przed && w.przed.s - w.s > 60 ? `<span class="note"> · oszczędność ${trCz(w.przed.s - w.s)} i ${trKm(Math.max(0, w.przed.m - w.m))} wobec kolejności z listy</span>` : '';
-  const linki = trLinki(w);
-  box.innerHTML = `<div class="card-h"><h3>Trasa: ${w.stopy.length} ${w.stopy.length === 1 ? 'ferma' : 'ferm'}</h3><span class="mono">${trKm(w.m)} · ${trCz(w.s)} jazdy</span></div>
-    ${w.zGodz ? (w.sp > 0.5 ? `<p class="tr-alert bad"><b>Nie zdążysz na wszystkie umówione godziny</b> – spóźnienie łącznie ok. ${trCz(w.sp * 60)}. Wyjedź wcześniej, skróć czas na fermach albo zmień godzinę.</p>`
-      : `<p class="tr-alert ok">Zdążysz na wszystkie umówione godziny.${w.najpWyjazd != null ? ` Wyjedź najpóźniej o <b>${trHM(w.najpWyjazd)}</b>.` : ''}</p>`) : ''}
-    <p class="note">Start ${esc(w.startN)} o ${esc(w.odj)} · koniec ok. ${trHM(w.koniecZeg)}${zysk}${w.prosta ? '<br><b>Bez połączenia z serwerem tras – odległości w linii prostej ×1,3, czasy orientacyjne.</b>' : ''}${w.bio ? '<br>Bioasekuracja zachowana: najpierw stada najmłodsze, potem starsze, chore na końcu.' : ''}</p>
-    <ol class="tr-stopy">${w.stopy.map((s, i) => `<li><div><b>${esc(s.n)}</b>${s.koniec ? ' <span class="pill">koniec</span>' : ''}${s.bio ? `<span class="note tr-bion">${esc(s.bio)}</span>` : ''}<span class="note">przyjazd ${trHM(s.przy)}${s.czas ? ' · wyjazd ' + trHM(s.odj) : ''} · ${trKm(s.m)}, ${trCz(s.s)} jazdy</span>${trGodzOpis(s)}</div>
-      <a class="btn small ghost" href="${trNav(s.la, s.lo)}" target="_blank" rel="noopener">Nawiguj</a></li>`).join('')}
-      ${w.powrot ? `<li class="pow"><div><b>Powrót: ${esc(w.startN)}</b><span class="note">ok. ${trHM(w.powrot.przy)} · ${trKm(w.powrot.m)}, ${trCz(w.powrot.s)} jazdy</span></div></li>` : ''}</ol>
-    <div class="tools">${linki.map((u, i) => `<a class="btn small" href="${u}" target="_blank" rel="noopener">${linki.length > 1 ? 'Google Maps – część ' + (i + 1) : 'Cała trasa w Google Maps'}</a>`).join('')}</div>
-    <p class="note">Przerwa między fermami (przebranie, dezynfekcja): ${w.przerwa} min. Trasy liczone po drogach (OSRM, dane OpenStreetMap) – czas przejazdu bez korków.</p>`;
-}
-
 /* ---------- zakładka ---------- */
 async function renderTrasa(){
   trListaFerm(); trPlanUI();
@@ -6155,22 +6411,33 @@ document.addEventListener('DOMContentLoaded', () => {
   $('tr-szukaj').onclick = trSzukaj;
   $('tr-q').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); trSzukaj(); } });
   $('tr-lay').addEventListener('click', e => { const b = e.target.closest('button'); if(b) trWarstwa(b.dataset.l === 'orto'); });
-  $('tr-go').onclick = trUluz;
-  ['tr-start', 'tr-kon', 'tr-odj', 'tr-przerwa'].forEach(id => $(id).addEventListener('change', trPlanZapisz));
-  $('tr-sel').addEventListener('change', trPlanZapisz);
+  $('tr-opt').onclick = trOptymalizuj; $('tr-nav').onclick = trNawiguj;
+  $('tr-dodaj').addEventListener('change', e => { const id = e.target.value; e.target.value = ''; if(id) trTrasaTog(id); });
+  $('tr-przerwa').addEventListener('change', e => trZmien(p => { p.przerwa = Math.max(0, +e.target.value || 0); }));
+  $('tr-lista').addEventListener('change', e => { const t = e.target;
+    if(t.id === 'tr-start') trZmien(p => { p.start = t.value; });
+    else if(t.id === 'tr-kon') trZmien(p => { p.kon = t.value; });
+    else if(t.id === 'tr-odj') trZmien(p => { p.odj = t.value || '07:00'; });
+    else if(t.dataset.godz) trZmien(p => { if(t.value) p.godz[t.dataset.godz] = t.value; else delete p.godz[t.dataset.godz]; }); });
+  $('tr-baza').addEventListener('toggle', () => { const det = $('tr-baza'); if(det.dataset.auto) delete det.dataset.auto; else trBazaOtw = det.open; $('tr-baza-t').textContent = det.open ? 'zwiń' : 'pokaż'; });
+  $('tr-filtr').addEventListener('input', trFiltr);
+  trDrag();
   $('v-trasa').addEventListener('click', e => {
     const b = e.target.closest('[data-tr]'); if(!b) return;
-    const a = b.dataset.tr, row = b.closest('.tr-f'), id = row && row.dataset.id, d = trGet(), f = id && d.fermy.find(x => x.id === id);
+    const a = b.dataset.tr, row = b.closest('.tr-f'), id = b.dataset.id || (row && row.dataset.id), d = trGet(), f = id && trF(d, id);
     if(a === 'nowa') trForm(null);
     else if(a === 'zapisz') trZapiszForm(b.dataset.id);
     else if(a === 'form-x') $('tr-form').hidden = true;
+    else if((a === 'tog' || a === 'zdejmij') && f) trTrasaTog(f.id);
+    else if(a === 'gps') trPrzelicz(false, true).then(w => { if(w && w.bezStartu) toast('Nie udało się ustalić Twojej pozycji (GPS wyłączony albo brak zgody).', 5000); });
+    else if(a === 'wyczysc'){ if(!confirm('Wyczyścić trasę na dziś? Fermy zostaną w bazie.')) return; trZmien(p => { p.kol = []; p.godz = {}; delete p.wynik; }); }
     else if(a === 'pokaz' && f) trPokaz(f.id);
     else if(a === 'edytuj' && f) trForm(f);
     else if(a === 'punkt' && f){ trEdit = f.id; trRysujFermy(); if(trMap){ trMap.setView([f.la, f.lo], 18); trWarstwa(true); trWskaz(f.la, f.lo, false, f.adr || f.n); $('tr-map').scrollIntoView({behavior:'smooth', block:'center'}); } }
     else if(a === 'punkt-ok'){ const g = d.fermy.find(x => x.id === trEdit); if(g && trPickData){ g.la = +trPickData.la.toFixed(6); g.lo = +trPickData.lo.toFixed(6); delete d.plan.wynik; trSet(d); toast('Zapisano nowy punkt fermy „' + g.n + '”.'); }
       trEdit = null; trPickData = null; if(trPick){ trMap.removeLayer(trPick); trPick = null; } trKarta(); renderTrasa(); }
     else if(a === 'punkt-anuluj'){ trEdit = null; trPickData = null; if(trPick){ trMap.removeLayer(trPick); trPick = null; } trKarta(); trRysujFermy(); }
-    else if(a === 'usun' && f){ if(!confirm('Usunąć fermę „' + f.n + '” z bazy adresów?')) return; d.fermy = d.fermy.filter(x => x.id !== f.id); delete d.plan.wynik; trSet(d); renderTrasa(); }
+    else if(a === 'usun' && f){ if(!confirm('Usunąć fermę „' + f.n + '” z bazy adresów?')) return; d.fermy = d.fermy.filter(x => x.id !== f.id); d.plan.kol = d.plan.kol.filter(x => x !== f.id); delete d.plan.wynik; trSet(d); renderTrasa(); }
   });
 });
 

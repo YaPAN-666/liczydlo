@@ -1,8 +1,9 @@
 {
- "wersja": "2.0.2",
- "data": "2026-11-26",
+ "wersja": "2.1.0",
+ "data": "2026-11-27",
  "zmiany": [
-  "Wiedza z „Sygnałów kur nieśnych”: dobowe zużycie wody przez młode kury i nioski (20 °C i upał) przy szczepieniu przez wodę, wydatek smoczków, przepłukanie linii, sitko i filtry opryskiwacza, ocena reakcji poszczepiennej, kontrola przeciwciał 4–6 tyg. po szczepieniu i ostrzeżenie przed zbyt głębokim wkłuciem w mięsień piersiowy.",
+  "Trasa przebudowana: na górze lista „Trasa na dziś” – fermy dodajesz z listy albo z mapy, kolejność zmieniasz ręcznie, przeciągając za uchwyt. Przycisk „Optymalizuj” ułoży kolejność najkrócej (z bioasekuracją i umówionymi godzinami), „Nawiguj” prowadzi w Mapach Google w kolejności z listy. Baza ferm zwija się, gdy wpisów jest więcej, a pole „na godz.” mieści się w jednej linii. Zakładki w nowej kolejności, a strzałki przy krawędziach pokazują, że po prawej jest więcej.",
+  "(2.0.2) Wiedza z „Sygnałów kur nieśnych”: dobowe zużycie wody przez młode kury i nioski (20 °C i upał) przy szczepieniu przez wodę, wydatek smoczków, przepłukanie linii, sitko i filtry opryskiwacza, ocena reakcji poszczepiennej, kontrola przeciwciał 4–6 tyg. po szczepieniu i ostrzeżenie przed zbyt głębokim wkłuciem w mięsień piersiowy.",
   "(2.0.1) Stuknij nazwę albo logo u góry – kod QR aplikacji na cały ekran oraz „Udostępnij aplikację” i „Kopiuj link”.",
   "(2.0.0) Liczydło WET 2.0 – ogłoszenie na pełnym ekranie z animacją: słowo od autora, najważniejsze możliwości i pełna lista zmian. Później można je otworzyć w „O aplikacji”.",
   "(1.46.1) Ochrona danych: aplikacja od startu prosi przeglądarkę o pamięć trwałą (dane nie są czyszczone przy braku miejsca), niedokończone obliczenie z notatkami nie znika już po 24 h, a kopia obejmuje wszystko – raporty, program, fermy i adresy z Trasy, kurniki, sprzęt. Stan ochrony widać w „O aplikacji”.",

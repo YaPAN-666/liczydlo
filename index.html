@@ -767,10 +767,10 @@ body.oglOtw{overflow:hidden}
 <div class="gate who" id="who" role="dialog" aria-modal="true" aria-labelledby="who-h" hidden>
   <form class="gate-in" id="who-form" novalidate>
     <svg class="gate-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    <h2 id="who-h">Nazwa użytkownika</h2>
-    <p>Przed pierwszym użyciem wpisz nazwę użytkownika. Zostanie przypisana do tej kopii aplikacji na tym urządzeniu – służy do obsługi licencji i udostępnień.</p>
-    <label>Nazwa użytkownika (wymagana)
-      <input id="who-name" type="text" autocomplete="name" maxlength="60" enterkeyhint="done" placeholder="np. Jan Kowalski – firma X" required></label>
+    <h2 id="who-h">Kto korzysta z aplikacji?</h2>
+    <p>Wpisz imię i nazwisko albo nazwę użytkownika. <b>To jedyny warunek uzyskania bezpłatnego dostępu do aplikacji.</b> Nazwa zostanie przypisana do tej kopii aplikacji na tym urządzeniu.</p>
+    <label>Imię i nazwisko lub nazwa użytkownika (wymagane)
+      <input id="who-name" type="text" autocomplete="name" maxlength="60" enterkeyhint="done" placeholder="np. Jan Kowalski" required></label>
     <span class="note err" id="who-err" role="alert"></span>
     <button class="btn" type="submit" id="who-ok">Zapisz i rozpocznij</button>
     <p class="note">Nazwę później może zmienić tylko administrator aplikacji.</p>
@@ -2519,7 +2519,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.1.1';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -4873,7 +4873,7 @@ function whoInit(){
   $('who-form').addEventListener('submit', ev => {
     ev.preventDefault();
     const n = $('who-name').value.replace(/\s+/g, ' ').trim();
-    if(n.length < 2 || !/\p{L}/u.test(n)){ $('who-err').textContent = 'Wpisz nazwę użytkownika (co najmniej 2 znaki, w tym litery).'; $('who-name').focus(); return; }
+    if(n.length < 2 || !/\p{L}/u.test(n)){ $('who-err').textContent = 'Bez imienia i nazwiska lub nazwy nie można przejść dalej – wpisz co najmniej 2 znaki, w tym litery.'; $('who-name').focus(); return; }
     lsSet(USER_KEY, {name:n.slice(0, 60), at:new Date().toISOString(), sent:false});
     box.hidden = true; userPaint(); toast(`Witaj, ${n}!`);
     if(typeof opSync === 'function') opSync(true).catch(() => {});

@@ -2265,10 +2265,13 @@ const VMD_VK18 = [[2,235],[3,216],[4,203],[6,188]];
 // Wydatek TX-VS2 wg katalogu TeeJet 52 (wyd. metryczne, s. 81) [bar, l/min]; klasa kropli „bardzo drobna” w całym zakresie, bez µm.
 const TXVS2_TEEJET = [[2,0.110],[3,0.131],[4,0.148],[5,0.164],[6,0.177]];
 const VMD_VS2 = [[2,114],[3,106]];
-// TX-VK8 (szara) – instrukcja Ceva Desvac ELEC KIT (UM 02.16, 10.2020): 173 µm i 0,44 l/min przy 2 bar, „szczepienie pierwotne ND”.
-// Dane tylko dla 2 bar (Ceva zaleca szczepić zawsze przy 2 bar); wydatek przy innym ciśnieniu – przeliczenie z pierwiastka ciśnienia.
-const TXVK8_CEVA = [[2,0.44]];
-const VMD_VK8 = [[2,173],[2,173]];
+// TX-VK8 (szara): TeeJet 0,133 gpm przy 40 psi = 1,33 × TX-VK6, więc wydatek w 2–6 bar to tabela TX-VK6 × 1,33 [bar, l/min];
+// przy 2 bar 0,44 l/min – zgodnie z instrukcją Ceva Desvac ELEC KIT (UM 02.16, 10.2020): 173 µm i 0,44 l/min, „szczepienie pierwotne ND”.
+const TXVK8_TEEJET = [[2,0.436],[3,0.524],[4,0.597],[5,0.661],[6,0.719]];
+// VMD TX-VK8 [bar, µm]: 2 bar – pomiar Ceva (173 µm). 3–6 bar – SZACUNEK: 173 µm × średni spadek kropli z ciśnieniem
+// dysz sąsiednich (TX-VK6 i TX-VK18, karta MSD/Birchmeier i TeeJet: 3 bar 0,93; 4 bar 0,86; 6 bar 0,80) – oba przebiegi są prawie jednakowe.
+const VMD_VK8 = [[2,173],[3,161],[4,149],[6,138]];
+const VK8_SZAC_OD = 2;   // powyżej 2 bar kropla TX-VK8 jest szacowana
 const VS2_D = [106,114];
 const VS2_TXT = 'dysza TX-VS2 (biała) do opryskiwacza Birchmeier daje ok. 106–114 µm przy 2–3 bar – też za grubo';
 const DISEASES = {'ND':'Rzekomy pomór drobiu (ND)','IB':'Zakaźne zapalenie oskrzeli (IB)','IBD':'Choroba Gumboro (IBD)','aMPV':'Metapneumowirus – TRT/SHS','Marek':'Choroba Mareka','HPAI':'Grypa ptaków – wysoce zjadliwa, podtyp H5 (HPAI)','ILT':'Zakaźne zapalenie krtani i tchawicy (ILT)','AE':'Zakaźne zapalenie mózgu i rdzenia (AE)','CAV':'Zakaźna anemia kurcząt (CAV)','EDS':'Zespół spadku nieśności (EDS)','Reo':'Reowirusy','Salmonella':'Salmonelloza','E. coli':'Kolibakterioza (E. coli)','Pasteurella':'Cholera drobiu (pasterelloza)','ORT':'ORT (Ornithobacterium)','MG':'Mykoplazmoza (MG)','MS':'Mykoplazmoza – M. synoviae (MS)','HE':'Krwotoczne zapalenie jelit indyków (HE)','PMV3':'Paramyksowiroza ptaków typu 3 (PMV3)','POX':'Ospa drobiu','Derzsy':'Choroba Derzsy’ego – parwowiroza gęsi (GPV)','MDPV':'Parwowiroza kaczek piżmowych (MDPV)','Kokcydioza':'Kokcydioza','inne':'Inne'};
@@ -2519,7 +2522,7 @@ function applyTheme(m){
 }
 function cycleTheme(){ const k = Object.keys(THEMES), cur = (lsGet(THEME_KEY) || 'auto'), m = k[(k.indexOf(cur) + 1) % k.length]; lsSet(THEME_KEY, m); applyTheme(m); opFeat('motyw'); toast(`Motyw: ${THEMES[m]}.`); }
 applyTheme(lsGet(THEME_KEY));
-const APP_VERSION = '2.1.1';
+const APP_VERSION = '2.1.2';
 const DATA_DATE = '22.11.2026';
 // Producent w filtrze szczepionek – jedna nazwa na firmę (Ceva-Phylaxia → Ceva, Lohmann → Elanco)
 const MFR = [[/^MSD|Intervet/i, 'MSD Animal Health'], [/^Boehringer/i, 'Boehringer Ingelheim'], [/^Ceva/i, 'Ceva'], [/^Zoetis/i, 'Zoetis'], [/Elanco|Lohmann/i, 'Elanco'], [/Hipra/i, 'Hipra'], [/Calier/i, 'Calier'], [/^Phibro/i, 'Phibro'], [/^Fatro/i, 'Fatro'], [/^Huvepharma/i, 'Huvepharma'], [/^IZO/i, 'IZO / Genera'], [/laboratorium/i, 'autogenne (laboratorium)']];
@@ -2542,13 +2545,13 @@ function flowTab(tab, p){
 // katalog Birchmeiera nie podaje TX-VK18.
 const NOZ = {
   vk6:  {mesh:50, n:'TX-VK6',  teejet:TXVK6_TEEJET,  vmd:VMD_TEEJET, h:'zalecana przez Birchmeiera do szczepienia drobiu'},
-  vk8:  {mesh:50, n:'TX-VK8',  teejet:TXVK8_CEVA,   vmd:VMD_VK8,    h:'szara: ok. 173 µm i 0,44 l/min przy 2 bar (instrukcja Ceva Desvac) – między TX-VK6 a TX-VK18; dane tylko dla 2 bar'},
+  vk8:  {mesh:50, n:'TX-VK8',  teejet:TXVK8_TEEJET, vmd:VMD_VK8,    h:'szara: 0,44–0,72 l/min przy 2–6 bar (TeeJet), kropla 173 µm przy 2 bar (Ceva Desvac), wyżej szacunek ok. 160–140 µm – między TX-VK6 a TX-VK18'},
   vk18: {mesh:50, n:'TX-VK18', teejet:TXVK18_TEEJET, vmd:VMD_VK18,   h:'ok. 3 razy większy wydatek i grubsza kropla niż TX-VK6'},
   vs2:  {mesh:100, n:'TX-VS2',  teejet:TXVS2_TEEJET,  vmd:VMD_VS2,    h:'biała: drobniejsza kropla (106–114 µm przy 2–3 bar) i 3 razy mniejszy wydatek niż TX-VK6'}
 };
 const NOZ_ORDER = ['vs2', 'vk6', 'vk8', 'vk18'];   // od najdrobniejszej kropli
 const FLOW_SRC = {
-  teejet: {n:'katalog TeeJet',     h:{vk6:'TeeJet: 0,33 l/min na jedną dyszę przy 2 bar (lanca z 2 dyszami – 0,65 l/min).', vk8:'Ceva Desvac: 0,44 l/min na jedną dyszę przy 2 bar (inne ciśnienia – przeliczenie).', vk18:'TeeJet: 0,97 l/min na jedną dyszę przy 2 bar.', vs2:'TeeJet: 0,11 l/min na jedną dyszę przy 2 bar (lanca z 2 dyszami – 0,22 l/min).'}},
+  teejet: {n:'katalog TeeJet',     h:{vk6:'TeeJet: 0,33 l/min na jedną dyszę przy 2 bar (lanca z 2 dyszami – 0,65 l/min).', vk8:'TeeJet: 0,44 l/min na jedną dyszę przy 2 bar (tyle samo podaje Ceva Desvac).', vk18:'TeeJet: 0,97 l/min na jedną dyszę przy 2 bar.', vs2:'TeeJet: 0,11 l/min na jedną dyszę przy 2 bar (lanca z 2 dyszami – 0,22 l/min).'}},
   reczne: {n:'pomiar własny',      h:{vk6:'Najpewniejsze: zbierz ciecz z jednej dyszy przez 60 s do cylindra.', vk8:'Najpewniejsze: zbierz ciecz z jednej dyszy przez 60 s do cylindra.', vk18:'Najpewniejsze: zbierz ciecz z jednej dyszy przez 60 s do cylindra.', vs2:'Najpewniejsze: zbierz ciecz z jednej dyszy przez 60 s do cylindra.'}}
 };
 // Opryskiwacze plecakowe Birchmeier „Accu-Power” – ulotka linii (12076802), karta REC 15 AC1 (12076702)
@@ -2786,7 +2789,7 @@ function dropState(v){
   const vAt = pp => est ? vmdEst(pp, q1 * Math.sqrt(pp / p), noz) : vmdAt(pp, noz);
   // Ciśnienia do sprawdzenia: z lancą do 6 bar (i do maks. opryskiwacza), z dmuchawą do 3 bar
   const PS = [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6].filter(pp => pp <= (mode === 'lanca' ? Math.min(6, SP.pMax || 6) : 3) + 1e-9);
-  const D = {sp, noz, NZ, p, mode, est, PS, vAt, vmd:p > 0 ? vAt(p) : null, win:sp.d || null, state:null, lvl:null, tip:''};
+  const D = {sp, noz, NZ, p, mode, est, szac:!est && noz === 'vk8' && p > VK8_SZAC_OD + 1e-9, PS, vAt, vmd:p > 0 ? vAt(p) : null, win:sp.d || null, state:null, lvl:null, tip:''};
   if(D.win && D.vmd){
     const [lo, hi] = D.win, vmd = D.vmd;
     if(isNum(lo) && vmd < lo){
@@ -2957,12 +2960,12 @@ function dropViz(v, D){
   }
   { const cc = dropCat(vmd); $('dv-cat').innerHTML = DROP_CAT.map(c => `<span class="${cc === c ? 'on' : ''}">${c.l}<i>${!isNum(c.d[0]) ? '< ' + c.d[1] : !isNum(c.d[1]) ? '> ' + c.d[0] : c.d[0] + '–' + c.d[1]} µm</i></span>`).join(''); }
   $('dv-mk').hidden = !vmd;
-  if(vmd){ $('dv-mk').style.left = dvX(vmd) + '%'; $('dv-v').textContent = `${D.est ? 'ok. ' : ''}${fmt0(vmd)} µm`; }
+  if(vmd){ $('dv-mk').style.left = dvX(vmd) + '%'; $('dv-v').textContent = `${D.est || D.szac ? 'ok. ' : ''}${fmt0(vmd)} µm`; }
   const okP = win ? D.PS.filter(pp => isNum(D.vAt(pp)) && inWin(win, D.vAt(pp))) : [];
   const st = !v ? (noVac() ? 'wybierz szczepionkę' : 'spoza bazy – bez widełek') : !(D.p > 0) ? 'wybierz ciśnienie' : !vmd ? `brak danych kropli przy ${fmtT(D.p)} bar`
     : D.state === 'ok' ? (D.sp.dAssumed ? '✓ w przyjętych widełkach' : '✓ w widełkach ChPLW') : D.state === 'coarse' ? `✗ za gruba o ${fmt0(vmd - win[1])} µm` : D.state === 'fine' ? `✗ za drobna o ${fmt0(win[0] - vmd)} µm` : mikro ? '! ChPLW: mikrokrople' : 'ChPLW nie podaje µm';
   $('dv-st').textContent = st;
-  $('dv-tip').textContent = !v ? 'Po wyborze szczepionki pokażę widełki kropli z jej ChPLW.' : !vmd ? (D.p > 0 ? (D.noz === 'vs2' ? 'Dla TX-VS2 są dane kropli tylko dla 2–3 bar (karta dysz MSD/Birchmeier).' : D.noz === 'vk8' ? 'Dla TX-VK8 wielkość kropli jest znana tylko przy 2 bar (instrukcja Ceva Desvac).' : 'Tabele kropli TeeJet obejmują 2–6 bar.') : '')
+  $('dv-tip').textContent = !v ? 'Po wyborze szczepionki pokażę widełki kropli z jej ChPLW.' : !vmd ? (D.p > 0 ? (D.noz === 'vs2' ? 'Dla TX-VS2 są dane kropli tylko dla 2–3 bar (karta dysz MSD/Birchmeier).' : 'Tabele kropli TeeJet obejmują 2–6 bar.') : '')
     : D.state === 'ok' ? (okP.length === D.PS.length ? `${D.NZ.n} mieści się w widełkach w całym zakresie ${dvRange(D.PS)} bar.` : `${D.NZ.n} mieści się w widełkach przy ${dvRange(okP)} bar.`)
     : D.state ? D.tip : mikro ? `${D.NZ.n} daje ok. ${fmt0(vmd)} µm – grubszą niż mikrokrople. Sposób podania ustal z lekarzem weterynarii.` : 'ChPLW nie podaje wielkości kropli – kropla tylko dla orientacji.';
   $('dv-leg').innerHTML = [win ? `<span><i class="sw w${D.sp.dAssumed ? ' a' : ''}"></i>${D.sp.dAssumed ? 'widełki przyjęte' : 'widełki ChPLW'} ${esc(fmtRange(win))} µm${rep ? ' – pierwotne' : ''}${D.sp.dAssumed ? ' (ChPLW nie podaje µm)' : ''}${!isNum(win[1]) ? ' – bez górnej granicy w ChPLW' : !isNum(win[0]) ? ' – bez dolnej granicy w ChPLW' : ''}</span>` : '',
@@ -3354,7 +3357,7 @@ function calc(){
     if(k > 1) tiles.push({k:'Czas zabiegu', v:fmtMin(tw), s:isNum(tw) ? `${k} ${plOsoba(k)} jednocześnie · ${C.n > 1 ? fmtMin(ts) + ' na sektor' : 'razem w jednym sektorze'}` : nTxt, cls:isNum(tw) ? '' : 't-need'});
     else tiles.push({k:'Czas oprysku', v:fmtMin(tw), s:!isNum(tw) ? nTxt : nsec > 1 ? `${nsec} ${plSektor(nsec)} po ${fmtMin(ts)}` : 'czysty czas natrysku', cls:isNum(tw) ? '' : 't-need'});
     tiles.push({k:'Przepływ – ' + nzT, v:isNum(Q) ? fmt(Q,3) + ' l/min' : '–', s:!(p > 0) ? 'wybierz ciśnienie' : (nn > 1 && isNum(q1) ? `${nn} × ${fmt(q1,3)} l/min · ` : '') + qsrc + (k > 1 ? ' · każdy opryskiwacz' : ''), cls:isNum(Q) ? '' : 't-need'});
-    if(DROP && v){ const W = DROP.win; tiles.push({k:'Kropla', v:isNum(DROP.vmd) ? `${DROP.est ? 'ok. ' : ''}${fmt0(DROP.vmd)} µm` : '–', cls:DROP.state === 'ok' ? 't-ok' : DROP.state ? 't-bad' : '',
+    if(DROP && v){ const W = DROP.win; tiles.push({k:'Kropla', v:isNum(DROP.vmd) ? `${DROP.est || DROP.szac ? 'ok. ' : ''}${fmt0(DROP.vmd)} µm` : '–', cls:DROP.state === 'ok' ? 't-ok' : DROP.state ? 't-bad' : '',
       s:W ? `widełki ChPLW ${fmtRange(W)} µm${DROP.state === 'ok' ? ' · w widełkach' : DROP.state === 'coarse' ? ' · za gruba' : DROP.state === 'fine' ? ' · za drobna' : ''}` : 'ChPLW nie podaje wielkości kropli'}); }
     if(k > 1){
       const L = C.persons.map(o => V * o.share), same = L.every(x => Math.abs(x - L[0]) < 0.005);
@@ -3394,8 +3397,8 @@ function calc(){
       if(mode !== 'lanca') msgs.push(['warn', 'TX-VS2 z dmuchawą AS 1200: karta dysz Birchmeiera do AS 1200 zaleca do szczepienia drobiu tylko TXVK-6 – szczep lancą albo załóż TX-VK6.']);
     }
     if(noz === 'vk8'){
-      msgs.push(['info', 'TX-VK8 (szara): ok. 173 µm i 0,44 l/min na dyszę przy 2 bar – Ceva (instrukcja Desvac ELEC KIT) podaje ją do szczepienia pierwotnego ND, a w niektórych warunkach także pierwotnego TRT. Wielkość kropli rozstrzyga ChPLW.']);
-      if(Math.abs(p - 2) > 1e-9) msgs.push(['warn', 'TX-VK8: wielkość kropli jest znana tylko przy 2 bar – przy innym ciśnieniu okna kropli z ChPLW nie da się sprawdzić. Ceva zaleca szczepić zawsze przy 2 bar.']);
+      msgs.push(['info', 'TX-VK8 (szara): ok. 173 µm i 0,44 l/min na dyszę przy 2 bar, przy 6 bar 0,72 l/min (TeeJet) – Ceva (instrukcja Desvac ELEC KIT) podaje ją do szczepienia pierwotnego ND, a w niektórych warunkach także pierwotnego TRT. Wielkość kropli rozstrzyga ChPLW.']);
+      if(p > VK8_SZAC_OD + 1e-9) msgs.push(['info', `TX-VK8 przy ${fmtT(p)} bar: kropla ok. ${fmt0(vmdAt(p, 'vk8'))} µm to szacunek – zmierzona jest tylko przy 2 bar (173 µm, Ceva). Wyżej przeliczona z tego, jak kropla drobnieje z ciśnieniem w dyszach TX-VK6 i TX-VK18 (karta dysz MSD/Birchmeier, TeeJet). Ceva zaleca szczepić przy 2 bar.`]);
       if(mode !== 'lanca') msgs.push(['warn', 'TX-VK8 z dmuchawą AS 1200: karta dysz Birchmeiera do AS 1200 zaleca do szczepienia drobiu tylko TXVK-6 – szczep lancą albo załóż TX-VK6.']);
     }
     if(noz === 'vk18'){

@@ -1,7 +1,7 @@
 /* Liczydło WET – service worker (praca bez internetu i aktualizacje)
    Przy każdej nowej wersji zmienia się VERSION – telefon pobiera wtedy nowe pliki
    i pokazuje pasek „Dostępna nowa wersja”. */
-const VERSION = '2.1.1';
+const VERSION = '2.1.2';
 const CACHE = 'liczydlo-app-' + VERSION;
 const FONTS = 'liczydlo-fonts';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png?v=2', './icons/icon-512.png?v=2', './icons/icon-maskable-512.png?v=2', './icons/apple-touch-icon.png?v=2'];

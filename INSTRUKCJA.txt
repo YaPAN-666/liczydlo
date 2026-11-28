@@ -1,4 +1,4 @@
-LICZYDŁO WET – wersja 2.1.2
+LICZYDŁO WET – wersja 2.1.3
 =====================================
 
 Zawartość folderu „liczydlo”:
